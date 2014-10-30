@@ -6,7 +6,10 @@
 	<groupId>swt14w30</groupId>
 	<artifactId>GeekShop</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modules>
+        <module>kleinerPrototyp</module>
+    </modules>
+    <packaging>pom</packaging>
 
 	<name>GeekShop</name>
 	<description>INTERN GeekShop</description>
