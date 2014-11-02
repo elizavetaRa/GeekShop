@@ -9,6 +9,7 @@
     <modules>
         <module>kleinerPrototyp</module>
         <module>Prototyp_Felix</module>
+        <module>Prototype_Elizaveta</module>
     </modules>
     <packaging>pom</packaging>
 
