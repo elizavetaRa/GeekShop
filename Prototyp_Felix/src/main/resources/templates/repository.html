@@ -29,9 +29,9 @@
                 <h3 th:text="${index} + '. ' + ${entry.artName}">1. Posting</h3>
             </div>
             <div class="panel-body">
-                <blockquote class="entryprice" th:text="${entry.artPrice}"></blockquote>
-                <blockquote class="entrydescription" th:text="${entry.artDescription}"></blockquote>
-                <blockquote class="entryquantity" th:text="${entry.artQuantity}"></blockquote>
+                <div class="entryprice" th:text="${entry.artPrice} + ' Euro'"></div>
+                <div class="entrydescription" th:text="${entry.artDescription}"></div>
+                <div class="entryquantity" th:text="${entry.artQuantity} + ' Stueck verfuegbar'"></div>
 
             </div>
         </div>

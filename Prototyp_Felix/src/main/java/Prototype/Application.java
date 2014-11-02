@@ -31,6 +31,11 @@ public class Application {
     @Autowired ArticleRepository articleRepository;
     @PostConstruct
     void initialize(){
-        articleRepository.save(new Article("Test", 23.1f, "Test", 5));
+        articleRepository.save(new Article("ARTIKEL-Name", 23.1f, "Dies ist eine Beschreibung fuer den Artiken", 5));
+        articleRepository.save(new Article("ARTIKEL-2", 1.2f, "Dies ist eine Beschreibung fuer den Artiken", 5));
+        articleRepository.save(new Article("ARTIKEL-test", 87654f, "Dies ist eine Beschreibung fuer den Artiken", 5));
+        articleRepository.save(new Article("Schluesselband", 1234.65f, "Dies ist eine Beschreibung fuer den Artiken", 5));
+        articleRepository.save(new Article("ARTIKEL-Name", 0f, "Dies ist eine Beschreibung fuer den Artiken", 5));
+        articleRepository.save(new Article("ARTIKEL-Name", 9876.54f, "Dies ist eine Beschreibung fuer den Artiken", 5));
     }
 }
