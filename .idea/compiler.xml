@@ -23,13 +23,13 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="Prototyp_Felix" />
-        <module name="Prototyp_Marcus" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="GeekShop" target="1.8" />
       <module name="kleinerPrototyp" target="1.8" />
       <module name="Prototyp_Felix" target="1.8" />
+      <module name="Prototype_Elizaveta" target="1.8" />
       <module name="Prototyp_Marcus" target="1.8" />
     </bytecodeTargetLevel>
   </component>
