@@ -12,6 +12,7 @@
         <module>Prototyp_Marcus</module>
         <module>Prototype_Elizaveta</module>
         <module>Prototype_Dominik</module>
+        <module>Prototype_Marcus</module>
     </modules>
     <packaging>pom</packaging>
 
