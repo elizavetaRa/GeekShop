@@ -8,6 +8,7 @@
 	<version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>kleinerPrototyp</module>
+        <module>Prototyp_Felix</module>
     </modules>
     <packaging>pom</packaging>
 
