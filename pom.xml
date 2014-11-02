@@ -6,7 +6,11 @@
 	<groupId>swt14w30</groupId>
 	<artifactId>GeekShop</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modules>
+        <module>kleinerPrototyp</module>
+        <module>Prototyp_Felix</module>
+    </modules>
+    <packaging>pom</packaging>
 
 	<name>GeekShop</name>
 	<description>INTERN GeekShop</description>
@@ -19,6 +23,10 @@
 	</parent>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -28,6 +36,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+        </dependency>
 	</dependencies>
 
 	<properties>

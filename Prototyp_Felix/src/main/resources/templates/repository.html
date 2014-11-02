@@ -1,0 +1,64 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script th:src="@{/resources/js/repository.js}"></script>
+    <link rel="stylesheet" type="text/css" href="/resources/css/style.css" />
+    <title th:text="#{repository.title}">Inventar</title>
+</head>
+<body>
+<h1 class="text-center" th:text="#{repository.title}">Inventar</h1>
+
+<div class="checkbox text-center">
+    <input type="checkbox" id="use_ajax" />
+    <label for="use_ajax" th:text="#{repository.useajax}">Ajax nutzen</label>
+</div>
+
+<div id="entries">
+    <div th:each="entry, it : ${entries}" th:with="index = ${it.count}">
+        <div class="panel panel-default" th:fragment="entry" th:id="entry+${entry.artId}">
+            <div class="panel-heading" >
+                <form th:method="delete" th:action="@{/repository/} + ${entry.artId}" th:attr="data-entry-id=${entry.artId}">
+                    <button class="btn btn-default pull-right" >
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </form>
+                <h3 th:text="${index} + '. ' + ${entry.artName}">1. Posting</h3>
+            </div>
+            <div class="panel-body">
+                <blockquote class="entryprice" th:text="${entry.artPrice}"></blockquote>
+                <blockquote class="entrydescription" th:text="${entry.artDescription}"></blockquote>
+                <blockquote class="entryquantity" th:text="${entry.artQuantity}"></blockquote>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<form method="post" role="form" class="gb-form" id="form" th:action="@{/repository}">
+    <div class="form-group">
+        <label for="artName" th:text="#{repository.form.artName}">Artikelname</label><br />
+        <input name="artName" id="artName" class="form-control" type="text" />
+    </div>
+    <div class="form-group">
+        <label for="artPrice" th:text="#{repository.form.artPrice}">Preis</label><br />
+        <input name="artPrice" id="artPrice" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="artDescription" th:text="#{repository.form.artDescription}">Beschreibung</label><br />
+        <textarea name="artDescription" id="artDescription" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="artQuantity" th:text="#{repository.form.artQuantity}">Anzahl</label><br />
+        <input name="artQuantity" id="artQuantity" class="form-control" />
+    </div>
+
+    <input type="submit" class="btn btn-default" th:value="#{repository.form.submit}" value="Senden" />
+</form>
+
+</body>
+</html>
