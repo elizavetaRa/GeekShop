@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * 
  * @author Paul Henke
  * @author Oliver Gierke
- * @see http://en.wikipedia.org/wiki/Domain-driven_design#Building_blocks_of_DDD
+ * @see ://en.wikipedia.org/wiki/Domain-driven_design#Building_blocks_of_DDD
  */
 @Entity
 public class GuestbookEntry {
