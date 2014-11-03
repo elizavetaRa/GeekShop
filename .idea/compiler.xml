@@ -25,6 +25,7 @@
         <module name="Prototyp_Felix" />
         <module name="Prototype_Felix" />
         <module name="Prototype_Marcus" />
+        <module name="Prototype_Sebastian" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -33,6 +34,7 @@
       <module name="Prototype_Elizaveta" target="1.8" />
       <module name="Prototype_Felix" target="1.8" />
       <module name="Prototype_Marcus" target="1.8" />
+      <module name="Prototype_Sebastian" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
