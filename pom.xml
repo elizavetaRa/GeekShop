@@ -6,14 +6,6 @@
     <groupId>swt14w30</groupId>
     <artifactId>GeekShop</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <modules>
-        <module>Prototype_Felix</module>
-        <module>Prototype_Marcus</module>
-        <module>Prototype_Elizaveta</module>
-        <module>Prototype_Dominik</module>
-        <module>Prototype_Marcus</module>
-        <module>Prototype_Sebastian</module>
-    </modules>
     <packaging>pom</packaging>
 
     <name>GeekShop</name>
