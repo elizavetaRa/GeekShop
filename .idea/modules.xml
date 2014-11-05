@@ -3,11 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GeekShop.iml" filepath="$PROJECT_DIR$/GeekShop.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Prototype_Dominik/Prototype_Dominik.iml" filepath="$PROJECT_DIR$/Prototype_Dominik/Prototype_Dominik.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Prototype_Elizaveta/Prototype_Elizaveta.iml" filepath="$PROJECT_DIR$/Prototype_Elizaveta/Prototype_Elizaveta.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Prototype_Felix/Prototype_Felix.iml" filepath="$PROJECT_DIR$/Prototype_Felix/Prototype_Felix.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Prototype_Marcus/Prototype_Marcus.iml" filepath="$PROJECT_DIR$/Prototype_Marcus/Prototype_Marcus.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Prototype_Sebastian/Prototype_Sebastian.iml" filepath="$PROJECT_DIR$/Prototype_Sebastian/Prototype_Sebastian.iml" />
     </modules>
   </component>
 </project>
