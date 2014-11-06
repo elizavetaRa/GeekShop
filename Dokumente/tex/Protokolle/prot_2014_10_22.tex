@@ -1,0 +1,50 @@
+\documentclass{scrartcl}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+
+\rofoot{\thepage~}
+
+\begin{document}
+\begin{center}
+\LARGE \bf{Protokoll vom 22.10.2014 \\
+SWT14W30}
+\end{center}
+
+\begin{tabular}{rp{10cm}}
+Protokollant & Marcus Kammerdiener \\
+Satz & Felix Döring \\
+Anwesend & Sebastian Döring, Felix Döring, Marcus Kammerdiener, Dominik Lauck, Elizaveta Ragozina \\
+\end{tabular}
+
+\vspace*{3em}
+
+\section{Ablauf}
+\subsection{Kundengespr\"ach}
+\subsubsection{Rechte}
+Von der Gruppe wurden einige Verständnisfragen an den Kunden gerichtet. So wurde gefragt, ob der Ladenbesitzer nur Verwaltungsrechte hat oder ob er auch Rechte für den Verkauf besitzt. Der Kunde möchte den Ladenbesitzer mit allen Rechten des Systems ausstatten.
+\subsubsection{Passwortsicherheit}
+Des Weiteren wurde nach dem Kundenwunsch für die Passwortsicherheit gefragt. Der Kunde erwiderte, dass er gern die Standardregeln für die Passwortsicherheit sehen würde, d.\,h. mindestens 8 Zeichen -- der Maximalwert soll von der Gruppe bestimmt werden, aber zwischen 16 und 64 Zeichen liegen --, mindestens ein Sonderzeichen, Groß- und Kleinschreibung und mindestens eine Zahl. Die Dummydaten sollen von der Gruppe festgelegt werden. Zur Verschlüsselung werden später noch Angaben gemacht werden.
+\subsubsection{Anmeldung}
+Der Anmeldebildschirm soll für Angestellte und Ladenbesitzer der Gleiche sein. Bei der Anmeldung verifiziert das System die Rechte der Person und leitet sie dann auf ihr jeweiliges Panel weiter.
+\subsubsection{Witze}
+Bezüglich der Begrüßungswitze wurde festgelegt, dass jeder Angestellte nach dem Login einen Witz angezeigt bekommt. Jedem Witz wird eine ID zugewiesen, die auf einem 5er-Stack gespeichert wird, damit jeder Angestellte mindestens 5 verschiedene Witze angezeigt bekommt, bevor die Möglichkeit einer Wiederholung besteht.
+\subsubsection{Warenkorb}
+Der Warenkorb soll für zwei Anwendungen konzipiert werden. Einmal für die physische Kasse im Laden, bei der die Produkte durch die eingelesene ID bestimmt werden, und außerdem für eine "`virtuelle"' Kasse, bei der für ausgewählte Kunden auch eine Suche nach Artikelnamen möglich ist.
+\subsubsection{Reklamation}
+Für die Reklamation von Waren wurde Folgendes festgelegt: Es besteht eine 14-Tage-Geld-zurück-Garantie. Wenn ein Kunde einen Reklamationswunsch äußert, werden alle zu reklamierenden Artikel in den Reklamations-Warenkorb gelegt und eine Rechnungsnummer angegeben. Daraufhin wird überprüft, ob sich die Rechnung noch in dem 14-Tage-Fenster befindet, ob der Artikel für die Rechnungsnummer existiert und ob er schon einmal zurückgegeben wurde. Sollten alle Angaben stimmen, wird die Reklamation zur Verifizierung durch den Ladenbesitzer weitergeleitet. Wenn der Ladenbesitzer der Reklamation zustimmt, wird zum Abschluss das Geld auf dem vom Kunden gewünschten Weg überwiesen.
+\subsubsection{Datenbanken}
+Zu den Datenbanken wurden folgende Angaben gemacht: Es wird eine leere Datenbank vorhanden sein. Die Datenbanken sollen mit MySQL oder SQLite erstellt und verwaltet werden. Das Programm soll die permanente Datenbank einlesen und nutzen, sofern diese vorhanden ist, ansonsten eine neue Datenbank erstellen.
+\subsection{Protokoll}
+Zum Protokoll wurde angemerkt, dass zu jedem Treffen eines angelegt werden soll, unabhängig davon, ob es sich um ein Gruppentreffen oder eine Konsultation handelt. Der Umfang ist der Gruppe überlassen, allerdings sind die Protokolle auszuformulieren. Die investierten Arbeitsstunden sind pro Woche zu verfolgen und zu veröffentlichen. Zudem ist eine vollständige Dokumentation und ein Benutzerhandbuch anzulegen.
+
+\vspace*{1em}
+
+\section{Aufgaben}
+Als erste Aufgabe wurde die Erstellung der Diagramme festgelegt. Die Gruppe soll bis zum nächsten Treffen die wichtigsten Diagramme fertigstellen. Alle erstellten Diagramme sind auf der Website hochzuladen und in einem Projekt zu speichern. Als mögliche Diagramme wurden das Analyseklassendiagramm, das Anwendungsfalldiagramm und Sequenzdiagramme für die Kaufabwicklung und Reklamation genannt.\\
+Außerdem bis zur nächsten Woche fertigzustellen ist der kleine Prototyp. Er soll auf eine Datenbank zugreifen, in ihr Daten ändern, diese Änderungen speichern und schließlich wieder ausgeben können.
+\end{document}
