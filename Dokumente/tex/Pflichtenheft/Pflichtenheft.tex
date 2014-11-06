@@ -72,7 +72,7 @@ Das Anwendungsfalldiagramm zeigt die in die verschiedenen Teilbereiche geglieder
 Dieses Diagramm beschreibt den Anmeldevorgang des Benutzers und wie das Programm bei einem fehlerhaften Benutzernamen oder Passwort reagiert.
 \subsubsection*{2. Witze}
 \includegraphics[width=1\textwidth]{./images/witze}
-Im folgenden Diagramm wird gezeigt, wie der Ladenbesitzer einen neuen Witz zur bestehenden Witzsammlung hinzufügen kann, wie ein zufälliger Witz aus der Sammlung einem Angestellten angezeigt wird und wie ein Witz aus der Sammlung gelöscht wird.
+Im oben stehenden Diagramm wird gezeigt, wie der Ladenbesitzer einen neuen Witz zur bestehenden Witzsammlung hinzufügen kann, wie ein zufälliger Witz aus der Sammlung einem Angestellten angezeigt wird und wie ein Witz aus der Sammlung gelöscht wird.
 \subsubsection*{3. Benutzerverwaltung}
 \includegraphics[width=1\textwidth]{./images/benutzerverwaltung}
 In dem Sequenzdiagramm der Benutzerverwaltung werden die M\"oglichkeit der \"Anderung der pers\"onlichen Daten und das Setzen neuer Passwortregeln sowie die dazugeh\"orige \"Anderung des Passwortes beschrieben.
@@ -93,14 +93,13 @@ Hier wird beschrieben, wie eine Reklamation abl\"auft.
 Die Top-Level-Architektur veranschaulicht die inneren Komponenten des Shops und ihre Abh\"angigkeiten untereinander auf oberster Ebene.
 \subsection*{Analyseklassendiagramm}
 \includegraphics[width=1\textwidth]{./images/analyseklassendiagramm}
-Das Analyseklassendiagramm zeigt die Klassen und Beziehungen des Systems, die sich aus dem Kundengespr\"ach ergeben haben. \\
+Das Analyseklassendiagramm zeigt die Klassen und Beziehungen des Systems, die sich aus dem Kundengespr\"ach ergeben haben. \\\\
 Klassenbeschreibung: \\
 \begin{itemize}
 \item Die Klasse Geek-Shop vereint die groben Bestandteile des Shops. Sie besteht aus Benutzerverwaltung, Sortiment und Lager.
-\item Die Klasse Ladenbesitzer bildet den realen Ladenbesitzer ab. Sie ist für die Verwaltung des Shops verantwortlich. Insbesondere kümmert er sich um Personalverwaltung, Witzeverwaltung, Passwortregeln und Verkaufsstatistik. Die Klasse erbt von Benutzer.
+\item Die Klasse Ladenbesitzer bildet den realen Ladenbesitzer ab. Sie ist für die Verwaltung des Shops verantwortlich. Insbesondere kümmert er sich um Personalverwaltung, Witzeverwaltung, Passwortregeln und Verkaufsstatistik. Die Klasse erbt von Angestellter.
 \item Die Klasse Benutzerverwaltung verwaltet die Angestellten und den Ladenbesitzer. Weiterhin umfasst sie Funktionalit\"aten der Personalverwaltung.
-\item Die Klasse Angestellter abstrahiert die Mitarbeiter des Shops. Allgemeine Eigenschaften werden von der Klasse Benutzer geerbt.
-\item In der abstrakten Klasse Benutzer sind die typischen Eigenschaften eines Angestellten und des Ladenbesitzers zusammengefasst. Die Postadresse ist als separate Klasse modelliert. Enumerationen f\"ur Geschlecht und Familienstand sind weitere Benutzereigenschaften. Jedem Benutzer ist ein Passwort zugewiesen, das mithilfe der Passwortregeln auf ausreichende Sicherheit gepr\"uft wird.
+\item Die Klasse Angestellter abstrahiert die Mitarbeiter des Shops. In ihr sind die typischen Eigenschaften eines Angestellten zusammengefasst. Die Postadresse ist als separate Klasse modelliert. Enumerationen f\"ur Geschlecht und Familienstand sind weitere Benutzereigenschaften. Jedem Angestellten ist ein Passwort zugewiesen, das mithilfe der Passwortregeln auf ausreichende Sicherheit gepr\"uft wird.
 \item Die Klasse Witz, deren Objekte von der Klasse Witzesammlung verwaltet werden, stellt die Witze dar, die die Angestellten nach dem Login angezeigt bekommen.
 \item Die Klasse Sortiment umfasst die verschiedenen Produktkategorien mit den darin enthaltenen Artikeln.
 \item Die abstrakte Klasse Kategorie abstrahiert die Kategorien, deren Eigenschaften und Funktionalitäten.
@@ -116,109 +115,103 @@ Klassenbeschreibung: \\
 \end{itemize}
 \subsection*{Dialoglandkarte}
 \includegraphics[width=1\textwidth]{./images/dialoglandkarte}
+Die Dialoglandkarte gibt eine Übersicht über die verschiedenen Dialoge und ihre Beziehungen untereinander.
 \newpage
 
 %Produktfunktionen
 \section{Produktfunktionen}
 \subsubsection*{/F01/ Begr\"u\ss{}ung}
 \begin{itemize}
-\item Nach Anmeldung eines Angestellten zeigt das System eien zuf\"alligen Nerdwitz. Dabei werden die f\"unf zuletzt gezeigten Witze aus der Auswahl ausgeschlossen.
-\item Der Ladenbesitzer kann Witze hinzuf\"ugen
-\item Der Ladenbesitzer kann Witze bearbeiten
-\item Der Ladenbesitzer kann Witze l\"oschen
+\item Nach Anmeldung eines Angestellten zeigt das System einen zuf\"alligen Nerdwitz. Dabei werden die f\"unf zuletzt gezeigten Witze aus der Auswahl ausgeschlossen.
+\item Der Ladenbesitzer kann Witze hinzuf\"ugen.
+\item Der Ladenbesitzer kann Witze bearbeiten.
+\item Der Ladenbesitzer kann Witze l\"oschen.
 \end{itemize}
 \subsection*{Account}
 \subsubsection*{/F02/ Profilverwaltung}
 \begin{itemize}
-\item Der Ladenbesitzer kann neue Profile erstellen
-\item Der Ladenbesitzer kann Profile l\"oschen (entlassen)
-\item Der Ladenbesitzer kann Profilinformationen bearbeiten
+\item Der Ladenbesitzer kann Angestellte hinzufügen.
+\item Der Ladenbesitzer kann Angestellte l\"oschen (entlassen).
+\item Der Ladenbesitzer kann die Daten der Angestellten bearbeiten.
 \end{itemize}
 \subsubsection*{/F03/ Passwortverwaltung}
 \begin{itemize}
-\item Der Ladenbesitzer kann Passwortregeln beim Aufsetzen des Systems festlegen (min/max Zeichenanzahl, Gro\ss{}buchstaben ja/nein, Sonderzeichen ja/nein)
-\item Der Ladenbesitzer kann Passwortregeln \"andern. Die Angestellten werden bei der Anmeldung aufgefordert, ihr Passwort nach den neuen Regeln zu \"andern
-\item Alle Mitarbeiter k\"onnen jederzeit ihr Passwort nach den g\"ultigen Regeln \"andern
-\item Der Ladenbesitzer wird \"uber Passwort\"anderungen anderer Angestellter benachrichtigt
-\item Der Ladenbesitzer kann jederzeit Passw\"orter anderer Angestellter \"andern
-\item Alle Passw\"orter sind verschl\"usselt
+\item Der Ladenbesitzer kann die Passwortregeln, mit denen die Gültigkeit eines neuen Passwortes ermittelt werden, beim Aufsetzen des Systems festlegen (minimale/maximale Zeichenanzahl, Gro\ss{}buchstaben ja/nein, Sonderzeichen ja/nein).
+\item Der Ladenbesitzer kann die Passwortregeln \"andern. Die Angestellten werden bei der Anmeldung aufgefordert, ihr Passwort den neuen Regeln entsprechend zu \"andern.
+\item Alle Mitarbeiter k\"onnen jederzeit ihr Passwort den derzeit g\"ultigen Regeln entsprechend \"andern.
+\item Der Ladenbesitzer wird \"uber Passwort\"anderungen seiner Angestellten benachrichtigt.
+\item Der Ladenbesitzer kann jederzeit Passw\"orter seiner Angestellten \"andern, ohne dass er das Passwort seiner Angestellten einsehen kann.
+\item Alle Passw\"orter werden verschl\"usselt gespeichert.
 \end{itemize}
 \subsection*{Sortiment}
 \subsubsection*{/F020/ Verwaltung von Artikeln}
 \begin{itemize}
-\item Mitarbeiter k\"onnen nach Artikeln suchen
-\item Mitarbeiter k\"onnen Artikel nach Name und Preis sortieren (auf-/absteigend)
-\item Mitarbeiter k\"onnen Informationen zu jedem Artikel lesen
-\item Der Ladenbesitzer kann neue Artikel erstellen
-\item Der Ladenbesitzer kann Artikel bearbeiten
-\item Der Ladenbesitzer kann Artikel l\"oschen
-\item Der Ladenbesitzer kann Kategorien und Unterkategorien erstellen
-\item Der Ladenbesitzer kann Kategorien und Unterkategorien umbenennen
-\item Der Ladenbesitzer kann Kategorien und Unterkategorien l\"oschen
+\item Mitarbeiter k\"onnen nach einem Artikelnamen, einer Artikelnummer oder einem Kategorienamen suchen.
+\item Mitarbeiter k\"onnen Artikel nach Name, Artikelnummer und Preis sortieren (auf-/absteigend).
+\item Der Ladenbesitzer kann neue Artikel erstellen.
+\item Der Ladenbesitzer kann Artikel bearbeiten.
+\item Der Ladenbesitzer kann Artikel l\"oschen.
+\item Der Ladenbesitzer kann Kategorien und Unterkategorien erstellen.
+\item Der Ladenbesitzer kann Kategorien und Unterkategorien bearbeiten.
+\item Der Ladenbesitzer kann Kategorien und Unterkategorien l\"oschen.
 \end{itemize}
 \subsubsection*{/F050/ Lagerbestandsverwaltung}
 \begin{itemize}
-\item Der Ladenbesitzer kann Mengen von Artikeln \"andern
-\item Der Ladenbesitzer kann nach Artikeln suchen
-\item Der Ladenbesitzer kann eine untere Grenze f\"ur Bestand der Artikel setzen
-\item Der Ladenbesitzer wird bei unterschreitung der unteren Grenze gewarnt
-\item Der Ladenbesitzer kann Verkaufsdaten einsehen und mit Hilfe der XML-Exportfunktion exportieren
+\item Der Ladenbesitzer kann die Artikelanzahl \"andern.
+\item Der Ladenbesitzer kann die minimale Stückzahl eines jeden Artikels im Lager festlegen.
+\item Der Ladenbesitzer wird bei Erreichung oder Unterschreitung dieser unteren Grenze gewarnt.
+\item Der Ladenbesitzer kann Verkaufsdaten einsehen und mithilfe der XML-Exportfunktion exportieren.
 \end{itemize}
 \subsection*{Kaufabwicklung}
 \subsubsection*{/F060/ Warenkorbverwaltung}
 \begin{itemize}
-\item Mitarbeiter k\"onnen jeden Artikel in den Warenkorb legen
-\item Mitarbeiter k\"onnen jeden Artikel aus dem Warenkorb entfernen
-\item Mitarbeiter k\"onnen den Warenkorb leeren
-\item Mitarbeiter k\"onnen hineingelegte Artikel ansehen
-\item Mitarbeiter k\"onnen die Anzahl von Artikeln \"andern
-\item Zahlungsvorgang starten
-\item Reklamation abschlie\ss{}en
+\item Mitarbeiter k\"onnen jeden Artikel in den Warenkorb legen.
+\item Mitarbeiter k\"onnen jeden Artikel aus dem Warenkorb entfernen.
+\item Mitarbeiter k\"onnen den Warenkorb leeren.
+\item Mitarbeiter k\"onnen die Anzahl von Artikeln im Warenkorb \"andern.
 \end{itemize}
 \subsubsection*{/F070/ Bezahlvorgang}
 \begin{itemize}
-\item Zahlungsmethode ausw\"ahlen (Kreditkarte, Bar, Lastschrift)
-\item Kundendaten eingeben
-\item Verkaud best\"atigen
-\item Rechnung anzeigen
+\item Mitarbeiter können die Zahlungsmethode ausw\"ahlen (Kreditkarte, Bar, Lastschrift).
+\item Verkauf best\"atigen
+\item Als Abschluss des Kaufvorgangs können die Mitarbeiter die Rechnung anzeigen lassen.
 \end{itemize}
 \subsubsection*{/F080/ Reklamation}
 \begin{itemize}
-\item Rechnung validieren
-\item \"Ubersicht anzeigen
-\item Der Ladenbesitzer kann Reklamationen genehmigen und somit abschlie\ss{}en
-\item Der Ladenbesitzer kann Reklamationen ablehnen
+\item Zu Beginn einer Reklamation wird die Rechnung des Kunden anhand der Rechnungsnummer validiert.
+\item Im Anschluss daran wird eine Liste der Artikel, die auf dieser Rechnung stehen, angezeigt. Ausschlie\ss{}lich diese Artikel können dem Warenkorb hinzugefügt werden.
+\item Nur der Ladenbesitzer kann die Reklamation abschlie\ss{}en. Er kann diese entweder genehmigen und somit abschlie\ss{}en oder ablehnen.
 \end{itemize}
 
 %Produktdaten
 \section{Produktdaten}
 Folgende Daten sind \"uber einzelne Elemente zu speichern:
-\subsubsection*{/D010/ Profil}
+\subsubsection*{/D010/ Angestellter}
 \begin{itemize}
 \item Name
 \item Adresse
 \item Geburtsdatum
 \item Telefonnummer
-\item Email-Adresse
+\item E-Mail-Adresse
 \item Geschlecht
 \item Familienstand
-\item Benutzername
+\item Nutzername
 \item Passwort
 \end{itemize}
 \subsubsection*{/D020/ Artikel}
 \begin{itemize}
 \item Name
-\item Preis
-\item Kategorie
-\item (gegebenenfalls) Unterkategorie
 \item Artikelnummer
+\item Menge
+\item minimale Artikelanzahl im Lager
+\item Preis
 \item Verf\"ugbarkeit
+\item Kategorie
 \end{itemize}
-\subsubsection*{/D030/ Lagereintrag}
+\subsubsection*{/D030/ Kategorie}
 \begin{itemize}
-\item Eintrags-ID
-\item Vorhandene Anzahl
-\item Untere Grenze
+\item Name
+\item ggf. Oberkategorie
 \end{itemize}
 \subsubsection*{/D040/ Witz}
 \begin{itemize}
@@ -227,25 +220,27 @@ Folgende Daten sind \"uber einzelne Elemente zu speichern:
 \end{itemize}
 \subsubsection*{/D050/ Warenkorb}
 \begin{itemize}
-\item ID von reingelegten Artikeln
-\item Anzahl von jedem Artikel
+\item enthaltene Artikel mit zugehöriger Stückzahl
 \end{itemize}
-\subsubsection*{/D060/ Verkaufsvorgang}
+\subsubsection*{/D060/ Zahlungsvorgang}
 \begin{itemize}
-\item K\"auferdatem
-\item ID der gekauften Artikel
+\item Zahlungsart
+\end{itemize}
+\subsubsection*{/D070/ Rechnung}
+\begin{itemize}
 \item Datum
-\item Bezahlmethode
+\item Rechnungsnummer
+\item zugehörige Artikel
 \end{itemize}
 
 %Qualitaetsanforderungen
 \section{Qualit\"atsanforderungen}
 \begin{tabularx}{\textwidth}{| *4{>{\centering\arraybackslash}X|}} \hline
 {\textbf{Produktivit\"at}} & {\textbf {sehr gut}} & {\textbf {gut}} & {\textbf {normal}}\\ \hline
-Funktionalit\"at & & X & \\ \hline
-Zuverl\"assigkeit & X & & \\ \hline
-Effizienz & & & X \\ \hline
-Behutsamkeit & X & & \\ \hline
-\"Anderbarkeit & & X & \\ \hline
+Funktionalit\"at & & x & \\ \hline
+Zuverl\"assigkeit & x & & \\ \hline
+Effizienz & & & x \\ \hline
+Benutzbarkeit & x & & \\ \hline
+\"Anderbarkeit & & x & \\ \hline
 \end{tabularx}
 \end{document}
