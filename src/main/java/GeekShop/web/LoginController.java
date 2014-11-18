@@ -23,18 +23,22 @@ import java.util.Optional;
 public class LoginController {
 
 
-    @RequestMapping(value = "/")
+    @RequestMapping("/")
     public String index() {
         return "/index";
     }
 
-    @RequestMapping(value = "/index")
+    @RequestMapping(value = "/index", method = RequestMethod.POST)
     public String login(@RequestParam("userName") String userName, @RequestParam("password") String password){
-        if (userName == "" || password == "") {
+        if (userName.isEmpty() || password.isEmpty()) {
             return "redirect:/index";
         } else{
             return "redirect:/main";
         }
 
+    }
+    @RequestMapping(value = "/main", method = RequestMethod.POST)
+    public String home(){
+        return "/main";
     }
 }
