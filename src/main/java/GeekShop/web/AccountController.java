@@ -45,4 +45,9 @@ public class AccountController {
     public String home(){
         return "/main";
     }
+
+    @RequestMapping(value = "/profil")
+    public String profil(){
+        return "/profil";
+    }
 }
