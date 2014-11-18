@@ -41,13 +41,13 @@ public class AccountController {
         }
 
     }
-    @RequestMapping(value = "/main", method = RequestMethod.POST)
+    @RequestMapping(value = "/main")
     public String home(){
         return "/main";
     }
 
     @RequestMapping(value = "/profil")
-    public String profil(){
+    public String profile(){
         return "/profil";
     }
 }

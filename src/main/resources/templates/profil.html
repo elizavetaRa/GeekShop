@@ -15,58 +15,36 @@
 
 <div id="main">
 
-    <!-- Header -->
     <div id="header">
-
-        
         <h1 id="logo">Geek Shop <span>Think Nerd</span></h1>
         <hr class="noscreen" />        
-
-        
         <div id="slogan">SWT-Praktikum Gruppe 30</div>
         <hr class="noscreen" />        
-        
-        
         <p class="noscreen noprint"><em>Quick links: <a href="#content">content</a>, <a href="#nav">navigation</a>.</em></p>
         <hr class="noscreen" />
+    </div>
 
-    </div> <!-- /header -->
-
-    <!-- Navigation -->
     <div id="nav">
-    
         <ul class="box">
-         <!--   <li><a href="Suche.html">Suche</a></li>
-            <li id="nav-active.html"><a href="profil">Profil</a></li>
-            <li><a href="Reklamation.html">Reklamation</a></li> -->
-            
+            <li><a th:href="@{main}">Main</a></li>
+            <li><a th:href="@{search}">Suche</a></li>
+            <li><a>Profil</a></li>
+            <li><a th:href="@{reclaim}">Reklamation</a></li>
         </ul>
-        
-    <hr class="noscreen" /> 
-    </div> <!-- /nav -->
-
-    <!-- 2 columns (content + sidebar) -->
-    <div id="cols" class="box">
-
-        <!-- Content -->
-        <div id="content">
-        
-            <h2 id="content-title">Profil von </h2>
-            
-           
-
-            <hr class="noscreen" />
-            
-            
-               
-        </div> <!-- /content -->
 
         <hr class="noscreen" />
+    </div>
 
-        <!-- Sidebar -->
+    <div id="cols" class="box">
+
+        <div id="content">
+            <h2 id="content-title">Profil von </h2>
+            <hr class="noscreen" />
+        </div>
+        <hr class="noscreen" />
+
         <div id="aside">
 
-            <!-- News -->                    
             <h4 id="aside-title">Warenkorb</h4>
             
             <div class="aside-in">
@@ -76,31 +54,23 @@
                         
                     </dl>
                 
-                </div> <!-- /aside-box -->
-            </div> <!-- /aside-in -->
-            
+                </div>
+            </div>
             
 
             
    
-        </div> <!-- /aside -->
+        </div>
     
-    </div> <!-- /cols -->
+    </div>
     
     <div id="cols-bottom"></div>
 
     <hr class="noscreen" />
     
-    <!-- Footer -->
     <div id="footer">
 
-      
-        
-       
-
-    </div> <!-- /footer -->
-
-</div> <!-- /main -->
-
+    </div>
+</div>
 </body>
 </html>
