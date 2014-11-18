@@ -5,18 +5,33 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title th:text="#{index.title}">Login</title>
-    <link rel="stylesheet" type="text/css" href="resources/css/style_login.css" />
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="resources/css/style.css" />
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
     <script th:src="@{resources/js/modernizr.custom.63321.js}"></script>
 </head>
 <body>
 <div class="container">
 
-    <header>
+    <div id="main">
+        <div id="header">
+            <h1 id="logo"><a href="#">Geek Shop <span>Think Nerd</span></a></h1>
+            <hr class="noscreen" />
+            <div id="slogan">SWT-Praktikum Gruppe 30</div>
+            <hr class="noscreen" />
+            <p class="noscreen noprint"><em>Quick links: <a href="#content">content</a>, <a href="#nav">navigation</a>.</em></p>
+            <hr class="noscreen" />
 
-        <h1> <strong>Think Nerd</strong></h1>
+        </div>
+        <div id="nav">
+            <ul class="box">
+                <li><p>Login</p></li>
+            </ul>
 
-    </header>
+            <hr class="noscreen" />
+        </div>
+    </div>
 
     <section class="main">
         <form method="post" class="form-1" id="form" th:action="@{/index}">
