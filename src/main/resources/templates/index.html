@@ -1,0 +1,41 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="#{index.title}">Login</title>
+    <meta name="description" content="Custom Login Form Styling with CSS3" />
+    <meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+    <meta name="author" content="Codrops" />
+    <link rel="stylesheet" type="text/css" href="resources/css/style_login.css" />
+    <script src="resources/js/modernizr.custom.63321.js"></script>
+</head>
+<body>
+<div class="container">
+
+    <header>
+
+        <h1> <strong>Think Nerd</strong></h1>
+
+    </header>
+
+    <section class="main">
+        <form method="post" role="form" class="form-1" id="form" th:action="@{/main}">
+            <p class="field">
+                <input name="userName" id="userName" type="text" placeholder="Username"/>
+                <i class="icon-user icon-large"></i>
+            </p>
+            <p class="field">
+                <input name="password" id="password" type="password" placeholder="Password" />
+                <i class="icon-lock icon-large"></i>
+            </p>
+            <p class="submit">
+                <button type="submit" name="submit"><i class="icon-arrow-right icon-large" th:value="#{index.form.login}" value="Login"></i></button>
+            </p>
+        </form>
+    </section>
+</div>
+</body>
+</html>
