@@ -10,8 +10,8 @@ body {
     font-size: 15px;
     color: #333;
     -webkit-font-smoothing: antialiased;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    /*overflow-y: scroll;
+    overflow-x: hidden;*/
 }
 
 a {
@@ -19,10 +19,10 @@ a {
     text-decoration: none;
 }
 
-.container {
+/*.container {
     width: 100%;
     position: relative;
-}
+}*/
 
 .clr {
     clear: both;

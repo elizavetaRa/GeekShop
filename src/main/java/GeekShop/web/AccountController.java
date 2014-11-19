@@ -46,8 +46,8 @@ public class AccountController {
         return "/main";
     }
 
-    @RequestMapping(value = "/profil")
+    @RequestMapping(value = "/profile")
     public String profile(){
-        return "/profil";
+        return "/profile";
     }
 }

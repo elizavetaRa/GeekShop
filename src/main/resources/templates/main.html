@@ -5,29 +5,40 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Geek Shop</title>
+    <title>Geek-Shop Think NERD</title>
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
     <link rel="stylesheet" media="print" type="text/css" href="css/print.css" />
 </head>
+
 <body>
 
 <div id="main">
+
+    <!-- Header -->
     <div id="header">
-        <h1 id="logo"><a href="#">Geek Shop <span>Think Nerd</span></a></h1>
+
+        <!-- Logo -->
+        <h1 id="logo"><a href="#">Geek-Shop <span>Think NERD</span></a></h1>
         <hr class="noscreen" />
+
+        <!-- Slogan -->
         <div id="slogan">SWT-Praktikum Gruppe 30</div>
         <hr class="noscreen" />
+
+        <!-- Hidden navigation -->
         <p class="noscreen noprint"><em>Quick links: <a href="#content">content</a>, <a href="#nav">navigation</a>.</em></p>
         <hr class="noscreen" />
 
-    </div>
+    </div> <!-- /header -->
 
+    <!-- Navigation -->
     <div id="nav">
+
         <ul class="box">
-            <li><a>Main</a></li>
+            <!--<li id="nav-active"><a>Main</a></li>-->
             <li><a th:href="@{search}">Suche</a></li>
-            <li><a th:href="@{profil}">Profil</a></li>
+            <li><a th:href="@{profile}">Profil</a></li>
             <li><a th:href="@{reclaim}">Reklamation</a></li>
         </ul>
 
@@ -46,10 +57,11 @@
             <div id="perex" class="box">
 
                 <p>
-                Frau: “Ich habe das neuste Windows-System.”
-                Berater: “Ja, und?”
-                Frau: “Ich habe da ein Problem.”
-                Berater: “Ja, aber das haben Sie doch bereits gesagt.”</p>
+                Frau: „Ich habe das neuste Windows-System.“<br/>
+                Berater: „Ja, und?“<br/>
+                Frau: „Ich habe da ein Problem.“<br/>
+                Berater: „Ja, aber das haben Sie doch bereits gesagt.“
+                </p>
 
             </div> <!-- /perex -->
 
@@ -62,26 +74,26 @@
         <hr class="noscreen" />
 
         <!-- Sidebar -->
-        <div id="aside">
+        <!--<div id="aside">-->
 
             <!-- News -->
-            <h4 id="aside-title">Warenkorb</h4>
+        <!--<h4 id="aside-title">Warenkorb</h4>
 
-            <div class="aside-in">
-                <div class="aside-box">
+        <div class="aside-in">
+            <div class="aside-box">
 
-                    <dl id="news">
+                <dl id="news">
 
-                    </dl>
+                </dl>
 
-                </div> <!-- /aside-box -->
-            </div> <!-- /aside-in -->
-
-
+            </div>--> <!-- /aside-box -->
+        <!--</div>--> <!-- /aside-in -->
 
 
 
-        </div> <!-- /aside -->
+
+
+        <!--</div>--> <!-- /aside -->
 
     </div> <!-- /cols -->
 
@@ -90,13 +102,13 @@
     <hr class="noscreen" />
 
     <!-- Footer -->
-    <div id="footer">
+    <!--<div id="footer">
 
 
 
 
 
-    </div> <!-- /footer -->
+    </div>--> <!-- /footer -->
 
 </div> <!-- /main -->
 

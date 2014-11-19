@@ -12,42 +12,42 @@
     <script th:src="@{resources/js/modernizr.custom.63321.js}"></script>
 </head>
 <body>
-<div class="container">
+<!--<div class="container">-->
 
     <div id="main">
         <div id="header">
-            <h1 id="logo"><a href="#">Geek Shop <span>Think Nerd</span></a></h1>
+            <h1 id="logo"><a href="#">Geek-Shop <span>Think NERD</span></a></h1>
             <hr class="noscreen" />
             <div id="slogan">SWT-Praktikum Gruppe 30</div>
             <hr class="noscreen" />
             <p class="noscreen noprint"><em>Quick links: <a href="#content">content</a>, <a href="#nav">navigation</a>.</em></p>
             <hr class="noscreen" />
-
         </div>
+
         <div id="nav">
             <ul class="box">
-                <li><p>Login</p></li>
+                <li id="nav-active"><a href="#">Login</a></li>
             </ul>
 
             <hr class="noscreen" />
         </div>
-    </div>
 
-    <section class="main">
-        <form method="post" class="form-1" id="form" th:action="@{/index}">
-            <p class="field">
-                <input name="userName" id="userName" type="text" placeholder="Username"/>
-                <i class="icon-user icon-large"></i>
-            </p>
-            <p class="field">
-                <input name="password" id="password" type="password" placeholder="Password" />
-                <i class="icon-lock icon-large"></i>
-            </p>
-            <p class="submit">
-                <button type="submit" name="submit" th:value="#{index.form.login}" value="Login"><i class="icon-arrow-right icon-large"></i></button>
-            </p>
-        </form>
-    </section>
-</div>
+        <section class="main">
+            <form method="post" class="form-1" id="form" th:action="@{/index}">
+                <p class="field">
+                    <input name="userName" id="userName" type="text" placeholder="Username"/>
+                    <i class="icon-user icon-large"></i>
+                </p>
+                <p class="field">
+                    <input name="password" id="password" type="password" placeholder="Password" />
+                    <i class="icon-lock icon-large"></i>
+                </p>
+                <p class="submit">
+                    <button type="submit" name="submit" th:value="#{index.form.login}" value="Login"><i class="icon-arrow-right icon-large"></i></button>
+                </p>
+            </form>
+        </section>
+    </div>
+<!--</div>-->
 </body>
 </html>

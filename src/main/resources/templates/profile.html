@@ -5,7 +5,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Geek Shop</title>
+    <title>Geek-Shop Think NERD</title>
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
     <link rel="stylesheet" media="print" type="text/css" href="css/print.css" />
@@ -15,35 +15,47 @@
 
 <div id="main">
 
+    <!-- Header -->
     <div id="header">
-        <h1 id="logo">Geek Shop <span>Think Nerd</span></h1>
-        <hr class="noscreen" />        
+
+        <!-- Logo -->
+        <h1 id="logo"><a href="#">Geek-Shop <span>Think NERD</span></a></h1>
+        <hr class="noscreen" />
+
+        <!-- Slogan -->
         <div id="slogan">SWT-Praktikum Gruppe 30</div>
-        <hr class="noscreen" />        
+        <hr class="noscreen" />
+
+        <!-- Hidden navigation -->
         <p class="noscreen noprint"><em>Quick links: <a href="#content">content</a>, <a href="#nav">navigation</a>.</em></p>
         <hr class="noscreen" />
-    </div>
 
+    </div> <!-- /header -->
+
+    <!-- Navigation -->
     <div id="nav">
+
         <ul class="box">
-            <li><a th:href="@{main}">Main</a></li>
+            <!--<li><a th:href="@{main}">Main</a></li>-->
             <li><a th:href="@{search}">Suche</a></li>
-            <li><a>Profil</a></li>
+            <li id="nav-active"><a>Profil</a></li>
             <li><a th:href="@{reclaim}">Reklamation</a></li>
         </ul>
 
         <hr class="noscreen" />
     </div>
 
+    <!-- 2 columns (content + sidebar) -->
     <div id="cols" class="box">
 
+        <!-- Content -->
         <div id="content">
             <h2 id="content-title">Profil von </h2>
             <hr class="noscreen" />
         </div>
         <hr class="noscreen" />
 
-        <div id="aside">
+        <!--<div id="aside">
 
             <h4 id="aside-title">Warenkorb</h4>
             
@@ -60,7 +72,7 @@
 
             
    
-        </div>
+        </div>-->
     
     </div>
     
@@ -68,9 +80,9 @@
 
     <hr class="noscreen" />
     
-    <div id="footer">
+    <!--<div id="footer">
 
-    </div>
+    </div>-->
 </div>
 </body>
 </html>
