@@ -1,0 +1,30 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Geek-Shop Think NERD</title>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
+    <link rel="stylesheet" media="print" type="text/css" href="css/print.css" />
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <div th:fragment="nav (page)" id="nav">
+
+        <ul class="box">
+            <!--<li id="nav-active"><a>Begrüßung</a></li>-->
+            <li th:attr="id=(${page == 'search'} ? 'nav-active' : null)" ><a th:href="@{search}">Artikelsuche</a></li>
+            <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{profile}">Mein Profil</a></li>
+            <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{reclaim}">Reklamation</a></li>
+        </ul>
+
+        <hr class="noscreen" />
+    </div>
+
+</body>
+</html>
