@@ -1,14 +1,13 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Geek-Shop Think NERD</title>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
-    <link rel="stylesheet" media="print" type="text/css" href="css/print.css" />
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css"/>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css"/>
+    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css"/>
 </head>
 
 <body>
@@ -26,39 +25,95 @@
 
         <!-- Content -->
         <div id="content">
-            <h2 id="content-title">Profil von </h2>
-            <hr class="noscreen" />
-        </div>
-        <hr class="noscreen" />
 
-        <!--<div id="aside">
+            <h3 id="content-title">Profil von Steve Jobs</h3>
 
-            <h4 id="aside-title">Warenkorb</h4>
-            
-            <div class="aside-in">
-                <div class="aside-box">
+            <div id="content-in">
 
-                    <dl id="news">
-                        
-                    </dl>
-                
-                </div>
+                <form action="profile">
+                    <table class="table-style01">
+                        <tr>
+                            <th class="t-left">
+                                <p>
+                                    <label for="firstname">Vorname:</label><br/>
+                                    <input name="firstname" id="firstname" type="text" size="30" maxlength="30" value="Steve" required="required"/>
+                                </p><p>
+                                    <label for="lastname">Nachname:</label><br/>
+                                    <input name="lastname" id="lastname" type="text" size="30" maxlength="40" value="Jobs" required="required"/>
+                                </p><p>
+                                    <label for="m">männlich</label>
+                                    <input type="radio" name="gender" id="m" value="m" checked="checked"/>&nbsp;
+                                    <label for="f">weiblich</label>
+                                    <input type="radio" name="gender" id="f" value="f"/>
+                                </p><p>
+                                    <label for="birthday">Geburtsdatum:</label><br/>
+                                    <input type="text" name="birthday" id="birthday" value="24.02.1955" pattern="^(31|30|[012][1-9]|[1-9])\.(0[1-9]|1[012]|[1-9])\.((18|19|20)\d{2}|\d{2})$"/>
+                                </p><p>
+                                    <label for="maritalStatus">Familienzustand:</label><br/>
+                                    <select name="maritalStatus" id="maritalStatus">
+                                        <option selected="selected">ledig</option>
+                                        <option>verheiratet</option>
+                                        <option>verwitwet</option>
+                                        <option>dauernd getrennt lebend</option>
+                                    </select>
+                                </p><p>
+                                    <label for="number">Telefonnummer:</label><br/>
+                                    <input name="number" id="number" type="text" size="30" maxlength="13" value="911911911" required="required"/>
+                                </p>
+                            </th>
+
+                            <th class="t-left">
+                                <p>
+                                    <label for="id">Nutzer-Id:</label><br/>
+                                    <input name="id" id="id" type="text" size="3" maxlength="3" value="001" readonly="readonly"/>
+                                </p><p>
+                                    <label for="street">Strasse:</label><br/>
+                                    <input name="street" id="street" type="text" size="15" maxlength="40" value="Wall Street" required="required"/>
+                                </p><p>
+                                    <label for="houseNr">Hausnummer:</label><br/>
+                                    <input name="houseNr" id="houseNr" type="text" size="15" maxlength="40" value="2" required="required"/>
+                                </p><p>
+                                    <label for="postcode">PLZ:</label><br/>
+                                    <input name="postcode" id="postcode" type="text" size="7" maxlength="40" value="4815162342" required="required"/>
+                                </p><p>
+                                    <label for="place">Ort:</label><br/>
+                                    <input name="place" id="place" type="text" size="15" maxlength="40" value="City" required="required"/>
+                                </p><p>
+                                    <button id="changePW" class="myButton">Passwort ändern</button>
+                                </p>
+                            </th>
+                        </tr>
+                    </table>
+                </form>
+
             </div>
-            
 
-            
-   
-        </div>-->
-    
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
     </div>
-    
+    <!-- /cols -->
+
     <div id="cols-bottom"></div>
 
-    <hr class="noscreen" />
-    
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
     <!--<div id="footer">
 
+
     </div>-->
+    <!-- /footer -->
+
 </div>
+<!-- /main -->
+
+
 </body>
 </html>

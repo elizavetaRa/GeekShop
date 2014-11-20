@@ -8,7 +8,7 @@
     <title>Geek-Shop Think NERD</title>
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
-    <link rel="stylesheet" media="print" type="text/css" href="css/print.css" />
+    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css" />
 </head>
 
 <body>
@@ -18,9 +18,13 @@
 
         <ul class="box">
             <!--<li id="nav-active"><a>Begrüßung</a></li>-->
-            <li th:attr="id=(${page == 'search'} ? 'nav-active' : null)" ><a th:href="@{search}">Artikelsuche</a></li>
-            <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{profile}">Mein Profil</a></li>
-            <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{reclaim}">Reklamation</a></li>
+            <li th:attr="id=(${page == 'catalog'} ? 'nav-active' : null)" ><a th:href="@{catalog}" style="width:100px">Artikelsuche</a></li>
+            <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{reclaim}" style="width:100px">Reklamation</a></li>
+            <li th:attr="id=(${page == 'cart'} ? 'nav-active' : null)"><a th:href="@{cart}" style="width:90px">Warenkorb</a></li>
+            <li th:attr="id=(${page == 'staff'} ? 'nav-active' : null)"><a th:href="@{staff}" style="width:80px">Personal</a></li>
+            <li th:attr="id=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{jokes}" style="width:70px">Witze</a></li>
+            <li th:attr="id=(${page == 'messages'} ? 'nav-active' : null)"><a th:href="@{messages}" style="width:150px">Benachrichtigungen</a></li>
+            <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{profile}" style="width:90px">Mein Profil</a></li>
         </ul>
 
         <hr class="noscreen" />

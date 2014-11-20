@@ -1,5 +1,4 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -8,7 +7,7 @@
     <title>Geek-Shop Think NERD</title>
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
-    <link rel="stylesheet" media="print" type="text/css" href="css/print.css" />
+    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css" />
 </head>
 
 <body>
@@ -19,7 +18,7 @@
     <div th:replace="header :: #header"></div>
 
     <!-- Navigation -->
-    <div th:replace="navigation :: nav ('main')"></div>
+    <div th:replace="navigation :: nav ('welcome')"></div>
 
     <!-- 2 columns (content + sidebar) -->
     <div id="cols" class="box">
