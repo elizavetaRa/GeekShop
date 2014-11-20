@@ -5,13 +5,14 @@ package GeekShop.web;
  */
 
 import GeekShop.*;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
 import org.springframework.ui.Model;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,8 +23,14 @@ import java.util.Optional;
 @Controller
 public class AccountController {
 
+    private final UserRepository userRepository;
 
     @Autowired
+    public AccountController(UserRepository userRepository) {
+        Assert.notNull(userRepository, "Has not to be Null.");
+        this.userRepository = userRepository;
+    }
+
 
     @RequestMapping({"/", "/index"})
     public String index() {
@@ -33,11 +40,26 @@ public class AccountController {
 
 
     @RequestMapping(value = "/index", method = RequestMethod.POST)
-    public String login(@RequestParam("userName") String userName, @RequestParam("password") String password){
+    public String login(@RequestParam("userName") String userName, @RequestParam("password") String password, Model model){
+
         if (userName.isEmpty() || password.isEmpty()) {
             return "/index";
-        } else{
-            return "/main";
+        } else {
+            boolean found = false;
+            for (User user : userRepository.findAll()){
+                if (user.getUserName()== userName) {
+                    if (user.getPassword() == password) {
+                        found = true;
+                        break;
+                    }
+                }
+
+            }
+            if (found == false){
+                return "/index";
+            } else {
+                return "/main";
+            }
         }
 
     }
