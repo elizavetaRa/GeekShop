@@ -1,4 +1,4 @@
-package GeekShop.web;
+package geeksho.controller;
 
 /**
  * Created by h4llow3En on 17/11/14.
@@ -13,8 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AccountController {
 
+//    private final UserRepository userRepository;
 
     @Autowired
+//    public AccountController(UserRepository userRepository) {
+//        Assert.notNull(userRepository, "Has not to be Null.");
+//        this.userRepository = userRepository;
+//    }
 
     @RequestMapping({"/", "/index"})
     public String index() {
@@ -29,8 +34,30 @@ public class AccountController {
         } else {
             return "welcome";
         }
-
     }
+
+//    public String login(@RequestParam("userName") String userName, @RequestParam("password") String password, Model model){
+//
+//        if (userName.isEmpty() || password.isEmpty()) {
+//            return "/index";
+//        } else {
+//            boolean found = false;
+//            for (User user : userRepository.findAll()){
+//                if (user.getUserName()== userName) {
+//                    if (user.getPassword() == password) {
+//                        found = true;
+//                        break;
+//                    }
+//                }
+//
+//            }
+//            if (found == false){
+//                return "/index";
+//            } else {
+//                return "/main";
+//            }
+//        }
+//   }
 
 
     @RequestMapping("/welcome")

@@ -1,4 +1,4 @@
-package GeekShop;
+package geeksho;
 
 import org.salespointframework.Salespoint;
 import org.salespointframework.SalespointSecurityConfiguration;
@@ -15,14 +15,25 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
 @Configuration
 @EnableAutoConfiguration
-@EntityScan(basePackageClasses = { Salespoint.class, Application.class })
-@EnableJpaRepositories(basePackageClasses = { Salespoint.class, Application.class })
+@EntityScan(basePackageClasses = {Salespoint.class, GeekShop.class})
+@EnableJpaRepositories(basePackageClasses = {Salespoint.class, GeekShop.class})
 @ComponentScan
-public class Application {
+public class GeekShop {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(GeekShop.class, args);
     }
+
+
+//    @Autowired UserRepository userRepository;
+//
+//    @PostConstruct
+//    void initialize(){
+//        userRepository.save(new User("test3", "T3st"));
+//        userRepository.save(new User("test2", "T2st"));
+//        userRepository.save(new User("test", "T1st"));
+//    }
+
 
     @Configuration
     static class GeekShopWebConfiguration extends SalespointWebConfiguration {
