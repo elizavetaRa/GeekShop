@@ -31,6 +31,8 @@ dd {margin-left:30px;}
 fieldset {position:relative; padding:10px;}
 legend {position:absolute; top:-1em; margin:0; padding:5px 10px; font-size:100%; font-weight:bold;}
 
+textarea {font-family:inherit; font-size:inherit;}
+
 /* ----------------------------------------------------------------------------------------------------------
 2) Universal styles (display, float, margin, text-align...)
 ---------------------------------------------------------------------------------------------------------- */
@@ -76,7 +78,7 @@ tr.highlight:focus td, tr.highlight:hover td, tr.highlight:active td {background
 tr.indent td:first-child {padding-left:1.5em;}
 
 ul.ul-style01 {margin:5px 0 15px 0px; padding:0; list-style:none;}
-ul.ul-style01 li {margin:0; padding:0; padding-left:15px; background:url("../images/ul-style01.gif") 0 55% no-repeat;}
+ul.ul-style01 li {margin:0; padding:0; padding-left:15px; background:url("../images/ul-style01.gif") 0 0.5em no-repeat;}
 ul.ul-style01 ul {margin:0; padding:0; list-style:none;}
 ul.ul-style01 ul li {background:url("../images/ul-style01-sub.gif") 0 5px no-repeat;}
 
@@ -98,7 +100,7 @@ ul.ul-style01 ul li {background:url("../images/ul-style01-sub.gif") 0 5px no-rep
     
         #nav ul {margin:0; padding:0; list-style:none;}
         #nav ul li {display:inline; margin:0; padding:0;}
-        #nav ul li a {display:block; min-width:100px; float:left; padding:12px 15px 12px 14px; background:url("../images/nav-link.gif") 100% 0 repeat-y; text-decoration:underline; text-align:center; text-decoration:none;}
+        #nav ul li a {display:block; /*min-width:100px;*/ float:left; padding:12px 10px 12px 9px; background:url("../images/nav-link.gif") 100% 0 repeat-y; text-decoration:underline; text-align:center; text-decoration:none;}
         #nav ul li#nav-active a {font-weight:bold; text-decoration:none;}
 
     #cols {position:absolute; top:150px; bottom:27px;/*77px;*/ background:url("../images/cols.gif") 0 0 repeat-y;}
@@ -106,7 +108,7 @@ ul.ul-style01 ul li {background:url("../images/ul-style01-sub.gif") 0 5px no-rep
         #content {position:relative; height:100%; float:left; width:910px; overflow:hidden;}
         
             #content #content-title {margin:0; padding:15px 15px 10px 20px; height:30px; line-height:30px; background:url("../images/content-title.gif") 0 0 no-repeat; font-size:140%; font-weight:normal;}
-            #content #content-in {position:absolute; top:55px; bottom:0; width: 620px; overflow: auto; padding:10px 15px 10px 20px;}
+            #content #content-in {position:absolute; top:55px; bottom:0; width: 870px; overflow: auto; padding:10px 15px 10px 20px;}
         
         #aside {position:relative; height:100%; float:right; width:255px; overflow:hidden;}
         
@@ -145,3 +147,10 @@ dl#news dd span.date {padding-right:10px; background:url("../images/date.gif") 1
 .members {font-size: 120%;}
 .members li {clear: left;}
 .members span {display: block; float: left; width: 12em; font-weight: bold;}
+
+
+/*
+ * Joke
+ */
+#joke{position: absolute; width: 899px; height: 504px; top: 8%; background:url("../images/joke.gif");
+    background-size:70%; border-radius: 12px; color: black;  text-align: center; padding-right: 10px; padding-left:10px;}

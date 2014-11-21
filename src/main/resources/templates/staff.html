@@ -1,0 +1,95 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Geek-Shop Think NERD</title>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css"/>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css"/>
+    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css"/>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="resources/js/selectAll.js"></script>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('staff')"></div>
+
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Personalverwaltung</h3>
+
+            <div id="content-in">
+
+                <table class="table-style01 alternatRows">
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"/></th>
+                        <th>Vorname</th>
+                        <th>Nachname</th>
+                        <th>Email-Adresse</th>
+                        <th>Nutzer-Id</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
+                        <td>Steve</td>
+                        <td>Jobs</td>
+                        <td>boss@apple.com</td>
+                        <td>001</td>
+                        <td><a href="#">Profil ansehen</a></td>
+                    </tr>
+                    <tr>
+                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
+                        <td>Nerdy</td>
+                        <td>Geekmann</td>
+                        <td>geeky@nerd.com</td>
+                        <td>002</td>
+                        <td><a href="#">Profil ansehen</a></td>
+                    </tr>
+
+                </table>
+
+                <button id="employ" class="myButton" style="margin-left: 1%">Einstellen</button>
+                <button id="dismiss" class="myButton" style="margin-left: 1%">Entlassen</button>
+
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>
