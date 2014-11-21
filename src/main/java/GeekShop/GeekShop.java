@@ -1,8 +1,11 @@
 package GeekShop;
 
+import GeekShop.model.*;
 import org.salespointframework.Salespoint;
 import org.salespointframework.SalespointSecurityConfiguration;
 import org.salespointframework.SalespointWebConfiguration;
+import org.salespointframework.useraccount.UserAccount;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
@@ -12,6 +15,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+
+import javax.annotation.PostConstruct;
 
 @Configuration
 @EnableAutoConfiguration
@@ -25,14 +30,15 @@ public class GeekShop {
     }
 
 
-//    @Autowired UserRepository userRepository;
-//
-//    @PostConstruct
-//    void initialize(){
-//        userRepository.save(new User("test3", "T3st"));
+    @Autowired
+    UserRepository userRepository;
+
+    @PostConstruct
+    void initialize(){
+//        userRepository.save(new User(new UserAccount("efsr", "sdfs"), "T3st"));
 //        userRepository.save(new User("test2", "T2st"));
 //        userRepository.save(new User("test", "T1st"));
-//    }
+    }
 
 
     @Configuration
