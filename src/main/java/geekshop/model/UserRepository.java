@@ -1,4 +1,4 @@
-package geekshop.model;
+package GeekShop.model;
 
 /**
  * Created by h4llow3En on 20/11/14.

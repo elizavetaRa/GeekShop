@@ -1,4 +1,4 @@
-package geekshop.controller;
+package GeekShop.controller;
 
 /**
  * Created by Basti on 20.11.2014.

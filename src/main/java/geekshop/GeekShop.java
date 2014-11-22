@@ -1,6 +1,6 @@
-package geekshop;
+package GeekShop;
 
-import geekshop.model.*;
+import GeekShop.model.*;
 import org.salespointframework.Salespoint;
 import org.salespointframework.SalespointSecurityConfiguration;
 import org.salespointframework.SalespointWebConfiguration;
