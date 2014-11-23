@@ -1,6 +1,6 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -21,9 +21,9 @@
             <li th:attr="id=(${page == 'catalog'} ? 'nav-active' : null)" ><a th:href="@{catalog}" style="width:100px">Artikelsuche</a></li>
             <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{reclaim}" style="width:100px">Reklamation</a></li>
             <li th:attr="id=(${page == 'cart'} ? 'nav-active' : null)"><a th:href="@{cart}" style="width:90px">Warenkorb</a></li>
-            <li th:attr="id=(${page == 'staff'} ? 'nav-active' : null)"><a th:href="@{staff}" style="width:80px">Personal</a></li>
-            <li th:attr="id=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{jokes}" style="width:70px">Witze</a></li>
-            <li th:attr="id=(${page == 'messages'} ? 'nav-active' : null)"><a th:href="@{messages}" style="width:150px">Benachrichtigungen</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')"><a th:href="@{staff}" style="width:80px">Personal</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{jokes}" style="width:70px">Witze</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'messages'} ? 'nav-active' : null)"><a th:href="@{messages}" style="width:150px">Benachrichtigungen</a></li>
             <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{profile}" style="width:90px">Mein Profil</a></li>
         </ul>
 
