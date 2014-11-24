@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
-public class CartController {
+class CartController {
 
 //    @Autowired
 
     @RequestMapping("/cart")
     public String cart() {
-        return "/cart";
+        return "cart";
     }
 
     @RequestMapping("/reclaim")
     public String reclaim() {
-        return "/reclaim";
+        return "reclaim";
     }
 }

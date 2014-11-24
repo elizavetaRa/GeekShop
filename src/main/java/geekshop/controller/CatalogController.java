@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
-public class CatalogController {
+class CatalogController {
 
 //    @Autowired
 
     @RequestMapping("/catalog")
     public String catalog() {
-        return "/catalog";
+        return "catalog";
     }
 }

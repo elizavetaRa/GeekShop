@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @PreAuthorize("hasRole('ROLE_OWNER')")
-public class OwnerController {
+class OwnerController {
 
 //    @Autowired
 

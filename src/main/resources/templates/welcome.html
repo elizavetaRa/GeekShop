@@ -26,10 +26,10 @@
         <!-- Content -->
         <div id="content">
 
-            <h2 id="content-title">Hier dein Witz</h2>
+            <h2 id="content-title">Dein Begrüßungswitz</h2>
 
             <!-- Perex -->
-            <div id="perex" class="box">
+            <div id="perex" class="box" th:utext="${joke.text}">
 
                 <p>
                 Frau: „Ich habe das neuste Windows-System.“<br/>

@@ -1,15 +1,14 @@
 package GeekShop.model;
 
+import org.salespointframework.useraccount.UserAccount;
+import org.springframework.util.Assert;
+
+import javax.persistence.*;
+import java.util.*;
+
 /**
  * Created by h4llow3En on 20/11/14.
  */
-
-import org.salespointframework.useraccount.UserAccount;
-import org.springframework.util.Assert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
 
 @Entity
 public class User {
@@ -20,21 +19,136 @@ public class User {
     @OneToOne
     private UserAccount userAccount;
 
-    private String userName;
+    private Date birthday;
+    private String landline;
+    private String mobile;
+    private String street;
+    private String houseNr;
+    private String postcode;
+    private String place;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    @Enumerated(EnumType.STRING)
+    private MaritalStatus status;
 
-    public User(UserAccount userAccount, String userName){
-        Assert.notNull(userAccount, "UserAccount must not be null.");
-        Assert.hasText(userName, "Username must not be null.");
+    @ManyToMany
+    private List<Joke> recentJokes;
 
-        this.userAccount = userAccount;
-        this.userName = userName;
+
+    @Deprecated
+    protected User() {
     }
 
-    public User(){}
+    public User(UserAccount userAccount) {
+        Assert.notNull(userAccount, "UserAccount must not be null.");
+        this.userAccount = userAccount;
 
-    public String getUserName() { return userName; }
+        this.recentJokes = new LinkedList<Joke>();
+    }
 
-    public UserAccount getUserAccount(){
+
+    public UserAccount getUserAccount() {
         return userAccount;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getLandline() {
+        return landline;
+    }
+
+    public void setLandline(String landline) {
+        this.landline = landline;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getHouseNr() {
+        return houseNr;
+    }
+
+    public void setHouseNr(String houseNr) {
+        this.houseNr = houseNr;
+    }
+
+    public String getPostcode() {
+        return postcode;
+    }
+
+    public void setPostcode(String postcode) {
+        this.postcode = postcode;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public MaritalStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MaritalStatus status) {
+        this.status = status;
+    }
+
+    public List<Joke> getRecentJokes() {
+        return recentJokes;
+    }
+
+    protected void setRecentJokes(List<Joke> recentJokes) {
+        this.recentJokes = recentJokes;
+    }
+
+    public void addJoke(Joke joke) {
+        System.out.println("\ndavor:");
+        for (int i = 0; i < recentJokes.size(); i++) {
+            Joke j = recentJokes.get(i);
+            System.out.println(i + ": " + j.getText().substring(0, 30));
+        }
+
+        recentJokes.remove(joke);
+        if (recentJokes.size() == 5) {
+            recentJokes.remove(0);
+        }
+        recentJokes.add(joke);
+
+        System.out.println("\ndanach:");
+        for (int i = 0; i < recentJokes.size(); i++) {
+            Joke j = recentJokes.get(i);
+            System.out.println(i + ": " + j.getText().substring(0, 30));
+        }
+
     }
 }

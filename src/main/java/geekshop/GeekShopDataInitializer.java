@@ -1,5 +1,7 @@
 package GeekShop;
 
+import GeekShop.model.Joke;
+import GeekShop.model.JokeRepository;
 import GeekShop.model.User;
 import GeekShop.model.UserRepository;
 import org.salespointframework.core.DataInitializer;
@@ -20,21 +22,24 @@ import java.util.Arrays;
 @Component
 public class GeekShopDataInitializer implements DataInitializer {
 
-//    private final Inventory<InventoryItem> inventory;
+    //    private final Inventory<InventoryItem> inventory;
 //    private final VideoCatalog videoCatalog;
     private final UserAccountManager userAccountManager;
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
+    private final JokeRepository jokeRepo;
 
     @Autowired
-    public GeekShopDataInitializer(UserRepository userRepository/*, Inventory<InventoryItem> inventory*/,
-                                    UserAccountManager userAccountManager/*, VideoCatalog videoCatalog*/) {
+    public GeekShopDataInitializer(UserRepository userRepo, JokeRepository jokeRepo/*, Inventory<InventoryItem> inventory*/,
+                                   UserAccountManager userAccountManager/*, VideoCatalog videoCatalog*/) {
 
-        Assert.notNull(userRepository, "UserRepository must not be null!");
+        Assert.notNull(userRepo, "UserRepository must not be null!");
+        Assert.notNull(jokeRepo, "JokeRepository must not be null!");
 //        Assert.notNull(inventory, "Inventory must not be null!");
         Assert.notNull(userAccountManager, "UserAccountManager must not be null!");
 //        Assert.notNull(videoCatalog, "VideoCatalog must not be null!");
 
-        this.userRepository = userRepository;
+        this.userRepo = userRepo;
+        this.jokeRepo = jokeRepo;
 //        this.inventory = inventory;
         this.userAccountManager = userAccountManager;
 //        this.videoCatalog = videoCatalog;
@@ -47,7 +52,8 @@ public class GeekShopDataInitializer implements DataInitializer {
     @Override
     public void initialize() {
 
-        initializeUsers(userAccountManager, userRepository);
+        initializeUsers(userAccountManager, userRepo);
+        initializeJokes(jokeRepo);
 //        initializeCatalog(videoCatalog, inventory);
     }
 
@@ -93,7 +99,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 //        }
 //    }
 
-    private void initializeUsers(UserAccountManager userAccountManager, UserRepository userRepository) {
+    private void initializeUsers(UserAccountManager userAccountManager, UserRepository userRepo) {
 
         // (｡◕‿◕｡)
         // UserAccounts bestehen aus einem Identifier und eine Password, diese werden auch für ein Login gebraucht
@@ -121,11 +127,70 @@ public class GeekShopDataInitializer implements DataInitializer {
         UserAccount ua4 = userAccountManager.create("mclovinfogell", "123", employeeRole);
         userAccountManager.save(ua4);
 
-        User u1 = new User(ua1, "wurst");
-        User u2 = new User(ua2, "Miami-Dade County");
-        User u3 = new User(ua3, "Camden County - Motel");
-        User u4 = new User(ua4, "Los Angeles");
+        User owner = new User(ownerAccount);
+        User u1 = new User(ua1);
+        User u2 = new User(ua2);
+        User u3 = new User(ua3);
+        User u4 = new User(ua4);
 
-        userRepository.save(Arrays.asList(u1, u2, u3, u4));
+        userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }
+
+    private void initializeJokes(JokeRepository jokeRepo) {
+        if (jokeRepo.count() > 0) {
+            return;
+        }
+
+        jokeRepo.save(new Joke(
+                "Frau: „Ich habe das neuste Windows-System.“<br/>\n" +
+                "Berater: „Ja, und?“<br/>\n" +
+                "Frau: „Ich habe da ein Problem.“<br/>\n" +
+                "Berater: „Ja, aber das haben Sie doch bereits gesagt.“"
+        ));
+        jokeRepo.save(new Joke(
+                "Ein Informatiker stellt sich jeden Abend ein volles und ein leeres Glas Wasser neben sein Bett. Warum?<br/>\n" +
+                "– Das volle Glas ist dafür da, falls er in der Nacht aufwacht und Durst hat.\n" +
+                "Und das leere Glas, falls er in der Nacht aufwacht und keinen Durst hat."
+        ));
+        jokeRepo.save(new Joke(
+                "Was hat Windows mit einem U-Boot gemein?</br>Kaum macht man ein Fenster auf, fangen die Probleme an."
+        ));
+        jokeRepo.save(new Joke(
+                "Immer wenn jemand auf „Eigene Dateien“ klickt, fällt irgendwo ein NSA-Mitarbeiter lachend vom Stuhl."
+        ));
+        jokeRepo.save(new Joke(
+                "Es gibt genau 10 Arten von Menschen: Die, die binäre Zahlen verstehen und die, die es nicht tun."
+        ));
+        jokeRepo.save(new Joke(
+                "Treffen sich zufällig zwei Informatiker im Park. Der eine kommt auf einem Fahrrad daher.<br/>\n" +
+                "„Hey, cooles Rad. Wo hast du denn das her?“<br/>\n" +
+                "„Ach, das ist eine seltsame Geschichte“, antwortet der andere. „Ich komme da hinten in den Park. " +
+                "Da kommt eine Frau in einem blauen Kleid auf dem Fahrrad daher, versperrt mir den Weg, " +
+                "zieht sich das Kleid aus und wirft es vor mir auf den Boden. Dann steht die da splitterfasernackt und meint zu mir: " +
+                "‚Du kannst von mir haben, was du willst!‘. Tja und da hab ich halt das Fahrrad genommen.“<br/>\n" +
+                "„Ja, das war klug von dir“, antwortet der andere. „Im blauen Kleid hättest Du auch ziemlich bescheuert ausgesehen!“"
+        ));
+        jokeRepo.save(new Joke(
+                "Treffen sich zwei Pointer auf dem Stack. Sagt der eine zum anderen: „Ey, hör auf, auf mich zu zeigen!“"
+        ));
+        jokeRepo.save(new Joke(
+                "DAU: „Mein Monitor geht nicht.“<br/>\n" +
+                "Helpdesk: „Ist er denn eingeschaltet?“<br/>\n" +
+                "DAU: „Ja.“<br/>\n" +
+                "Helpdesk: „Schalten Sie ihn doch bitte mal aus.“<br/>\n" +
+                "DAU: „Ah, jetzt geht’s …“"
+        ));
+        jokeRepo.save(new Joke(
+                "Dicker Nebel. Ein kleines amerikanisches Flugzeug hat sich verflogen. " +
+                "Der Pilot kreist um das oberste Stockwerk eines Bürohauses, lehnt sich aus dem Cockpit " +
+                "und brüllt durch ein offenes Fenster: „Wo sind wir?“<br/>Ein Mann blickt von seinem PC auf: " +
+                "„In einem Flugzeug!“<br/>Der Pilot dreht eine scharfe Kurve und " +
+                "landet fünf Minuten später mit dem letzten Tropfen Treibstoff auf dem Flughafen von Seattle.<br/>" +
+                "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren.<br/>" +
+                "„Ganz einfach“, sagt der Pilot. „Die Antwort auf meine Frage war kurz, korrekt und völlig nutzlos. " +
+                "Ich hatte also mit der Microsoft-Hotline gesprochen. " +
+                "Das Microsoft Gebäude liegt 5 Meilen westlich vom Flughafen Seattle, Kurs 89 Grad.“"
+        ));
+    }
+
 }
