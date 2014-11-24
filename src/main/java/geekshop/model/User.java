@@ -132,23 +132,10 @@ public class User {
     }
 
     public void addJoke(Joke joke) {
-        System.out.println("\ndavor:");
-        for (int i = 0; i < recentJokes.size(); i++) {
-            Joke j = recentJokes.get(i);
-            System.out.println(i + ": " + j.getText().substring(0, 30));
-        }
-
         recentJokes.remove(joke);
         if (recentJokes.size() == 5) {
             recentJokes.remove(0);
         }
         recentJokes.add(joke);
-
-        System.out.println("\ndanach:");
-        for (int i = 0; i < recentJokes.size(); i++) {
-            Joke j = recentJokes.get(i);
-            System.out.println(i + ": " + j.getText().substring(0, 30));
-        }
-
     }
 }

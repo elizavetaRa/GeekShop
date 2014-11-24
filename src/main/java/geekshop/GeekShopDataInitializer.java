@@ -142,18 +142,18 @@ public class GeekShopDataInitializer implements DataInitializer {
         }
 
         jokeRepo.save(new Joke(
-                "Frau: „Ich habe das neuste Windows-System.“<br/>\n" +
-                "Berater: „Ja, und?“<br/>\n" +
-                "Frau: „Ich habe da ein Problem.“<br/>\n" +
+                "Frau: „Ich habe das neuste Windows-System.“" + System.getProperty("line.separator") +
+                "Berater: „Ja, und?“" + System.getProperty("line.separator") +
+                "Frau: „Ich habe da ein Problem.“" + System.getProperty("line.separator") +
                 "Berater: „Ja, aber das haben Sie doch bereits gesagt.“"
         ));
         jokeRepo.save(new Joke(
-                "Ein Informatiker stellt sich jeden Abend ein volles und ein leeres Glas Wasser neben sein Bett. Warum?<br/>\n" +
-                "– Das volle Glas ist dafür da, falls er in der Nacht aufwacht und Durst hat.\n" +
+                "Ein Informatiker stellt sich jeden Abend ein volles und ein leeres Glas Wasser neben sein Bett. Warum?" + System.getProperty("line.separator") +
+                "– Das volle Glas ist dafür da, falls er in der Nacht aufwacht und Durst hat." + System.getProperty("line.separator") +
                 "Und das leere Glas, falls er in der Nacht aufwacht und keinen Durst hat."
         ));
         jokeRepo.save(new Joke(
-                "Was hat Windows mit einem U-Boot gemein?</br>Kaum macht man ein Fenster auf, fangen die Probleme an."
+                "Was hat Windows mit einem U-Boot gemein?" + System.getProperty("line.separator") + "Kaum macht man ein Fenster auf, fangen die Probleme an."
         ));
         jokeRepo.save(new Joke(
                 "Immer wenn jemand auf „Eigene Dateien“ klickt, fällt irgendwo ein NSA-Mitarbeiter lachend vom Stuhl."
@@ -162,34 +162,38 @@ public class GeekShopDataInitializer implements DataInitializer {
                 "Es gibt genau 10 Arten von Menschen: Die, die binäre Zahlen verstehen und die, die es nicht tun."
         ));
         jokeRepo.save(new Joke(
-                "Treffen sich zufällig zwei Informatiker im Park. Der eine kommt auf einem Fahrrad daher.<br/>\n" +
-                "„Hey, cooles Rad. Wo hast du denn das her?“<br/>\n" +
+                "Treffen sich zufällig zwei Informatiker im Park. Der eine kommt auf einem Fahrrad daher." + System.getProperty("line.separator") +
+                "„Hey, cooles Rad. Wo hast du denn das her?“" + System.getProperty("line.separator") +
                 "„Ach, das ist eine seltsame Geschichte“, antwortet der andere. „Ich komme da hinten in den Park. " +
                 "Da kommt eine Frau in einem blauen Kleid auf dem Fahrrad daher, versperrt mir den Weg, " +
                 "zieht sich das Kleid aus und wirft es vor mir auf den Boden. Dann steht die da splitterfasernackt und meint zu mir: " +
-                "‚Du kannst von mir haben, was du willst!‘. Tja und da hab ich halt das Fahrrad genommen.“<br/>\n" +
+                "‚Du kannst von mir haben, was du willst!‘. Tja und da hab ich halt das Fahrrad genommen.“" + System.getProperty("line.separator") +
                 "„Ja, das war klug von dir“, antwortet der andere. „Im blauen Kleid hättest Du auch ziemlich bescheuert ausgesehen!“"
         ));
         jokeRepo.save(new Joke(
                 "Treffen sich zwei Pointer auf dem Stack. Sagt der eine zum anderen: „Ey, hör auf, auf mich zu zeigen!“"
         ));
         jokeRepo.save(new Joke(
-                "DAU: „Mein Monitor geht nicht.“<br/>\n" +
-                "Helpdesk: „Ist er denn eingeschaltet?“<br/>\n" +
-                "DAU: „Ja.“<br/>\n" +
-                "Helpdesk: „Schalten Sie ihn doch bitte mal aus.“<br/>\n" +
+                "DAU: „Mein Monitor geht nicht.“" + System.getProperty("line.separator") +
+                "Helpdesk: „Ist er denn eingeschaltet?“" + System.getProperty("line.separator") +
+                "DAU: „Ja.“" + System.getProperty("line.separator") +
+                "Helpdesk: „Schalten Sie ihn doch bitte mal aus.“" + System.getProperty("line.separator") +
                 "DAU: „Ah, jetzt geht’s …“"
         ));
         jokeRepo.save(new Joke(
                 "Dicker Nebel. Ein kleines amerikanisches Flugzeug hat sich verflogen. " +
                 "Der Pilot kreist um das oberste Stockwerk eines Bürohauses, lehnt sich aus dem Cockpit " +
-                "und brüllt durch ein offenes Fenster: „Wo sind wir?“<br/>Ein Mann blickt von seinem PC auf: " +
-                "„In einem Flugzeug!“<br/>Der Pilot dreht eine scharfe Kurve und " +
-                "landet fünf Minuten später mit dem letzten Tropfen Treibstoff auf dem Flughafen von Seattle.<br/>" +
-                "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren.<br/>" +
+                "und brüllt durch ein offenes Fenster: „Wo sind wir?“" + System.getProperty("line.separator") + "Ein Mann blickt von seinem PC auf: " +
+                "„In einem Flugzeug!“\nDer Pilot dreht eine scharfe Kurve und " +
+                "landet fünf Minuten später mit dem letzten Tropfen Treibstoff auf dem Flughafen von Seattle.\n" +
+                "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren.\n" +
                 "„Ganz einfach“, sagt der Pilot. „Die Antwort auf meine Frage war kurz, korrekt und völlig nutzlos. " +
                 "Ich hatte also mit der Microsoft-Hotline gesprochen. " +
                 "Das Microsoft Gebäude liegt 5 Meilen westlich vom Flughafen Seattle, Kurs 89 Grad.“"
+        ));
+        jokeRepo.save(new Joke(
+                "Am Straßenrand steht ein Auto mit einem platten Reifen. Woran erkennt man, dass der Fahrer Informatiker ist?" + System.getProperty("line.separator") +
+                "– Wenn er nachsieht, ob an den anderen Reifen der gleiche Fehler auftritt."
         ));
     }
 

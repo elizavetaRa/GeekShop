@@ -4,18 +4,29 @@ package GeekShop.controller;
  * Created by Basti on 20.11.2014.
  */
 
+import GeekShop.model.JokeRepository;
+import GeekShop.model.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @PreAuthorize("hasRole('ROLE_OWNER')")
 class OwnerController {
+    private final UserRepository userRepo;
+    private final JokeRepository jokeRepo;
 
-//    @Autowired
+    @Autowired
+    public OwnerController(UserRepository userRepo, JokeRepository jokeRepo) {
+        this.userRepo = userRepo;
+        this.jokeRepo = jokeRepo;
+    }
 
     @RequestMapping("/jokes")
-    public String jokes() {
+    public String jokes(Model model) {
+        model.addAttribute("jokes", jokeRepo.findAll());
         return "jokes";
     }
 

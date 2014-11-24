@@ -15,7 +15,7 @@ public class Joke {
     @GeneratedValue
     private Long id;
 
-    @Column(length = 5 * 1024 * 1024)
+    @Column(length = 512 * 1024)
     private String text;
 
 

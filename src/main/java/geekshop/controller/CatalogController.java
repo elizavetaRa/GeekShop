@@ -16,6 +16,6 @@ class CatalogController {
 
     @RequestMapping("/catalog")
     public String catalog() {
-        return "catalog";
+        return "/catalog";
     }
 }

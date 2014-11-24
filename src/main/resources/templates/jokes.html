@@ -33,27 +33,25 @@
 
             <div id="content-in">
 
-                <table class="table-style01 alternatRows">
-                    <tr>
-                        <th><input type="checkbox" id="selectAll"/></th>
-                        <th>Witz-Id</th>
-                        <th>Text</th>
+                <form action="#">
 
-                    </tr>
-                    <tr>
-                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
-                        <td>001</td>
-                        <td>
-                            <form action="textarea.htm">
+                    <table class="table-style01 alternatRows">
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"/></th>
+                            <!--<th>Witz-Id</th>-->
+                            <th>Text</th>
 
-                                <textarea name="joke" cols="50" rows="5">Es war dunkel, feucht und neblig ...</textarea>
-
-                            </form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center"><input type="checkbox" class="case" name="case" value="2"/></td>
-                        <td>002</td>
+                        </tr>
+                        <tr th:each="joke : ${jokes}">
+                            <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
+                            <!--<td>001</td>-->
+                            <td>
+                                <textarea name="joke[]" cols="50" rows="4" th:utext="${joke.text}">Es war dunkel, feucht und neblig ...</textarea>
+                            </td>
+                        </tr>
+                        <!--<tr>
+                            <td align="center"><input type="checkbox" class="case" name="case" value="2"/></td>
+                            &lt;!&ndash;<td>002</td>&ndash;&gt;
                         <td>
                             <form action="textarea.htm">
 
@@ -61,12 +59,13 @@
 
                             </form>
                         </td>
-                    </tr>
-                </table>
+                    </tr>-->
+                    </table>
 
-                <button id="add" class="myButton" style="margin-left: 1%">Neuen Witz hinzufügen</button>
-                <button id="delete" class="myButton" style="margin-left: 1%">Löschen</button>
+                    <button id="add" class="myButton" style="margin-left: 1%">Neuen Witz hinzufügen</button>
+                    <button id="delete" class="myButton" style="margin-left: 1%">Löschen</button>
 
+                </form>
             </div>
             <!-- content-in-->
 
