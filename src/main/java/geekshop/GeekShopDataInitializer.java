@@ -183,10 +183,11 @@ public class GeekShopDataInitializer implements DataInitializer {
         jokeRepo.save(new Joke(
                 "Dicker Nebel. Ein kleines amerikanisches Flugzeug hat sich verflogen. " +
                 "Der Pilot kreist um das oberste Stockwerk eines Bürohauses, lehnt sich aus dem Cockpit " +
-                "und brüllt durch ein offenes Fenster: „Wo sind wir?“" + System.getProperty("line.separator") + "Ein Mann blickt von seinem PC auf: " +
-                "„In einem Flugzeug!“\nDer Pilot dreht eine scharfe Kurve und " +
-                "landet fünf Minuten später mit dem letzten Tropfen Treibstoff auf dem Flughafen von Seattle.\n" +
-                "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren.\n" +
+                "und brüllt durch ein offenes Fenster: „Wo sind wir?“" + System.getProperty("line.separator") +
+                "Ein Mann blickt von seinem PC auf: „In einem Flugzeug!“" + System.getProperty("line.separator") +
+                "Der Pilot dreht eine scharfe Kurve und landet fünf Minuten später " +
+                "mit dem letzten Tropfen Treibstoff auf dem Flughafen von Seattle." + System.getProperty("line.separator") +
+                "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren." + System.getProperty("line.separator") +
                 "„Ganz einfach“, sagt der Pilot. „Die Antwort auf meine Frage war kurz, korrekt und völlig nutzlos. " +
                 "Ich hatte also mit der Microsoft-Hotline gesprochen. " +
                 "Das Microsoft Gebäude liegt 5 Meilen westlich vom Flughafen Seattle, Kurs 89 Grad.“"
