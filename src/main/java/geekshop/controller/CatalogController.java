@@ -14,6 +14,8 @@ class CatalogController {
 
 //    @Autowired
 
+    // Noch mehr bullshit
+
     @RequestMapping("/catalog")
     public String catalog() {
         return "/catalog";
