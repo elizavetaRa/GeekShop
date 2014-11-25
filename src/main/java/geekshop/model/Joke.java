@@ -1,4 +1,4 @@
-package GeekShop.model;
+package geekshop.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

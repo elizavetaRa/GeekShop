@@ -1,6 +1,4 @@
-package GeekShop.model;
-
-import org.springframework.stereotype.Component;
+package geekshop.model;
 
 /**
 * Created by Basti on 24.11.2014.

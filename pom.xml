@@ -8,8 +8,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>GeekShop</name>
-    <description>INTERN GeekShop</description>
+    <name>geekshop</name>
+    <description>INTERN geekshop</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -57,7 +57,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <start-class>GeekShop.GeekShop</start-class>
+        <start-class>geekshop.GeekShop</start-class>
         <java.version>1.8</java.version>
     </properties>
 

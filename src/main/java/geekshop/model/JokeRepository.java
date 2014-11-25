@@ -1,4 +1,4 @@
-package GeekShop.model;
+package geekshop.model;
 
 import org.salespointframework.core.SalespointRepository;
 

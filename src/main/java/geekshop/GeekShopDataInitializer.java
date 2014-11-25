@@ -1,9 +1,9 @@
-package GeekShop;
+package geekshop;
 
-import GeekShop.model.Joke;
-import GeekShop.model.JokeRepository;
-import GeekShop.model.User;
-import GeekShop.model.UserRepository;
+import geekshop.model.Joke;
+import geekshop.model.JokeRepository;
+import geekshop.model.User;
+import geekshop.model.UserRepository;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;

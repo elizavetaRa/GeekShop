@@ -1,11 +1,11 @@
-package GeekShop.controller;
+package geekshop.controller;
 
 /**
  * Created by Basti on 20.11.2014.
  */
 
-import GeekShop.model.JokeRepository;
-import GeekShop.model.UserRepository;
+import geekshop.model.JokeRepository;
+import geekshop.model.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;

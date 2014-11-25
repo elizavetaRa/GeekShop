@@ -1,4 +1,4 @@
-package GeekShop;
+package geekshop;
 
 import org.salespointframework.Salespoint;
 import org.salespointframework.SalespointSecurityConfiguration;

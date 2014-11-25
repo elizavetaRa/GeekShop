@@ -1,4 +1,4 @@
-swt14w30-GeekShop
+swt14w30-geekshop
 =================
 
 INTERN Geek Shop

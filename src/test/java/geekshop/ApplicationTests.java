@@ -1,4 +1,4 @@
-package GeekShop;
+package geekshop;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

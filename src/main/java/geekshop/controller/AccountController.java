@@ -1,13 +1,13 @@
-package GeekShop.controller;
+package geekshop.controller;
 
 /**
  * Created by h4llow3En on 17/11/14.
  */
 
-import GeekShop.model.Joke;
-import GeekShop.model.JokeRepository;
-import GeekShop.model.User;
-import GeekShop.model.UserRepository;
+import geekshop.model.Joke;
+import geekshop.model.JokeRepository;
+import geekshop.model.User;
+import geekshop.model.UserRepository;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
