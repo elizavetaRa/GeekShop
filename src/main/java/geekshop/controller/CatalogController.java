@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @PreAuthorize("isAuthenticated()")
 class CatalogController {
 
-//    @Autowired
-
-    // Noch mehr bullshit
-
     @RequestMapping("/catalog")
     public String catalog() {
         return "/catalog";

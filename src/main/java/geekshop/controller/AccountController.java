@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpSession;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -34,21 +35,29 @@ class AccountController {
     }
 
     @RequestMapping({"/", "/index"})
-    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
         List<Joke> recentJokes;
         User user = null;
+        String sessionId = null;
         if (userAccount.isPresent()) {
             user = userRepo.findByUserAccount(userAccount.get());
+            sessionId = user.getCurrentSessionId();
             recentJokes = user.getRecentJokes();
         } else {
             recentJokes = new LinkedList<Joke>();
         }
-        Joke joke = getRandomJoke(recentJokes);
-        if (user != null) {
-            user.addJoke(joke);
-            userRepo.save(user);
+
+        if (user != null && httpSession.getId().equals(sessionId)) {
+            model.addAttribute("joke", user.getLastJoke());
+        } else {
+            Joke joke = getRandomJoke(recentJokes);
+            if (user != null) {
+                user.addJoke(joke);
+                user.setCurrentSessionId(httpSession.getId());
+                userRepo.save(user);
+            }
+            model.addAttribute("joke", joke);
         }
-        model.addAttribute("joke", joke);
         return "welcome";
     }
 

@@ -20,7 +20,7 @@
         <hr class="noscreen" />
 
         <!-- Slogan -->
-        <div id="slogan" th:text="${#authentication?.name != 'anonymousUser' ? #authentication?.name : null}">SWT-Praktikum Gruppe 30</div>
+        <div id="slogan" th:text="${#authentication?.name != 'anonymousUser' ? #authentication?.name : 'SWT-Praktikum Gruppe 30'}">SWT-Praktikum Gruppe 30</div>
         <hr class="noscreen" />
 
         <!-- Hidden navigation -->

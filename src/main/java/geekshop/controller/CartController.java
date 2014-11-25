@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @PreAuthorize("isAuthenticated()")
 class CartController {
 
-//    @Autowired
-
     @RequestMapping("/cart")
     public String cart() {
         return "cart";

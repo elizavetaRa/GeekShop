@@ -4,7 +4,9 @@ import org.salespointframework.useraccount.UserAccount;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by h4llow3En on 20/11/14.
@@ -18,6 +20,8 @@ public class User {
 
     @OneToOne
     private UserAccount userAccount;
+
+    private String currentSessionId;
 
     private Date birthday;
     private String landline;
@@ -49,6 +53,14 @@ public class User {
 
     public UserAccount getUserAccount() {
         return userAccount;
+    }
+
+    public String getCurrentSessionId() {
+        return currentSessionId;
+    }
+
+    public void setCurrentSessionId(String currentSessionId) {
+        this.currentSessionId = currentSessionId;
     }
 
     public Date getBirthday() {
@@ -137,5 +149,9 @@ public class User {
             recentJokes.remove(0);
         }
         recentJokes.add(joke);
+    }
+
+    public Joke getLastJoke() {
+        return recentJokes.size() > 0 ? recentJokes.get(recentJokes.size() - 1) : null;
     }
 }

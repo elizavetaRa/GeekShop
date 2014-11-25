@@ -18,14 +18,14 @@
 
         <ul class="box">
             <!--<li id="nav-active"><a>Begrüßung</a></li>-->
-            <li th:attr="id=(${page == 'catalog'} ? 'nav-active' : null)" ><a th:href="@{catalog}" style="width:100px">Artikelsuche</a></li>
-            <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{reclaim}" style="width:100px">Reklamation</a></li>
-            <li th:attr="id=(${page == 'cart'} ? 'nav-active' : null)"><a th:href="@{cart}" style="width:90px">Warenkorb</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')"><a th:href="@{staff}" style="width:80px">Personal</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{jokes}" style="width:70px">Witze</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'messages'} ? 'nav-active' : null)"><a th:href="@{messages}" style="width:150px">Benachrichtigungen</a></li>
-            <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{profile}" style="width:90px">Mein Profil</a></li>
-            <li ><a th:href="@{logout}" style="width:90px">Logout</a></li>
+            <li th:attr="id=(${page == 'catalog'} ? 'nav-active' : null)" ><a th:href="@{catalog}" style="width:11%">Artikelsuche</a></li>
+            <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{reclaim}" style="width:11%">Reklamation</a></li>
+            <li th:attr="id=(${page == 'cart'} ? 'nav-active' : null)"><a th:href="@{cart}" style="width:10%">Warenkorb</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')"><a th:href="@{staff}" style="width:9%">Personal</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{jokes}" style="width:8%">Witze</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'messages'} ? 'nav-active' : null)"><a th:href="@{messages}" style="width:17%">Benachrichtigungen</a></li>
+            <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{profile}" style="width:10%">Mein Profil</a></li>
+            <li ><a th:href="@{logout}" style="width:8%">Logout</a></li>
         </ul>
 
         <hr class="noscreen" />
