@@ -8,6 +8,7 @@
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css"/>
     <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css"/>
     <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css"/>
+    <script language="javascript" type="text/javascript" src="resources/js/selectAll.js"></script>
 </head>
 
 <body>
@@ -23,11 +24,45 @@
     <!-- 2 columns (content + sidebar) -->
     <div id="cols" class="box">
 
+
         <!-- Content -->
         <div id="content">
 
             <h3 id="content-title">Reklamation</h3>
 
+            <div id="content-in">
+
+                <label for="ordernumber">Rechnungsnummer eingeben:  </label>
+                <input name="ordernumber" id="ordernumber" type="text" size="10" maxlength="30" value="0042" required="required"/>
+                <table class="table-style01 alternatRows">
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"/></th>
+                        <th scope="col">Anzahl</th>
+                        <th scope="col">Produkt</th>
+                        <th scope="col">Einzelpreis</th>
+                        <th scope="col">Gesamt</th>
+                    </tr>
+                    <tr>
+                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
+                        <td><input type="number" value="2" min="1" max="5"/></td>
+                        <td><a href="#">Digitalkamera: FujiFilm FinePix F100fd</a></td>
+                        <td>209,19 EUR</td>
+                        <td>209,19 EUR</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
+                        <td><input type="number" value="2" min="1" max="5"/></td>
+                        <td><a href="#">Speicherkarte: SanDisk Extreme III SD 4GB</a></td>
+                        <td>21,75 EUR</td>
+                        <td>43,50 EUR</td>
+                    </tr>
+
+                </table>
+
+                <button id="tocart" class="myButton" style="margin-left: 1%">zum Warenkorb hinzufügen</button>
+
+
+            </div>
 
             <hr class="noscreen"/>
 
