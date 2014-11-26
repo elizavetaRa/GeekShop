@@ -1,5 +1,7 @@
 *.pdf
 *.aux
+*.nav
+*.snm
 *.log
 *.synctex.gz
 *.out
