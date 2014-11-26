@@ -24,6 +24,11 @@ class OwnerController {
         this.jokeRepo = jokeRepo;
     }
 
+    @RequestMapping("/orders")
+    public String orders() {
+        return "orders";
+    }
+
     @RequestMapping("/jokes")
     public String jokes(Model model) {
         model.addAttribute("jokes", jokeRepo.findAll());

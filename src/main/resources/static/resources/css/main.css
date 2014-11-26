@@ -72,9 +72,9 @@ table.table-style01 td:first-child {font-weight:bold;}
 table.alternatRows tr:nth-child(2n+3) {background:#EFEFEF;}
 table.firstLeft th:first-child, table.firstLeft td:first-child {text-align:left;}
 table.firstLeft td:first-child {font-weight:normal;}
-tr.highlight th, tr.highlight td {font-weight:bold !important; background:#D5E7EF; cursor:pointer;}
-tr.highlight:focus th, tr.highlight:hover th, tr.highlight:active th,
-tr.highlight:focus td, tr.highlight:hover td, tr.highlight:active td {background:#E5F3F9;}
+tr.highlight th, tr.highlight td {font-weight:bold !important; background:#D5E7EF;/* cursor:pointer;*/}
+/*tr.highlight:focus th, tr.highlight:hover th, tr.highlight:active th,
+tr.highlight:focus td, tr.highlight:hover td, tr.highlight:active td {background:#E5F3F9;}*/
 tr.indent td:first-child {padding-left:1.5em;}
 
 ul.ul-style01 {margin:5px 0 15px 0px; padding:0; list-style:none;}
