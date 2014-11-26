@@ -41,24 +41,66 @@
             <h3 id="content-title">Artikelsuche</h3>
 
             <div id="content-in">
+
+                <div style="width: 195px; border: 4px solid #02AAFC; border-radius: 6px;
+                float:left; height: 100%; padding-left: 10px;">
                 <ul class="ul-style01">
-                    <li class="expand">Kategorie 1
-                        <ul>
-                            <li>Unterkategorie 1</li>
-                            <li>Unterhategorie 2</li>
+
+                    <li class="expand expanded" style="cursor:pointer"><h5>Kleidung für Nerds</h5>
+                        <ul style="display: none; cursor:pointer">
+                            <li >T-Shirts</li>
+                            <li>Pullis</li>
                         </ul>
                     </li>
 
-                    <li class="expand">Kategorie 1
-                        <ul>
-                            <li>A</li>
-                            <li>B</li>
-
+                    <li class="expand expanded" style="cursor:pointer"><h5>Gadgets</h5>
+                        <ul style="display: none; cursor:pointer">
+                            <li >für Android</li>
+                            <li>für IOS</li>
                         </ul>
                     </li>
 
                 </ul>
-            </div>
+                </div>
+
+
+                <div style="width: 620px;
+                float:right; height: 100%; padding-left: 10px;">
+
+
+                    <input name="suchen" id="suchen" type="text" size="15" maxlength="40" required="required"/>
+                    <button>suchen</button>
+
+                    <label>sortieren nach</label>
+                    <select name="sortieren" id="sortieren">
+                        <option selected="selected">Name</option>
+                        <option>Preis aufsteigend</option>
+                        <option>Preis absteigend</option>
+                        <option>Artikelnummer</option>
+                    </select>
+
+                    <table class="table-style01 alternatRows">
+                        <tr>
+
+                            <th scope="col">Produkt</th>
+                            <th scope="col"> Verfügbare Anzahl</th>
+                            <th scope="col"> zu Warenkorb</th>
+
+                        </tr>
+                        <tr>
+
+
+                            <td><a href="#">Digitalkamera</a></td>
+                            <td><input type="number" value="7" min="1"/></td>
+                            <td><button> + </button></td>
+
+                        </tr>
+                    </table>
+                 </div>
+
+
+
+            </div>  <!--/content-in -->
 
         </div>
         <!-- /content -->
