@@ -1,17 +1,10 @@
-\documentclass{beamer}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{tabularx}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage[ngerman]{babel}
+\input{source/Header.tex}
 
-\usetheme{Antibes}
+\usepackage[ngerman]{babel}
 
 \begin{document}
 \title{Zwischenpr\"asentation Geek-Shop}
-\author{SWT14W30}
+\author{Softwaretechnologie-Projekt 2014 Gruppe 30}
 \date{27. November 2014}
 
 \begin{frame}
@@ -19,24 +12,65 @@
 \end{frame}
 
 \begin{frame}
+\frametitle{Gruppenmitglieder}
+\begin{tabular}{rp{10cm}}
+Chefprogrammierer: & Sebastian D\"oring \\
+Assistent: & Elizaveta Ragozina \\
+Sekretär: & Marcus Kammerdiener \\
+Tester: & Dominik Lauck \\
+Administrator: & Felix D\"oring \\
+\end{tabular}
+\end{frame}
+
+
+\begin{frame}
 \frametitle{Inhaltsverzeichnis}\
 \tableofcontents
 \end{frame}
 
-\section{Erkl\"arung}
+\section{Entwurfsdiagramme}
+\subsection{Entwurfsklassendiagramm}
 \begin{frame}
-\begin{itemize}
-\item bla
-\item bla
-\item bla
-\end{itemize}
+\frametitle{Entwurfsklassendiagramm}
+\center{\includegraphics[scale=.131]{../../Entwurf/ekd_ood}}
 \end{frame}
 
-\subsection{Bild zur Erkl\"arung}
+\subsection{Sequenzdiagramme}
 \begin{frame}
-\center{\includegraphics[scale=.3]{../Pflichtenheft/images/reklamation}}
+\frametitle{Angestellten hinzuf\"ugen}
+\center{\includegraphics[width=\textwidth]{source/ekd_user}}
 \end{frame}
 
+\begin{frame}
+\frametitle{Angestellten hinzuf\"ugen}
+\center{\includegraphics[scale=.23]{../../Entwurf/angestellten_hinzufuegen_ood}}
+\end{frame}
 
+\begin{frame}
+\frametitle{Kaufvorgang}
+\center{\includegraphics[width=\textwidth]{source/ekd_order}}
+\end{frame}
+
+\begin{frame}
+\frametitle{Kaufvorgang}
+\center{\includegraphics[scale=.35]{../../Entwurf/kaufvorgang_ood}}
+\end{frame}
+
+\begin{frame}
+\frametitle{Reklamation}
+\center{\includegraphics[scale=.16]{../../Entwurf/reklamation_ood}}
+\end{frame}
+
+\section{Dialoglandkarte}
+\begin{frame}
+\frametitle{Dialoglandkarte}
+\center{\includegraphics[scale=.2]{../Pflichtenheft/images/dialoglandkarte}}
+\end{frame}
+
+\section{Prototyp}
+\begin{frame}
+\frametitle{Prototyp}
+\center{\includegraphics[scale=.175]{source/login}}
+\end{frame}
 
 \end{document}

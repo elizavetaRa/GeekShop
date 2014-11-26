@@ -1,5 +1,7 @@
-*.pdf
+Dokumente/tex/Protokolle/*.pdf
 *.aux
+*.nav
+*.snm
 *.log
 *.synctex.gz
 *.out
