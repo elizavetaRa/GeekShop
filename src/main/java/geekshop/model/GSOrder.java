@@ -1,27 +1,23 @@
 package geekshop.model;
 
-import javax.persistence.*;
-
 import org.salespointframework.order.Order;
-import org.salespointframework.order.OrderLine;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.useraccount.UserAccount;
 import org.springframework.util.Assert;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 /**
  * Created by Lisa on 30.11.2014.
  */
 
 @Entity
-public class GSOrder extends Order{
-    @Id
-    private UserAccount ua;
+public class GSOrder extends Order {
+
     @Enumerated(EnumType.STRING)
     private OrderType type;
-    private PaymentMethod paymentMethod;
-    private OrderLine orderLine;
-    private OrderLineState ols;
-
 
 
     @Deprecated
@@ -29,28 +25,23 @@ public class GSOrder extends Order{
     }
 
     public GSOrder(UserAccount ua, OrderType type) {
-      /*Assert.notNull(ua, "UserAccount must not be null.");
-      Assert.notNull(type, "OrderType must not be null.");*/
-      this.ua = ua;
-      this.type=type;
-
+        super(ua);
+        Assert.notNull(type, "OrderType must not be null.");
+        this.type = type;
     }
 
     public GSOrder(UserAccount ua, OrderType type, PaymentMethod paymentMethod) {
-        /*Assert.notNull(ua, "UserAccount must not be null.");
+        super(ua, paymentMethod);
         Assert.notNull(type, "OrderType must not be null.");
-        Assert.notNull(paymentMethod, "PaymentMethod must not be null.");*/
-        this.ua = ua;
-        this.type=type;
-        this.paymentMethod=paymentMethod;
-
+        this.type = type;
     }
 
-    public void setOrderType (OrderType type){this.type=type;}
+    public void setOrderType(OrderType type) {
+        this.type = type;
+    }
 
-    public OrderType getOrderType (){return type; }
-
-
-
+    public OrderType getOrderType() {
+        return type;
+    }
 
 }
