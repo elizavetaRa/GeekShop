@@ -1,5 +1,9 @@
 package geekshop.model;
 
+/*
+ * Created by Lisa on 30.11.2014.
+ */
+
 import org.salespointframework.order.Order;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.useraccount.UserAccount;
@@ -10,7 +14,10 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 /**
- * Created by Lisa on 30.11.2014.
+ * An extension of {@link Order} extended by {@link OrderType}.
+ *
+ * @author Elizaveta Ragozina
+ * @author Sebastian D&ouml;ring
  */
 
 @Entity

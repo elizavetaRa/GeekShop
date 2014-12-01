@@ -1,5 +1,9 @@
 package geekshop.model;
 
+/*
+ * Created by Lisa on 30.11.2014.
+ */
+
 import org.salespointframework.catalog.Product;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Quantity;
@@ -10,7 +14,10 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 /**
- * Created by Lisa on 30.11.2014.
+ * An extension of {@link OrderLine} extended by {@link OrderLineState}.
+ *
+ * @author Elizaveta Ragozina
+ * @author Sebastian D&ouml;ring
  */
 
 @Entity

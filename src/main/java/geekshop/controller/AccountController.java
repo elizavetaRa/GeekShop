@@ -1,6 +1,6 @@
 package geekshop.controller;
 
-/**
+/*
  * Created by h4llow3En on 17/11/14.
  */
 
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
@@ -22,14 +23,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * A Spring MVC controller to manage the {@link User}s.
+ *
+ * @author Felix D&ouml;ring
+ * @author Sebastian D&ouml;ring
+ */
+
 @Controller
 @PreAuthorize("isAuthenticated()")
 class AccountController {
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
 
+    /**
+     * Creates a new {@link AccountController} with the given {@link UserRepository} and  {@link JokeRepository}.
+     *
+     * @param userRepo must not be {@literal null}.
+     * @param jokeRepo must not be {@literal null}.
+     */
     @Autowired
     public AccountController(UserRepository userRepo, JokeRepository jokeRepo) {
+        Assert.notNull(userRepo, "UserRepository must not be null!");
+        Assert.notNull(jokeRepo, "JokeRepository must not be null!");
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
     }

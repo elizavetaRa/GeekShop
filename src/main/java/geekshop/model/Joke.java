@@ -1,13 +1,19 @@
 package geekshop.model;
 
+/*
+ * Created by Basti on 24.11.2014.
+ */
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
-* Created by Basti on 24.11.2014.
-*/
+ * Class representing a joke displayed after user login. Jokes are stored in the {@link geekshop.model.JokeRepository}.
+ *
+ * @author Sebastian D&ouml;ring
+ */
 
 @Entity
 public class Joke {

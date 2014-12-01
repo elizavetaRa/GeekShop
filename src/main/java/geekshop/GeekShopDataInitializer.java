@@ -1,9 +1,10 @@
 package geekshop;
 
-import geekshop.model.Joke;
-import geekshop.model.JokeRepository;
-import geekshop.model.User;
-import geekshop.model.UserRepository;
+/*
+ * Created by Basti on 23.11.2014.
+ */
+
+import geekshop.model.*;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -16,44 +17,46 @@ import org.springframework.util.Assert;
 import java.util.Arrays;
 
 /**
- * Created by Basti on 23.11.2014.
+ * A {@link DataInitializer} implementation that will create dummy data for the application on application startup.
+ *
+ * @author Felix D&ouml;ring
+ * @author Sebastian D&ouml;ring
  */
 
 @Component
 public class GeekShopDataInitializer implements DataInitializer {
 
-    //    private final Inventory<InventoryItem> inventory;
-//    private final VideoCatalog videoCatalog;
     private final UserAccountManager userAccountManager;
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
+    private final PasswordRulesRepository passRulesRepo;
 
     @Autowired
-    public GeekShopDataInitializer(UserRepository userRepo, JokeRepository jokeRepo/*, Inventory<InventoryItem> inventory*/,
+    public GeekShopDataInitializer(UserRepository userRepo, JokeRepository jokeRepo, PasswordRulesRepository passRulesRepo/*, Inventory<InventoryItem> inventory*/,
                                    UserAccountManager userAccountManager/*, VideoCatalog videoCatalog*/) {
 
         Assert.notNull(userRepo, "UserRepository must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
+        Assert.notNull(passRulesRepo, "PasswordRulesRepository must not be null!");
 //        Assert.notNull(inventory, "Inventory must not be null!");
         Assert.notNull(userAccountManager, "UserAccountManager must not be null!");
 //        Assert.notNull(videoCatalog, "VideoCatalog must not be null!");
 
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
+        this.passRulesRepo = passRulesRepo;
 //        this.inventory = inventory;
         this.userAccountManager = userAccountManager;
 //        this.videoCatalog = videoCatalog;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.salespointframework.core.DataInitializer#initialize()
-     */
+
     @Override
     public void initialize() {
 
         initializeUsers(userAccountManager, userRepo);
         initializeJokes(jokeRepo);
+        initializePasswordRules(passRulesRepo);
 //        initializeCatalog(videoCatalog, inventory);
     }
 
@@ -143,14 +146,14 @@ public class GeekShopDataInitializer implements DataInitializer {
 
         jokeRepo.save(new Joke(
                 "Frau: „Ich habe das neuste Windows-System.“" + System.getProperty("line.separator") +
-                "Berater: „Ja, und?“" + System.getProperty("line.separator") +
-                "Frau: „Ich habe da ein Problem.“" + System.getProperty("line.separator") +
-                "Berater: „Ja, aber das haben Sie doch bereits gesagt.“"
+                        "Berater: „Ja, und?“" + System.getProperty("line.separator") +
+                        "Frau: „Ich habe da ein Problem.“" + System.getProperty("line.separator") +
+                        "Berater: „Ja, aber das haben Sie doch bereits gesagt.“"
         ));
         jokeRepo.save(new Joke(
                 "Ein Informatiker stellt sich jeden Abend ein volles und ein leeres Glas Wasser neben sein Bett. Warum?" + System.getProperty("line.separator") +
-                "– Das volle Glas ist dafür da, falls er in der Nacht aufwacht und Durst hat." + System.getProperty("line.separator") +
-                "Und das leere Glas, falls er in der Nacht aufwacht und keinen Durst hat."
+                        "– Das volle Glas ist dafür da, falls er in der Nacht aufwacht und Durst hat." + System.getProperty("line.separator") +
+                        "Und das leere Glas, falls er in der Nacht aufwacht und keinen Durst hat."
         ));
         jokeRepo.save(new Joke(
                 "Was hat Windows mit einem U-Boot gemein?" + System.getProperty("line.separator") + "Kaum macht man ein Fenster auf, fangen die Probleme an."
@@ -163,39 +166,46 @@ public class GeekShopDataInitializer implements DataInitializer {
         ));
         jokeRepo.save(new Joke(
                 "Treffen sich zufällig zwei Informatiker im Park. Der eine kommt auf einem Fahrrad daher." + System.getProperty("line.separator") +
-                "„Hey, cooles Rad. Wo hast du denn das her?“" + System.getProperty("line.separator") +
-                "„Ach, das ist eine seltsame Geschichte“, antwortet der andere. „Ich komme da hinten in den Park. " +
-                "Da kommt eine Frau in einem blauen Kleid auf dem Fahrrad daher, versperrt mir den Weg, " +
-                "zieht sich das Kleid aus und wirft es vor mir auf den Boden. Dann steht die da splitterfasernackt und meint zu mir: " +
-                "‚Du kannst von mir haben, was du willst!‘. Tja und da hab ich halt das Fahrrad genommen.“" + System.getProperty("line.separator") +
-                "„Ja, das war klug von dir“, antwortet der andere. „Im blauen Kleid hättest Du auch ziemlich bescheuert ausgesehen!“"
+                        "„Hey, cooles Rad. Wo hast du denn das her?“" + System.getProperty("line.separator") +
+                        "„Ach, das ist eine seltsame Geschichte“, antwortet der andere. „Ich komme da hinten in den Park. " +
+                        "Da kommt eine Frau in einem blauen Kleid auf dem Fahrrad daher, versperrt mir den Weg, " +
+                        "zieht sich das Kleid aus und wirft es vor mir auf den Boden. Dann steht die da splitterfasernackt und meint zu mir: " +
+                        "‚Du kannst von mir haben, was du willst!‘. Tja und da hab ich halt das Fahrrad genommen.“" + System.getProperty("line.separator") +
+                        "„Ja, das war klug von dir“, antwortet der andere. „Im blauen Kleid hättest Du auch ziemlich bescheuert ausgesehen!“"
         ));
         jokeRepo.save(new Joke(
                 "Treffen sich zwei Pointer auf dem Stack. Sagt der eine zum anderen: „Ey, hör auf, auf mich zu zeigen!“"
         ));
         jokeRepo.save(new Joke(
                 "DAU: „Mein Monitor geht nicht.“" + System.getProperty("line.separator") +
-                "Helpdesk: „Ist er denn eingeschaltet?“" + System.getProperty("line.separator") +
-                "DAU: „Ja.“" + System.getProperty("line.separator") +
-                "Helpdesk: „Schalten Sie ihn doch bitte mal aus.“" + System.getProperty("line.separator") +
-                "DAU: „Ah, jetzt geht’s …“"
+                        "Helpdesk: „Ist er denn eingeschaltet?“" + System.getProperty("line.separator") +
+                        "DAU: „Ja.“" + System.getProperty("line.separator") +
+                        "Helpdesk: „Schalten Sie ihn doch bitte mal aus.“" + System.getProperty("line.separator") +
+                        "DAU: „Ah, jetzt geht’s …“"
         ));
         jokeRepo.save(new Joke(
                 "Dicker Nebel. Ein kleines amerikanisches Flugzeug hat sich verflogen. " +
-                "Der Pilot kreist um das oberste Stockwerk eines Bürohauses, lehnt sich aus dem Cockpit " +
-                "und brüllt durch ein offenes Fenster: „Wo sind wir?“" + System.getProperty("line.separator") +
-                "Ein Mann blickt von seinem PC auf: „In einem Flugzeug!“" + System.getProperty("line.separator") +
-                "Der Pilot dreht eine scharfe Kurve und landet fünf Minuten später " +
-                "mit dem letzten Tropfen Treibstoff auf dem Flughafen von Seattle." + System.getProperty("line.separator") +
-                "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren." + System.getProperty("line.separator") +
-                "„Ganz einfach“, sagt der Pilot. „Die Antwort auf meine Frage war kurz, korrekt und völlig nutzlos. " +
-                "Ich hatte also mit der Microsoft-Hotline gesprochen. " +
-                "Das Microsoft Gebäude liegt 5 Meilen westlich vom Flughafen Seattle, Kurs 89 Grad.“"
+                        "Der Pilot kreist um das oberste Stockwerk eines Bürohauses, lehnt sich aus dem Cockpit " +
+                        "und brüllt durch ein offenes Fenster: „Wo sind wir?“" + System.getProperty("line.separator") +
+                        "Ein Mann blickt von seinem PC auf: „In einem Flugzeug!“" + System.getProperty("line.separator") +
+                        "Der Pilot dreht eine scharfe Kurve und landet fünf Minuten später " +
+                        "mit dem letzten Tropfen Treibstoff auf dem Flughafen von Seattle." + System.getProperty("line.separator") +
+                        "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren." + System.getProperty("line.separator") +
+                        "„Ganz einfach“, sagt der Pilot. „Die Antwort auf meine Frage war kurz, korrekt und völlig nutzlos. " +
+                        "Ich hatte also mit der Microsoft-Hotline gesprochen. " +
+                        "Das Microsoft Gebäude liegt 5 Meilen westlich vom Flughafen Seattle, Kurs 89 Grad.“"
         ));
         jokeRepo.save(new Joke(
                 "Am Straßenrand steht ein Auto mit einem platten Reifen. Woran erkennt man, dass der Fahrer Informatiker ist?" + System.getProperty("line.separator") +
-                "– Wenn er nachsieht, ob an den anderen Reifen der gleiche Fehler auftritt."
+                        "– Wenn er nachsieht, ob an den anderen Reifen der gleiche Fehler auftritt."
         ));
+    }
+
+    private void initializePasswordRules(PasswordRulesRepository passRulesRepo) {
+        if (passRulesRepo.count() > 0)
+            return;
+
+        passRulesRepo.save(new PasswordRules());
     }
 
 }

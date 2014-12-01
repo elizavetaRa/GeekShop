@@ -1,12 +1,17 @@
 package geekshop.model;
 
+/*
+ * Created by Basti on 24.11.2014.
+ */
+
 import org.salespointframework.core.SalespointRepository;
 
 /**
-* Created by Basti on 24.11.2014.
-*/
+ * Repository to store {@link Joke}s.
+ *
+ * @author Sebastian D&ouml;ring
+ */
 
-//@Component("userRepository")
 public interface JokeRepository extends SalespointRepository<Joke, Long> {
 
 }

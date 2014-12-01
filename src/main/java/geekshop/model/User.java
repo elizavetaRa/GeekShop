@@ -1,5 +1,9 @@
 package geekshop.model;
 
+/*
+ * Created by h4llow3En on 20/11/14.
+ */
+
 import org.salespointframework.useraccount.UserAccount;
 import org.springframework.util.Assert;
 
@@ -9,7 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by h4llow3En on 20/11/14.
+ * This class represents the shop's users (shop owner and his employees).
+ *
+ * @author Felix D&ouml;ring
+ * @author Sebastian D&ouml;ring
  */
 
 @Entity

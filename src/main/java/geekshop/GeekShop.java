@@ -13,6 +13,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
+/**
+ * The central application class to configure the Spring container and run the application.
+ *
+ * @author Felix D&ouml;ring
+ * @author Sebastian D&ouml;ring
+ */
+
 @Configuration
 @EnableAutoConfiguration
 @EntityScan(basePackageClasses = {Salespoint.class, GeekShop.class})
@@ -23,17 +30,6 @@ public class GeekShop {
     public static void main(String[] args) {
         SpringApplication.run(GeekShop.class, args);
     }
-
-
-//    @Autowired
-//    UserRepository userRepository;
-//
-//    @PostConstruct
-//    void initialize(){
-//        userRepository.save(new User(new UserAccount("efsr", "sdfs"), "T3st"));
-//        userRepository.save(new User("test2", "T2st"));
-//        userRepository.save(new User("test", "T1st"));
-//    }
 
 
     @Configuration
@@ -66,8 +62,8 @@ public class GeekShop {
 
             http.csrf().disable();
 
-            http.authorizeRequests().antMatchers("/**").permitAll().and().//
-                    formLogin().loginPage("/login").loginProcessingUrl("/login").and().//
+            http.authorizeRequests().antMatchers("/**").permitAll().and().
+                    formLogin().loginPage("/login").loginProcessingUrl("/login").and().
                     logout().logoutUrl("/logout").logoutSuccessUrl("/");
         }
     }
