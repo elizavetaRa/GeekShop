@@ -30,9 +30,10 @@ public class User {
 
     private String currentSessionId;
 
+    private String firstname;
+    private String lastname;
     private Date birthday;
-    private String landline;
-    private String mobile;
+    private String phone;
     private String street;
     private String houseNr;
     private String postcode;
@@ -40,7 +41,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
     @Enumerated(EnumType.STRING)
-    private MaritalStatus status;
+    private MaritalStatus maritalStatus;
 
     @ManyToMany
     private List<Joke> recentJokes;
@@ -50,9 +51,22 @@ public class User {
     protected User() {
     }
 
-    public User(UserAccount userAccount) {
+    public User(UserAccount userAccount, String firstname,
+                String lastname, Gender gender, Date birthday,
+                MaritalStatus maritalStatus, String phone,
+                String street, String houseNr, String postcode, String place) {
         Assert.notNull(userAccount, "UserAccount must not be null.");
         this.userAccount = userAccount;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.maritalStatus = maritalStatus;
+        this.phone = phone;
+        this.street = street;
+        this.houseNr = houseNr;
+        this.postcode = postcode;
+        this.place = place;
 
         this.recentJokes = new LinkedList<Joke>();
     }
@@ -78,20 +92,12 @@ public class User {
         this.birthday = birthday;
     }
 
-    public String getLandline() {
-        return landline;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setLandline(String landline) {
-        this.landline = landline;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getStreet() {
@@ -134,12 +140,12 @@ public class User {
         this.gender = gender;
     }
 
-    public MaritalStatus getStatus() {
-        return status;
+    public MaritalStatus getMaritalStatus() {
+        return maritalStatus;
     }
 
-    public void setStatus(MaritalStatus status) {
-        this.status = status;
+    public void setMaritalStatus(MaritalStatus maritalStatus) {
+        this.maritalStatus = maritalStatus;
     }
 
     public List<Joke> getRecentJokes() {

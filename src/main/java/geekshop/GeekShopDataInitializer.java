@@ -5,6 +5,7 @@ package geekshop;
  */
 
 import geekshop.model.*;
+import geekshop.controller.*;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -14,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * A {@link DataInitializer} implementation that will create dummy data for the application on application startup.
@@ -115,6 +119,19 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (userAccountManager.get(new UserAccountIdentifier("owner")).isPresent()) {
             return;
         }
+        String firstname = "Max";
+        String lastname = "Mustermann";
+        Gender gender = Gender.SOMETHING_ELSE;
+        Date birthday = null;
+        try {
+            birthday= new SimpleDateFormat("dd MM YYYY").parse("12 12 2012");
+        }catch (ParseException e){}
+        MaritalStatus maritalStatus = MaritalStatus.UNKNOWN;
+        String phone = "01231234567";
+        String street = "Musterstrasse";
+        String houseNr = "1";
+        String postcode = "12345";
+        String place = "Musterstadt";
 
         UserAccount ownerAccount = userAccountManager.create("owner", "123", new Role("ROLE_OWNER"));
         userAccountManager.save(ownerAccount);
@@ -130,11 +147,11 @@ public class GeekShopDataInitializer implements DataInitializer {
         UserAccount ua4 = userAccountManager.create("mclovinfogell", "123", employeeRole);
         userAccountManager.save(ua4);
 
-        User owner = new User(ownerAccount);
-        User u1 = new User(ua1);
-        User u2 = new User(ua2);
-        User u3 = new User(ua3);
-        User u4 = new User(ua4);
+        User owner = new User(ownerAccount, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u1 = new User(ua1, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u2 = new User(ua2, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u3 = new User(ua3, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u4 = new User(ua4, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
 
         userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }
