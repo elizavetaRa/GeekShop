@@ -6,11 +6,13 @@ package geekshop.controller;
 
 import geekshop.model.JokeRepository;
 import geekshop.model.UserRepository;
+import org.salespointframework.useraccount.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -53,6 +55,11 @@ class OwnerController {
     }
 
     @RequestMapping("/addemployee")
+    public String employee(){
+        return "addemployee";
+    }
+
+    @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
     public String addemployee(@RequestParam("firstname") String firstname,
                               @RequestParam("lastname") String lastname,
                               @RequestParam("gender") String gender,
@@ -63,6 +70,9 @@ class OwnerController {
                               @RequestParam("houseNr") String houseNr,
                               @RequestParam("postcode") String postcode,
                               @RequestParam("place") String place) {
-        return "addemployee";
+
+      //  UserAccount newUnser = new UserAccount();
+
+        return "staff";
     }
 }
