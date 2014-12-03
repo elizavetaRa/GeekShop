@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -52,7 +53,16 @@ class OwnerController {
     }
 
     @RequestMapping("/addemployee")
-    public String addemployee(){
+    public String addemployee(@RequestParam("firstname") String firstname,
+                              @RequestParam("lastname") String lastname,
+                              @RequestParam("gender") String gender,
+                              @RequestParam("birthday") String birthday,
+                              @RequestParam("maritalStatus") String maritalStatus,
+                              @RequestParam("phone") String phone,
+                              @RequestParam("street") String street,
+                              @RequestParam("houseNr") String houseNr,
+                              @RequestParam("postcode") String postcode,
+                              @RequestParam("place") String place) {
         return "addemployee";
     }
 }

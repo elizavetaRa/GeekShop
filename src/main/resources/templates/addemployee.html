@@ -25,11 +25,11 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Profil von Steve Jobs</h3>
+            <h3 id="content-title">Nutzer anlegen</h3>
 
             <div id="content-in">
 
-                <form action="profile">
+                <form method="post" action="profile">
                     <table class="table-style01">
                         <tr>
                             <th class="t-left">
@@ -47,23 +47,23 @@
 
                                 <p>
                                     <label for="m">männlich</label>
-                                    <input type="radio" name="gender" id="m" value="m" checked="checked"/>&nbsp;
+                                    <input type="radio" name="gender" id="m" value="MALE" checked="checked"/>&nbsp;
                                     <label for="f">weiblich</label>
-                                    <input type="radio" name="gender" id="f" value="f"/>
+                                    <input type="radio" name="gender" id="f" value="FEMALE"/>
                                     <label for="s_e">etwas anderes</label>
-                                    <input type="radio" name="gender" id="s_e" value="s_e"/>
+                                    <input type="radio" name="gender" id="s_e" value="SOMETHING_ELSE"/>
                                 </p>
 
                                 <p>
                                     <label for="birthday">Geburtsdatum:</label><br/>
                                     <input type="text" name="birthday" id="birthday"
-                                           pattern="^(31|30|[012][1-9]|[1-9])\.(0[1-9]|1[012]|[1-9])\.((18|19|20)\d{2}|\d{2})$"/>
+                                           pattern="^(31|30|[012][1-9]|[1-9])\.-\/(0[1-9]|1[012]|[1-9])\.-\/((18|19|20)\d{2}|\d{2})$"/>
                                 </p>
 
                                 <p>
                                     <label for="maritalStatus">Familienzustand:</label><br/>
                                     <select name="maritalStatus" id="maritalStatus">
-                                        <option value="UNMARRIED" selected="selected">ledig</option>
+                                        <option value="UNMARRIED">ledig</option>
                                         <option value="MARRIED">verheiratet</option>
                                         <option value="WIDOWED">verwitwet</option>
                                         <option value="SEPARATED">dauernd getrennt lebend</option>
@@ -71,12 +71,12 @@
                                         <option value="PARTNERED">verpartnert</option>
                                         <option value="NO_MORE_PARTNERED">entpartnert</option>
                                         <option value="PARTNER_LEFT_BEHIND">Partner hinterbliebend</option>
-                                        <option value="UNKNOWN">soag i n@</option>
+                                        <option value="UNKNOWN">5046 1 |\|@</option>
                                     </select>
                                 </p>
                                 <p>
-                                    <label for="number">Telefonnummer:</label><br/>
-                                    <input name="number" id="number" type="text" size="30" maxlength="13" required="required"/>
+                                    <label for="phone">Telefonnummer:</label><br/>
+                                    <input name="phone" id="phone" type="text" size="30" maxlength="13" required="required"/>
                                 </p>
                             </th>
 
@@ -101,22 +101,19 @@
                                     <input name="place" id="place" type="text" size="15" maxlength="40" required="required"/>
                                 </p>
 
+                                <p>
+                                    <button type="submit" name="submit" class="myButton" th:value="#{addemployee.add.submit}"
+                                            value="Passwort ändern">Nutzer anlegen
+                                    </button>
+                                </p>
+
 
                             </th>
 
                         </tr>
                     </table>
                 </form>
-                <form method="post" id="changePW" th:action="@{/profil}">
-                    <input name="password" id="password" type="password" placeholder="New Password"/>
-                    <input name="retypepw" id="retypepw" type="password" placeholder="Retype Password"/>
 
-                    <p>
-                        <button type="submit" name="submit" th:value="#{addemployee.changePW.submit}"
-                                value="Passwort ändern">Passwort ändern
-                        </button>
-                    </p>
-                </form>
             </div>
 
         </div>
