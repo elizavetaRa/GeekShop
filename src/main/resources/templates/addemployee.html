@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css"/>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css"/>
+    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css"/>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="resources/js/selectAll.js"></script>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('staff')"></div>
+
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Profil von Steve Jobs</h3>
+
+            <div id="content-in">
+
+                <form action="profile">
+                    <table class="table-style01">
+                        <tr>
+                            <th class="t-left">
+                                <p>
+                                    <label for="firstname">Vorname:</label><br/>
+                                    <input name="firstname" id="firstname" type="text" size="30" maxlength="30"
+                                           required="required"/>
+                                </p>
+
+                                <p>
+                                    <label for="lastname">Nachname:</label><br/>
+                                    <input name="lastname" id="lastname" type="text" size="30" maxlength="40"
+                                           required="required"/>
+                                </p>
+
+                                <p>
+                                    <label for="m">männlich</label>
+                                    <input type="radio" name="gender" id="m" value="m" checked="checked"/>&nbsp;
+                                    <label for="f">weiblich</label>
+                                    <input type="radio" name="gender" id="f" value="f"/>
+                                    <label for="s_e">etwas anderes</label>
+                                    <input type="radio" name="gender" id="s_e" value="s_e"/>
+                                </p>
+
+                                <p>
+                                    <label for="birthday">Geburtsdatum:</label><br/>
+                                    <input type="text" name="birthday" id="birthday"
+                                           pattern="^(31|30|[012][1-9]|[1-9])\.(0[1-9]|1[012]|[1-9])\.((18|19|20)\d{2}|\d{2})$"/>
+                                </p>
+
+                                <p>
+                                    <label for="maritalStatus">Familienzustand:</label><br/>
+                                    <select name="maritalStatus" id="maritalStatus">
+                                        <option value="UNMARRIED" selected="selected">ledig</option>
+                                        <option value="MARRIED">verheiratet</option>
+                                        <option value="WIDOWED">verwitwet</option>
+                                        <option value="SEPARATED">dauernd getrennt lebend</option>
+                                        <option value="DIVORCED">geschieden</option>
+                                        <option value="PARTNERED">verpartnert</option>
+                                        <option value="NO_MORE_PARTNERED">entpartnert</option>
+                                        <option value="PARTNER_LEFT_BEHIND">Partner hinterbliebend</option>
+                                        <option value="UNKNOWN">soag i n@</option>
+                                    </select>
+                                </p>
+                                <p>
+                                    <label for="number">Telefonnummer:</label><br/>
+                                    <input name="number" id="number" type="text" size="30" maxlength="13" required="required"/>
+                                </p>
+                            </th>
+
+                            <th class="t-left">
+                                <p>
+                                    <label for="street">Strasse:</label><br/>
+                                    <input name="street" id="street" type="text" size="15" maxlength="40" required="required"/>
+                                </p>
+
+                                <p>
+                                    <label for="houseNr">Hausnummer:</label><br/>
+                                    <input name="houseNr" id="houseNr" type="text" size="15" maxlength="40" required="required"/>
+                                </p>
+
+                                <p>
+                                    <label for="postcode">PLZ:</label><br/>
+                                    <input name="postcode" id="postcode" type="text" size="7" maxlength="40" required="required"/>
+                                </p>
+
+                                <p>
+                                    <label for="place">Ort:</label><br/>
+                                    <input name="place" id="place" type="text" size="15" maxlength="40" required="required"/>
+                                </p>
+
+
+                            </th>
+
+                        </tr>
+                    </table>
+                </form>
+                <form method="post" id="changePW" th:action="@{/profil}">
+                    <input name="password" id="password" type="password" placeholder="New Password"/>
+                    <input name="retypepw" id="retypepw" type="password" placeholder="Retype Password"/>
+
+                    <p>
+                        <button type="submit" name="submit" th:value="#{addemployee.changePW.submit}"
+                                value="Passwort ändern">Passwort ändern
+                        </button>
+                    </p>
+                </form>
+            </div>
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+</body>
+</html>

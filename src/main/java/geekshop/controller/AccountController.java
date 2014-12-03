@@ -8,9 +8,7 @@ import geekshop.model.Joke;
 import geekshop.model.JokeRepository;
 import geekshop.model.User;
 import geekshop.model.UserRepository;
-import geekshop.model.PasswordRules;
 import org.salespointframework.useraccount.UserAccount;
-import org.salespointframework.useraccount.UserAccountManager;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -108,14 +106,14 @@ class AccountController {
         return "profile";
     }
 
-    @RequestMapping("/profile")
-    public String changePassword(@RequestParam("password") String password, @RequestParam("retypepw") String retypepw, @LoggedIn Optional<UserAccount> userAccount){
-        User user = userRepo.findByUserAccount(userAccount.get());
-        if (!(password.isEmpty()) && password.equals(retypepw)){
-//            if (isValidPassword(password)){
-//                userAccountManager.changePassword(user.getUserAccount(), password);
-//            }
-        }
-        return "profile";
-    }
+//    @RequestMapping("/profile")
+//    public String changePassword(@RequestParam("password") String password, @RequestParam("retypepw") String retypepw, @LoggedIn Optional<UserAccount> userAccount) {
+//        User user = userRepo.findByUserAccount(userAccount.get());
+//        if (!(password.isEmpty()) && password.equals(retypepw)) {
+////            if (isValidPassword(password)){
+////                userAccountManager.changePassword(user.getUserAccount(), password);
+////            }
+//        }
+//        return "profile";
+//    }
 }

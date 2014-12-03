@@ -50,4 +50,9 @@ class OwnerController {
     public String messages() {
         return "messages";
     }
+
+    @RequestMapping("/addemployee")
+    public String addemployee(){
+        return "addemployee";
+    }
 }
