@@ -8,3 +8,4 @@ Dokumente/tex/Protokolle/*.pdf
 *.toc
 geekshop.iml
 .idea/
+db/
