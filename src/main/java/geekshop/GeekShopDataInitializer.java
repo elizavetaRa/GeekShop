@@ -5,7 +5,6 @@ package geekshop;
  */
 
 import geekshop.model.*;
-import geekshop.controller.*;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -119,13 +118,18 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (userAccountManager.get(new UserAccountIdentifier("owner")).isPresent()) {
             return;
         }
+
         String firstname = "Max";
         String lastname = "Mustermann";
         Gender gender = Gender.SOMETHING_ELSE;
+
         Date birthday = null;
         try {
-            birthday= new SimpleDateFormat("dd MM YYYY").parse("12 12 2012");
-        }catch (ParseException e){}
+            birthday = new SimpleDateFormat("dd MM YYYY").parse("12 12 2012");
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+        }
+
         MaritalStatus maritalStatus = MaritalStatus.UNKNOWN;
         String phone = "01231234567";
         String street = "Musterstrasse";

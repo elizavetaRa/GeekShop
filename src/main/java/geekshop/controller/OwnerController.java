@@ -4,7 +4,6 @@ package geekshop.controller;
  * Created by Basti on 20.11.2014.
  */
 
-import com.sun.tools.javac.jvm.Gen;
 import geekshop.model.*;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -17,11 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.constraints.NotNull;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -65,7 +62,7 @@ class OwnerController {
     }
 
     @RequestMapping("/addemployee")
-    public String addemployee(){
+    public String addemployee() {
         return "addemployee";
     }
 
@@ -96,14 +93,14 @@ class OwnerController {
         return "staff";
     }
 
-    public Date strToDate(String strDate){
+    public Date strToDate(String strDate) {
         strDate = strDate.replace(".", " ");
         strDate = strDate.replace("-", " ");
         strDate = strDate.replace("/", " ");
         Date date = null;
         try {
             date = new SimpleDateFormat("dd MM YYYY").parse(strDate);
-        } catch (ParseException e){
+        } catch (ParseException e) {
 
         }
 
@@ -127,10 +124,10 @@ class OwnerController {
     }
 
 
-    public Gender strToGen(String strGender){
+    public Gender strToGen(String strGender) {
         Gender gender;
         if (strGender == "m") gender = Gender.MALE;
-        else if(strGender == "f") gender = Gender.FEMALE;
+        else if (strGender == "f") gender = Gender.FEMALE;
         else gender = Gender.SOMETHING_ELSE;
         return gender;
     }
