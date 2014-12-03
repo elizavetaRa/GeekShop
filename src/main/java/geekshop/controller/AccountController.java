@@ -8,7 +8,9 @@ import geekshop.model.Joke;
 import geekshop.model.JokeRepository;
 import geekshop.model.User;
 import geekshop.model.UserRepository;
+import geekshop.model.PasswordRules;
 import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.UserAccountManager;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 import java.util.LinkedList;
@@ -46,6 +49,7 @@ class AccountController {
     public AccountController(UserRepository userRepo, JokeRepository jokeRepo) {
         Assert.notNull(userRepo, "UserRepository must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
+
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
     }
@@ -101,6 +105,17 @@ class AccountController {
 
     @RequestMapping("/profile")
     public String profile() {
+        return "profile";
+    }
+
+    @RequestMapping("/profile")
+    public String changePassword(@RequestParam("password") String password, @RequestParam("retypepw") String retypepw, @LoggedIn Optional<UserAccount> userAccount){
+        User user = userRepo.findByUserAccount(userAccount.get());
+        if (!(password.isEmpty()) && password.equals(retypepw)){
+//            if (isValidPassword(password)){
+//                userAccountManager.changePassword(user.getUserAccount(), password);
+//            }
+        }
         return "profile";
     }
 }
