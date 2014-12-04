@@ -131,7 +131,7 @@ class AccountController {
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.POST)
-    public String changePassword(@RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+    public String changePassword(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
         if (!userAccount.isPresent())
             throw new IllegalArgumentException("There should be a user logged in.");
 
@@ -147,6 +147,8 @@ class AccountController {
         } else {
             uam.changePassword(user.getUserAccount(), newPW);
         }
+        model.addAttribute("user", user);
+        model.addAttribute("isOwnProfile", true);
         return "profile";
     }
 }
