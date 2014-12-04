@@ -4,11 +4,11 @@ package geekshop.controller;
  * Created by h4llow3En on 17/11/14.
  */
 
-import geekshop.model.Joke;
-import geekshop.model.JokeRepository;
-import geekshop.model.User;
-import geekshop.model.UserRepository;
+import geekshop.model.*;
+import org.salespointframework.useraccount.AuthenticationManager;
+import org.salespointframework.useraccount.Password;
 import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.UserAccountManager;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
@@ -36,20 +37,37 @@ import java.util.Random;
 class AccountController {
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
+    private final PasswordRules passwordRules;
+    private final UserAccountManager uam;
+    private final AuthenticationManager authManager;
 
     /**
      * Creates a new {@link AccountController} with the given {@link UserRepository} and  {@link JokeRepository}.
      *
-     * @param userRepo must not be {@literal null}.
-     * @param jokeRepo must not be {@literal null}.
+     * @param userRepo      must not be {@literal null}.
+     * @param jokeRepo      must not be {@literal null}.
+     * @param passRulesRepo must not be {@literal null}.
+     * @param uam           must not be {@literal null}.
+     * @param authManager   must not be {@literal null}.
      */
     @Autowired
-    public AccountController(UserRepository userRepo, JokeRepository jokeRepo) {
+    public AccountController(UserRepository userRepo,
+                             JokeRepository jokeRepo,
+                             PasswordRulesRepository passRulesRepo,
+                             UserAccountManager uam,
+                             AuthenticationManager authManager) {
         Assert.notNull(userRepo, "UserRepository must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
+        Assert.notNull(passRulesRepo, "PasswordRulesRepository must not be null!");
+        Assert.isTrue(passRulesRepo.findAll().iterator().hasNext(), "PasswordRulesRepository should contain PasswordRules!");
+        Assert.notNull(uam, "UserAccountManager must not be null!");
+        Assert.notNull(authManager, "AuthenticationManager must not be null!");
 
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
+        this.passwordRules = passRulesRepo.findAll().iterator().next();
+        this.uam = uam;
+        this.authManager = authManager;
     }
 
     @RequestMapping({"/", "/index"})
@@ -106,14 +124,23 @@ class AccountController {
         return "profile";
     }
 
-//    @RequestMapping("/profile")
-//    public String changePassword(@RequestParam("password") String password, @RequestParam("retypepw") String retypepw, @LoggedIn Optional<UserAccount> userAccount) {
-//        User user = userRepo.findByUserAccount(userAccount.get());
-//        if (!(password.isEmpty()) && password.equals(retypepw)) {
-////            if (isValidPassword(password)){
-////                userAccountManager.changePassword(user.getUserAccount(), password);
-////            }
-//        }
-//        return "profile";
-//    }
+    @RequestMapping(value = "/profile", method = RequestMethod.POST)
+    public String changePassword(@RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+        if (!userAccount.isPresent())
+            throw new IllegalArgumentException("There should be a user logged in.");
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+        if (!authManager.matches(new Password(oldPW), userAccount.get().getPassword())) {
+            System.out.println("Altes Passwort ist falsch!");
+        } else if (newPW.trim().isEmpty()) {
+            System.out.println("Neues Passwort ist leer!");
+        } else if (!newPW.equals(retypePW)) {
+            System.out.println("Passwörter stimmen nicht überein!");
+        } else if (!passwordRules.isValidPassword(newPW)) {
+            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
+        } else {
+            uam.changePassword(user.getUserAccount(), newPW);
+        }
+        return "profile";
+    }
 }
