@@ -30,7 +30,7 @@
             <div id="content-in">
 
                 <table class="table-style01 alternatRows">
-                    <thead>
+
                     <tr>
                         <th><input type="checkbox" id="selectAll"/></th>
                         <th>Vorname</th>
@@ -39,8 +39,7 @@
                         <th>Nutzer-Id</th>
                         <th></th>
                     </tr>
-                    </thead>
-                    <tbody th:remove="all-but-first">
+
                     <tr th:each="employee : ${staff}">
                         <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
                         <td th:utext="${employee.userAccount.firstname}">Steve</td>
@@ -62,8 +61,6 @@
                             </form>
                         </td>
                     </tr>
-                    </tbody>
-
 
                 </table>
 
