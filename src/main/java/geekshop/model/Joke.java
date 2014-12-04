@@ -26,7 +26,8 @@ public class Joke {
 
 
     @Deprecated
-    protected Joke() {}
+    protected Joke() {
+    }
 
     public Joke(String text) {
         this.text = text;

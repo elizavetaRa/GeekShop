@@ -100,7 +100,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/staff/{id}", method = RequestMethod.DELETE)
-    public String fire(@PathVariable Long id){
+    public String fire(@PathVariable Long id) {
         userRepo.delete(id);
         return "staff";
     }
