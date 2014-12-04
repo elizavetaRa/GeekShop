@@ -138,24 +138,34 @@ public class GeekShopDataInitializer implements DataInitializer {
         String place = "Musterstadt";
 
         UserAccount ownerAccount = userAccountManager.create("owner", "123", new Role("ROLE_OWNER"));
+        ownerAccount.setFirstname(firstname);
+        ownerAccount.setLastname(lastname);
         userAccountManager.save(ownerAccount);
 
         final Role employeeRole = new Role("ROLE_EMPLOYEE");
 
         UserAccount ua1 = userAccountManager.create("hans", "123", employeeRole);
+        ua1.setFirstname(firstname);
+        ua1.setLastname(lastname);
         userAccountManager.save(ua1);
         UserAccount ua2 = userAccountManager.create("dextermorgan", "123", employeeRole);
+        ua2.setFirstname(firstname);
+        ua2.setLastname(lastname);
         userAccountManager.save(ua2);
         UserAccount ua3 = userAccountManager.create("earlhickey", "123", employeeRole);
+        ua3.setFirstname(firstname);
+        ua3.setLastname(lastname);
         userAccountManager.save(ua3);
         UserAccount ua4 = userAccountManager.create("mclovinfogell", "123", employeeRole);
+        ua4.setFirstname(firstname);
+        ua4.setLastname(lastname);
         userAccountManager.save(ua4);
 
-        User owner = new User(ownerAccount, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u1 = new User(ua1, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u2 = new User(ua2, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u3 = new User(ua3, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u4 = new User(ua4, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User owner = new User(ownerAccount, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u1 = new User(ua1, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u2 = new User(ua2, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u3 = new User(ua3, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User u4 = new User(ua4, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
 
         userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }
