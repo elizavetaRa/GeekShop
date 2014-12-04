@@ -7,6 +7,7 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.UserAccountIdentifier;
 import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -73,6 +74,7 @@ class OwnerController {
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
     public String hire(@RequestParam("username") String username,
                        @RequestParam("firstname") String firstname,
+                       @RequestParam("mail") String mail,
                        @RequestParam("lastname") String lastname,
                        @RequestParam("gender") String strGender,
                        @RequestParam("birthday") String strBirthday,
@@ -87,10 +89,11 @@ class OwnerController {
         UserAccount newUserAccount = userAccountManager.create(username, password, new Role("ROLE_EMPLOYREE"));
         newUserAccount.setFirstname(firstname);
         newUserAccount.setLastname(lastname);
+        newUserAccount.setEmail(mail);
         userAccountManager.save(newUserAccount);
         Gender gender = strToGen(strGender);
         Date birthday = strToDate(strBirthday);
-        if (birthday == null) return "wrongdate";
+        if (birthday == null) return "/addemployee";
         MaritalStatus maritalStatus = strToMaritialStatus(strMaritalStatus);
 
         User newUser = new User(newUserAccount, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
@@ -99,10 +102,24 @@ class OwnerController {
         return "redirect:/staff";
     }
 
-    @RequestMapping(value = "/staff/{id}", method = RequestMethod.DELETE)
-    public String fire(@PathVariable Long id) {
-        userRepo.delete(id);
-        return "staff";
+    @RequestMapping("/staff/{username}")
+    public String showEmployee(@PathVariable("username") UserAccountIdentifier username) {
+        UserAccount userAccount = userAccountManager.get(username).get();
+
+        return "profile";
+    }
+
+    @RequestMapping(value = "/staff/{username}", method = RequestMethod.DELETE)
+    public String fire(@PathVariable("username") UserAccountIdentifier username) {
+        UserAccount userAccount = userAccountManager.get(username).get();
+        Role role = new Role("ROLE_OWNER");
+        if (userAccount.hasRole(role)) {
+            return "redirect:/staff";
+        } else {
+            Long id = userRepo.findByUserAccount(userAccount).getId();
+            userRepo.delete(id);
+        }
+        return "redirect:/staff";
     }
 
     public Date strToDate(String strDate) {

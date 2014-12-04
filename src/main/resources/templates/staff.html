@@ -47,7 +47,17 @@
                         <td th:utext="${employee.userAccount.lastname}">Jobs</td>
                         <td th:utext="${employee.userAccount.identifier}">Musterstrasse 1</td>
                         <td th:utext="${employee.Id}">001</td>
-                        <td><a href="#">Profil ansehen</a></td>
+                        <td>
+                            <form th:action="@{/staff/} + ${employee.userAccount.identifier}"
+                                  th:attr="data-entry-id=${employee.id}">
+                                <button class="myButton" style="margin-left: 1%">Ansehen</button>
+                            </form>
+
+                            <form th:method="delete" th:action="@{/staff/} + ${employee.userAccount.identifier}"
+                                  th:attr="data-entry-id=${employee.id}">
+                                <button class="myButton" style="margin-left: 1%">Entlassen</button>
+                            </form>
+                        </td>
                     </tr>
                     </tbody>
 
