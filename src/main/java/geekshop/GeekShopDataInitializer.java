@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Calendar;
 
 /**
  * A {@link DataInitializer} implementation that will create dummy data for the application on application startup.
@@ -119,16 +117,9 @@ public class GeekShopDataInitializer implements DataInitializer {
             return;
         }
 
-        String firstname = "Max";
-        String lastname = "Mustermann";
-        Gender gender = Gender.SOMETHING_ELSE;
 
-        Date birthday = null;
-        try {
-            birthday = new SimpleDateFormat("dd MM YYYY").parse("12 12 2012");
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-        }
+        Calendar cal = Calendar.getInstance();
+        cal.set(1900, 2, 14);
 
         MaritalStatus maritalStatus = MaritalStatus.UNKNOWN;
         String phone = "01231234567";
@@ -138,34 +129,36 @@ public class GeekShopDataInitializer implements DataInitializer {
         String place = "Musterstadt";
 
         UserAccount ownerAccount = userAccountManager.create("owner", "123", new Role("ROLE_OWNER"));
-        ownerAccount.setFirstname(firstname);
-        ownerAccount.setLastname(lastname);
+        ownerAccount.setFirstname("Owner");
+        ownerAccount.setLastname("");
         userAccountManager.save(ownerAccount);
 
         final Role employeeRole = new Role("ROLE_EMPLOYEE");
 
         UserAccount ua1 = userAccountManager.create("hans", "123", employeeRole);
-        ua1.setFirstname(firstname);
-        ua1.setLastname(lastname);
+        ua1.setFirstname("Hans");
+        ua1.setLastname("Hinz");
         userAccountManager.save(ua1);
-        UserAccount ua2 = userAccountManager.create("dextermorgan", "123", employeeRole);
-        ua2.setFirstname(firstname);
-        ua2.setLastname(lastname);
+        UserAccount ua2 = userAccountManager.create("erna", "123", employeeRole);
+        ua2.setFirstname("Erna");
+        ua2.setLastname("Anre");
         userAccountManager.save(ua2);
         UserAccount ua3 = userAccountManager.create("earlhickey", "123", employeeRole);
-        ua3.setFirstname(firstname);
-        ua3.setLastname(lastname);
+        ua3.setFirstname("Earl");
+        ua3.setLastname("Hickey");
         userAccountManager.save(ua3);
         UserAccount ua4 = userAccountManager.create("mclovinfogell", "123", employeeRole);
-        ua4.setFirstname(firstname);
-        ua4.setLastname(lastname);
+        ua4.setFirstname("Fogell");
+        ua4.setLastname("McLovin");
         userAccountManager.save(ua4);
 
-        User owner = new User(ownerAccount, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u1 = new User(ua1, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u2 = new User(ua2, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u3 = new User(ua3, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
-        User u4 = new User(ua4, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+
+        User owner = new User(ownerAccount, Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.UNKNOWN,
+                "123456789", "Ownerstreet", "0", "01234", "Ownercity");
+        User u1 = new User(ua1, Gender.MALE, cal.getTime(), MaritalStatus.UNMARRIED, phone, street, houseNr, postcode, place);
+        User u2 = new User(ua2, Gender.FEMALE, cal.getTime(), MaritalStatus.MARRIED, phone, street, houseNr, postcode, place);
+        User u3 = new User(ua3, Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.DIVORCED, phone, street, houseNr, postcode, place);
+        User u4 = new User(ua4, Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.WIDOWED, phone, street, houseNr, postcode, place);
 
         userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -55,8 +57,15 @@ class OwnerController {
 
     @RequestMapping("/staff")
     public String staff(Model model) {
+        Iterable<User> allUsers = userRepo.findAll();
+        List<User> employees = new LinkedList<User>();
+        for (User user : allUsers) {
+            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER"))) {
+                employees.add(user);
+            }
+        }
 
-        model.addAttribute("staff", userRepo.findAll());
+        model.addAttribute("staff", employees);
 
         return "staff";
     }
@@ -102,9 +111,21 @@ class OwnerController {
         return "redirect:/staff";
     }
 
-    @RequestMapping("/staff/{username}")
-    public String showEmployee(@PathVariable("username") UserAccountIdentifier username) {
-        UserAccount userAccount = userAccountManager.get(username).get();
+//    @RequestMapping("/staff/{username}")
+//    public String showEmployee(Model model, @PathVariable("username") UserAccountIdentifier username) {
+//        UserAccount userAccount = userAccountManager.get(username).get();
+//        User user = userRepo.findByUserAccount(userAccount);
+//        model.addAttribute("user", user);
+//
+//        return "profile";
+//    }
+
+    @RequestMapping(value = "/staff", method = RequestMethod.POST)
+    public String showEmployee(Model model, @RequestParam("uai") UserAccountIdentifier uai) {
+        UserAccount userAccount = userAccountManager.get(uai).get();
+        User user = userRepo.findByUserAccount(userAccount);
+        model.addAttribute("user", user);
+        model.addAttribute("isOwnProfile", false);
 
         return "profile";
     }

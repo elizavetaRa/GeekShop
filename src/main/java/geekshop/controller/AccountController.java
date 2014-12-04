@@ -120,7 +120,13 @@ class AccountController {
 //    }
 
     @RequestMapping("/profile")
-    public String profile() {
+    public String profile(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.isPresent()) {
+            User user = userRepo.findByUserAccount(userAccount.get());
+            model.addAttribute("user", user);
+        }
+        model.addAttribute("isOwnProfile", true);
+
         return "profile";
     }
 
@@ -130,10 +136,10 @@ class AccountController {
             throw new IllegalArgumentException("There should be a user logged in.");
 
         User user = userRepo.findByUserAccount(userAccount.get());
-        if (!authManager.matches(new Password(oldPW), userAccount.get().getPassword())) {
+        if (oldPW.trim().isEmpty() || newPW.trim().isEmpty()) {
+            System.out.println("Passwort ist leer!");
+        } else if (!authManager.matches(new Password(oldPW), userAccount.get().getPassword())) {
             System.out.println("Altes Passwort ist falsch!");
-        } else if (newPW.trim().isEmpty()) {
-            System.out.println("Neues Passwort ist leer!");
         } else if (!newPW.equals(retypePW)) {
             System.out.println("Passwörter stimmen nicht überein!");
         } else if (!passwordRules.isValidPassword(newPW)) {

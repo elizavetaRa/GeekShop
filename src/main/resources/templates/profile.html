@@ -16,7 +16,7 @@
     <div th:replace="header :: #header"></div>
 
     <!-- Navigation -->
-    <div th:replace="navigation :: nav ('profile')"></div>
+    <div th:replace="navigation :: nav (${isOwnProfile} ? 'profile' : 'staff')"></div>
 
     <!-- 2 columns (content + sidebar) -->
     <div id="cols" class="box">
@@ -24,7 +24,7 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Profil von Steve Jobs</h3>
+            <h3 id="content-title" th:text="'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname}">Profil</h3>
 
             <div id="content-in">
 
@@ -34,50 +34,100 @@
                             <th class="t-left">
                                 <p>
                                     <label for="firstname">Vorname:</label><br/>
-                                    <input name="firstname" id="firstname" type="text" size="30" maxlength="30" value="Steve" required="required"/>
-                                </p><p>
+                                    <input name="firstname" id="firstname" type="text" size="30" maxlength="30"
+                                           value="Max" th:value="${user.userAccount.firstname}" required="required"/>
+                                </p>
+
+                                <p>
                                     <label for="lastname">Nachname:</label><br/>
-                                    <input name="lastname" id="lastname" type="text" size="30" maxlength="40" value="Jobs" required="required"/>
-                                </p><p>
-                                    <label for="m">männlich</label>
-                                    <input type="radio" name="gender" id="m" value="m" checked="checked"/>&nbsp;
-                                    <label for="f">weiblich</label>
-                                    <input type="radio" name="gender" id="f" value="f"/>
-                                </p><p>
-                                    <label for="birthday">Geburtsdatum:</label><br/>
-                                    <input type="text" name="birthday" id="birthday" value="24.02.1955" pattern="^(31|30|[012][1-9]|[1-9])\.(0[1-9]|1[012]|[1-9])\.((18|19|20)\d{2}|\d{2})$"/>
-                                </p><p>
-                                    <label for="maritalStatus">Familienzustand:</label><br/>
-                                    <select name="maritalStatus" id="maritalStatus">
-                                        <option selected="selected">ledig</option>
-                                        <option>verheiratet</option>
-                                        <option>verwitwet</option>
-                                        <option>dauernd getrennt lebend</option>
+                                    <input name="lastname" id="lastname" type="text" size="30" maxlength="40"
+                                           value="Mustermann" th:value="${user.userAccount.lastname}" required="required"/>
+                                </p>
+
+                                <p>
+                                    <label for="gender">Geschlecht:</label><br/>
+                                    <select name="gender" id="gender">
+                                        <option th:selected="${user.gender == T(geekshop.model.Gender).MALE}">
+                                            männlich
+                                        </option>
+                                        <option th:selected="${user.gender == T(geekshop.model.Gender).FEMALE}">
+                                            weiblich
+                                        </option>
+                                        <option th:selected="${user.gender == T(geekshop.model.Gender).SOMETHING_ELSE}">
+                                            etwas Anderes
+                                        </option>
                                     </select>
-                                </p><p>
-                                    <label for="number">Telefonnummer:</label><br/>
-                                    <input name="number" id="number" type="text" size="30" maxlength="13" value="911911911" required="required"/>
+                                </p>
+                                <p>
+                                    <label for="birthday">Geburtsdatum:</label><br/>
+                                    <input type="text" name="birthday" id="birthday" value="24.02.1955"
+                                           th:value="${#dates.format(user.birthday, 'dd.MM.yyyy')}"
+                                           pattern="^(31|30|[012][1-9]|[1-9])\.-\/(0[1-9]|1[012]|[1-9])\.-\/((18|19|20)\d{2}|\d{2})$"/>
+                                </p>
+
+                                <p>
+                                    <label for="maritalStatus">Familienstand:</label><br/>
+                                    <select name="maritalStatus" id="maritalStatus">
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).UNMARRIED}">
+                                            ledig
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).MARRIED}">
+                                            verheiratet
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).SEPARATED}">
+                                            getrennt lebend
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).DIVORCED}">
+                                            geschieden
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).WIDOWED}">
+                                            verwitwet
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).PARTNERED}">
+                                            verpartnert
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).NO_MORE_PARTNERED}">
+                                            entpartnert
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).PARTNER_LEFT_BEHIND}">
+                                            partnerhinterblieben
+                                        </option>
+                                        <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).UNKNOWN}">
+                                            unbekannt
+                                        </option>
+                                    </select>
+                                </p>
+                                <p>
+                                    <label for="phone">Telefonnummer:</label><br/>
+                                    <input name="phone" id="phone" type="text" size="30" maxlength="13"
+                                           value="110" required="required" th:value="${user.phone}"/>
                                 </p>
                             </th>
 
                             <th class="t-left">
                                 <p>
-                                    <label for="id">Nutzer-Id:</label><br/>
-                                    <input name="id" id="id" type="text" size="3" maxlength="3" value="001" readonly="readonly"/>
-                                </p><p>
-                                    <label for="street">Strasse:</label><br/>
-                                    <input name="street" id="street" type="text" size="15" maxlength="40" value="Wall Street" required="required"/>
-                                </p><p>
+                                <label for="street">Strasse:</label><br/>
+                                <input name="street" id="street" type="text" size="15" maxlength="40"
+                                       value="Wall Street" required="required" th:value="${user.street}"/>
+                            </p>
+
+                                <p>
                                     <label for="houseNr">Hausnummer:</label><br/>
-                                    <input name="houseNr" id="houseNr" type="text" size="15" maxlength="40" value="2" required="required"/>
-                                </p><p>
-                                    <label for="postcode">PLZ:</label><br/>
-                                    <input name="postcode" id="postcode" type="text" size="7" maxlength="40" value="4815162342" required="required"/>
-                                </p><p>
-                                    <label for="place">Ort:</label><br/>
-                                    <input name="place" id="place" type="text" size="15" maxlength="40" value="City" required="required"/>
+                                    <input name="houseNr" id="houseNr" type="text" size="15" maxlength="40" value="2"
+                                           required="required" th:value="${user.houseNr}"/>
                                 </p>
 
+                                <p>
+                                    <label for="postcode">PLZ:</label><br/>
+                                    <input name="postcode" id="postcode" type="text" size="7" maxlength="40"
+                                           value="4815162342" required="required" th:value="${user.postcode}"/>
+                                </p>
+
+                                <p>
+                                    <label for="place">Ort:</label><br/>
+                                    <input name="place" id="place" type="text" size="15" maxlength="40" value="City"
+                                           required="required" th:value="${user.place}"/>
+                                </p>
 
                             </th>
 
@@ -85,12 +135,14 @@
                     </table>
                 </form>
                 <form method="post" id="changePW" action="profile">
-                    <input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort" />
-                    <input name="newPW" id="newPW" type="password" placeholder="Neues Passwort" />
-                    <input name="retypePW" id="retypePW" type="password" placeholder="Neues Passwort wiederholen" />
+                    <input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort"/>
+                    <input name="newPW" id="newPW" type="password" placeholder="Neues Passwort"/>
+                    <input name="retypePW" id="retypePW" type="password" placeholder="Neues Passwort wiederholen"/>
 
                     <p>
-                        <button type="submit" name="submit" th:value="#{profil.changePW.submit}" value="Passwort ändern">Passwort ändern</button>
+                        <button type="submit" name="submit" th:value="#{profil.changePW.submit}"
+                                value="Passwort ändern">Passwort ändern
+                        </button>
                     </p>
                 </form>
 

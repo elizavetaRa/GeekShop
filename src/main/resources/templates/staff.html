@@ -48,9 +48,12 @@
                         <td th:utext="${employee.userAccount.identifier}">Musterstrasse 1</td>
                         <td th:utext="${employee.Id}">001</td>
                         <td>
-                            <form th:action="@{/staff/} + ${employee.userAccount.identifier}"
-                                  th:attr="data-entry-id=${employee.id}">
-                                <button class="myButton" style="margin-left: 1%">Ansehen</button>
+                            <!--<form th:action="@{/staff/} + " th:attr="data-entry-id=${employee.id}">
+                                <button class="myButton">Ansehen</button>
+                            </form>-->
+                            <form th:action="@{/staff}" method="post">
+                                <input type="hidden" name="uai" th:value="${employee.userAccount.identifier}"/>
+                                <button type="submit" class="myButton">Ansehen</button>
                             </form>
 
                             <form th:method="delete" th:action="@{/staff/} + ${employee.userAccount.identifier}"
