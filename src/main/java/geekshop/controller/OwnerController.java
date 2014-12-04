@@ -4,7 +4,6 @@ package geekshop.controller;
  * Created by Basti on 20.11.2014.
  */
 
-import com.sun.tools.javac.jvm.Gen;
 import geekshop.model.*;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -13,15 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.constraints.NotNull;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -55,7 +54,10 @@ class OwnerController {
     }
 
     @RequestMapping("/staff")
-    public String staff() {
+    public String staff(Model model) {
+
+        model.addAttribute("staff", userRepo.findAll());
+
         return "staff";
     }
 
@@ -65,45 +67,53 @@ class OwnerController {
     }
 
     @RequestMapping("/addemployee")
-    public String addemployee(){
+    public String addemployee() {
         return "addemployee";
     }
 
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
-    public String addemployee(@RequestParam("username") String username,
-                              @RequestParam("firstname") String firstname,
-                              @RequestParam("lastname") String lastname,
-                              @RequestParam("gender") String strGender,
-                              @RequestParam("birthday") String strBirthday,
-                              @RequestParam("maritalStatus") String strMaritalStatus,
-                              @RequestParam("phone") String phone,
-                              @RequestParam("street") String street,
-                              @RequestParam("houseNr") String houseNr,
-                              @RequestParam("postcode") String postcode,
-                              @RequestParam("place") String place) {
+    public String hire(@RequestParam("username") String username,
+                       @RequestParam("firstname") String firstname,
+                       @RequestParam("lastname") String lastname,
+                       @RequestParam("gender") String strGender,
+                       @RequestParam("birthday") String strBirthday,
+                       @RequestParam("maritalStatus") String strMaritalStatus,
+                       @RequestParam("phone") String phone,
+                       @RequestParam("street") String street,
+                       @RequestParam("houseNr") String houseNr,
+                       @RequestParam("postcode") String postcode,
+                       @RequestParam("place") String place) {
 
         String password = "test" /*new PasswordRules().generateRandomPassword()*/;
         UserAccount newUserAccount = userAccountManager.create(username, password, new Role("ROLE_EMPLOYREE"));
+        newUserAccount.setFirstname(firstname);
+        newUserAccount.setLastname(lastname);
         userAccountManager.save(newUserAccount);
         Gender gender = strToGen(strGender);
         Date birthday = strToDate(strBirthday);
         if (birthday == null) return "wrongdate";
         MaritalStatus maritalStatus = strToMaritialStatus(strMaritalStatus);
 
-        User newUser = new User(newUserAccount, firstname, lastname, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
+        User newUser = new User(newUserAccount, gender, birthday, maritalStatus, phone, street, houseNr, postcode, place);
         userRepo.save(newUser);
 
+        return "redirect:/staff";
+    }
+
+    @RequestMapping(value = "/staff/{id}", method = RequestMethod.DELETE)
+    public String fire(@PathVariable Long id){
+        userRepo.delete(id);
         return "staff";
     }
 
-    public Date strToDate(String strDate){
+    public Date strToDate(String strDate) {
         strDate = strDate.replace(".", " ");
         strDate = strDate.replace("-", " ");
         strDate = strDate.replace("/", " ");
         Date date = null;
         try {
             date = new SimpleDateFormat("dd MM YYYY").parse(strDate);
-        } catch (ParseException e){
+        } catch (ParseException e) {
 
         }
 
@@ -113,24 +123,24 @@ class OwnerController {
 
     public MaritalStatus strToMaritialStatus(String strMaritalStatus) {
         MaritalStatus maritalStatus;
-        if (strMaritalStatus == "UNMARRIED") maritalStatus = MaritalStatus.UNMARRIED;
-        if (strMaritalStatus == "MARRIED") maritalStatus = MaritalStatus.MARRIED;
-        if (strMaritalStatus == "SEPARATED") maritalStatus = MaritalStatus.SEPARATED;
-        if (strMaritalStatus == "DIVORCED") maritalStatus = MaritalStatus.DIVORCED;
-        if (strMaritalStatus == "WIDOWED") maritalStatus = MaritalStatus.WIDOWED;
-        if (strMaritalStatus == "PARTNERED") maritalStatus = MaritalStatus.PARTNERED;
-        if (strMaritalStatus == "NO_MORE_PARTNERED") maritalStatus = MaritalStatus.NO_MORE_PARTNERED;
-        if (strMaritalStatus == "PARTNER_LEFT_BEHIND") maritalStatus = MaritalStatus.PARTNER_LEFT_BEHIND;
+        if (strMaritalStatus.equals("UNMARRIED")) maritalStatus = MaritalStatus.UNMARRIED;
+        if (strMaritalStatus.equals("MARRIED")) maritalStatus = MaritalStatus.MARRIED;
+        if (strMaritalStatus.equals("SEPARATED")) maritalStatus = MaritalStatus.SEPARATED;
+        if (strMaritalStatus.equals("DIVORCED")) maritalStatus = MaritalStatus.DIVORCED;
+        if (strMaritalStatus.equals("WIDOWED")) maritalStatus = MaritalStatus.WIDOWED;
+        if (strMaritalStatus.equals("PARTNERED")) maritalStatus = MaritalStatus.PARTNERED;
+        if (strMaritalStatus.equals("NO_MORE_PARTNERED")) maritalStatus = MaritalStatus.NO_MORE_PARTNERED;
+        if (strMaritalStatus.equals("PARTNER_LEFT_BEHIND")) maritalStatus = MaritalStatus.PARTNER_LEFT_BEHIND;
         else maritalStatus = MaritalStatus.UNKNOWN;
 
         return maritalStatus;
     }
 
 
-    public Gender strToGen(String strGender){
+    public Gender strToGen(String strGender) {
         Gender gender;
-        if (strGender == "m") gender = Gender.MALE;
-        else if(strGender == "f") gender = Gender.FEMALE;
+        if (strGender.equals("m")) gender = Gender.MALE;
+        else if (strGender.equals("f")) gender = Gender.FEMALE;
         else gender = Gender.SOMETHING_ELSE;
         return gender;
     }

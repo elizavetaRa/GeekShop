@@ -30,30 +30,27 @@
             <div id="content-in">
 
                 <table class="table-style01 alternatRows">
+                    <thead>
                     <tr>
                         <th><input type="checkbox" id="selectAll"/></th>
                         <th>Vorname</th>
                         <th>Nachname</th>
-                        <th>Email-Adresse</th>
+                        <th>Nutzername</th>
                         <th>Nutzer-Id</th>
                         <th></th>
                     </tr>
-                    <tr>
+                    </thead>
+                    <tbody th:remove="all-but-first">
+                    <tr th:each="employee : ${staff}">
                         <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
-                        <td>Steve</td>
-                        <td>Jobs</td>
-                        <td>boss@apple.com</td>
-                        <td>001</td>
+                        <td th:utext="${employee.userAccount.firstname}">Steve</td>
+                        <td th:utext="${employee.userAccount.lastname}">Jobs</td>
+                        <td th:utext="${employee.userAccount.identifier}">Musterstrasse 1</td>
+                        <td th:utext="${employee.Id}">001</td>
                         <td><a href="#">Profil ansehen</a></td>
                     </tr>
-                    <tr>
-                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
-                        <td>Nerdy</td>
-                        <td>Geekmann</td>
-                        <td>geeky@nerd.com</td>
-                        <td>002</td>
-                        <td><a href="#">Profil ansehen</a></td>
-                    </tr>
+                    </tbody>
+
 
                 </table>
 

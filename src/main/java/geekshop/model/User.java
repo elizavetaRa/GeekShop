@@ -30,8 +30,6 @@ public class User {
 
     private String currentSessionId;
 
-    private String firstname;
-    private String lastname;
     private Date birthday;
     private String phone;
     private String street;
@@ -51,14 +49,11 @@ public class User {
     protected User() {
     }
 
-    public User(UserAccount userAccount, String firstname,
-                String lastname, Gender gender, Date birthday,
+    public User(UserAccount userAccount, Gender gender, Date birthday,
                 MaritalStatus maritalStatus, String phone,
                 String street, String houseNr, String postcode, String place) {
         Assert.notNull(userAccount, "UserAccount must not be null.");
         this.userAccount = userAccount;
-        this.firstname = firstname;
-        this.lastname = lastname;
         this.gender = gender;
         this.birthday = birthday;
         this.maritalStatus = maritalStatus;
@@ -166,5 +161,9 @@ public class User {
 
     public Joke getLastJoke() {
         return recentJokes.size() > 0 ? recentJokes.get(recentJokes.size() - 1) : null;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
