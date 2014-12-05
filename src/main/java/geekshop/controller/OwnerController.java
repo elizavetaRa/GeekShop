@@ -57,14 +57,8 @@ class OwnerController {
 
     @RequestMapping("/staff")
     public String staff(Model model) {
-        Iterable<User> allUsers = userRepo.findAll();
-        List<User> employees = new LinkedList<User>();
-        for (User user : allUsers) {
-            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER"))) {
-                employees.add(user);
-            }
-        }
 
+        List<User> employees = getEmployees();
         model.addAttribute("staff", employees);
 
         return "staff";
@@ -143,6 +137,18 @@ class OwnerController {
         return "redirect:/staff";
     }
 
+//    @RequestMapping(value = "/staff/firemany", method = RequestMethod.DELETE)
+//    public String fireMany(){
+//
+//        List<User> employees = getEmployees();
+//        List<Long> ids = new LinkedList<Long>();
+//        for (User user : employees) {
+//            if(employees.iterator().
+//        }
+//
+//        return "redirect:/staff";
+//    }
+
     public Date strToDate(String strDate) {
         strDate = strDate.replace(".", " ");
         strDate = strDate.replace("-", " ");
@@ -180,5 +186,16 @@ class OwnerController {
         else if (strGender.equals("f")) gender = Gender.FEMALE;
         else gender = Gender.SOMETHING_ELSE;
         return gender;
+    }
+
+    public List<User> getEmployees(){
+        Iterable<User> allUsers = userRepo.findAll();
+        List<User> employees = new LinkedList<User>();
+        for (User user : allUsers) {
+            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER"))) {
+                employees.add(user);
+            }
+        }
+        return employees;
     }
 }
