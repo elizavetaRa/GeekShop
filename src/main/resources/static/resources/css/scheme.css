@@ -100,3 +100,8 @@ dl#news dd span.date {color:#0288CA;}
     position:relative;
     top:1px;
 }
+
+/*
+ * Error message
+ */
+.error {padding-top:10px; color:#AA0000;}
