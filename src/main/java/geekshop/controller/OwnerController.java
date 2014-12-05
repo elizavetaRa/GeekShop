@@ -36,12 +36,14 @@ class OwnerController {
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
     private final UserAccountManager userAccountManager;
+    private final MessageRepository messageRepo;
 
     @Autowired
-    public OwnerController(UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager) {
+    public OwnerController(UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
         this.userAccountManager = userAccountManager;
+        this.messageRepo = messageRepo;
     }
 
     @RequestMapping("/orders")
@@ -65,7 +67,8 @@ class OwnerController {
     }
 
     @RequestMapping("/messages")
-    public String messages() {
+    public String messages(Model model) {
+        model.addAttribute("ownermessage", messageRepo.findAll());
         return "messages";
     }
 

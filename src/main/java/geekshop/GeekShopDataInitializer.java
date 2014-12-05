@@ -31,10 +31,11 @@ public class GeekShopDataInitializer implements DataInitializer {
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
     private final PasswordRulesRepository passRulesRepo;
+    private final MessageRepository messageRepo;
 
     @Autowired
     public GeekShopDataInitializer(UserRepository userRepo, JokeRepository jokeRepo, PasswordRulesRepository passRulesRepo/*, Inventory<InventoryItem> inventory*/,
-                                   UserAccountManager userAccountManager/*, VideoCatalog videoCatalog*/) {
+                                   UserAccountManager userAccountManager, MessageRepository messageRepo /*, VideoCatalog videoCatalog*/) {
 
         Assert.notNull(userRepo, "UserRepository must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
@@ -48,6 +49,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         this.passRulesRepo = passRulesRepo;
 //        this.inventory = inventory;
         this.userAccountManager = userAccountManager;
+        this.messageRepo = messageRepo;
 //        this.videoCatalog = videoCatalog;
     }
 
@@ -58,6 +60,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         initializeUsers(userAccountManager, userRepo);
         initializeJokes(jokeRepo);
         initializePasswordRules(passRulesRepo);
+        initializeMessages(messageRepo);
 //        initializeCatalog(videoCatalog, inventory);
     }
 
@@ -121,7 +124,6 @@ public class GeekShopDataInitializer implements DataInitializer {
         Calendar cal = Calendar.getInstance();
         cal.set(1900, 2, 14);
 
-        MaritalStatus maritalStatus = MaritalStatus.UNKNOWN;
         String phone = "01231234567";
         String street = "Musterstrasse";
         String houseNr = "1";
@@ -230,6 +232,12 @@ public class GeekShopDataInitializer implements DataInitializer {
             return;
 
         passRulesRepo.save(new PasswordRules());
+    }
+    private void initializeMessages(MessageRepository messageRepo){
+        if (jokeRepo.count() > 0) {
+            return;
+        }
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
     }
 
 }
