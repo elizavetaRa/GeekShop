@@ -45,7 +45,6 @@
                         <td th:utext="${employee.userAccount.firstname}">Steve</td>
                         <td th:utext="${employee.userAccount.lastname}">Jobs</td>
                         <td th:utext="${employee.userAccount.identifier}">Musterstrasse 1</td>
-                        <td th:utext="${employee.Id}">001</td>
                         <td>
                             <!--<form th:action="@{/staff/} + " th:attr="data-entry-id=${employee.id}">
                                 <button class="myButton">Ansehen</button>
@@ -64,9 +63,20 @@
 
                 </table>
 
-                <button id="employ" class="myButton" style="margin-left: 1%">Einstellen</button>
-                <button id="dismiss" class="myButton" style="margin-left: 1%">Entlassen</button>
-                <button id="changeRules" class="myButton" style="margin-left: 1%">Passwortregeln ändern</button>
+                <form th:action="@{/addemployee}" style="display: inline-block">
+                    <button id="employ" class="myButton" type="submit" style="margin-left: 1%; height: 1cm">Einstellen
+                    </button>
+                </form>
+
+                <form th:action="@{/deletemany}" style="display: inline-block">
+                    <button id="dismiss" class="myButton" type="submit" style="margin-left: 1%; height: 1cm">Entlassen
+                    </button>
+                </form>
+                <form th:action="@{/setrules}" style="display: inline-block">
+                    <button id="changeRules" class="myButton" type="submit" style="margin-left: 1%; height: 1cm">
+                        Passwortregeln
+                    </button>
+                </form>
 
             </div>
 
