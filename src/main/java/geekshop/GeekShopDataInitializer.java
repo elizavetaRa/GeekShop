@@ -233,8 +233,9 @@ public class GeekShopDataInitializer implements DataInitializer {
 
         passRulesRepo.save(new PasswordRules());
     }
+
     private void initializeMessages(MessageRepository messageRepo){
-        if (jokeRepo.count() > 0) {
+        if (messageRepo.count() > 0) {
             return;
         }
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
