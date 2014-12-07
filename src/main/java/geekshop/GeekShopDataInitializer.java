@@ -5,7 +5,13 @@ package geekshop;
  */
 
 import geekshop.model.*;
+import org.joda.money.Money;
+import org.salespointframework.catalog.Catalog;
 import org.salespointframework.core.DataInitializer;
+import org.salespointframework.inventory.Inventory;
+import org.salespointframework.inventory.InventoryItem;
+import org.salespointframework.order.OrderManager;
+import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountIdentifier;
@@ -17,6 +23,8 @@ import org.springframework.util.Assert;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import static org.joda.money.CurrencyUnit.EUR;
+
 /**
  * A {@link DataInitializer} implementation that will create dummy data for the application on application startup.
  *
@@ -27,98 +35,90 @@ import java.util.Calendar;
 @Component
 public class GeekShopDataInitializer implements DataInitializer {
 
+    private final Catalog<GSProduct> catalog;
+    private final Inventory<InventoryItem> inventory;
+    private final JokeRepository jokeRepo;
+    private final MessageRepository messageRepo;
+    private final PasswordRulesRepository passRulesRepo;
+    private final SubCategoryRepository subCatRepo;
+    private final SuperCategoryRepository supCatRepo;
     private final UserAccountManager userAccountManager;
     private final UserRepository userRepo;
-    private final JokeRepository jokeRepo;
-    private final PasswordRulesRepository passRulesRepo;
-    private final MessageRepository messageRepo;
+    private final OrderManager<GSOrder> orderManager; // nur zu Testzwecken
 
     @Autowired
-    public GeekShopDataInitializer(UserRepository userRepo, JokeRepository jokeRepo, PasswordRulesRepository passRulesRepo/*, Inventory<InventoryItem> inventory*/,
-                                   UserAccountManager userAccountManager, MessageRepository messageRepo /*, VideoCatalog videoCatalog*/) {
+    public GeekShopDataInitializer(Catalog<GSProduct> catalog, Inventory<InventoryItem> inventory, JokeRepository jokeRepo,
+                                   MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCatRepo,
+                                   SuperCategoryRepository supCatRepo, UserAccountManager userAccountManager, UserRepository userRepo,
+                                   OrderManager<GSOrder> orderManager) {
 
-        Assert.notNull(userRepo, "UserRepository must not be null!");
+        Assert.notNull(catalog, "Catalog must not be null!");
+        Assert.notNull(inventory, "Inventory must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
+        Assert.notNull(messageRepo, "MessageRepository must not be null!");
         Assert.notNull(passRulesRepo, "PasswordRulesRepository must not be null!");
-//        Assert.notNull(inventory, "Inventory must not be null!");
+        Assert.notNull(subCatRepo, "SubCategoryRepository must not be null!");
+        Assert.notNull(supCatRepo, "SuperCategoryRepository must not be null!");
         Assert.notNull(userAccountManager, "UserAccountManager must not be null!");
-//        Assert.notNull(videoCatalog, "VideoCatalog must not be null!");
+        Assert.notNull(userRepo, "UserRepository must not be null!");
 
-        this.userRepo = userRepo;
+        this.catalog = catalog;
+        this.inventory = inventory;
         this.jokeRepo = jokeRepo;
-        this.passRulesRepo = passRulesRepo;
-//        this.inventory = inventory;
-        this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
-//        this.videoCatalog = videoCatalog;
+        this.passRulesRepo = passRulesRepo;
+        this.subCatRepo = subCatRepo;
+        this.supCatRepo = supCatRepo;
+        this.userAccountManager = userAccountManager;
+        this.userRepo = userRepo;
+        this.orderManager = orderManager;
     }
 
 
     @Override
     public void initialize() {
 
+        initializeCatalog(catalog, inventory, supCatRepo, subCatRepo);
         initializeUsers(userAccountManager, userRepo);
         initializeJokes(jokeRepo);
         initializePasswordRules(passRulesRepo);
         initializeMessages(messageRepo);
-//        initializeCatalog(videoCatalog, inventory);
+        initializeTestOrders(catalog, orderManager); // nur zu Testzwecken
     }
 
-//    private void initializeCatalog(VideoCatalog videoCatalog, Inventory<InventoryItem> inventory) {
-//
-//        if (videoCatalog.findAll().iterator().hasNext()) {
-//            return;
-//        }
-//
-//        videoCatalog.save(new Disc("Last Action Hero", "lac", Money.of(EUR, 9.99), "Äktschn/Comedy", DiscType.DVD));
-//        videoCatalog.save(new Disc("Back to the Future", "bttf", Money.of(EUR, 9.99), "Sci-Fi", DiscType.DVD));
-//        videoCatalog.save(new Disc("Fido", "fido", Money.of(EUR, 9.99), "Comedy/Drama/Horror", DiscType.DVD));
-//        videoCatalog.save(new Disc("Super Fuzz", "sf", Money.of(EUR, 9.99), "Action/Sci-Fi/Comedy", DiscType.DVD));
-//        videoCatalog.save(new Disc("Armour of God II: Operation Condor", "aog2oc", Money.of(EUR, 14.99),
-//                "Action/Adventure/Comedy", DiscType.DVD));
-//        videoCatalog.save(new Disc("Persepolis", "pers", Money.of(EUR, 14.99), "Animation/Biography/Drama", DiscType.DVD));
-//        videoCatalog
-//                .save(new Disc("Hot Shots! Part Deux", "hspd", Money.of(EUR, 9999.0), "Action/Comedy/War", DiscType.DVD));
-//        videoCatalog.save(new Disc("Avatar: The Last Airbender", "tla", Money.of(EUR, 19.99), "Animation/Action/Adventure",
-//                DiscType.DVD));
-//
-//        videoCatalog.save(new Disc("Secretary", "secretary", Money.of(EUR, 6.99), "Political Drama", DiscType.BLURAY));
-//        videoCatalog.save(new Disc("The Godfather", "tg", Money.of(EUR, 19.99), "Crime/Drama", DiscType.BLURAY));
-//        videoCatalog.save(new Disc("No Retreat, No Surrender", "nrns", Money.of(EUR, 29.99), "Martial Arts",
-//                DiscType.BLURAY));
-//        videoCatalog.save(new Disc("The Princess Bride", "tpb", Money.of(EUR, 39.99), "Adventure/Comedy/Family",
-//                DiscType.BLURAY));
-//        videoCatalog.save(new Disc("Top Secret!", "ts", Money.of(EUR, 39.99), "Comedy", DiscType.BLURAY));
-//        videoCatalog.save(new Disc("The Iron Giant", "tig", Money.of(EUR, 34.99), "Animation/Action/Adventure",
-//                DiscType.BLURAY));
-//        videoCatalog.save(new Disc("Battle Royale", "br", Money.of(EUR, 19.99), "Action/Drama/Thriller", DiscType.BLURAY));
-//        videoCatalog.save(new Disc("Oldboy", "old", Money.of(EUR, 24.99), "Action/Drama/Thriller", DiscType.BLURAY));
-//        videoCatalog.save(new Disc("Bill & Ted's Excellent Adventure", "bt", Money.of(EUR, 29.99),
-//                "Adventure/Comedy/Family", DiscType.BLURAY));
-//
-//        // (｡◕‿◕｡)
-//        // Über alle eben hinzugefügten Discs iterieren und jeweils ein InventoryItem mit der Quantity 10 setzen
-//        // Das heißt: Von jeder Disc sind 10 Stück im Inventar.
-//
-//        for (Disc disc : videoCatalog.findAll()) {
-//            InventoryItem inventoryItem = new InventoryItem(disc, Units.TEN);
-//            inventory.save(inventoryItem);
-//        }
-//    }
+    private void initializeCatalog(Catalog<GSProduct> catalog, Inventory<InventoryItem> inventory, SuperCategoryRepository supCatRepo, SubCategoryRepository subCatRepo) {
+
+        // Skip creation if database was already populated
+        if (catalog.findAll().iterator().hasNext())
+            return;
+
+
+        SuperCategory sup = new SuperCategory("SuperCategory");
+        SubCategory sub1 = new SubCategory("SubCategory1", sup);
+        SubCategory sub2 = new SubCategory("SubCategory2", sup);
+        supCatRepo.save(sup);
+        subCatRepo.save(sub1);
+        subCatRepo.save(sub2);
+
+        catalog.save(new GSProduct("Product1", Money.of(EUR, 9.99), sub1));
+        catalog.save(new GSProduct("Product2", Money.of(EUR, 19.99), sub2));
+        catalog.save(new GSProduct("Product3", Money.of(EUR, 29.99), sub2));
+        catalog.save(new GSProduct("Product4", Money.of(EUR, 39.99), sub1));
+
+
+        for (GSProduct product : catalog.findAll()) {
+            if (product.getClass().equals(GSProduct.class)) {
+                InventoryItem inventoryItem = new InventoryItem(product, Units.TEN);
+                inventory.save(inventoryItem);
+                System.out.println(product.getName() + ": " + product.getSubCategory());
+            }
+        }
+    }
 
     private void initializeUsers(UserAccountManager userAccountManager, UserRepository userRepo) {
 
-        // (｡◕‿◕｡)
-        // UserAccounts bestehen aus einem Identifier und eine Password, diese werden auch für ein Login gebraucht
-        // Zusätzlich kann ein UserAccount noch Rollen bekommen, diese können in den Controllern und im View dazu genutzt
-        // werden
-        // um bestimmte Bereiche nicht zugänglich zu machen, das "ROLE_"-Prefix ist eine Konvention welche für Spring
-        // Security nötig ist.
-
-        // Skip creation if database was already populated
-        if (userAccountManager.get(new UserAccountIdentifier("owner")).isPresent()) {
+        if (userAccountManager.get(new UserAccountIdentifier("owner")).isPresent())
             return;
-        }
 
 
         Calendar cal = Calendar.getInstance();
@@ -166,9 +166,9 @@ public class GeekShopDataInitializer implements DataInitializer {
     }
 
     private void initializeJokes(JokeRepository jokeRepo) {
-        if (jokeRepo.count() > 0) {
+        if (jokeRepo.count() > 0)
             return;
-        }
+
 
         jokeRepo.save(new Joke(
                 "Frau: „Ich habe das neuste Windows-System.“" + System.getProperty("line.separator") +
@@ -234,11 +234,23 @@ public class GeekShopDataInitializer implements DataInitializer {
         passRulesRepo.save(new PasswordRules());
     }
 
-    private void initializeMessages(MessageRepository messageRepo){
-        if (messageRepo.count() > 0) {
+    private void initializeMessages(MessageRepository messageRepo) {
+        if (messageRepo.count() > 0)
             return;
-        }
+
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
     }
 
+    private void initializeTestOrders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) { // nur zu Testzwecken
+
+        UserAccount ua = userAccountManager.findAll().iterator().next(); // suche irgendeinen UserAcount
+        GSProduct prod = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
+        GSOrder order = new GSOrder(ua, OrderType.NORMAL); // erzeuge GSOrder
+        order.add(new GSOrderLine(prod, Units.TEN, OrderLineState.NOT_RECLAIMED)); // füge GSOrderLine hinzu
+        orderManager.save(order); // speichere die Order im OrderManager
+
+        for (GSOrder o : orderManager.find(ua)) { // iteriere über alle gespeicherten Orders
+            System.out.println("+++++ " + o + ": " + o.getOrderType());
+        }
+    }
 }

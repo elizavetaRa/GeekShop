@@ -1,5 +1,6 @@
 package geekshop.model;
-/**
+
+/*
  * Created by h4llow3En on 05/12/14.
  */
 
@@ -7,12 +8,12 @@ import org.springframework.util.Assert;
 
 import javax.persistence.*;
 
-
 /**
  * Class representing a message to the owner displayed on Messages. Messages are stored in the {@link geekshop.model.MessageRepository}.
  *
  * @author Felix D&ouml;ring
  */
+
 @Entity
 public class Message {
     @Id
