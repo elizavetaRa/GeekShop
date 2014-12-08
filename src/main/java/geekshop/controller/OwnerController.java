@@ -5,6 +5,8 @@ package geekshop.controller;
  */
 
 import geekshop.model.*;
+import org.salespointframework.catalog.Catalog;
+import org.salespointframework.order.OrderManager;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountIdentifier;
@@ -20,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -48,7 +48,31 @@ class OwnerController {
     }
 
     @RequestMapping("/orders")
-    public String orders() {
+    public String orders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) {
+        Iterable<UserAccount> userAccountList = userAccountManager.findAll();                                               //1. Iterable mit allen userAccounts erstellen
+        List<GSOrder> ol = new ArrayList<GSOrder>();                                                                        //2. neue Liste über GSOrder
+        for(Iterator<UserAccount> uaList = userAccountList.iterator(); uaList.hasNext(); ){                                 //3. für alle Elemente der userAccountListe
+            Iterable<GSOrder> myOrderList = orderManager.find(uaList.next());                                               //4. wird eine weitere Liste über GSOrderLines erstellt (jede enthält nur order eines userAccounts)
+            for(Iterator<GSOrder> orderList = myOrderList.iterator(); orderList.hasNext(); ){                               //5. jedes Element dieser neuerstellten Listen
+                ol.add(orderList.next());                                                                                   //6. wird zu der ursprünglichen orderListe hizugefügt (in 2.)
+            }
+        }
+
+        Iterable<GSProduct> productList = catalog.findAll();                                                                //7. Iterable mit allen Produkten erstellen
+
+        Map<GSProduct, List<GSProductOrder>> map = new HashMap<GSProduct, List<GSProductOrder>>();                          //8. die Map wird initialisiert
+        List<GSProductOrder> productOrderList = new ArrayList<GSProductOrder>();                                            //9. die Liste über die GSProductOrder wird erstellt
+        for (Iterator<GSProduct> prodList = productList.iterator(); prodList.hasNext(); ){                                  //10. für jedes Product aus der Liste (in 8.)
+            for(Iterator<GSOrder> oList = ol.iterator(); oList.hasNext(); ){                                                //11. und für jede order aus der Liste (in 2.)
+                if (oList.next().getOrderLines().iterator().next().getProductName().equals(prodList.next().getName())){     //12. wird geprüft, ob die orderLine zu dem aktuellen Produkt gehört
+                    GSOrderLine gsol = (GSOrderLine)oList.next().getOrderLines();                                           //13. die orderLine wird zwischengespeichert
+                    User user = userRepo.findByUserAccount(oList.next().getUserAccount());                                  //14. der Verkäufer der aktuellen order wird ermittelt
+                    GSProductOrder productOrder = new GSProductOrder(gsol, oList.next().getDateCreated(), user);            //15. mit der orderLine (in 13.), dem datum der order und dem Verkäufer (in 14.) wird die GSProductOrder erstellt
+                    productOrderList.add(productOrder);                                                                     //16. diese GSProductOrder wird einer Liste hinzugefügt
+                    map.put(prodList.next(), productOrderList);                                                             //17. in die Map werden die Produkte mit einer Liste der zugehörigen OrderLines gespeichert
+                }
+            }
+        }
         return "orders";
     }
 
