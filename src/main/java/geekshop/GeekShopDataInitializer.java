@@ -9,7 +9,6 @@ import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.inventory.Inventory;
-import org.salespointframework.inventory.InventoryItem;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.quantity.Units;
@@ -37,7 +36,7 @@ import static org.joda.money.CurrencyUnit.EUR;
 public class GeekShopDataInitializer implements DataInitializer {
 
     private final Catalog<GSProduct> catalog;
-    private final Inventory<InventoryItem> inventory;
+    private final Inventory<GSInventoryItem> inventory;
     private final JokeRepository jokeRepo;
     private final MessageRepository messageRepo;
     private final PasswordRulesRepository passRulesRepo;
@@ -48,7 +47,7 @@ public class GeekShopDataInitializer implements DataInitializer {
     private final OrderManager<GSOrder> orderManager; // nur zu Testzwecken
 
     @Autowired
-    public GeekShopDataInitializer(Catalog<GSProduct> catalog, Inventory<InventoryItem> inventory, JokeRepository jokeRepo,
+    public GeekShopDataInitializer(Catalog<GSProduct> catalog, Inventory<GSInventoryItem> inventory, JokeRepository jokeRepo,
                                    MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCatRepo,
                                    SuperCategoryRepository supCatRepo, UserAccountManager userAccountManager, UserRepository userRepo,
                                    OrderManager<GSOrder> orderManager) {
@@ -88,7 +87,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         initializeTestOrders(catalog, orderManager); // nur zu Testzwecken
     }
 
-    private void initializeCatalog(Catalog<GSProduct> catalog, Inventory<InventoryItem> inventory, SuperCategoryRepository supCatRepo, SubCategoryRepository subCatRepo) {
+    private void initializeCatalog(Catalog<GSProduct> catalog, Inventory<GSInventoryItem> inventory, SuperCategoryRepository supCatRepo, SubCategoryRepository subCatRepo) {
 
         // Skip creation if database was already populated
         if (catalog.findAll().iterator().hasNext())
@@ -110,7 +109,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 
         for (GSProduct product : catalog.findAll()) {
             if (product.getClass().equals(GSProduct.class)) {
-                InventoryItem inventoryItem = new InventoryItem(product, Units.TEN);
+                GSInventoryItem inventoryItem = new GSInventoryItem(product, Units.TEN, Units.ONE);
                 inventory.save(inventoryItem);
                 System.out.println(product.getName() + ": " + product.getSubCategory());
             }
