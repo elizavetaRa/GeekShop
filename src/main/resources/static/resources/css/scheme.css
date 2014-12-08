@@ -101,6 +101,8 @@ dl#news dd span.date {color:#0288CA;}
     top:1px;
 }
 
+a.myButton {color:#FFF !important;}
+
 /*
  * Error message
  */
