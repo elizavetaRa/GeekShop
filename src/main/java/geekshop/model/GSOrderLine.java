@@ -7,11 +7,9 @@ package geekshop.model;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Quantity;
-import org.springframework.util.Assert;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import java.math.BigDecimal;
 
 /**
  * An extension of {@link OrderLine} extended by {@link OrderLineState}.
@@ -23,25 +21,46 @@ import javax.persistence.Enumerated;
 @Entity
 public class GSOrderLine extends OrderLine {
 
-    @Enumerated(EnumType.STRING)
-    private OrderLineState state;
+//    @Enumerated(EnumType.STRING)
+//    private OrderLineState state;
+//    @Lob
+//    private Quantity reclaimedQuantity;
+    private BigDecimal reclaimedAmount;
 
 
     @Deprecated
     protected GSOrderLine() {
     }
 
-    public GSOrderLine(Product product, Quantity quantity, OrderLineState state) {
+    public GSOrderLine(Product product, Quantity quantity/*, Quantity reclaimedQuantity*/) {
         super(product, quantity);
-        Assert.notNull(state, "OrderLineState must not be null.");
-        this.state = state;
+//        Assert.notNull(state, "OrderLineState must not be null.");
+//        this.state = state;
+//        this.reclaimedQuantity = new Quantity(BigDecimal.ZERO, quantity.getMetric(), quantity.getRoundingStrategy());
+        this.reclaimedAmount = BigDecimal.ZERO;
     }
 
-    public OrderLineState getOrderLineState() {
-        return state;
+//    public OrderLineState getOrderLineState() {
+//        return state;
+//    }
+
+//    public void setOrderLineState(OrderLineState state) {            /*Im EKD in GSOrder??*/
+//        this.state = state;
+//    }
+
+//    public Quantity getReclaimedQuantity() {
+//        return reclaimedQuantity;
+//    }
+//
+//    public void increaseReclaimedQuantity(BigDecimal amount) {
+//        reclaimedQuantity = reclaimedQuantity.add(new Quantity(amount, getQuantity().getMetric(), getQuantity().getRoundingStrategy()));
+//    }
+
+    public BigDecimal getReclaimedAmount() {
+        return reclaimedAmount;
     }
 
-    public void setOrderLineState(OrderLineState state) {            /*Im EKD in GSOrder??*/
-        this.state = state;
+    public void increaseReclaimedAmount(BigDecimal amount) {
+        reclaimedAmount = reclaimedAmount.add(amount);
     }
 }
