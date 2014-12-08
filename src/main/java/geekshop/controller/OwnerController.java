@@ -6,7 +6,9 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
+import org.salespointframework.order.OrderStatus;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountIdentifier;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -29,25 +32,30 @@ import java.util.*;
  *
  * @author Felix D&ouml;ring
  * @author Sebastian D&ouml;ring
+ * @author Dominik Lauck
  */
 
 @Controller
 @PreAuthorize("hasRole('ROLE_OWNER')")
 class OwnerController {
+    private final OrderManager<GSOrder> orderManager;
+    private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
 
     @Autowired
-    public OwnerController(UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
+    public OwnerController(OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
+        this.orderManager = orderManager;
+        this.catalog = catalog;
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
     }
 
-    @RequestMapping("/orders")
+    /*@RequestMapping("/orders")
     public String orders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) {
         Iterable<UserAccount> userAccountList = userAccountManager.findAll();                                               //1. Iterable mit allen userAccounts erstellen
         List<GSOrder> ol = new ArrayList<GSOrder>();                                                                        //2. neue Liste über GSOrder
@@ -74,6 +82,46 @@ class OwnerController {
             }
         }
         return "orders";
+    }*/
+
+    @RequestMapping("/orders")
+    public String orders(Model model) {
+
+        Map<GSProduct, GSProductOrders> map = new HashMap<GSProduct, GSProductOrders>();
+
+        // for each GSProduct create map entry
+        for (GSProduct product : catalog.findAll()) {
+            map.put(product, new GSProductOrders());
+        }
+
+        for (GSOrder order : orderManager.find(OrderStatus.PAID)) {
+            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
+                createProductOrder(map, order);
+            }
+        }
+
+        for (GSOrder order : orderManager.find(OrderStatus.COMPLETED)) {
+            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
+                createProductOrder(map, order);
+            }
+        }
+
+        model.addAttribute("orders", map);
+
+        return "orders";
+    }
+
+    private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
+        LocalDateTime date = order.getDateCreated();    // date
+        UserAccount ua = order.getUserAccount();
+        User seller = userRepo.findByUserAccount(ua);   // seller
+        for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respetive map entry
+            GSProductOrder productOrder = new GSProductOrder((GSOrderLine)ol, date, seller);
+            GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
+            GSProductOrders prodOrders = map.get(product);
+            if (prodOrders != null)
+                prodOrders.addProductOrder(productOrder);
+        }
     }
 
     @RequestMapping("/jokes")

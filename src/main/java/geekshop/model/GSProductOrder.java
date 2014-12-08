@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 
 public class GSProductOrder {
 
-    public GSOrderLine orderLine;
-    public LocalDateTime date;
-    public User seller;
+    private GSOrderLine orderLine;
+    private LocalDateTime date;
+    private User seller;
 
 
     @Deprecated
