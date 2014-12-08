@@ -58,6 +58,12 @@ class OwnerController {
         return "jokes";
     }
 
+    @RequestMapping(value = "/newjoke", method = RequestMethod.POST)
+    public String newJoke(@RequestParam("newJoke") String text){
+        jokeRepo.save(new Joke(text));
+        return "redirect:/jokes";
+    }
+
     @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
     public String showJoke(Model model, @PathVariable("id") Long id) {
         Joke joke = jokeRepo.findJokeById(id);
