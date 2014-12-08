@@ -77,6 +77,7 @@
                     </select>
 
                     <table class="table-style01 alternatRows">
+                        <thead>
                         <tr>
 
                             <th>Artikel</th>
@@ -86,16 +87,36 @@
                             <th>in den Warenkorb</th>
 
                         </tr>
+                        </thead>
+
+                        <tbody th:remove="all-but-first">
+                        <!--<tr th:each="product : ${catalog}">
+
+                            <td th:text="${product.name}">Digitalkamera</td>
+                            <td th:text="${product.identifier}">12345678</td>
+                            <td><input type="number" value="7" min="1"/></td>
+                            <td th:text="${product.price}">123 €</td>
+                            <td><form method="post" action="/cart" th:if="${orderable}">
+                                <button id="tocart"  type="submit">+
+                                </button>
+                            </form></td>
+
+                        </tr>-->
                         <tr>
 
-                            <td>Digitalkamera</td>
+                            <td >Digitalkamera</td>
                             <td>12345678</td>
                             <td><input type="number" value="7" min="1"/></td>
                             <td>123 €</td>
-                            <td><button> + </button></td>
+                            <td>
+                                <button id="tocart"  type="submit">+
+                                </button>
+                            </td>
 
                         </tr>
+                        </tbody>
                     </table>
+
                  </div>
 
 

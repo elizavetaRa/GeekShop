@@ -31,63 +31,78 @@
 
             <div id="content-in">
 
+               <!-- <div th:unless="${cart.empty}"> funktioniert,später wieder zum Code!  -->
                 <table class="table-style01 alternatRows">
+                    <thead>
                     <tr>
-                        <th><input type="checkbox" id="selectAll"/></th>
-                        <th scope="col">Anzahl</th>
+                      <!--  <th><input type="checkbox" id="selectAll"/></th>-->
                         <th scope="col">Produkt</th>
-                        <th scope="col">Einzelpreis</th>
-                        <th scope="col">Gesamt</th>
+                        <th scope="col">Anzahl</th>
+                        <th scope="col">Preis</th>
+                        <th></th>
                     </tr>
-                    <tr>
-                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
-                        <td><input type="number" value="2" min="1"/></td>
-                        <td><a href="#">Digitalkamera: FujiFilm FinePix F100fd</a></td>
+                    </thead>
+                    <tbody th:remove="all-but-first">
+                   <!-- <tr th:each="orderline : ${cart}">
+
+                   <td th:text="${orderline.productName}">FujiFilm FinePix F100fd</td>
+                        <td><input type="number" value="2" min="1" max=""/></td>
+                        <td th:text="${orderline.price}">209,19 EUR</td>
+                        <td>
+                            <form th:method="delete" th:action="@{/cart/} + ${orderline.identifier}"
+                                  th:attr="data-entry-id=${orderline.identifier}">
+                                <button class="myButton" style="margin-left: 1%">Löschen</button>
+                            </form></td>
+                    </tr> -->
+
+                   <tr>
+                       <!-- <td align="center"><input type="checkbox" class="case" name="case[]" value="1"/></td>-->
+                        <td>FujiFilm FinePix F100fd</td>
+                        <td><input type="number" value="2" min="1" max=""/></td>
                         <td>209,19 EUR</td>
-                        <td>209,19 EUR</td>
+                        <td>
+
+                                <button class="myButton" style="margin-left: 1%">Löschen</button>
+                            </td>
                     </tr>
-                    <tr>
-                        <td align="center"><input type="checkbox" class="case" name="case" value="1"/></td>
-                        <td><input type="number" value="2" min="1"/></td>
-                        <td><a href="#">Speicherkarte: SanDisk Extreme III SD 4GB</a></td>
-                        <td>21,75 EUR</td>
-                        <td>43,50 EUR</td>
-                    </tr>
+
+                    </tbody>
+
                     <tfoot>
                     <tr>
-                        <td colspan="4" class="t-right">Summe Warenkorb:</td>
-                        <td>269,47 EUR</td>
+                        <td colspan="3" class="t-right">Summe Warenkorb:</td>
+                        <td th:text="${cart.price}">269,47 EUR</td>
                     </tr>
                     </tfoot>
                 </table>
 
                 <button id="delete" class="myButton" style="margin-left: 1%">Löschen</button>
-                <button id="buy" class="myButton" style="margin-left: 1%">Kaufen</button>
+                <form th:action="@{/checkout}" style="display: inline-block">
+                    <button id="checkout" class="myButton" type="submit" ">zur Kasse
+                    </button>
+                </form>
+           <!-- </div> vom cart.empty-->
+            <!--  th:unless="${cart.empty}"-->
 
-            </div>
+             <!--   <p th:if="${cart.empty}">Warenkorb ist leer.</p> -->  <!--funktioniert, später wieder zum Code-->
 
             <hr class="noscreen"/>
 
 
         </div>
-        <!-- /content -->
+        <!-- /content-in -->
 
         <hr class="noscreen"/>
 
 
     </div>
-    <!-- /cols -->
+    <!-- /content -->
 
-    <div id="cols-bottom"></div>
+
 
     <hr class="noscreen"/>
 
-    <!-- Footer -->
-    <!--<div id="footer">
-
-
-    </div>-->
-    <!-- /footer -->
+</div>
 
 </div>
 <!-- /main -->
