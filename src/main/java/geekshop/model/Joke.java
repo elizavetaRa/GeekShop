@@ -41,4 +41,8 @@ public class Joke {
     public void setText(String text) {
         this.text = text;
     }
+
+    public Long getId() {
+        return id;
+    }
 }

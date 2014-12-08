@@ -24,17 +24,39 @@ public class Message {
     private MessageKind messageKind;
     private String messageText;
 
+    private String reclaimLink;
+
+
     @Deprecated
-    protected Message(){
+    protected Message() {
 
     }
 
-    public Message(MessageKind messageKind, String messageText){
+    public Message(MessageKind messageKind, String messageText) {
         Assert.hasText(messageText, "messageText must not be null.");
         this.messageKind = messageKind;
         this.messageText = messageText;
+
     }
 
+    public Message(MessageKind messageKind, String messageText, String reclaimLink) {
+        Assert.hasText(messageText, "messageText must not be null.");
+        this.messageKind = messageKind;
+        this.messageText = messageText;
+
+        if (messageKind == MessageKind.RECLAIM) {
+            this.reclaimLink = reclaimLink;
+        } else {
+            this.reclaimLink = null;
+        }
+
+    }
+
+
+    public String kindToString() {
+        if (messageKind.equals(MessageKind.NOTIFICATION)) return "NOTIFICATION";
+        else return "RECLAIM";
+    }
 
     public MessageKind getMessageKind() {
         return messageKind;
@@ -42,5 +64,13 @@ public class Message {
 
     public String getMessageText() {
         return messageText;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getReclaimLink() {
+        return reclaimLink;
     }
 }

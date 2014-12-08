@@ -27,6 +27,7 @@ import java.util.List;
 /**
  * A Spring MVC controller to manage the shop owner's functions.
  *
+ * @author Felix D&ouml;ring
  * @author Sebastian D&ouml;ring
  */
 
@@ -57,6 +58,24 @@ class OwnerController {
         return "jokes";
     }
 
+    @RequestMapping(value = "/newjoke", method = RequestMethod.POST)
+    public String newJoke(@RequestParam("newJoke") String text){
+        jokeRepo.save(new Joke(text));
+        return "redirect:/jokes";
+    }
+
+    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
+    public String showJoke(Model model, @PathVariable("id") Long id) {
+        Joke joke = jokeRepo.findJokeById(id);
+        model.addAttribute("joke", joke);
+        return "editjoke";
+    }
+
+    @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
+    public String editJoke(Model model, @PathVariable("id") Long id) {
+        return "redirect:/jokes";
+    }
+
     @RequestMapping("/staff")
     public String staff(Model model) {
 
@@ -70,6 +89,12 @@ class OwnerController {
     public String messages(Model model) {
         model.addAttribute("ownermessage", messageRepo.findAll());
         return "messages";
+    }
+
+    @RequestMapping(value = "/messages/{id}", method = RequestMethod.DELETE)
+    public String deleteMessage(@PathVariable("id") Long id) {
+        messageRepo.delete(id);
+        return "redirect:/messages";
     }
 
     @RequestMapping("/addemployee")
@@ -191,7 +216,7 @@ class OwnerController {
         return gender;
     }
 
-    public List<User> getEmployees(){
+    public List<User> getEmployees() {
         Iterable<User> allUsers = userRepo.findAll();
         List<User> employees = new LinkedList<User>();
         for (User user : allUsers) {
