@@ -10,6 +10,7 @@ import org.salespointframework.catalog.Catalog;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.inventory.InventoryItem;
+import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.Role;
@@ -251,6 +252,9 @@ public class GeekShopDataInitializer implements DataInitializer {
 
         for (GSOrder o : orderManager.find(ua)) { // iteriere über alle gespeicherten Orders
             System.out.println("+++++ " + o + ": " + o.getOrderType());
+            for (OrderLine ol : o.getOrderLines()) {
+                System.out.println("+++++ --- " + ((GSOrderLine) ol).getOrderLineState());
+            }
         }
     }
 }
