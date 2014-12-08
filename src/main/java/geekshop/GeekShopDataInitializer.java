@@ -240,7 +240,8 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (messageRepo.count() > 0)
             return;
 
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage", "Test"));
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
+        messageRepo.save(new Message(MessageKind.RECLAIM, "Testreclaim (noch Weiterleitung auf catalog)", "catalog"));
     }
 
     private void initializeTestOrders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) { // nur zu Testzwecken
