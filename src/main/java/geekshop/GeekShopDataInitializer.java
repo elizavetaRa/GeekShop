@@ -72,6 +72,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         this.userAccountManager = userAccountManager;
         this.userRepo = userRepo;
         this.orderManager = orderManager;
+
     }
 
 
@@ -238,7 +239,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (messageRepo.count() > 0)
             return;
 
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage", "Test"));
     }
 
     private void initializeTestOrders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) { // nur zu Testzwecken

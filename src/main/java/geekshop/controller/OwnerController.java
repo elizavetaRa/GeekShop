@@ -27,6 +27,7 @@ import java.util.List;
 /**
  * A Spring MVC controller to manage the shop owner's functions.
  *
+ * @author Felix D&ouml;ring
  * @author Sebastian D&ouml;ring
  */
 
@@ -55,6 +56,17 @@ class OwnerController {
     public String jokes(Model model) {
         model.addAttribute("jokes", jokeRepo.findAll());
         return "jokes";
+    }
+
+    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
+    public String showJoke(Model model, @PathVariable("id") Long id){
+        Joke joke = jokeRepo.findJokeById(id);
+        model.addAttribute("joke", joke);
+        return "editjoke";
+    }
+    @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
+    public String editJoke(Model model, @PathVariable("id") Long id){
+        return "redirect:/jokes";
     }
 
     @RequestMapping("/staff")

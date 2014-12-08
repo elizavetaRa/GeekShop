@@ -4,6 +4,8 @@ package geekshop.model;
  * Created by h4llow3En on 05/12/14.
  */
 
+import org.hibernate.annotations.Type;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -24,23 +26,48 @@ public class Message {
     private MessageKind messageKind;
     private String messageText;
 
+    private String reclaimLink;
+
+
+
+
+
     @Deprecated
     protected Message(){
 
     }
 
-    public Message(MessageKind messageKind, String messageText){
+    public Message(MessageKind messageKind, String messageText, String reclaimLink){
         Assert.hasText(messageText, "messageText must not be null.");
         this.messageKind = messageKind;
         this.messageText = messageText;
+
+        if (messageKind == MessageKind.RECLAIM){
+            this.reclaimLink = reclaimLink;
+        } else {
+            this.reclaimLink = null;
+        }
+
     }
 
 
+    public String kindToString(){
+        if (messageKind.equals(MessageKind.NOTIFICATION)) return "NOTIFICATION";
+        else return "RECLAIM";
+    }
     public MessageKind getMessageKind() {
         return messageKind;
     }
 
     public String getMessageText() {
         return messageText;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getReclaimLink() {
+        return reclaimLink;
     }
 }
