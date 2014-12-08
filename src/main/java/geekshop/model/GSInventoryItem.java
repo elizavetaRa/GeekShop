@@ -9,8 +9,9 @@ import org.salespointframework.inventory.InventoryItem;
 import org.salespointframework.quantity.Quantity;
 import org.springframework.util.Assert;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.Lob;
 
 /**
  * An extension of {@link InventoryItem} extended by a minimal {@link Quantity} in stock which must not be undercut.
@@ -21,7 +22,8 @@ import javax.persistence.OneToOne;
 @Entity
 public class GSInventoryItem extends InventoryItem {
 
-    @OneToOne
+    @Lob
+    @Column(length = 4096)
     private Quantity minimalQuantity;
 
     @Deprecated
