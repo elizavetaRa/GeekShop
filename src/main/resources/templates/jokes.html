@@ -40,7 +40,8 @@
 
                         </tr>
                         <tr th:each="joke : ${jokes}">
-                            <td align="center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/></td>
+                            <td align="center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>
+                            </td>
                             <td>
                                 <p name="joke[]" cols="50" rows="4" th:utext="${joke.text}">Es war dunkel, feucht und
                                     neblig ...</p>

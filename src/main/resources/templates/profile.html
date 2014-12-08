@@ -24,7 +24,8 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title" th:text="'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname}">Profil</h3>
+            <h3 id="content-title"
+                th:text="'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname}">Profil</h3>
 
             <div id="content-in">
 
@@ -41,7 +42,8 @@
                                 <p>
                                     <label for="lastname">Nachname:</label><br/>
                                     <input name="lastname" id="lastname" type="text" size="30" maxlength="40"
-                                           value="Mustermann" th:value="${user.userAccount.lastname}" required="required"/>
+                                           value="Mustermann" th:value="${user.userAccount.lastname}"
+                                           required="required"/>
                                 </p>
 
                                 <p>
@@ -106,10 +108,10 @@
 
                             <th class="t-left">
                                 <p>
-                                <label for="street">Strasse:</label><br/>
-                                <input name="street" id="street" type="text" size="15" maxlength="40"
-                                       value="Wall Street" required="required" th:value="${user.street}"/>
-                            </p>
+                                    <label for="street">Strasse:</label><br/>
+                                    <input name="street" id="street" type="text" size="15" maxlength="40"
+                                           value="Wall Street" required="required" th:value="${user.street}"/>
+                                </p>
 
                                 <p>
                                     <label for="houseNr">Hausnummer:</label><br/>

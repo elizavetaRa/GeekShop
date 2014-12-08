@@ -59,13 +59,14 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
-    public String showJoke(Model model, @PathVariable("id") Long id){
+    public String showJoke(Model model, @PathVariable("id") Long id) {
         Joke joke = jokeRepo.findJokeById(id);
         model.addAttribute("joke", joke);
         return "editjoke";
     }
+
     @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
-    public String editJoke(Model model, @PathVariable("id") Long id){
+    public String editJoke(Model model, @PathVariable("id") Long id) {
         return "redirect:/jokes";
     }
 
@@ -85,7 +86,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/messages/{id}", method = RequestMethod.DELETE)
-    public String deleteMessage(@PathVariable("id") Long id){
+    public String deleteMessage(@PathVariable("id") Long id) {
         messageRepo.delete(id);
         return "redirect:/messages";
     }
@@ -209,7 +210,7 @@ class OwnerController {
         return gender;
     }
 
-    public List<User> getEmployees(){
+    public List<User> getEmployees() {
         Iterable<User> allUsers = userRepo.findAll();
         List<User> employees = new LinkedList<User>();
         for (User user : allUsers) {
