@@ -246,7 +246,10 @@ public class GeekShopDataInitializer implements DataInitializer {
 
     private void initializeTestOrders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) { // nur zu Testzwecken
 
-        UserAccount ua = userAccountManager.findAll().iterator().next(); // suche irgendeinen UserAcount
+        if (orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().hasNext())
+            return;
+
+        UserAccount ua = userAccountManager.findByUsername("owner").get(); // suche UserAccount von owner
         GSProduct prod = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
         GSOrder order = new GSOrder(ua, OrderType.NORMAL, Cash.CASH); // erzeuge GSOrder
         GSOrderLine orderLine = new GSOrderLine(prod, Units.TEN);
