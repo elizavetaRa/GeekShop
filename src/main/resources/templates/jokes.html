@@ -30,7 +30,7 @@
 
             <div id="content-in">
 
-                <form action="#">
+                <form>
 
                     <table class="table-style01 alternatRows">
                         <tr>
@@ -43,21 +43,30 @@
                             <td align="center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>
                             </td>
                             <td>
-                                <p name="joke[]" cols="50" rows="4" th:utext="${joke.text}">Es war dunkel, feucht und
+                                <p name="joke[]" cols="50" rows="4" th:utext="${joke.id} + ' ' + ${joke.text}">Es war dunkel, feucht und
                                     neblig ...</p>
                             </td>
                             <td>
-                                <form th:action="@{/jokes/} + ${joke.id}" method="post">
+                                <form th:action="${joke.id}" method="post">
                                     <button type="submit" class="myButton">Ändern</button>
                                 </form>
                             </td>
                         </tr>
                     </table>
-
-                    <button id="add" class="myButton" style="margin-left: 1%">Neuen Witz hinzufügen</button>
-                    <button id="delete" class="myButton" style="margin-left: 1%">Löschen</button>
-
                 </form>
+
+                <form method="post" id="Joke" th:action="@{/newjoke}" style="display: inline-block">
+                    <div class="form-group" style="display: inline-block">
+                        <label for="newJoke">Neuer Witz</label><br/>
+                        <textarea name="newJoke" id="newJoke" class="form-control" type="text" />
+                    </div>
+                    <button id="add" class="myButton" style="margin-left: 1%; display: inline-block">Neuen Witz hinzufügen</button>
+                </form>
+                <form method="delete" id="delJokes" th:action="@{/deljokes}" style="display: inline-block">
+                    <button id="delete" class="myButton" style="margin-left: 1%">Markierte löschen</button>
+                </form>
+
+
             </div>
             <!-- content-in-->
 
