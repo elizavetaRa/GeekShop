@@ -3,9 +3,9 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>Geek-Shop Think NERD</title>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css" />
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css" />
-    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css" />
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/main.css" />
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/scheme.css" />
+    <link rel="stylesheet" media="print" type="text/css" href="../resources/css/print.css" />
 </head>
 
 <body>
@@ -15,15 +15,15 @@
 
         <ul class="box">
             <!--<li id="nav-active"><a>Begrüßung</a></li>-->
-            <li th:attr="id=(${page == 'catalog'} ? 'nav-active' : null)" ><a th:href="@{catalog}" style="width:10%">Artikelsuche</a></li>
-            <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{reclaim}" style="width:10%">Reklamation</a></li>
-            <li th:attr="id=(${page == 'cart'} ? 'nav-active' : null)"><a th:href="@{cart}" style="width:9%">Warenkorb</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'orders'} ? 'nav-active' : null)"><a th:href="@{orders}" style="width:8%">Verkäufe</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'staff'} ? 'nav-active' : null)"><a th:href="@{staff}" style="width:8%">Personal</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{jokes}" style="width:6%">Witze</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'messages'} ? 'nav-active' : null)"><a th:href="@{messages}" style="width:15%">Benachrichtigungen</a></li>
-            <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{profile}" style="width:9%">Mein Profil</a></li>
-            <li ><a th:href="@{logout}" style="width:7%">Logout</a></li>
+            <li th:attr="id=(${page == 'catalog'} ? 'nav-active' : null)" ><a th:href="@{/catalog}" style="width:10%">Artikelsuche</a></li>
+            <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{/reclaim}" style="width:10%">Reklamation</a></li>
+            <li th:attr="id=(${page == 'cart'} ? 'nav-active' : null)"><a th:href="@{/cart}" style="width:9%">Warenkorb</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'orders'} ? 'nav-active' : null)"><a th:href="@{/orders}" style="width:8%">Verkäufe</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'staff'} ? 'nav-active' : null)"><a th:href="@{/staff}" style="width:8%">Personal</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{/jokes}" style="width:6%">Witze</a></li>
+            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'messages'} ? 'nav-active' : null)"><a th:href="@{/messages}" style="width:15%">Benachrichtigungen</a></li>
+            <li th:attr="id=(${page == 'profile'} ? 'nav-active' : null)"><a th:href="@{/profile}" style="width:9%">Mein Profil</a></li>
+            <li ><a th:href="@{/logout}" style="width:7%">Logout</a></li>
         </ul>
 
         <hr class="noscreen" />

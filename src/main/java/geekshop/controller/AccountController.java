@@ -5,10 +5,7 @@ package geekshop.controller;
  */
 
 import geekshop.model.*;
-import org.salespointframework.useraccount.AuthenticationManager;
-import org.salespointframework.useraccount.Password;
-import org.salespointframework.useraccount.UserAccount;
-import org.salespointframework.useraccount.UserAccountManager;
+import org.salespointframework.useraccount.*;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -130,8 +127,8 @@ class AccountController {
         return "profile";
     }
 
-    @RequestMapping(value = "/profile", method = RequestMethod.POST)
-    public String changePassword(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+    @RequestMapping(value = "/changeOwnPW", method = RequestMethod.POST)
+    public String changeOwnPassword(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
         if (!userAccount.isPresent())
             throw new IllegalArgumentException("There should be a user logged in.");
 
@@ -149,6 +146,25 @@ class AccountController {
         }
         model.addAttribute("user", user);
         model.addAttribute("isOwnProfile", true);
+        return "profile";
+    }
+
+    @RequestMapping(value = "/changePW", method = RequestMethod.POST)
+    public String changePassword(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai) {
+
+        UserAccount ua = uam.get(uai).get();
+        User user = userRepo.findByUserAccount(ua);
+        if (newPW.trim().isEmpty()) {
+            System.out.println("Passwort ist leer!");
+        } else if (!newPW.equals(retypePW)) {
+            System.out.println("Passwörter stimmen nicht überein!");
+        } else if (!passwordRules.isValidPassword(newPW)) {
+            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
+        } else {
+            uam.changePassword(user.getUserAccount(), newPW);
+        }
+        model.addAttribute("user", user);
+        model.addAttribute("isOwnProfile", false);
         return "profile";
     }
 }

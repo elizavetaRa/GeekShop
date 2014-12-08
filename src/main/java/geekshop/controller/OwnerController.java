@@ -142,8 +142,8 @@ class OwnerController {
 //        return "profile";
 //    }
 
-    @RequestMapping(value = "/staff", method = RequestMethod.POST)
-    public String showEmployee(Model model, @RequestParam("uai") UserAccountIdentifier uai) {
+    @RequestMapping("/staff/{uai}")
+    public String showEmployee(Model model, @PathVariable("uai") UserAccountIdentifier uai) {
         UserAccount userAccount = userAccountManager.get(uai).get();
         User user = userRepo.findByUserAccount(userAccount);
         model.addAttribute("user", user);

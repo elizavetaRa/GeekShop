@@ -3,9 +3,9 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Geek-Shop Think NERD</title>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css"/>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css"/>
-    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css"/>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/main.css"/>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/scheme.css"/>
+    <link rel="stylesheet" media="print" type="text/css" href="../resources/css/print.css"/>
 </head>
 
 <body>
@@ -136,8 +136,9 @@
                         </tr>
                     </table>
                 </form>
-                <form method="post" id="changePW" action="profile">
-                    <input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort"/>
+                <form method="post" id="changePW" th:action="${isOwnProfile ? 'changeOwnPW' : 'changePW'}">
+                    <input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort" th:if="${isOwnProfile}"/>
+                    <input name="uai" id="uai"  type="hidden" th:if="${!isOwnProfile}" th:value="${user.userAccount.identifier}"/>
                     <input name="newPW" id="newPW" type="password" placeholder="Neues Passwort"/>
                     <input name="retypePW" id="retypePW" type="password" placeholder="Neues Passwort wiederholen"/>
 
