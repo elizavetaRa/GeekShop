@@ -30,7 +30,7 @@
 
             <div id="content-in">
 
-                <form>
+                <div>
 
                     <table class="table-style01 alternatRows">
                         <tr>
@@ -48,12 +48,12 @@
                             </td>
                             <td>
                                 <form th:action="@{/jokes/} + ${joke.id}" method="post">
-                                    <button type="submit" class="myButton">Ändern</button>
+                                <button type="submit" class="myButton">Ändern</button>
                                 </form>
                             </td>
                         </tr>
                     </table>
-                </form>
+                </div>
 
                 <form method="post" id="Joke" th:action="@{/newjoke}" style="display: inline-block">
                     <div class="form-group" style="display: inline-block">
