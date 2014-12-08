@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/main.css"/>
+    <link rel="stylesheet" media="screen,projection" type="text/css" href="resources/css/scheme.css"/>
+    <link rel="stylesheet" media="print" type="text/css" href="resources/css/print.css"/>
+    <link rel="stylesheet" media="print" type="text/css" href="resources/css/tree.css"/>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="resources/js/selectAll.js"></script>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('cart')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Kasse</h3>
+
+            <div id="content-in">
+                <h4>Übersicht</h4>
+
+                <table class="table-style01 alternatRows">
+                    <thead>
+                    <tr>
+
+                        <th scope="col">Produkt</th>
+                        <th scope="col">Anzahl</th>
+                        <th scope="col">Preis</th>
+                    </tr>
+                    </thead>
+                <!--    <tbody th:remove="all-but-first">     //später wieder zum Code
+                    <tr th:each="orderline : ${cart}">
+
+                        <td th:text="${orderline.productName}">FujiFilm FinePix F100fd</td>
+                        <td th:text="${orderline.quantity}"}</td>
+                        <td th:text="${orderline.price}">209,19 EUR</td>
+                    </tr>
+                    </tbody>
+
+                    <tfoot>
+                    <tr>
+                        <td colspan="4" class="t-right">Gesamt:</td>
+                        <td th:text="${cart.price}">269,47 EUR</td>
+                    </tr>
+                    </tfoot>-->
+                </table>
+
+                <label for="paymentMethod">Zahlmethode auswählen</label><br/>
+                <select name="paymentMethod" id="paymentMethod">
+                    <option value="cash">Cash</option>
+                    <option value="creditCard">CreditCard</option>
+                    <option value="debitCard">DebitCard</option>
+                </select> <br/><br/>
+                <form th:action="@{/catalog}" style="display: inline-block">
+                    <button id="buy" class="myButton" type="submit" style="margin-left: 1%; height: 1cm">kaufen
+                    </button>
+                </form>
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>
