@@ -19,48 +19,25 @@
 
     <!-- Navigation -->
     <div th:replace="navigation :: nav ('jokes')"></div>
-
     <!-- 2 columns (content + sidebar) -->
     <div id="cols" class="box">
 
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Witzeverwaltung</h3>
+            <h3 id="content-title" th:text="'Witz ' + ${joke.id} + ' editieren'">Profil</h3>
 
             <div id="content-in">
 
-                <form action="#">
-
-                    <table class="table-style01 alternatRows">
-                        <tr>
-                            <th><input type="checkbox" id="selectAll"/></th>
-                            <th>Text</th>
-                            <th></th>
-
-                        </tr>
-                        <tr th:each="joke : ${jokes}">
-                            <td align="center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/></td>
-                            <td>
-                                <p name="joke[]" cols="50" rows="4" th:utext="${joke.text}">Es war dunkel, feucht und
-                                    neblig ...</p>
-                            </td>
-                            <td>
-                                <form th:action="@{/jokes/} + ${joke.id}" method="post">
-                                    <button type="submit" class="myButton">Ansehen</button>
-                                </form>
-                            </td>
-                        </tr>
-                    </table>
-
-                    <button id="add" class="myButton" style="margin-left: 1%">Neuen Witz hinzufügen</button>
-                    <button id="delete" class="myButton" style="margin-left: 1%">Löschen</button>
+                <form th:action="@{/editjoke/} + ${joke.id}" method="post">
+                    <button type="submit" class="myButton">Editieren</button>
 
                 </form>
+
             </div>
-            <!-- content-in-->
 
             <hr class="noscreen"/>
+
 
         </div>
         <!-- /content -->
