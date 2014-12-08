@@ -84,6 +84,12 @@ class OwnerController {
         return "messages";
     }
 
+    @RequestMapping(value = "/messages/{id}", method = RequestMethod.DELETE)
+    public String deleteMessage(@PathVariable("id") Long id){
+        messageRepo.delete(id);
+        return "redirect:/messages";
+    }
+
     @RequestMapping("/addemployee")
     public String hire() {
         return "addemployee";

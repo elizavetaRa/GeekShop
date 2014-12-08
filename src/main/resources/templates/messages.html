@@ -30,13 +30,20 @@
 
 
                 <div th:each="message : ${ownermessage}">
-                <table class="table-style01 alternatRows">
-                    <tr style="background: #EFEFEF; border-color: #EFEFEF;">
-                        <td th:utext="${message.messageText}">Hans hat seine Daten geändert.  </td>
-                        <td  style="width: 100px;"><p><button th:if="${message.kindToString() == 'RECLAIM'}" id="tocart" class="myButton" style="margin-left: 1%">ansehen</button></p>
-                            <p><button id="tocart2" class="myButton" style="margin-left: 1%">löschen</button></p> </td>
-                    </tr>
-                </table>
+                    <table class="table-style01 alternatRows">
+                        <tr style="background: #EFEFEF; border-color: #EFEFEF;">
+                            <td th:utext="${message.messageText}">Hans hat seine Daten geändert.</td>
+                            <td style="width: 100px;">
+                                <form th:method="post" th:if="${message.kindToString() == 'RECLAIM'}"
+                                      th:action="${message.reclaimLink}">
+                                    <button id="shwoReclaim" class="myButton" style="margin-left: 1%">ansehen</button>
+                                </form>
+                                <form th:method="delete" th:action="@{/messages/} + ${message.id}">
+                                    <button id="delMessage" class="myButton" style="margin-left: 1%">löschen</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
             </div>
