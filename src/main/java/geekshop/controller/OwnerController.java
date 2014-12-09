@@ -116,7 +116,7 @@ class OwnerController {
         UserAccount ua = order.getUserAccount();
         User seller = userRepo.findByUserAccount(ua);   // seller
         for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respetive map entry
-            GSProductOrder productOrder = new GSProductOrder((GSOrderLine)ol, date, seller);
+            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, seller);
             GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
             GSProductOrders prodOrders = map.get(product);
             if (prodOrders != null)
@@ -144,7 +144,10 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
-    public String editJoke(Model model, @PathVariable("id") Long id) {
+    public String editJoke(@PathVariable("id") Long id, @RequestParam("jokeText") String jokeText) {
+        Joke joke = jokeRepo.findJokeById(id);
+        joke.setText(jokeText);
+        jokeRepo.save(joke);
         return "redirect:/jokes";
     }
 
