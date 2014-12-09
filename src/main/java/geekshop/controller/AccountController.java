@@ -128,7 +128,7 @@ class AccountController {
     }
 
     @RequestMapping(value = "/changeOwnPW", method = RequestMethod.POST)
-    public String changeOwnPassword(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+    public String changeOwnPassword(@RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
         if (!userAccount.isPresent())
             throw new IllegalArgumentException("There should be a user logged in.");
 
@@ -144,13 +144,12 @@ class AccountController {
         } else {
             uam.changePassword(user.getUserAccount(), newPW);
         }
-        model.addAttribute("user", user);
-        model.addAttribute("isOwnProfile", true);
-        return "profile";
+
+        return "redirect:/profile";
     }
 
     @RequestMapping(value = "/changePW", method = RequestMethod.POST)
-    public String changePassword(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai) {
+    public String changePassword(@RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai) {
 
         UserAccount ua = uam.get(uai).get();
         User user = userRepo.findByUserAccount(ua);
@@ -163,8 +162,7 @@ class AccountController {
         } else {
             uam.changePassword(user.getUserAccount(), newPW);
         }
-        model.addAttribute("user", user);
-        model.addAttribute("isOwnProfile", false);
-        return "profile";
+
+        return "redirect:/staff/" + uai.toString();
     }
 }

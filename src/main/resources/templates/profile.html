@@ -157,7 +157,7 @@
 
                 <br/>
 
-                <form method="post" id="changePW" th:action="${isOwnProfile ? 'changeOwnPW' : 'changePW'}">
+                <form method="post" id="changePW" th:action="${isOwnProfile ? '/changeOwnPW' : '/changePW'}">
                     <input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort"
                            th:if="${isOwnProfile}"/>
                     <input name="uai" id="uai" type="hidden" th:if="${!isOwnProfile}"
