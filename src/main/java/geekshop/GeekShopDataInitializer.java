@@ -11,6 +11,7 @@ import org.salespointframework.core.DataInitializer;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
+import org.salespointframework.payment.Cash;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -245,16 +246,27 @@ public class GeekShopDataInitializer implements DataInitializer {
 
     private void initializeTestOrders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) { // nur zu Testzwecken
 
-        UserAccount ua = userAccountManager.findAll().iterator().next(); // suche irgendeinen UserAcount
+        if (orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().hasNext())
+            return;
+
+        UserAccount ua = userAccountManager.findByUsername("owner").get(); // suche UserAccount von owner
         GSProduct prod = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
-        GSOrder order = new GSOrder(ua, OrderType.NORMAL); // erzeuge GSOrder
-        order.add(new GSOrderLine(prod, Units.TEN, OrderLineState.NOT_RECLAIMED)); // füge GSOrderLine hinzu
+        GSOrder order = new GSOrder(ua, OrderType.NORMAL, Cash.CASH); // erzeuge GSOrder
+        GSOrderLine orderLine = new GSOrderLine(prod, Units.TEN);
+        order.add(orderLine); // füge GSOrderLine hinzu
+        orderManager.payOrder(order);
+        orderManager.completeOrder(order);
         orderManager.save(order); // speichere die Order im OrderManager
+        System.out.println(order.isPaid());
+
+//        orderLine.increaseReclaimedAmount(BigDecimal.valueOf(5)); // reklamiere 5 Stück
+//        orderManager.save(order);
+
 
         for (GSOrder o : orderManager.find(ua)) { // iteriere über alle gespeicherten Orders
-            System.out.println("+++++ " + o + ": " + o.getOrderType());
+            System.out.println("+++++ " + o + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ")");
             for (OrderLine ol : o.getOrderLines()) {
-                System.out.println("+++++ --- " + ((GSOrderLine) ol).getOrderLineState());
+                System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
             }
         }
     }

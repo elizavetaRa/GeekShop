@@ -5,6 +5,10 @@ package geekshop.controller;
  */
 
 import geekshop.model.*;
+import org.salespointframework.catalog.Catalog;
+import org.salespointframework.order.OrderLine;
+import org.salespointframework.order.OrderManager;
+import org.salespointframework.order.OrderStatus;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountIdentifier;
@@ -20,36 +24,104 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
  *
  * @author Felix D&ouml;ring
  * @author Sebastian D&ouml;ring
+ * @author Dominik Lauck
  */
 
 @Controller
 @PreAuthorize("hasRole('ROLE_OWNER')")
 class OwnerController {
+    private final OrderManager<GSOrder> orderManager;
+    private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
 
     @Autowired
-    public OwnerController(UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
+    public OwnerController(OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
+        this.orderManager = orderManager;
+        this.catalog = catalog;
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
     }
 
-    @RequestMapping("/orders")
-    public String orders() {
+    /*@RequestMapping("/orders")
+    public String orders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) {
+        Iterable<UserAccount> userAccountList = userAccountManager.findAll();                                               //1. Iterable mit allen userAccounts erstellen
+        List<GSOrder> ol = new ArrayList<GSOrder>();                                                                        //2. neue Liste über GSOrder
+        for (Iterator<UserAccount> uaList = userAccountList.iterator(); uaList.hasNext(); ) {                                 //3. für alle Elemente der userAccountListe
+            Iterable<GSOrder> myOrderList = orderManager.find(uaList.next());                                               //4. wird eine weitere Liste über GSOrderLines erstellt (jede enthält nur order eines userAccounts)
+            for (Iterator<GSOrder> orderList = myOrderList.iterator(); orderList.hasNext(); ) {                               //5. jedes Element dieser neuerstellten Listen
+                ol.add(orderList.next());                                                                                   //6. wird zu der ursprünglichen orderListe hizugefügt (in 2.)
+            }
+        }
+
+        Iterable<GSProduct> productList = catalog.findAll();                                                                //7. Iterable mit allen Produkten erstellen
+
+        Map<GSProduct, List<GSProductOrder>> map = new HashMap<GSProduct, List<GSProductOrder>>();                          //8. die Map wird initialisiert
+        List<GSProductOrder> productOrderList = new ArrayList<GSProductOrder>();                                            //9. die Liste über die GSProductOrder wird erstellt
+        for (Iterator<GSProduct> prodList = productList.iterator(); prodList.hasNext(); ) {                                  //10. für jedes Product aus der Liste (in 8.)
+            for (Iterator<GSOrder> oList = ol.iterator(); oList.hasNext(); ) {                                                //11. und für jede order aus der Liste (in 2.)
+                if (oList.next().getOrderLines().iterator().next().getProductName().equals(prodList.next().getName())) {     //12. wird geprüft, ob die orderLine zu dem aktuellen Produkt gehört
+                    GSOrderLine gsol = (GSOrderLine) oList.next().getOrderLines();                                           //13. die orderLine wird zwischengespeichert
+                    User user = userRepo.findByUserAccount(oList.next().getUserAccount());                                  //14. der Verkäufer der aktuellen order wird ermittelt
+                    GSProductOrder productOrder = new GSProductOrder(gsol, oList.next().getDateCreated(), user);            //15. mit der orderLine (in 13.), dem datum der order und dem Verkäufer (in 14.) wird die GSProductOrder erstellt
+                    productOrderList.add(productOrder);                                                                     //16. diese GSProductOrder wird einer Liste hinzugefügt
+                    map.put(prodList.next(), productOrderList);                                                             //17. in die Map werden die Produkte mit einer Liste der zugehörigen OrderLines gespeichert
+                }
+            }
+        }
         return "orders";
+    }*/
+
+    @RequestMapping("/orders")
+    public String orders(Model model) {
+
+        Map<GSProduct, GSProductOrders> map = new HashMap<GSProduct, GSProductOrders>();
+
+        // for each GSProduct create map entry
+        for (GSProduct product : catalog.findAll()) {
+            map.put(product, new GSProductOrders());
+        }
+
+        for (GSOrder order : orderManager.find(OrderStatus.PAID)) {
+            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
+                createProductOrder(map, order);
+            }
+        }
+
+        for (GSOrder order : orderManager.find(OrderStatus.COMPLETED)) {
+            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
+                createProductOrder(map, order);
+            }
+        }
+
+        model.addAttribute("orders", map);
+
+        return "orders";
+    }
+
+    private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
+        LocalDateTime date = order.getDateCreated();    // date
+        UserAccount ua = order.getUserAccount();
+        User seller = userRepo.findByUserAccount(ua);   // seller
+        for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respetive map entry
+            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, seller);
+            GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
+            GSProductOrders prodOrders = map.get(product);
+            if (prodOrders != null)
+                prodOrders.addProductOrder(productOrder);
+        }
     }
 
     @RequestMapping("/jokes")
@@ -59,7 +131,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/newjoke", method = RequestMethod.POST)
-    public String newJoke(@RequestParam("newJoke") String text){
+    public String newJoke(@RequestParam("newJoke") String text) {
         jokeRepo.save(new Joke(text));
         return "redirect:/jokes";
     }
@@ -72,7 +144,10 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
-    public String editJoke(Model model, @PathVariable("id") Long id) {
+    public String editJoke(@PathVariable("id") Long id, @RequestParam("jokeText") String jokeText) {
+        Joke joke = jokeRepo.findJokeById(id);
+        joke.setText(jokeText);
+        jokeRepo.save(joke);
         return "redirect:/jokes";
     }
 
@@ -116,7 +191,9 @@ class OwnerController {
                        @RequestParam("postcode") String postcode,
                        @RequestParam("place") String place) {
 
-        String password = "test" /*new PasswordRules().generateRandomPassword()*/;
+        String password = new PasswordRules().generateRandomPassword();
+        String messageText = "Startpasswort des Nutzers" + username + ": " + password;
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, messageText));
         UserAccount newUserAccount = userAccountManager.create(username, password, new Role("ROLE_EMPLOYREE"));
         newUserAccount.setFirstname(firstname);
         newUserAccount.setLastname(lastname);

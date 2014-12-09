@@ -18,7 +18,6 @@ p {margin:0px 0;}
 
 table {border-collapse:collapse; border-spacing:0; font-size:100%;}
 th {text-align:center; font-weight:bold;}
-th, td {padding:3px 7px;}
 
 ul, ol {margin-left:30px;}
 ul ul, ol ol {margin:0; margin-left:20px;}
@@ -32,6 +31,10 @@ fieldset {position:relative; padding:10px;}
 legend {position:absolute; top:-1em; margin:0; padding:5px 10px; font-size:100%; font-weight:bold;}
 
 textarea {font-family:inherit; font-size:inherit; width:100%;}
+
+input, option {padding: 2px 3px;}
+
+table input, table select {width:100%; box-sizing:border-box;}
 
 /* ----------------------------------------------------------------------------------------------------------
 2) Universal styles (display, float, margin, text-align...)
@@ -62,12 +65,15 @@ textarea {font-family:inherit; font-size:inherit; width:100%;}
 
 .noscreen {display:none;}
 
+table.noborder, table.noborder tr, table.noborder th, table.noborder td  {border:0 !important;}
+
 /* ----------------------------------------------------------------------------------------------------------
 3) Generally HTML styles (table, ul, dl...)
 ---------------------------------------------------------------------------------------------------------- */
 
 table.table-style01 {width:100%;text-align:center;}
 table.table-style01 th {text-align:center;}
+table.table-style01 th, table.table-style01 td {padding:3px 7px;}
 table.table-style01 td:first-child {font-weight:bold;}
 table.alternatRows tr:nth-child(2n+3) {background:#EFEFEF;}
 table.firstLeft th:first-child, table.firstLeft td:first-child {text-align:left;}
@@ -75,7 +81,7 @@ table.firstLeft td:first-child {font-weight:normal;}
 tr.highlight th, tr.highlight td {font-weight:bold !important; background:#D5E7EF;/* cursor:pointer;*/}
 /*tr.highlight:focus th, tr.highlight:hover th, tr.highlight:active th,
 tr.highlight:focus td, tr.highlight:hover td, tr.highlight:active td {background:#E5F3F9;}*/
-tr.indent td:first-child {padding-left:1.5em;}
+tr.indent td:first-child, td.indent {padding-left:2em !important;}
 
 ul.ul-style01 {margin:5px 0 15px 0px; padding:0; list-style:none;}
 ul.ul-style01 li {margin:0; padding:0; padding-left:15px; background:url("../images/ul-style01.gif") 0 0.5em no-repeat;}

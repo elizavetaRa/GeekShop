@@ -30,6 +30,7 @@
             <div id="content-in">
 
                 <form th:action="@{/editjoke/} + ${joke.id}" method="post">
+                    <textarea id="jokeText" name="jokeText" th:text="${joke.text}" style="height: 4cm"></textarea>
                     <button type="submit" class="myButton">Editieren</button>
 
                 </form>

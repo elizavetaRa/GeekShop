@@ -14,6 +14,8 @@ table.table-style01 th {border-right:1px solid #CCC; background:#EFEFEF; color:#
 table.table-style01 td {border:1px solid #DDD;}
 table.table-style01 tr.bg td {background:#F5F5F5;}
 
+label.highlight {font-weight:bold; /*color:#0288CA;*/}
+
 /* ----------------------------------------------------------------------------------------------------------
 Layout
 ---------------------------------------------------------------------------------------------------------- */
