@@ -45,16 +45,6 @@ class OwnerController {
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
 
-    @Autowired
-    public OwnerController(OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
-        this.orderManager = orderManager;
-        this.catalog = catalog;
-        this.userRepo = userRepo;
-        this.jokeRepo = jokeRepo;
-        this.userAccountManager = userAccountManager;
-        this.messageRepo = messageRepo;
-    }
-
     /*@RequestMapping("/orders")
     public String orders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) {
         Iterable<UserAccount> userAccountList = userAccountManager.findAll();                                               //1. Iterable mit allen userAccounts erstellen
@@ -83,6 +73,16 @@ class OwnerController {
         }
         return "orders";
     }*/
+
+    @Autowired
+    public OwnerController(OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
+        this.orderManager = orderManager;
+        this.catalog = catalog;
+        this.userRepo = userRepo;
+        this.jokeRepo = jokeRepo;
+        this.userAccountManager = userAccountManager;
+        this.messageRepo = messageRepo;
+    }
 
     @RequestMapping("/orders")
     public String orders(Model model) {

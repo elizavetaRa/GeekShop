@@ -4,6 +4,7 @@ package geekshop.controller;
  * Created by Basti on 20.11.2014.
  */
 
+import geekshop.model.GSInventoryItem;
 import geekshop.model.GSOrder;
 import geekshop.model.GSProduct;
 import org.salespointframework.catalog.Product;
@@ -12,6 +13,7 @@ import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.Cash;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
+import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,8 @@ class CartController {
 
     private PaymentMethod paymentMethod;
     private final OrderManager<GSOrder> orderManager;
+    private final Inventory<GSInventoryItem> inventory;
+    private final BusinessTime businessTime;
 
     /**
      * Creates a new {@link CartController} with the given {@link OrderManager}.
@@ -56,10 +60,12 @@ class CartController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public CartController(OrderManager<GSOrder> orderManager) {
+    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime) {
 
         Assert.notNull(orderManager, "OrderManager must not be null!");
         this.orderManager = orderManager;
+        this.inventory = inventory;
+        this.businessTime= businessTime;
     }
 
     /**
@@ -87,15 +93,16 @@ class CartController {
      */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
-    public String addProduct(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart,
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart,
                              ModelMap modelMap) {
 
 
         if (number <= 0){number =1;}
-        if (number > /*Inventory.findByProduct(product)*/ 5){number=5;};
+        if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact())
+        {number=inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();};
 
         cart.addOrUpdateItem(product,Units.of(number));
-        return "catalog";
+        return "redirect:/catalog";
 
     }
 
@@ -122,30 +129,31 @@ class CartController {
      * @param userAccount must not be {@literal null}.
      * @return
      */
-         /*   public String buy(@ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount) {
+          public String buy(@ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount) {
 
-                return userAccount.map(account -> {
+//                return userAccount.map(account -> {
+//
+//                    // (｡◕‿◕｡)
+//                    // Mit commit wird der Warenkorb in die Order überführt, diese wird dann bezahlt und abgeschlossen.
+//                    // Orders können nur abgeschlossen werden, wenn diese vorher bezahlt wurden.
+//                    Order order = new GSOrder(userAccount, Cash.CASH);
+//
+//                    cart.addItemsTo(GSOrder);
+//
+//                    orderManager.payOrder(GSOrder);
+//                    //  orderManager.completeOrder(GSOrder);
+//                    orderManager.save(GSOrder);
+//
+//                    cart.clear();
+//
+//                    return "redirect:/";
+//                }).orElse("redirect:/cart");
 
-                    // (｡◕‿◕｡)
-                    // Mit commit wird der Warenkorb in die Order überführt, diese wird dann bezahlt und abgeschlossen.
-                    // Orders können nur abgeschlossen werden, wenn diese vorher bezahlt wurden.
-                    Order order = new GSOrder(userAccount, Cash.CASH);
-
-                    cart.addItemsTo(GSOrder);
-
-                    orderManager.payOrder(GSOrder);
-                    //  orderManager.completeOrder(GSOrder);
-                    orderManager.add(GSOrder);
-
-                    cart.clear();
-
-                    return "redirect:/";
-                }).orElse("redirect:/cart");
+              return "cart";
             }
 
-        public void acceptReclaim(){
-            //orderline.state='reclaimed';
-        }
-*/
+//        public void acceptReclaim(){
+//            //orderline.state='reclaimed';
+//        }
 
     }

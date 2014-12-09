@@ -89,31 +89,21 @@
                         </tr>
                         </thead>
 
-                        <tbody th:remove="all-but-first">
-                        <!--<tr th:each="product : ${catalog}">
-
+                        <tbody>
+                        <tr th:each="product : ${catalog}">
+                            <form method="post" th:action="@{/cart}" >
                             <td th:text="${product.name}">Digitalkamera</td>
                             <td th:text="${product.identifier}">12345678</td>
-                            <td><input type="number" value="7" min="1"/></td>
+                            <td><input type="number" name="number" value="1" min="1" max="5"/></td>
                             <td th:text="${product.price}">123 €</td>
-                            <td><form method="post" action="/cart" th:if="${orderable}">
-                                <button id="tocart"  type="submit">+
-                                </button>
-                            </form></td>
-
-                        </tr>-->
-                        <tr>
-
-                            <td >Digitalkamera</td>
-                            <td>12345678</td>
-                            <td><input type="number" value="7" min="1"/></td>
-                            <td>123 €</td>
                             <td>
-                                <button id="tocart"  type="submit">+
-                                </button>
-                            </td>
+                                <input type="hidden" name="pid" th:value="${product.identifier}"/>
+                                <button id="tocart" name="tocart" type="submit">+
+                                </button></td>
+                            </form>
 
                         </tr>
+
                         </tbody>
                     </table>
 
