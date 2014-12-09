@@ -58,16 +58,26 @@
                     </tfoot>-->
                 </table>
 
-                <label for="paymentMethod">Zahlmethode auswählen</label><br/>
+                <label for="paymentMethod">Zahlmethode:</label><br/>
                 <select name="paymentMethod" id="paymentMethod">
                     <option value="cash">Cash</option>
                     <option value="creditCard">CreditCard</option>
                     <option value="debitCard">DebitCard</option>
                 </select> <br/><br/>
-                <form th:action="@{/catalog}" style="display: inline-block">
-                    <button id="buy" class="myButton" type="submit" style="margin-left: 1%; height: 1cm">kaufen
-                    </button>
-                </form>
+
+                    <form id="buyit" th:action="@{/checkout}" style="display: inline-block; float: left">
+                     <input type="submit" class="myButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerufsrecht.'); this.disabled=true;
+                    document.getElementById('printit').disabled=false;" style="margin-left: 1%"/>
+                    </form>
+                    <form id="printthis" style=" margin-left: 1%;" >
+                    <input type="button" id="printit" value="drucken"
+                             onclick="window.print()" disabled="true"  class="myButton" />
+                    </form>
+
+
+
+
+
             </div>
 
             <hr class="noscreen"/>
@@ -82,16 +92,11 @@
     </div>
     <!-- /cols -->
 
-    <div id="cols-bottom"></div>
+
 
     <hr class="noscreen"/>
 
-    <!-- Footer -->
-    <!--<div id="footer">
 
-
-    </div>-->
-    <!-- /footer -->
 
 </div>
 <!-- /main -->
