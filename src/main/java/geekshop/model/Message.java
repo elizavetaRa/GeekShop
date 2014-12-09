@@ -34,6 +34,7 @@ public class Message {
 
     public Message(MessageKind messageKind, String messageText) {
         Assert.hasText(messageText, "messageText must not be null.");
+        Assert.notNull(messageKind, "messageKind must not be null.");
         this.messageKind = messageKind;
         this.messageText = messageText;
 
@@ -41,6 +42,8 @@ public class Message {
 
     public Message(MessageKind messageKind, String messageText, String reclaimLink) {
         Assert.hasText(messageText, "messageText must not be null.");
+        Assert.notNull(messageKind, "messageKind must not be null.");
+        Assert.hasText(reclaimLink, "reclaimLink must not be null.");
         this.messageKind = messageKind;
         this.messageText = messageText;
 
