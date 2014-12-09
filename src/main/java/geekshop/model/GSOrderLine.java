@@ -9,6 +9,7 @@ import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Quantity;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import java.math.BigDecimal;
 
 /**
@@ -21,10 +22,7 @@ import java.math.BigDecimal;
 @Entity
 public class GSOrderLine extends OrderLine {
 
-//    @Enumerated(EnumType.STRING)
-//    private OrderLineState state;
-//    @Lob
-//    private Quantity reclaimedQuantity;
+    @Lob
     private BigDecimal reclaimedAmount;
 
 
@@ -34,27 +32,10 @@ public class GSOrderLine extends OrderLine {
 
     public GSOrderLine(Product product, Quantity quantity/*, Quantity reclaimedQuantity*/) {
         super(product, quantity);
-//        Assert.notNull(state, "OrderLineState must not be null.");
-//        this.state = state;
-//        this.reclaimedQuantity = new Quantity(BigDecimal.ZERO, quantity.getMetric(), quantity.getRoundingStrategy());
+
         this.reclaimedAmount = BigDecimal.ZERO;
     }
 
-//    public OrderLineState getOrderLineState() {
-//        return state;
-//    }
-
-//    public void setOrderLineState(OrderLineState state) {            /*Im EKD in GSOrder??*/
-//        this.state = state;
-//    }
-
-//    public Quantity getReclaimedQuantity() {
-//        return reclaimedQuantity;
-//    }
-//
-//    public void increaseReclaimedQuantity(BigDecimal amount) {
-//        reclaimedQuantity = reclaimedQuantity.add(new Quantity(amount, getQuantity().getMetric(), getQuantity().getRoundingStrategy()));
-//    }
 
     public BigDecimal getReclaimedAmount() {
         return reclaimedAmount;
