@@ -44,6 +44,7 @@ class OwnerController {
     private final JokeRepository jokeRepo;
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
+    private final PasswordRules passwordRules;
 
     /*@RequestMapping("/orders")
     public String orders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) {
@@ -75,13 +76,14 @@ class OwnerController {
     }*/
 
     @Autowired
-    public OwnerController(OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo) {
+    public OwnerController(OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo, PasswordRulesRepository passRulesRepo) {
         this.orderManager = orderManager;
         this.catalog = catalog;
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
+        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
     }
 
     @RequestMapping("/orders")
@@ -191,7 +193,7 @@ class OwnerController {
                        @RequestParam("postcode") String postcode,
                        @RequestParam("place") String place) {
 
-        String password = new PasswordRules().generateRandomPassword();
+        String password = passwordRules.generateRandomPassword();
         String messageText = "Startpasswort des Nutzers" + username + ": " + password;
         messageRepo.save(new Message(MessageKind.NOTIFICATION, messageText));
         UserAccount newUserAccount = userAccountManager.create(username, password, new Role("ROLE_EMPLOYREE"));

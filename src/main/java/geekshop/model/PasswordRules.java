@@ -5,7 +5,6 @@ package geekshop.model;
  */
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.security.SecureRandom;
 import java.util.Random;
@@ -19,8 +18,7 @@ import java.util.Random;
 @Entity
 public class PasswordRules {
     @Id
-    @GeneratedValue
-    private Long id;
+    private final String id = "passwordRules";
 
     private boolean specialCharactersNecessary;
     private boolean upperAndLowerNecessary;

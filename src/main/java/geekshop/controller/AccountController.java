@@ -62,7 +62,7 @@ class AccountController {
 
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
-        this.passwordRules = passRulesRepo.findAll().iterator().next();
+        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.uam = uam;
         this.authManager = authManager;
     }

@@ -12,6 +12,6 @@ import org.salespointframework.core.SalespointRepository;
  * @author Sebastian D&ouml;ring
  */
 
-public interface PasswordRulesRepository extends SalespointRepository<PasswordRules, Long> {
+public interface PasswordRulesRepository extends SalespointRepository<PasswordRules, String> {
 
 }
