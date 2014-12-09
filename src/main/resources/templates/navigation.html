@@ -15,7 +15,7 @@
 
         <ul class="box">
             <!--<li id="nav-active"><a>Begrüßung</a></li>-->
-            <li th:attr="id=(${page == 'catalog'} ? 'nav-active' : null)" ><a th:href="@{/catalog}" style="width:10%">Artikelsuche</a></li>
+            <li th:attr="id=(${page == 'productsearch'} ? 'nav-active' : null)" ><a th:href="@{/productsearch}" style="width:10%">Artikelsuche</a></li>
             <li th:attr="id=(${page == 'reclaim'} ? 'nav-active' : null)"><a th:href="@{/reclaim}" style="width:10%">Reklamation</a></li>
             <li th:attr="id=(${page == 'cart'} ? 'nav-active' : null)"><a th:href="@{/cart}" style="width:9%">Warenkorb</a></li>
             <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="id=(${page == 'orders'} ? 'nav-active' : null)"><a th:href="@{/orders}" style="width:8%">Verkäufe</a></li>

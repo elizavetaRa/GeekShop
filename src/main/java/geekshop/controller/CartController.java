@@ -6,25 +6,21 @@ package geekshop.controller;
 
 import geekshop.model.GSInventoryItem;
 import geekshop.model.GSOrder;
-import geekshop.model.GSProduct;
 import org.salespointframework.catalog.Product;
+import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.OrderManager;
-import org.salespointframework.payment.Cash;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import org.salespointframework.inventory.Inventory;
-import org.salespointframework.inventory.InventoryItem;
 
 import java.util.Optional;
 
@@ -102,7 +98,7 @@ class CartController {
         {number=inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();};
 
         cart.addOrUpdateItem(product,Units.of(number));
-        return "redirect:/catalog";
+        return "redirect:/productsearch";
 
     }
 
