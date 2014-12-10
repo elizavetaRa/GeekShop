@@ -17,10 +17,10 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Integration tests for {@link geekshop.model.MessageRepository}.
- * <p>
+ * <p/>
  * *
- * @author Felix D&ouml;ring
  *
+ * @author Felix D&ouml;ring
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
