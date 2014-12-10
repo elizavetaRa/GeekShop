@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the {@link User}s.
@@ -39,7 +36,7 @@ class AccountController {
     private final AuthenticationManager authManager;
 
     /**
-     * Creates a new {@link AccountController} with the given {@link UserRepository} and  {@link JokeRepository}.
+     * Creates a new {@link AccountController} with the given {@link UserRepository} and {@link JokeRepository}.
      *
      * @param userRepo      must not be {@literal null}.
      * @param jokeRepo      must not be {@literal null}.
@@ -125,6 +122,32 @@ class AccountController {
         model.addAttribute("isOwnProfile", true);
 
         return "profile";
+    }
+
+    @RequestMapping(value = "/profile", method = RequestMethod.POST)
+    public String changeData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
+        String uai = formData.get("uai");
+        UserAccount ua = uam.get(new UserAccountIdentifier(uai)).get();
+        User user = userRepo.findByUserAccount(ua);
+
+        ua.setFirstname(formData.get("firstname"));
+        ua.setLastname(formData.get("lastname"));
+        user.setGender(Gender.valueOf(formData.get("gender")));
+        user.setBirthday(OwnerController.strToDate(formData.get("birthday")));
+        user.setMaritalStatus(MaritalStatus.valueOf(formData.get("maritalStatus")));
+        user.setPhone(formData.get("phone"));
+        user.setStreet(formData.get("street"));
+        user.setHouseNr(formData.get("houseNr"));
+        user.setPostcode(formData.get("postcode"));
+        user.setPlace(formData.get("place"));
+
+        uam.save(ua);
+        userRepo.save(user);
+
+        if (userAccount.get().equals(ua))
+            return "redirect:/profile";
+        else
+            return "redirect:/staff/" + uai.toString();
     }
 
     @RequestMapping(value = "/changeOwnPW", method = RequestMethod.POST)
