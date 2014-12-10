@@ -29,7 +29,7 @@
 
             <div id="content-in">
 
-                <form action="profile" method="post">
+                <form action="/profile" method="post">
                     <table class="table-style01 t-left noborder">
                         <tr>
                             <td>
@@ -54,13 +54,13 @@
                             </td>
                             <td>
                                 <select name="gender" id="gender">
-                                    <option th:selected="${user.gender == T(geekshop.model.Gender).MALE}">
+                                    <option value="MALE" th:selected="${user.gender == T(geekshop.model.Gender).MALE}">
                                         männlich
                                     </option>
-                                    <option th:selected="${user.gender == T(geekshop.model.Gender).FEMALE}">
+                                    <option value="FEMALE" th:selected="${user.gender == T(geekshop.model.Gender).FEMALE}">
                                         weiblich
                                     </option>
-                                    <option th:selected="${user.gender == T(geekshop.model.Gender).SOMETHING_ELSE}">
+                                    <option value="SOMETHING_ELSE" th:selected="${user.gender == T(geekshop.model.Gender).SOMETHING_ELSE}">
                                         etwas Anderes
                                     </option>
                                 </select>
@@ -71,7 +71,7 @@
                             <td>
                                 <input type="text" name="birthday" id="birthday" value="24.02.1955"
                                        th:value="${#dates.format(user.birthday, 'dd.MM.yyyy')}"
-                                       pattern="^(31|30|[012][1-9]|[1-9])\.-\/(0[1-9]|1[012]|[1-9])\.-\/((18|19|20)\d{2}|\d{2})$"/>
+                                       pattern="^(31|30|[012][1-9]|[1-9])[\.-\/](0[1-9]|1[012]|[1-9])[\.-\/]((18|19|20)\d{2}|\d{2})$"/>
                             </td>
                         </tr>
                         <tr>
@@ -80,31 +80,31 @@
                             </td>
                             <td>
                                 <select name="maritalStatus" id="maritalStatus">
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).UNMARRIED}">
+                                    <option value="UNMARRIED" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).UNMARRIED}">
                                         ledig
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).MARRIED}">
+                                    <option value="MARRIED" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).MARRIED}">
                                         verheiratet
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).SEPARATED}">
+                                    <option value="SEPARATED" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).SEPARATED}">
                                         getrennt lebend
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).DIVORCED}">
+                                    <option value="DIVORCED" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).DIVORCED}">
                                         geschieden
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).WIDOWED}">
+                                    <option value="WIDOWED" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).WIDOWED}">
                                         verwitwet
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).PARTNERED}">
+                                    <option value="PARTNERED" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).PARTNERED}">
                                         verpartnert
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).NO_MORE_PARTNERED}">
+                                    <option value="NO_MORE_PARTNERED" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).NO_MORE_PARTNERED}">
                                         entpartnert
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).PARTNER_LEFT_BEHIND}">
+                                    <option value="PARTNER_LEFT_BEHIND" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).PARTNER_LEFT_BEHIND}">
                                         partnerhinterblieben
                                     </option>
-                                    <option th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).UNKNOWN}">
+                                    <option value="UNKNOWN" th:selected="${user.maritalStatus == T(geekshop.model.MaritalStatus).UNKNOWN}">
                                         unbekannt
                                     </option>
                                 </select>
@@ -152,6 +152,7 @@
 
                         </tr>
                     </table>
+                    <input name="uai" id="uai" type="hidden" th:value="${user.userAccount.identifier}"/>
                     <button type="submit" name="save" id="save" class="myButton">Speichern</button>
                 </form>
 
