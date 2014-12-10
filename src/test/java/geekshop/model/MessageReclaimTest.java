@@ -8,6 +8,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.transaction.Transactional;
 
+/**
+ * Empty ReclaimLink Test for {@link geekshop.model.MessageRepository}.
+ * <p>
+ * *
+ * @author Felix D&ouml;ring
+ *
+ */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GeekShop.class)
 @Transactional

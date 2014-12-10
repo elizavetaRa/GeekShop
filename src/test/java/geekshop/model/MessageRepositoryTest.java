@@ -15,6 +15,14 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
+/**
+ * Integration tests for {@link geekshop.model.MessageRepository}.
+ * <p>
+ * *
+ * @author Felix D&ouml;ring
+ *
+ */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GeekShop.class)
 @Transactional
