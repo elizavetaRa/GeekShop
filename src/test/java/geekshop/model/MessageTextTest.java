@@ -10,7 +10,7 @@ import javax.transaction.Transactional;
 
 /**
  * Empty MessageText Test for {@link geekshop.model.MessageRepository}.
- * <p/>
+ * <p>
  * *
  *
  * @author Felix D&ouml;ring
