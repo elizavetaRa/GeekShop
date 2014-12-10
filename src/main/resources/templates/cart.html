@@ -31,7 +31,7 @@
 
             <div id="content-in">
 
-               <!-- <div th:unless="${cart.empty}"> funktioniert,später wieder zum Code!  -->
+               <div th:unless="${cart.empty}">
                 <table class="table-style01 alternatRows">
                     <thead>
                     <tr>
@@ -43,28 +43,18 @@
                     </tr>
                     </thead>
                     <tbody th:remove="all-but-first">
-                   <!-- <tr th:each="orderline : ${cart}">
+                   <tr th:each="orderline : ${cart}">
 
                    <td th:text="${orderline.productName}">FujiFilm FinePix F100fd</td>
-                        <td><input type="number" value="2" min="1" max=""/></td>
+                        <td><input type="number" name="number" th:value="${orderline.quantity.amount}" min="1" max=""/></td>
                         <td th:text="${orderline.price}">209,19 EUR</td>
                         <td>
                             <form th:method="delete" th:action="@{/cart/} + ${orderline.identifier}"
                                   th:attr="data-entry-id=${orderline.identifier}">
                                 <button class="myButton" style="margin-left: 1%">Löschen</button>
                             </form></td>
-                    </tr> -->
-
-                   <tr>
-                       <!-- <td align="center"><input type="checkbox" class="case" name="case[]" value="1"/></td>-->
-                        <td>FujiFilm FinePix F100fd</td>
-                        <td><input type="number" value="2" min="1" max=""/></td>
-                        <td>209,19 EUR</td>
-                        <td>
-
-                                <button class="myButton" style="margin-left: 1%">Löschen</button>
-                            </td>
                     </tr>
+
 
                     </tbody>
 
@@ -76,15 +66,16 @@
                     </tfoot>
                 </table>
 
+
                 <button id="delete" class="myButton" style="margin-left: 1%">Warenkorb leeren</button>
                 <form th:action="@{/checkout}" style="display: inline-block">
                     <button id="checkout" class="myButton" type="submit">zur Kasse
                     </button>
                 </form>
-           <!-- </div> vom cart.empty-->
+           </div>
             <!--  th:unless="${cart.empty}"-->
 
-             <!--   <p th:if="${cart.empty}">Warenkorb ist leer.</p> -->  <!--funktioniert, später wieder zum Code-->
+                <p th:if="${cart.empty}">Warenkorb ist leer.</p>
 
             <hr class="noscreen"/>
 
