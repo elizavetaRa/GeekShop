@@ -6,11 +6,16 @@ package geekshop.controller;
 
 import geekshop.model.GSInventoryItem;
 import geekshop.model.GSOrder;
+import geekshop.model.GSProduct;
+import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
+import org.salespointframework.order.CartItem;
+import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.PaymentMethod;
+import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
@@ -49,6 +54,7 @@ class CartController {
     private final OrderManager<GSOrder> orderManager;
     private final Inventory<GSInventoryItem> inventory;
     private final BusinessTime businessTime;
+    private final Catalog<GSProduct> catalog;
 
     /**
      * Creates a new {@link CartController} with the given {@link OrderManager}.
@@ -56,12 +62,13 @@ class CartController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime) {
+    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime,Catalog<GSProduct> catalog) {
 
         Assert.notNull(orderManager, "OrderManager must not be null!");
         this.orderManager = orderManager;
         this.inventory = inventory;
         this.businessTime= businessTime;
+        this.catalog= catalog;
     }
 
     /**
@@ -101,6 +108,23 @@ class CartController {
         return "redirect:/productsearch";
 
     }
+
+
+
+
+
+    @RequestMapping(value= "/deleteallitems", method= RequestMethod.DELETE)
+   public String deleteAll (@ModelAttribute Cart cart){
+      cart.clear();
+       return "redirect:/cart";
+   }
+
+    @RequestMapping(value="/deletecartitem/", method = RequestMethod.POST)
+    public String deleteCartItem (@RequestParam String identifier, @ModelAttribute Cart cart,  ModelMap modelMap ) {
+        cart.removeItem(identifier);
+        return "redirect:/cart";
+    }
+
 
     @RequestMapping(value = "/cart", method = RequestMethod.GET)
     public String basket() {

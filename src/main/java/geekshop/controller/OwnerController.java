@@ -8,7 +8,6 @@ import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
-import org.salespointframework.order.OrderStatus;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountIdentifier;
@@ -39,6 +38,7 @@ import java.util.*;
 @PreAuthorize("hasRole('ROLE_OWNER')")
 class OwnerController {
     private final OrderManager<GSOrder> orderManager;
+    private final GSOrderRepository orderRepo;
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
@@ -76,8 +76,9 @@ class OwnerController {
     }*/
 
     @Autowired
-    public OwnerController(OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo, PasswordRulesRepository passRulesRepo) {
+    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo, PasswordRulesRepository passRulesRepo) {
         this.orderManager = orderManager;
+        this.orderRepo = orderRepo;
         this.catalog = catalog;
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
@@ -96,17 +97,22 @@ class OwnerController {
             map.put(product, new GSProductOrders());
         }
 
-        for (GSOrder order : orderManager.find(OrderStatus.PAID)) {
+//        GSOrder recOrder = orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().next();
+//        GSOrderLine recOl = (GSOrderLine) recOrder.getOrderLines().iterator().next();
+//        recOl.increaseReclaimedAmount(BigDecimal.valueOf(5));
+//        orderManager.save(recOrder);
+
+        for (GSOrder order : orderRepo.findAll()) {
             if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
                 createProductOrder(map, order);
             }
         }
 
-        for (GSOrder order : orderManager.find(OrderStatus.COMPLETED)) {
-            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
-                createProductOrder(map, order);
-            }
-        }
+//        for (GSOrder order : orderManager.find(OrderStatus.COMPLETED)) {
+//            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
+//                createProductOrder(map, order);
+//            }
+//        }
 
         model.addAttribute("orders", map);
 
@@ -256,13 +262,13 @@ class OwnerController {
 //        return "redirect:/staff";
 //    }
 
-    public Date strToDate(String strDate) {
+    public static Date strToDate(String strDate) {
         strDate = strDate.replace(".", " ");
         strDate = strDate.replace("-", " ");
         strDate = strDate.replace("/", " ");
         Date date = null;
         try {
-            date = new SimpleDateFormat("dd MM YYYY").parse(strDate);
+            date = new SimpleDateFormat("dd MM yyyy").parse(strDate);
         } catch (ParseException e) {
 
         }

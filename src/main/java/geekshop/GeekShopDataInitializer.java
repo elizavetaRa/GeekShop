@@ -46,12 +46,13 @@ public class GeekShopDataInitializer implements DataInitializer {
     private final UserAccountManager userAccountManager;
     private final UserRepository userRepo;
     private final OrderManager<GSOrder> orderManager; // nur zu Testzwecken
+    private final GSOrderRepository orderRepo; // nur zu Testzwecken
 
     @Autowired
     public GeekShopDataInitializer(Catalog<GSProduct> catalog, Inventory<GSInventoryItem> inventory, JokeRepository jokeRepo,
                                    MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCatRepo,
                                    SuperCategoryRepository supCatRepo, UserAccountManager userAccountManager, UserRepository userRepo,
-                                   OrderManager<GSOrder> orderManager) {
+                                   OrderManager<GSOrder> orderManager, GSOrderRepository orderRepo) {
 
         Assert.notNull(catalog, "Catalog must not be null!");
         Assert.notNull(inventory, "Inventory must not be null!");
@@ -73,6 +74,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         this.userAccountManager = userAccountManager;
         this.userRepo = userRepo;
         this.orderManager = orderManager;
+        this.orderRepo = orderRepo;
 
     }
 
@@ -80,15 +82,15 @@ public class GeekShopDataInitializer implements DataInitializer {
     @Override
     public void initialize() {
 
-        initializeCatalog(catalog, inventory, supCatRepo, subCatRepo);
-        initializeUsers(userAccountManager, userRepo);
-        initializeJokes(jokeRepo);
-        initializePasswordRules(passRulesRepo);
-        initializeMessages(messageRepo);
-        initializeTestOrders(catalog, orderManager); // nur zu Testzwecken
+        initializeCatalog();
+        initializeUsers();
+        initializeJokes();
+        initializePasswordRules();
+        initializeMessages();
+        initializeTestOrders(); // nur zu Testzwecken
     }
 
-    private void initializeCatalog(Catalog<GSProduct> catalog, Inventory<GSInventoryItem> inventory, SuperCategoryRepository supCatRepo, SubCategoryRepository subCatRepo) {
+    private void initializeCatalog() {
 
         // Skip creation if database was already populated
         if (catalog.findAll().iterator().hasNext())
@@ -117,7 +119,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         }
     }
 
-    private void initializeUsers(UserAccountManager userAccountManager, UserRepository userRepo) {
+    private void initializeUsers() {
 
         if (userAccountManager.get(new UserAccountIdentifier("owner")).isPresent())
             return;
@@ -167,7 +169,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }
 
-    private void initializeJokes(JokeRepository jokeRepo) {
+    private void initializeJokes() {
         if (jokeRepo.count() > 0)
             return;
 
@@ -229,14 +231,14 @@ public class GeekShopDataInitializer implements DataInitializer {
         ));
     }
 
-    private void initializePasswordRules(PasswordRulesRepository passRulesRepo) {
+    private void initializePasswordRules() {
         if (passRulesRepo.count() > 0)
             return;
 
         passRulesRepo.save(new PasswordRules());
     }
 
-    private void initializeMessages(MessageRepository messageRepo) {
+    private void initializeMessages() {
         if (messageRepo.count() > 0)
             return;
 
@@ -244,7 +246,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         messageRepo.save(new Message(MessageKind.RECLAIM, "Testreclaim (noch Weiterleitung auf catalog)", "productsearch"));
     }
 
-    private void initializeTestOrders(Catalog<GSProduct> catalog, OrderManager<GSOrder> orderManager) { // nur zu Testzwecken
+    private void initializeTestOrders() { // nur zu Testzwecken
 
         if (orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().hasNext())
             return;
@@ -254,14 +256,18 @@ public class GeekShopDataInitializer implements DataInitializer {
         GSOrder order = new GSOrder(ua, OrderType.NORMAL, Cash.CASH); // erzeuge GSOrder
         GSOrderLine orderLine = new GSOrderLine(prod, Units.TEN);
         order.add(orderLine); // füge GSOrderLine hinzu
-        orderManager.payOrder(order);
-        orderManager.completeOrder(order);
+        System.out.println("orderManager.payOrder(order): " + orderManager.payOrder(order));
+        System.out.println("orderManager.completeOrder(order): " + orderManager.completeOrder(order).getStatus().toString());
+        System.out.println("order paid: " + order.isPaid());
+        System.out.println("order completed: " + order.isCompleted());
         orderManager.save(order); // speichere die Order im OrderManager
-        System.out.println(order.isPaid());
+//        orderRepo.save(order);
 
 //        orderLine.increaseReclaimedAmount(BigDecimal.valueOf(5)); // reklamiere 5 Stück
 //        orderManager.save(order);
-
+//        orderRepo.save(order);
+//        order.add(new GSOrderLine(prod, Units.ONE));
+//        order.setOrderType(OrderType.RECLAIM);
 
         for (GSOrder o : orderManager.find(ua)) { // iteriere über alle gespeicherten Orders
             System.out.println("+++++ " + o + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ")");
