@@ -66,9 +66,10 @@
                     </tfoot>
                 </table>
 
+                <form method="post" id="formforpayment" th:action="@{/chosepaymentmethod}">
                 <label for="paymentMethod">Zahlmethode:</label><br/>
                 <select name="paymentMethod" id="paymentMethod" onchange="process_select(this,1)">
-                    <option value="Barzahlung">Bahrzahlung</option>
+                    <option value="Barzahlung" >Bahrzahlung</option> <!-- th:selected="${strpayment='Barzahlung'}"-->
                     <option value="Kreditkarte">Kreditkarte</option>
                     <option value="Lastschriftverfahren">Lastschriftverfahren</option>
                 </select> <br/><br/>
@@ -109,35 +110,10 @@
                         </p>
 
                         <p>
-                            <label for="validfrom">Valid from:</label><br/>
-                            <input name="validfrom" id="validfrom" type="text" size="30" maxlength="30"
-                                   required="required"/>
-                        </p>
-
-                        <p>
-                            <label for="expirydate">Expiry date:</label><br/>
-                            <input name="expirydate" id="expirydate" type="text" size="30" maxlength="30"
-                                   required="required"/>
-                        </p>
-                        <p>
                             <label for="cardverificationcode">Card verification code:</label><br/>
                             <input name="cardverificationcode" id="cardverificationcode" type="text" size="30" maxlength="30"
                                    required="required"/>
                         </p>
-                        <p>
-                            <label for="dailywithdrawallimit">Daily withdrawal limit:</label><br/>
-                            <input name="dailywithdrawallimit" id="dailywithdrawallimit" type="number" size="30" maxlength="30"
-                                   required="required"/>
-                        </p>
-
-                        <p>
-                            <label for="creditlimit">name on card:</label><br/>
-                            <input name="creditlimit" id="creditlimit" type="number" size="30" maxlength="30"
-                                   required="required"/>
-                        </p>
-
-
-
                     </div>
                 <br/>
                 </div>
@@ -170,11 +146,6 @@
                                    required="required"/>
                         </p>
 
-                        <p>
-                            <label for="datewritten">Date Written:</label><br/>
-                            <input name="datewritten" id="datewritten" type="text" size="30" maxlength="30"
-                                   required="required"/>
-                        </p>
 
                         <p>
                             <label for="bankname">Bank name:</label><br/>
@@ -197,7 +168,7 @@
                     <br/>
                 </div>
 
-
+                </form>
 
                     <form id="buyit" th:action="@{/checkout}" style="display: inline-block; float: left">
                      <input type="submit" class="myButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerufsrecht.'); this.disabled=true;

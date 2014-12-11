@@ -7,6 +7,7 @@ package geekshop.controller;
 import geekshop.model.GSInventoryItem;
 import geekshop.model.GSOrder;
 import geekshop.model.GSProduct;
+import geekshop.model.Gender;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
@@ -14,6 +15,9 @@ import org.salespointframework.order.Cart;
 import org.salespointframework.order.CartItem;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
+import org.salespointframework.payment.Cash;
+import org.salespointframework.payment.Cheque;
+import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
@@ -27,6 +31,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -136,6 +141,36 @@ class CartController {
         return "checkout";
     }
 
+
+    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
+    public PaymentMethod strToPaymentMethod(@RequestParam ("strpayment") String strPayment,
+                                            @RequestParam ("accountname") String accountName,
+                                            @RequestParam ("accountnumber")String accountNumber,
+                                            @RequestParam ("chequenumber") String chequeNumber,
+                                            @RequestParam ("payee") String payee,
+                                            @RequestParam ("bankname") String bankName,
+                                            @RequestParam ("bankaddress") String bankAddress,
+                                            @RequestParam ("bankid")String bankIdentificationNumber,
+                                            @RequestParam ("cardname")String cardName,
+                                            @RequestParam ("cardassociationname") String cardAssociationName,
+                                            @RequestParam ("cardnumber")String cardNumber,
+                                            @RequestParam ("nameoncard")String nameOnCard,
+                                            @RequestParam ("billingadress")String billingAddress,
+                                            @RequestParam ("cardverificationcode")String cardVerificationCode) {
+        PaymentMethod paymentMethod;
+        LocalDateTime dateWritten= LocalDateTime.now();
+        LocalDateTime validFrom= LocalDateTime.parse("2013-12-18T14:30");  //später ändern
+        LocalDateTime expiryDate=LocalDateTime.parse("2020-12-18T14:30");  //später ändern
+        org.joda.money.Money dailyWithdrawalLimit=  org.joda.money.Money.parse("1000");
+        org.joda.money.Money creditLimit=  org.joda.money.Money.parse("1000");
+
+        if (strPayment.equals("Barzahlung")) {paymentMethod = new Cash(); return paymentMethod;}
+        else if (strPayment.equals("Lastshriftverfahren")) {paymentMethod = new Cheque(accountName, accountNumber, chequeNumber,payee, dateWritten, bankName,
+                bankAddress,bankIdentificationNumber); return paymentMethod;}
+        else if (strPayment.equals("Kreditkarte")) {paymentMethod= new CreditCard(cardName, cardAssociationName, cardNumber,
+                nameOnCard, billingAddress, validFrom, expiryDate, cardVerificationCode, dailyWithdrawalLimit, creditLimit); return paymentMethod;}
+        return new Cash();
+    }
 
 
 
