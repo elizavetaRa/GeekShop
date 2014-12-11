@@ -49,21 +49,21 @@
                         <th scope="col">Preis</th>
                     </tr>
                     </thead>
-                <!--    <tbody th:remove="all-but-first">     //später wieder zum Code
-                    <tr th:each="orderline : ${cart}">
+                    <tbody th:remove="all-but-first">
+                    <tr th:each="cartitem : ${cart}">
 
-                        <td th:text="${orderline.productName}">FujiFilm FinePix F100fd</td>
-                        <td th:text="${orderline.quantity}"}</td>
-                        <td th:text="${orderline.price}">209,19 EUR</td>
+                        <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
+                        <td th:text="${cartitem.quantity}">42</td>
+                        <td th:text="${cartitem.price}">209,19 EUR</td>
                     </tr>
                     </tbody>
 
                     <tfoot>
                     <tr>
-                        <td colspan="4" class="t-right">Gesamt:</td>
+                        <td colspan="2" class="t-right">Gesamt:</td>
                         <td th:text="${cart.price}">269,47 EUR</td>
                     </tr>
-                    </tfoot>-->
+                    </tfoot>
                 </table>
 
                 <label for="paymentMethod">Zahlmethode:</label><br/>
