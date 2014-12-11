@@ -38,7 +38,8 @@
                                       th:action="@{/} + ${message.reclaimLink}">
                                     <button id="shwoReclaim" class="myButton" style="margin-left: 1%">Ansehen</button>
                                 </form>
-                                <form th:method="delete" th:action="@{/messages/} + ${message.id}">
+                                <form th:method="delete" th:if="${message.kindToString() == 'RECLAIM'}"
+                                      th:action="@{/messages/} + ${message.id}">
                                     <button id="delMessage" class="myButton" style="margin-left: 1%">Löschen</button>
                                 </form>
                             </td>
