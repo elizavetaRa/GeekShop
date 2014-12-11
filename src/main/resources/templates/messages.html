@@ -3,9 +3,9 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Geek-Shop Think NERD</title>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/main.css"/>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/scheme.css"/>
-    <link rel="stylesheet" media="print" type="text/css" href="../resources/css/print.css"/>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
 </head>
 
 <body>
@@ -36,10 +36,10 @@
                             <td style="width: 100px;">
                                 <form th:method="post" th:if="${message.kindToString() == 'RECLAIM'}"
                                       th:action="@{/} + ${message.reclaimLink}">
-                                    <button id="shwoReclaim" class="myButton" style="margin-left: 1%">Ansehen</button>
+                                    <button id="shwoReclaim" class="myButton marginButton">Ansehen</button>
                                 </form>
                                 <form th:method="delete" th:action="@{/messages/} + ${message.id}">
-                                    <button id="delMessage" class="myButton" style="margin-left: 1%">Löschen</button>
+                                    <button id="delMessage" class="myButton">Löschen</button>
                                 </form>
                             </td>
                         </tr>

@@ -11,5 +11,15 @@ package geekshop.model;
  */
 
 public enum Gender {
-    MALE, FEMALE, SOMETHING_ELSE
+    MALE("männlich"), FEMALE("weiblich"), SOMETHING_ELSE("etwas anderes");
+
+    private String value;
+
+    private Gender(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

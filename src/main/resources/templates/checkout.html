@@ -3,18 +3,18 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Geek-Shop Think NERD</title>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/main.css"/>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/scheme.css"/>
-    <link rel="stylesheet" media="print" type="text/css" href="../resources/css/print.css"/>
-    <link rel="stylesheet" media="print" type="text/css" href="../resources/css/tree.css"/>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-    <script language="javascript" type="text/javascript" src="../resources/js/selectAll.js"></script>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <link th:replace="header :: tree-css"/>
+    <!--<script th:replace="header :: jquery-js"></script>-->
+    <!--<script th:replace="header :: selectAll-js"></script>-->
     <script>
-        function process_select(sel,id) {
-            $('#'+'Barzahlung'+'_'+id).hide();
-            $('#'+'Kreditkarte'+'_'+id).hide();
-            $('#'+'Lastschriftverfahren'+'_'+id).hide();
-            $('#'+sel.value+'_'+id).show();
+        function process_select(sel, id) {
+            $('#' + 'Barzahlung' + '_' + id).hide();
+            $('#' + 'Kreditkarte' + '_' + id).hide();
+            $('#' + 'Lastschriftverfahren' + '_' + id).hide();
+            $('#' + sel.value + '_' + id).show();
         }
     </script>
 </head>
@@ -73,12 +73,12 @@
                     <option value="Lastschriftverfahren">Lastschriftverfahren</option>
                 </select> <br/><br/>
 
-                <div id="Barzahlung_1" >Sie haben Die Zahlmethode Barzahlung gewählt</div>
+                <div id="Barzahlung_1">Sie haben Die Zahlmethode Barzahlung gewählt</div>
 
 
                 <div id="Kreditkarte_1" style="display:none">
                     <div>Sie haben die Zahlmethode Kreditkarte gewählt.</div>
-                    <div> <p>
+                    <div><p>
                         <label for="cardname">Card name:</label><br/>
                         <input name="cardname" id="cardname" type="text" size="30" maxlength="30"
                                required="required"/>
@@ -86,7 +86,8 @@
 
                         <p>
                             <label for="cardassociationname">Card association name:</label><br/>
-                            <input name="cardassociationname" id="cardassociationname" type="text" size="30" maxlength="30"
+                            <input name="cardassociationname" id="cardassociationname" type="text" size="30"
+                                   maxlength="30"
                                    required="required"/>
                         </p>
 
@@ -119,14 +120,18 @@
                             <input name="expirydate" id="expirydate" type="text" size="30" maxlength="30"
                                    required="required"/>
                         </p>
+
                         <p>
                             <label for="cardverificationcode">Card verification code:</label><br/>
-                            <input name="cardverificationcode" id="cardverificationcode" type="text" size="30" maxlength="30"
+                            <input name="cardverificationcode" id="cardverificationcode" type="text" size="30"
+                                   maxlength="30"
                                    required="required"/>
                         </p>
+
                         <p>
                             <label for="dailywithdrawallimit">Daily withdrawal limit:</label><br/>
-                            <input name="dailywithdrawallimit" id="dailywithdrawallimit" type="number" size="30" maxlength="30"
+                            <input name="dailywithdrawallimit" id="dailywithdrawallimit" type="number" size="30"
+                                   maxlength="30"
                                    required="required"/>
                         </p>
 
@@ -137,20 +142,20 @@
                         </p>
 
 
-
                     </div>
-                <br/>
+                    <br/>
                 </div>
 
 
-                <div id="Lastschriftverfahren_1" style="display:none"><div>Sie haben die Zahlmethode Lastschriftverfahren gewählt.</div>
+                <div id="Lastschriftverfahren_1" style="display:none">
+                    <div>Sie haben die Zahlmethode Lastschriftverfahren gewählt.</div>
                     <div>
 
                         <p>
-                        <label for="accoutname">Account name:</label><br/>
-                        <input name="accountname" id="accoutname" type="text" size="30" maxlength="30"
-                               required="required"/>
-                    </p>
+                            <label for="accoutname">Account name:</label><br/>
+                            <input name="accountname" id="accoutname" type="text" size="30" maxlength="30"
+                                   required="required"/>
+                        </p>
 
                         <p>
                             <label for="accountnumber">Account number:</label><br/>
@@ -187,9 +192,11 @@
                             <input name="bankaddress" id="bankaddress" type="text" size="30" maxlength="30"
                                    required="required"/>
                         </p>
+
                         <p>
                             <label for="bankidentificationnumber">Bank identification number:</label><br/>
-                            <input name="bankidentificationnumber" id="bankidentificationnumber" type="text" size="30" maxlength="30"
+                            <input name="bankidentificationnumber" id="bankidentificationnumber" type="text" size="30"
+                                   maxlength="30"
                                    required="required"/>
                         </p>
 
@@ -198,18 +205,14 @@
                 </div>
 
 
-
-                    <form id="buyit" th:action="@{/checkout}" style="display: inline-block; float: left">
-                     <input type="submit" class="myButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerufsrecht.'); this.disabled=true;
-                    document.getElementById('printit').disabled=false;" style="margin-left: 1%"/>
-                    </form>
-                    <form id="printthis" style=" margin-left: 1%;" >
+                <form id="buyit" th:action="@{/checkout}">
+                    <input type="submit" class="myButton marginButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerrufsrecht.'); this.disabled=true;
+                    document.getElementById('printit').disabled=false;"/>
+                </form>
+                <form id="printthis">
                     <input type="button" id="printit" value="drucken"
-                             onclick="window.print()" disabled="true"  class="myButton" />
-                    </form>
-
-
-
+                           onclick="window.print()" disabled="true" class="myButton"/>
+                </form>
 
 
             </div>
@@ -227,9 +230,7 @@
     <!-- /cols -->
 
 
-
     <hr class="noscreen"/>
-
 
 
 </div>
