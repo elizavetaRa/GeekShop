@@ -97,12 +97,25 @@ public class GeekShopDataInitializer implements DataInitializer {
             return;
 
 
-        SuperCategory sup = new SuperCategory("SuperCategory");
-        SubCategory sub1 = new SubCategory("SubCategory1", sup);
-        SubCategory sub2 = new SubCategory("SubCategory2", sup);
-        supCatRepo.save(sup);
+        SuperCategory sup1 = new SuperCategory("SuperCategory1");
+        SuperCategory sup2 = new SuperCategory("SuperCategory2");
+        SuperCategory sup3 = new SuperCategory("SuperCategory3");
+        SubCategory sub1 = new SubCategory("SubCategory1", sup1);
+        SubCategory sub2 = new SubCategory("SubCategory2", sup1);
+        SubCategory sub3 = new SubCategory("SubCategory3", sup2);
+        SubCategory sub4 = new SubCategory("SubCategory4", sup2);
+        sup1.addSubCategory(sub1);
+        sup1.addSubCategory(sub2);
+        sup2.addSubCategory(sub3);
+        sup2.addSubCategory(sub4);
+        supCatRepo.save(sup1);
+        supCatRepo.save(sup2);
+        supCatRepo.save(sup3);
         subCatRepo.save(sub1);
         subCatRepo.save(sub2);
+        subCatRepo.save(sub3);
+        subCatRepo.save(sub4);
+
 
         catalog.save(new GSProduct("Product1", Money.of(EUR, 9.99), sub1));
         catalog.save(new GSProduct("Product2", Money.of(EUR, 19.99), sub2));

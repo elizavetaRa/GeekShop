@@ -41,19 +41,11 @@
 
                 <div style="width: 195px; border: 4px solid #02AAFC; border-radius: 6px;
                 float:left; height: 100%; padding-left: 10px;">
-                    <ul class="ul-style01">
+                    <ul class="ul-style01" th:each="superCategory: ${superCategories}">
 
-                        <li class="expand expanded" style="cursor:pointer"><h5>Kleidung für Nerds</h5>
-                            <ul style="display: none; cursor:pointer">
-                                <li>T-Shirts</li>
-                                <li>Pullis</li>
-                            </ul>
-                        </li>
-
-                        <li class="expand expanded" style="cursor:pointer"><h5>Gadgets</h5>
-                            <ul style="display: none; cursor:pointer">
-                                <li>für Android</li>
-                                <li>für IOS</li>
+                        <li><h5 th:text="${superCategory.name}">Kleidung für Nerds</h5>
+                            <ul th:each="subCategory: ${superCategory.subCategories}">
+                                <li><a th:href="@{/productsearch.html}" th:text="${subCategory.name}">T-Shirts</a></li>
                             </ul>
                         </li>
 
@@ -80,7 +72,7 @@
                         <tr>
                             <th>Artikel</th>
                             <th>Artikelnummer</th>
-                            <th>Verfügbare Anzahl</th>
+                            <th>Anzahl</th>
                             <th>Stückpreis</th>
                             <th>in den Warenkorb</th>
                         </tr>
