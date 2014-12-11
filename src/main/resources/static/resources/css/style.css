@@ -108,7 +108,7 @@
 
 .form-1 input[type=text]:focus ~ i,
 .form-1 input[type=password]:focus ~ i {
-    color: #42A2BC;
+    color: #42a2bc;
 }
 
 .form-1 input[type=text]:focus,

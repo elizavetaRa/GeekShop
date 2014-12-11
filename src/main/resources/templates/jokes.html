@@ -3,11 +3,11 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Geek-Shop Think NERD</title>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/main.css"/>
-    <link rel="stylesheet" media="screen,projection" type="text/css" href="../resources/css/scheme.css"/>
-    <link rel="stylesheet" media="print" type="text/css" href="../resources/css/print.css"/>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-    <script language="javascript" type="text/javascript" src="../resources/js/selectAll.js"></script>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <!--<script th:replace="header :: jquery-js"></script>-->
+    <!--<script th:replace="header :: selectAll-js"></script>-->
 </head>
 
 <body>
@@ -40,9 +40,9 @@
 
                         </tr>
                         <tr th:each="joke : ${jokes}">
-                            <td align="center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>
+                            <td class="t-center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>
                             </td>
-                            <td>
+                            <td class="t-left">
                                 <p name="joke[]" cols="50" rows="4" th:utext="${joke.text}">Es war dunkel, feucht und
                                     neblig ...</p>
                             </td>
@@ -56,14 +56,14 @@
                 </div>
 
                 <form method="post" id="Joke" th:action="@{/newjoke}" style="display: inline-block">
-                    <div class="form-group" style="display: inline-block">
+                    <div class="form-group" style="display: block">
                         <label for="newJoke">Neuer Witz</label><br/>
                         <textarea name="newJoke" id="newJoke" class="form-control" type="text" />
                     </div>
-                    <button id="add" class="myButton" style="margin-left: 1%; display: inline-block">Neuen Witz hinzufügen</button>
+                    <button id="add" class="myButton">Neuen Witz hinzufügen</button>
                 </form>
-                <form method="delete" id="delJokes" th:action="@{/deljokes}" style="display: inline-block">
-                    <button id="delete" class="myButton" style="margin-left: 1%">Markierte löschen</button>
+                <form method="delete" id="delJokes" th:action="@{/deljokes}" style="display: inline-block; margin-left: 4em">
+                    <button id="delete" class="myButton">Markierte löschen</button>
                 </form>
 
 

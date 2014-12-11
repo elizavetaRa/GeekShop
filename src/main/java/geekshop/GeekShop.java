@@ -64,7 +64,7 @@ public class GeekShop {
 
             http.authorizeRequests().antMatchers("/**").permitAll().and().
                     formLogin().loginPage("/login").loginProcessingUrl("/login").and().
-                    logout().logoutUrl("/logout").logoutSuccessUrl("/");
+                    logout()/*.logoutUrl("/logout").logoutSuccessUrl("/")*/;
         }
     }
 }

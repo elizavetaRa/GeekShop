@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ class AccountController {
     private final PasswordRules passwordRules;
     private final UserAccountManager uam;
     private final AuthenticationManager authManager;
+    private final MessageRepository messageRepo;
 
     /**
      * Creates a new {@link AccountController} with the given {@link UserRepository} and {@link JokeRepository}.
@@ -43,27 +45,28 @@ class AccountController {
      * @param passRulesRepo must not be {@literal null}.
      * @param uam           must not be {@literal null}.
      * @param authManager   must not be {@literal null}.
+     * @param messageRepo   must not be {@literal null}.
      */
     @Autowired
-    public AccountController(UserRepository userRepo,
-                             JokeRepository jokeRepo,
-                             PasswordRulesRepository passRulesRepo,
-                             UserAccountManager uam,
-                             AuthenticationManager authManager) {
+    public AccountController(UserRepository userRepo, JokeRepository jokeRepo, PasswordRulesRepository passRulesRepo,
+                             UserAccountManager uam, AuthenticationManager authManager, MessageRepository messageRepo) {
         Assert.notNull(userRepo, "UserRepository must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
         Assert.notNull(passRulesRepo, "PasswordRulesRepository must not be null!");
         Assert.isTrue(passRulesRepo.findAll().iterator().hasNext(), "PasswordRulesRepository should contain PasswordRules!");
         Assert.notNull(uam, "UserAccountManager must not be null!");
         Assert.notNull(authManager, "AuthenticationManager must not be null!");
+        Assert.notNull(messageRepo, "MessageRepo must not be null!");
 
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.uam = uam;
         this.authManager = authManager;
+        this.messageRepo = messageRepo;
     }
 
+    //region Login
     @RequestMapping({"/", "/index"})
     public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
         List<Joke> recentJokes;
@@ -107,12 +110,108 @@ class AccountController {
         }
         return joke;
     }
+    //endregion
 
-//    @RequestMapping("/welcome")
-//    public String home() {
-//        return "welcome";
+    //region Staff
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping("/staff")
+    public String staff(Model model) {
+
+        List<User> employees = getEmployees();
+        model.addAttribute("staff", employees);
+
+        return "staff";
+    }
+
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping("/staff/{uai}")
+    public String showEmployee(Model model, @PathVariable("uai") UserAccountIdentifier uai) {
+        UserAccount userAccount = uam.get(uai).get();
+        User user = userRepo.findByUserAccount(userAccount);
+        model.addAttribute("user", user);
+        model.addAttribute("isOwnProfile", false);
+        model.addAttribute("inEditingMode", false);
+
+        return "profile";
+    }
+
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping("/addemployee")
+    public String hire(Model model) {
+        model.addAttribute("inEditingMode", true);
+        return "profile";
+    }
+
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
+    public String hire(@RequestParam Map<String, String> formData) {
+
+        String password = passwordRules.generateRandomPassword();
+        UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
+        ua.setFirstname(formData.get("firstname"));
+        ua.setLastname(formData.get("lastname"));
+        ua.setEmail(formData.get("email"));
+
+        User user = new User(ua, Gender.valueOf(formData.get("gender")), OwnerController.strToDate(formData.get("birthday")),
+                MaritalStatus.valueOf(formData.get("maritalStatus")), formData.get("phone"), formData.get("street"),
+                formData.get("houseNr"), formData.get("postcode"), formData.get("place"));
+
+        uam.save(ua);
+        userRepo.save(user);
+
+        String messageText = "Startpasswort des Nutzers " + formData.get("username") + ": " + password;
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, messageText));
+
+        return "redirect:/staff";
+    }
+
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping(value = "/staff/{uai}", method = RequestMethod.DELETE)
+    public String fire(@PathVariable("uai") UserAccountIdentifier uai) {
+        UserAccount userAccount = uam.get(uai).get();
+        Role role = new Role("ROLE_OWNER");
+        if (userAccount.hasRole(role)) {
+            return "redirect:/staff";
+        } else {
+            Long id = userRepo.findByUserAccount(userAccount).getId();
+            userRepo.delete(id);
+        }
+        return "redirect:/staff";
+    }
+
+//    @RequestMapping(value = "/staff/firemany", method = RequestMethod.DELETE)
+//    public String fireMany(){
+//
+//        List<User> employees = getEmployees();
+//        List<Long> ids = new LinkedList<Long>();
+//        for (User user : employees) {
+//            if(employees.iterator().
+//        }
+//
+//        return "redirect:/staff";
 //    }
 
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping("/staff/{uai}/{page}")
+    public String profileChange(Model model, @PathVariable("uai") UserAccountIdentifier uai, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
+        UserAccount ua = uam.get(uai).get();
+        User user = userRepo.findByUserAccount(ua);
+        model.addAttribute("user", user);
+
+        if (page.equals("changedata")) {
+            model.addAttribute("isOwnProfile", false);
+            model.addAttribute("inEditingMode", true);
+
+            return "profile";
+        } else {
+            model.addAttribute("isOwnProfile", false);
+
+            return "changepw";
+        }
+    }
+    //endregion
+
+    //region Profile
     @RequestMapping("/profile")
     public String profile(Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.isPresent()) {
@@ -120,18 +219,44 @@ class AccountController {
             model.addAttribute("user", user);
         }
         model.addAttribute("isOwnProfile", true);
+        model.addAttribute("inEditingMode", false);
 
         return "profile";
     }
 
-    @RequestMapping(value = "/profile", method = RequestMethod.POST)
-    public String changeData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
+    @RequestMapping("/profile/{page}")
+    public String profileChange(Model model, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
+        if (page.equals("changedata")) {
+            if (userAccount.isPresent()) {
+                User user = userRepo.findByUserAccount(userAccount.get());
+                model.addAttribute("user", user);
+            }
+            model.addAttribute("isOwnProfile", true);
+            model.addAttribute("inEditingMode", true);
+
+            return "profile";
+        } else {
+            if (userAccount.isPresent()) {
+                User user = userRepo.findByUserAccount(userAccount.get());
+                model.addAttribute("user", user);
+            }
+            model.addAttribute("isOwnProfile", true);
+
+            return "changepw";
+        }
+    }
+    //endregion
+
+    //region General account methods
+    @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
+    public String changedData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
         String uai = formData.get("uai");
         UserAccount ua = uam.get(new UserAccountIdentifier(uai)).get();
         User user = userRepo.findByUserAccount(ua);
 
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
+        ua.setEmail(formData.get("email"));
         user.setGender(Gender.valueOf(formData.get("gender")));
         user.setBirthday(OwnerController.strToDate(formData.get("birthday")));
         user.setMaritalStatus(MaritalStatus.valueOf(formData.get("maritalStatus")));
@@ -147,10 +272,10 @@ class AccountController {
         if (userAccount.get().equals(ua))
             return "redirect:/profile";
         else
-            return "redirect:/staff/" + uai.toString();
+            return "redirect:/staff/" + uai;
     }
 
-    @RequestMapping(value = "/changeOwnPW", method = RequestMethod.POST)
+    @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
     public String changeOwnPassword(@RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
         if (!userAccount.isPresent())
             throw new IllegalArgumentException("There should be a user logged in.");
@@ -171,7 +296,7 @@ class AccountController {
         return "redirect:/profile";
     }
 
-    @RequestMapping(value = "/changePW", method = RequestMethod.POST)
+    @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
     public String changePassword(@RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai) {
 
         UserAccount ua = uam.get(uai).get();
@@ -188,4 +313,16 @@ class AccountController {
 
         return "redirect:/staff/" + uai.toString();
     }
+
+    private List<User> getEmployees() {
+        Iterable<User> allUsers = userRepo.findAll();
+        List<User> employees = new LinkedList<User>();
+        for (User user : allUsers) {
+            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER"))) {
+                employees.add(user);
+            }
+        }
+        return employees;
+    }
+    //endregion
 }

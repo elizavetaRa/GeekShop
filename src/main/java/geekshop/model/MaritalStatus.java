@@ -11,7 +11,17 @@ package geekshop.model;
  */
 
 public enum MaritalStatus {
-    UNMARRIED, MARRIED, SEPARATED, DIVORCED, WIDOWED,
-    PARTNERED, NO_MORE_PARTNERED, PARTNER_LEFT_BEHIND,
-    UNKNOWN
+    UNMARRIED("ledig"), MARRIED("verheiratet"), SEPARATED("getrennt lebend"), DIVORCED("geschieden"), WIDOWED("verwitwet"),
+    PARTNERED("verpartnert"), NO_MORE_PARTNERED("entpartnert"), PARTNER_LEFT_BEHIND("partnerhinterblieben"),
+    UNKNOWN("unbekannt");
+
+    private String value;
+
+    private MaritalStatus(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav (${isOwnProfile} ? 'profile' : 'staff')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title"
+                th:text="'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname}">Profil</h3>
+
+            <div id="content-in">
+
+                <form method="post" th:action="${isOwnProfile ? '/changedownpw' : '/changedpw'}">
+                    <table class="table-style01 t-left noborder">
+                        <tr th:if="${isOwnProfile}">
+                            <td><label for="oldPW">Altes Passwort:</label></td>
+                            <td><input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort"/></td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><label for="newPW">Neues Passwort:</label></td>
+                            <td>
+                                <input name="newPW" id="newPW" type="password" placeholder="Neues Passwort"/></td>
+                        </tr>
+                        <tr>
+                            <td><label for="retypePW">Neues Passwort wiederholen:</label></td>
+                            <td><input name="retypePW" id="retypePW" type="password"
+                                       placeholder="Neues Passwort wiederholen"/></td>
+                        </tr>
+                    </table>
+
+                    <input name="uai" id="uai" type="hidden" th:if="${!isOwnProfile}"
+                           th:value="${user.userAccount.identifier}"/>
+
+                    <p>
+                        <button type="submit" name="submit" class="myButton" th:value="#{profil.changePW.submit}"
+                                value="Passwort ändern">Passwort speichern
+                        </button>
+                        <a th:href="(${isOwnProfile} ? '/profile' : '/staff/' + ${user.userAccount.identifier})"
+                           class="myButton">Zurück</a>
+                    </p>
+                </form>
+
+            </div>
+            <!-- /content-in -->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>
