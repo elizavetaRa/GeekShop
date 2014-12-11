@@ -7,7 +7,6 @@ package geekshop.controller;
 import geekshop.model.GSInventoryItem;
 import geekshop.model.GSOrder;
 import geekshop.model.GSProduct;
-import geekshop.model.Gender;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
