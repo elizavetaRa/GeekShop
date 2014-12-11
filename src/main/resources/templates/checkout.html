@@ -7,7 +7,7 @@
     <link th:replace="header :: scheme-css"/>
     <link th:replace="header :: print-css"/>
     <link th:replace="header :: tree-css"/>
-    <!--<script th:replace="header :: jquery-js"></script>-->
+    <script th:replace="header :: jquery-js"></script>
     <!--<script th:replace="header :: selectAll-js"></script>-->
     <script>
         function process_select(sel, id) {
@@ -141,7 +141,6 @@
                                    required="required"/>
                         </p>
 
-
                     </div>
                     <br/>
                 </div>
@@ -205,11 +204,11 @@
                 </div>
 
 
-                <form id="buyit" th:action="@{/checkout}">
-                    <input type="submit" class="myButton marginButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerrufsrecht.'); this.disabled=true;
-                    document.getElementById('printit').disabled=false;"/>
+                <form id="buyit" th:action="@{/checkout}" style="display: inline-block; float: left">
+                    <input type="submit" class="myButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerufsrecht.'); this.disabled=true;
+                    document.getElementById('printit').disabled=false;" style="margin-left: 1%"/>
                 </form>
-                <form id="printthis">
+                <form id="printthis" style=" margin-left: 1%;">
                     <input type="button" id="printit" value="drucken"
                            onclick="window.print()" disabled="true" class="myButton"/>
                 </form>
