@@ -53,7 +53,7 @@
                                 <input type="hidden" name="uai" th:value="${employee.userAccount.identifier}"/>
                                 <button type="submit" class="myButton">Ansehen</button>
                             </form>-->
-                            <a th:href="'staff/' + ${employee.userAccount.identifier}" class="myButton marginButton">Ansehen</a>
+                            <a th:href="'staff/' + ${employee.userAccount.identifier}" class="myButton marginButton">Ansehen/Bearbeiten</a>
 
                             <form th:method="delete" th:action="@{/staff/} + ${employee.userAccount.identifier}"
                                   th:attr="data-entry-id=${employee.id}" class="f-left">

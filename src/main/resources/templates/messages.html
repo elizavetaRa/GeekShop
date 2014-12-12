@@ -36,9 +36,9 @@
                             <td style="width: 100px;">
                                 <form th:method="post" th:if="${message.kindToString() == 'RECLAIM'}"
                                       th:action="@{/} + ${message.reclaimLink}">
-                                    <button id="shwoReclaim" class="myButton marginButton">Ansehen</button>
+                                    <button id="shwoReclaim" class="myButton">Ansehen</button>
                                 </form>
-                                <form th:method="delete" th:if="${message.kindToString() == 'RECLAIM'}"
+                                <form th:method="delete" th:if="${message.kindToString() != 'RECLAIM'}"
                                       th:action="@{/messages/} + ${message.id}">
                                     <button id="delMessage" class="myButton" style="margin-left: 1%">Löschen</button>
                                 </form>
