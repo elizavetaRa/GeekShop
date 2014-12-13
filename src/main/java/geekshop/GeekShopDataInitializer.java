@@ -15,7 +15,6 @@ import org.salespointframework.payment.Cash;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
-import org.salespointframework.useraccount.UserAccountIdentifier;
 import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -137,7 +136,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 
     private void initializeUsers() {
 
-        if (userAccountManager.get(new UserAccountIdentifier("owner")).isPresent())
+        if (userAccountManager.findByUsername("owner").isPresent())
             return;
 
 
@@ -269,15 +268,15 @@ public class GeekShopDataInitializer implements DataInitializer {
 
         UserAccount ua = userAccountManager.findByUsername("owner").get(); // suche UserAccount von owner
         GSProduct prod = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
-        GSOrder order = new GSOrder(ua, OrderType.NORMAL, Cash.CASH); // erzeuge GSOrder
+        GSOrder order = new GSOrder("1", ua, OrderType.NORMAL, Cash.CASH); // erzeuge GSOrder
         GSOrderLine orderLine = new GSOrderLine(prod, Units.TEN);
         order.add(orderLine); // füge GSOrderLine hinzu
-        System.out.println("orderManager.payOrder(order): " + orderManager.payOrder(order));
-        System.out.println("orderManager.completeOrder(order): " + orderManager.completeOrder(order).getStatus().toString());
-        System.out.println("order paid: " + order.isPaid());
-        System.out.println("order completed: " + order.isCompleted());
-        orderManager.save(order); // speichere die Order im OrderManager
-//        orderRepo.save(order);
+//        System.out.println("orderManager.payOrder(order): " + orderManager.payOrder(order));
+//        System.out.println("orderManager.completeOrder(order): " + orderManager.completeOrder(order).getStatus().toString());
+//        System.out.println("order paid: " + order.isPaid());
+//        System.out.println("order completed: " + order.isCompleted());
+//        orderManager.save(order); // speichere die Order im OrderManager
+        orderRepo.save(order);
 
 //        orderLine.increaseReclaimedAmount(BigDecimal.valueOf(5)); // reklamiere 5 Stück
 //        orderManager.save(order);
@@ -285,7 +284,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 //        order.add(new GSOrderLine(prod, Units.ONE));
 //        order.setOrderType(OrderType.RECLAIM);
 
-        for (GSOrder o : orderManager.find(ua)) { // iteriere über alle gespeicherten Orders
+        for (GSOrder o : orderRepo.findAll()) { // iteriere über alle gespeicherten Orders
             System.out.println("+++++ " + o + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ")");
             for (OrderLine ol : o.getOrderLines()) {
                 System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
