@@ -117,13 +117,26 @@ public class GeekShopDataInitializer implements DataInitializer {
         subCatRepo.save(sub4);
 
 
-        catalog.save(new GSProduct("Product1", Money.of(EUR, 9.99), sub1, 1));
-        catalog.save(new GSProduct("Product2", Money.of(EUR, 19.99), sub2, 2));
-        catalog.save(new GSProduct("Product3", Money.of(EUR, 29.99), sub2, 3));
-        catalog.save(new GSProduct("Product4", Money.of(EUR, 39.99), sub1, 4));
-        catalog.save(new GSProduct("Product5", Money.of(EUR, 49.99), sub3, 5));
+        GSProduct prod1 = new GSProduct("Product1", Money.of(EUR, 9.99), sub1, 1);
+        GSProduct prod2 = new GSProduct("Product2", Money.of(EUR, 19.99), sub2, 2);
+        GSProduct prod3 = new GSProduct("Product3", Money.of(EUR, 29.99), sub2, 3);
+        GSProduct prod4 = new GSProduct("Product4", Money.of(EUR, 39.99), sub1, 4);
+        GSProduct prod5 = new GSProduct("Product5", Money.of(EUR, 49.99), sub3, 5);
+
+        catalog.save(prod1);
+        catalog.save(prod2);
+        catalog.save(prod3);
+        catalog.save(prod4);
+        catalog.save(prod5);
 
         System.out.println(catalog.count());
+
+
+        sub1.addProduct(prod1);
+        sub2.addProduct(prod2);
+        sub2.addProduct(prod3);
+        sub1.addProduct(prod4);
+        sub3.addProduct(prod5);
 
 
         for (GSProduct product : catalog.findAll()) {
