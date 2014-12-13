@@ -32,6 +32,7 @@ import java.util.*;
 class AccountController {
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
+    private final PasswordRulesRepository passRulesRepo;
     private final PasswordRules passwordRules;
     private final UserAccountManager uam;
     private final AuthenticationManager authManager;
@@ -60,6 +61,7 @@ class AccountController {
 
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
+        this.passRulesRepo = passRulesRepo;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.uam = uam;
         this.authManager = authManager;
@@ -211,6 +213,39 @@ class AccountController {
     }
     //endregion
 
+    //region Setting PasswordRules
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping("/setrules")
+    public String setPWRules(Model model) {
+
+        model.addAttribute("passwordRules", passwordRules);
+
+        return "setrules";
+    }
+
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping(value = "/setrules", method = RequestMethod.POST)
+    public String setPWRules(@RequestParam Map<String, String> map) {
+
+        int minLength = Integer.parseInt(map.get("minLength"));
+        boolean upperLower = map.get("upperLower") != null && Boolean.parseBoolean(map.get("upperLower"));
+        System.out.println(map.get("upperLower"));
+        boolean digits = map.get("digits") != null && Boolean.parseBoolean(map.get("digits"));
+        boolean specialChars = map.get("specialChars") != null && Boolean.parseBoolean(map.get("specialChars"));
+
+        if (minLength < 1)
+            minLength = 1;
+
+        passwordRules.setUpperAndLowerNecessary(upperLower);
+        passwordRules.setDigitsNecessary(digits);
+        passwordRules.setSpecialCharactersNecessary(specialChars);
+        passwordRules.setMinLength(minLength);
+        passRulesRepo.save(passwordRules);
+
+        return "redirect:/staff";
+    }
+    //endregion
+
     //region Profile
     @RequestMapping("/profile")
     public String profile(Model model, @LoggedIn Optional<UserAccount> userAccount) {
@@ -251,7 +286,7 @@ class AccountController {
     @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
     public String changedData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
         String uai = formData.get("uai");
-        UserAccount ua = uam.get(new UserAccountIdentifier(uai)).get();
+        UserAccount ua = uam.findByUsername(uai).get();
         User user = userRepo.findByUserAccount(ua);
 
         ua.setFirstname(formData.get("firstname"));

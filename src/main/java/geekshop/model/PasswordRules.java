@@ -67,7 +67,7 @@ public class PasswordRules {
     }
 
     public boolean isValidPassword(String password) {
-        return isLongEnough(password) && !password.matches(".*\\s.*") &&
+        return isLongEnough(password) && !password.matches(".*\\s.*") && password.matches(".*\\w.*") &&
                 (!this.specialCharactersNecessary || containsSpecialCharacters(password)) &&
                 (!this.upperAndLowerNecessary || containsUpperAndLower(password)) &&
                 (!this.digitsNecessary || containsDigits(password));
@@ -106,12 +106,12 @@ public class PasswordRules {
         this.upperAndLowerNecessary = upperAndLowerNecessary;
     }
 
-    public boolean areNumbersNecessary() {
+    public boolean areDigitsNecessary() {
         return digitsNecessary;
     }
 
-    public void setNumbersNecessary(boolean numbersNecessary) {
-        this.digitsNecessary = numbersNecessary;
+    public void setDigitsNecessary(boolean digitsNecessary) {
+        this.digitsNecessary = digitsNecessary;
     }
 
     public int getMinLength() {
@@ -121,5 +121,4 @@ public class PasswordRules {
     public void setMinLength(int minLength) {
         this.minLength = minLength;
     }
-
 }
