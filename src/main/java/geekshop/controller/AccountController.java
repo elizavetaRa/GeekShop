@@ -68,29 +68,27 @@ class AccountController {
         this.messageRepo = messageRepo;
     }
 
-    //region Login
+    //region Login/Logout
     @RequestMapping({"/", "/index"})
     public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
-        List<Joke> recentJokes;
-        User user = null;
-        String sessionId = null;
-        if (userAccount.isPresent()) {
-            user = userRepo.findByUserAccount(userAccount.get());
-            sessionId = user.getCurrentSessionId();
-            recentJokes = user.getRecentJokes();
-        } else {
-            recentJokes = new LinkedList<Joke>();
-        }
 
-        if (user != null && httpSession.getId().equals(sessionId)) {
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return adjustPW(model, user, passwordRules);
+
+        String sessionId = user.getCurrentSessionId();
+        List<Joke> recentJokes = user.getRecentJokes();
+
+        if (httpSession.getId().equals(sessionId)) {
             model.addAttribute("joke", user.getLastJoke());
         } else {
             Joke joke = getRandomJoke(recentJokes);
-            if (user != null) {
-                user.addJoke(joke);
-                user.setCurrentSessionId(httpSession.getId());
-                userRepo.save(user);
-            }
+
+            user.addJoke(joke);
+            user.setCurrentSessionId(httpSession.getId());
+            userRepo.save(user);
+
             model.addAttribute("joke", joke);
         }
         return "welcome";
@@ -112,9 +110,45 @@ class AccountController {
         }
         return joke;
     }
+
+    @RequestMapping("/logoff")
+    public String logout(@LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (userAccount.get().hasRole(new Role("ROLE_OWNER")) && !passwordRules.isValidPassword(user.getPasswordAttributes())) {
+            messageRepo.save(new Message(MessageKind.NOTIFICATION, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
+        }
+
+        return "redirect:/logout";
+    }
+
+    public static String adjustPW(Model model, User user, PasswordRules passwordRules) {
+
+        model.addAttribute("passwordRules", passwordRules);
+
+        return "adjustpw";
+    }
+
+    @RequestMapping("/adjustpw")
+    public String adjustPW() {
+        return "redirect:/";
+    }
+
+    @RequestMapping(value = "/adjustpw", method = RequestMethod.POST)
+    public String adjustPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        changePassword(model, user, newPW, retypePW);
+
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+
+        return "redirect:/";
+    }
     //endregion
 
-    //region Staff
+    //region Staff (owner functions)
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/staff")
     public String staff(Model model) {
@@ -154,7 +188,7 @@ class AccountController {
         ua.setLastname(formData.get("lastname"));
         ua.setEmail(formData.get("email"));
 
-        User user = new User(ua, Gender.valueOf(formData.get("gender")), OwnerController.strToDate(formData.get("birthday")),
+        User user = new User(ua, password, Gender.valueOf(formData.get("gender")), OwnerController.strToDate(formData.get("birthday")),
                 MaritalStatus.valueOf(formData.get("maritalStatus")), formData.get("phone"), formData.get("street"),
                 formData.get("houseNr"), formData.get("postcode"), formData.get("place"));
 
@@ -205,15 +239,16 @@ class AccountController {
             model.addAttribute("inEditingMode", true);
 
             return "profile";
-        } else {
+        } else { // password change
             model.addAttribute("isOwnProfile", false);
+            model.addAttribute("passwordRules", passwordRules);
 
             return "changepw";
         }
     }
     //endregion
 
-    //region Setting PasswordRules
+    //region Setting PasswordRules (owner functions)
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/setrules")
     public String setPWRules(Model model) {
@@ -229,7 +264,6 @@ class AccountController {
 
         int minLength = Integer.parseInt(map.get("minLength"));
         boolean upperLower = map.get("upperLower") != null && Boolean.parseBoolean(map.get("upperLower"));
-        System.out.println(map.get("upperLower"));
         boolean digits = map.get("digits") != null && Boolean.parseBoolean(map.get("digits"));
         boolean specialChars = map.get("specialChars") != null && Boolean.parseBoolean(map.get("specialChars"));
 
@@ -242,6 +276,13 @@ class AccountController {
         passwordRules.setMinLength(minLength);
         passRulesRepo.save(passwordRules);
 
+        for (User user : userRepo.findAll()) {
+            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER")) && !passwordRules.isValidPassword(user.getPasswordAttributes())) {
+                user.setPwHasToBeChanged(true);
+                userRepo.save(user);
+            }
+        }
+
         return "redirect:/staff";
     }
     //endregion
@@ -249,10 +290,14 @@ class AccountController {
     //region Profile
     @RequestMapping("/profile")
     public String profile(Model model, @LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.isPresent()) {
-            User user = userRepo.findByUserAccount(userAccount.get());
-            model.addAttribute("user", user);
-        }
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return adjustPW(model, user, passwordRules);
+
+        model.addAttribute("user", user);
+
         model.addAttribute("isOwnProfile", true);
         model.addAttribute("inEditingMode", false);
 
@@ -261,21 +306,22 @@ class AccountController {
 
     @RequestMapping("/profile/{page}")
     public String profileChange(Model model, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return adjustPW(model, user, passwordRules);
+
         if (page.equals("changedata")) {
-            if (userAccount.isPresent()) {
-                User user = userRepo.findByUserAccount(userAccount.get());
-                model.addAttribute("user", user);
-            }
+            model.addAttribute("user", user);
             model.addAttribute("isOwnProfile", true);
             model.addAttribute("inEditingMode", true);
 
             return "profile";
-        } else {
-            if (userAccount.isPresent()) {
-                User user = userRepo.findByUserAccount(userAccount.get());
-                model.addAttribute("user", user);
-            }
+        } else { // password change
+            model.addAttribute("user", user);
             model.addAttribute("isOwnProfile", true);
+            model.addAttribute("passwordRules", passwordRules);
 
             return "changepw";
         }
@@ -284,10 +330,16 @@ class AccountController {
 
     //region General account methods
     @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
-    public String changedData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
+    public String changedData(Model model, @RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return adjustPW(model, user, passwordRules);
+
         String uai = formData.get("uai");
         UserAccount ua = uam.findByUsername(uai).get();
-        User user = userRepo.findByUserAccount(ua);
+        user = userRepo.findByUserAccount(ua);
 
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
@@ -304,49 +356,86 @@ class AccountController {
         uam.save(ua);
         userRepo.save(user);
 
-        if (userAccount.get().equals(ua))
+        if (userAccount.get().equals(ua)) {
+            messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat seine persönlichen Daten geändert."));
             return "redirect:/profile";
-        else
+        } else
             return "redirect:/staff/" + uai;
     }
 
     @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
-    public String changeOwnPassword(@RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
-        if (!userAccount.isPresent())
-            throw new IllegalArgumentException("There should be a user logged in.");
+    public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
-        if (oldPW.trim().isEmpty() || newPW.trim().isEmpty()) {
+
+        if (user.pwHasToBeChanged())
+            return adjustPW(model, user, passwordRules);
+
+        if (oldPW.trim().isEmpty()) {
             System.out.println("Passwort ist leer!");
+            model.addAttribute("error", "Passwort ist leer!");
         } else if (!authManager.matches(new Password(oldPW), userAccount.get().getPassword())) {
             System.out.println("Altes Passwort ist falsch!");
-        } else if (!newPW.equals(retypePW)) {
-            System.out.println("Passwörter stimmen nicht überein!");
-        } else if (!passwordRules.isValidPassword(newPW)) {
-            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
+            model.addAttribute("error", "Altes Passwort ist falsch!");
         } else {
-            uam.changePassword(user.getUserAccount(), newPW);
+            changePassword(model, user, newPW, retypePW);
         }
+
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
 
         return "redirect:/profile";
     }
 
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
-    public String changePassword(@RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai) {
+    public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return adjustPW(model, user, passwordRules);
 
         UserAccount ua = uam.get(uai).get();
-        User user = userRepo.findByUserAccount(ua);
-        if (newPW.trim().isEmpty()) {
-            System.out.println("Passwort ist leer!");
-        } else if (!newPW.equals(retypePW)) {
-            System.out.println("Passwörter stimmen nicht überein!");
-        } else if (!passwordRules.isValidPassword(newPW)) {
-            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
-        } else {
-            uam.changePassword(user.getUserAccount(), newPW);
-        }
+        user = userRepo.findByUserAccount(ua);
+
+        changePassword(model, user, newPW, retypePW);
 
         return "redirect:/staff/" + uai.toString();
+    }
+
+    private boolean changePassword(Model model, User user, String newPW, String retypePW) {
+
+        if (newPW.trim().isEmpty()) {
+            System.out.println("Passwort ist leer!");
+            model.addAttribute("error", "Passwort ist leer!");
+
+            return false;
+        }
+
+        if (!newPW.equals(retypePW)) {
+            System.out.println("Passwörter stimmen nicht überein!");
+            model.addAttribute("error", "Passwörter stimmen nicht überein!");
+
+            return false;
+        }
+
+        if (!passwordRules.isValidPassword(newPW)) {
+            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
+            model.addAttribute("error", "Neues Passwort entspricht nicht den Sicherheitsregeln!");
+
+            return false;
+        }
+
+        uam.changePassword(user.getUserAccount(), newPW);
+
+        PasswordAttributes pwAttributes = user.getPasswordAttributes();
+        pwAttributes.setHasUpperAndLower(PasswordRules.containsUpperAndLower(newPW));
+        pwAttributes.setHasDigits(PasswordRules.containsDigits(newPW));
+        pwAttributes.setHasSpecialCharacters(PasswordRules.containsSpecialCharacters(newPW));
+        pwAttributes.setLength(newPW.length());
+        user.setPwHasToBeChanged(false);
+        userRepo.save(user);
+
+        return true;
     }
 
     private List<User> getEmployees() {

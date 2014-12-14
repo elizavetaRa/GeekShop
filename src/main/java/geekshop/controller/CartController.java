@@ -4,21 +4,16 @@ package geekshop.controller;
  * Created by Basti on 20.11.2014.
  */
 
-import geekshop.model.GSInventoryItem;
-import geekshop.model.GSOrder;
-import geekshop.model.GSProduct;
+import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
-import org.salespointframework.order.CartItem;
-import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.Cash;
 import org.salespointframework.payment.Cheque;
 import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
-import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
@@ -26,7 +21,7 @@ import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,22 +38,13 @@ import java.util.Optional;
 @PreAuthorize("isAuthenticated()")
 @SessionAttributes("cart")
 class CartController {
-
-    @RequestMapping("/cart")
-    public String cart() {
-        return "cart";
-    }
-
-    @RequestMapping("/reclaim")
-    public String reclaim() {
-        return "reclaim";
-    }
-
     private PaymentMethod paymentMethod;
     private final OrderManager<GSOrder> orderManager;
     private final Inventory<GSInventoryItem> inventory;
     private final BusinessTime businessTime;
     private final Catalog<GSProduct> catalog;
+    private final PasswordRules passwordRules;
+    private final UserRepository userRepo;
 
     /**
      * Creates a new {@link CartController} with the given {@link OrderManager}.
@@ -66,13 +52,15 @@ class CartController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime,Catalog<GSProduct> catalog) {
+    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, PasswordRulesRepository passRulesRepo, UserRepository userRepo) {
 
         Assert.notNull(orderManager, "OrderManager must not be null!");
         this.orderManager = orderManager;
         this.inventory = inventory;
-        this.businessTime= businessTime;
-        this.catalog= catalog;
+        this.businessTime = businessTime;
+        this.catalog = catalog;
+        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
+        this.userRepo = userRepo;
     }
 
     /**
@@ -86,6 +74,28 @@ class CartController {
         return new Cart();
     }
 
+    @RequestMapping("/cart")
+    public String cart(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+        return "cart";
+    }
+
+    @RequestMapping("/reclaim")
+    public String reclaim(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+        return "reclaim";
+    }
+
     /**
      * Adds a {@link Product} to the {@link Cart}. Note how the type of the parameter taking the request parameter
      * {@code pid} is {@link Product}. For all domain types extening {@link AbstractEntity} (directly or indirectly) a tiny
@@ -95,84 +105,120 @@ class CartController {
      * @param product
      * @param number
      * @param session
-     * @param modelMap
+     * @param model
      * @return
      */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
     public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart,
-                             ModelMap modelMap) {
+                                   Model model, @LoggedIn Optional<UserAccount> userAccount) {
 
 
-        if (number <= 0){number =1;}
-        if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact())
-        {number=inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();};
+        User user = userRepo.findByUserAccount(userAccount.get());
 
-        cart.addOrUpdateItem(product,Units.of(number));
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+        if (number <= 0) {
+            number = 1;
+        }
+        if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
+            number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
+        }
+        ;
+
+        cart.addOrUpdateItem(product, Units.of(number));
         return "redirect:/productsearch";
 
     }
 
 
+    @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
+    public String deleteAll(Model model, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
 
+        User user = userRepo.findByUserAccount(userAccount.get());
 
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
 
-    @RequestMapping(value= "/deleteallitems", method= RequestMethod.DELETE)
-   public String deleteAll (@ModelAttribute Cart cart){
-      cart.clear();
-       return "redirect:/cart";
-   }
+        cart.clear();
+        return "redirect:/cart";
+    }
 
-    @RequestMapping(value="/deletecartitem/", method = RequestMethod.POST)
-    public String deleteCartItem (@RequestParam String identifier, @ModelAttribute Cart cart,  ModelMap modelMap ) {
+    @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
         cart.removeItem(identifier);
         return "redirect:/cart";
     }
 
 
     @RequestMapping(value = "/cart", method = RequestMethod.GET)
-    public String basket() {
+    public String basket(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
         return "cart";
     }
 
     @RequestMapping("/checkout")
-    public String checkout() {
+    public String checkout(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
         return "checkout";
     }
 
 
     @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
-    public PaymentMethod strToPaymentMethod(@RequestParam ("strpayment") String strPayment,
-                                            @RequestParam ("accountname") String accountName,
-                                            @RequestParam ("accountnumber")String accountNumber,
-                                            @RequestParam ("chequenumber") String chequeNumber,
-                                            @RequestParam ("payee") String payee,
-                                            @RequestParam ("bankname") String bankName,
-                                            @RequestParam ("bankaddress") String bankAddress,
-                                            @RequestParam ("bankid")String bankIdentificationNumber,
-                                            @RequestParam ("cardname")String cardName,
-                                            @RequestParam ("cardassociationname") String cardAssociationName,
-                                            @RequestParam ("cardnumber")String cardNumber,
-                                            @RequestParam ("nameoncard")String nameOnCard,
-                                            @RequestParam ("billingadress")String billingAddress,
-                                            @RequestParam ("cardverificationcode")String cardVerificationCode) {
-        PaymentMethod paymentMethod;
-        LocalDateTime dateWritten= LocalDateTime.now();
-        LocalDateTime validFrom= LocalDateTime.parse("2013-12-18T14:30");  //später ändern
-        LocalDateTime expiryDate=LocalDateTime.parse("2020-12-18T14:30");  //später ändern
-        org.joda.money.Money dailyWithdrawalLimit=  org.joda.money.Money.parse("1000");
-        org.joda.money.Money creditLimit=  org.joda.money.Money.parse("1000");
+    public PaymentMethod strToPaymentMethod(@RequestParam("strpayment") String strPayment,
+                                            @RequestParam("accountname") String accountName,
+                                            @RequestParam("accountnumber") String accountNumber,
+                                            @RequestParam("chequenumber") String chequeNumber,
+                                            @RequestParam("payee") String payee,
+                                            @RequestParam("bankname") String bankName,
+                                            @RequestParam("bankaddress") String bankAddress,
+                                            @RequestParam("bankid") String bankIdentificationNumber,
+                                            @RequestParam("cardname") String cardName,
+                                            @RequestParam("cardassociationname") String cardAssociationName,
+                                            @RequestParam("cardnumber") String cardNumber,
+                                            @RequestParam("nameoncard") String nameOnCard,
+                                            @RequestParam("billingadress") String billingAddress,
+                                            @RequestParam("cardverificationcode") String cardVerificationCode
+                                            ) {
 
-        if (strPayment.equals("Barzahlung")) {paymentMethod = new Cash(); return paymentMethod;}
-        else if (strPayment.equals("Lastshriftverfahren")) {paymentMethod = new Cheque(accountName, accountNumber, chequeNumber,payee, dateWritten, bankName,
-                bankAddress,bankIdentificationNumber); return paymentMethod;}
-        else if (strPayment.equals("Kreditkarte")) {paymentMethod= new CreditCard(cardName, cardAssociationName, cardNumber,
-                nameOnCard, billingAddress, validFrom, expiryDate, cardVerificationCode, dailyWithdrawalLimit, creditLimit); return paymentMethod;}
+        PaymentMethod paymentMethod;
+        LocalDateTime dateWritten = LocalDateTime.now();
+        LocalDateTime validFrom = LocalDateTime.parse("2013-12-18T14:30");  //später ändern
+        LocalDateTime expiryDate = LocalDateTime.parse("2020-12-18T14:30");  //später ändern
+        org.joda.money.Money dailyWithdrawalLimit = org.joda.money.Money.parse("1000");
+        org.joda.money.Money creditLimit = org.joda.money.Money.parse("1000");
+
+        if (strPayment.equals("Barzahlung")) {
+            paymentMethod = new Cash();
+            return paymentMethod;
+        } else if (strPayment.equals("Lastshriftverfahren")) {
+            paymentMethod = new Cheque(accountName, accountNumber, chequeNumber, payee, dateWritten, bankName,
+                    bankAddress, bankIdentificationNumber);
+            return paymentMethod;
+        } else if (strPayment.equals("Kreditkarte")) {
+            paymentMethod = new CreditCard(cardName, cardAssociationName, cardNumber,
+                    nameOnCard, billingAddress, validFrom, expiryDate, cardVerificationCode, dailyWithdrawalLimit, creditLimit);
+            return paymentMethod;
+        }
         return new Cash();
     }
-
-
-
 
 
     /**
@@ -183,7 +229,13 @@ class CartController {
      * @param userAccount must not be {@literal null}.
      * @return
      */
-          public String buy(@ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount) {
+    public String buy(Model model, @ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
 
 //                return userAccount.map(account -> {
 //
@@ -203,11 +255,11 @@ class CartController {
 //                    return "redirect:/";
 //                }).orElse("redirect:/cart");
 
-              return "cart";
-            }
+        return "cart";
+    }
 
 //        public void acceptReclaim(){
 //            //orderline.state='reclaimed';
 //        }
 
-    }
+}

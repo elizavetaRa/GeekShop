@@ -73,20 +73,31 @@ public class PasswordRules {
                 (!this.digitsNecessary || containsDigits(password));
     }
 
-    private boolean containsSpecialCharacters(String password) {
+    public boolean isValidPassword(PasswordAttributes passwordAttributes) {
+        return isLongEnough(passwordAttributes.getLength()) &&
+                (!this.specialCharactersNecessary || passwordAttributes.hasSpecialCharacters()) &&
+                (!this.upperAndLowerNecessary || passwordAttributes.hasUpperAndLower()) &&
+                (!this.digitsNecessary || passwordAttributes.hasDigits());
+    }
+
+    public static boolean containsSpecialCharacters(String password) {
         return password.matches(".*[^A-Za-z0-9\\s].*");
     }
 
-    private boolean containsUpperAndLower(String password) {
+    public static boolean containsUpperAndLower(String password) {
         return password.matches(".*[A-Za-z].*");
     }
 
-    private boolean containsDigits(String password) {
+    public static boolean containsDigits(String password) {
         return password.matches(".*[0-9].*");
     }
 
     private boolean isLongEnough(String password) {
         return password.length() >= this.minLength;
+    }
+
+    private boolean isLongEnough(int passwordLength) {
+        return passwordLength >= this.minLength;
     }
 
 
@@ -98,7 +109,7 @@ public class PasswordRules {
         this.specialCharactersNecessary = specialCharactersNecessary;
     }
 
-    public boolean isUpperAndLowerNecessary() {
+    public boolean areUpperAndLowerNecessary() {
         return upperAndLowerNecessary;
     }
 

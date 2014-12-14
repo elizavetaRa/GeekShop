@@ -16,7 +16,14 @@
     <div th:replace="header :: #header"></div>
 
     <!-- Navigation -->
-    <div th:replace="navigation :: nav (${isOwnProfile} ? 'profile' : 'staff')"></div>
+    <div id="nav">
+        <ul class="box">
+            <li id="nav-active"><a href="#" style="width:150px">Passwort anpassen</a></li>
+            <li><a href="logoff" style="width:70px">Logout</a></li>
+        </ul>
+
+        <hr class="noscreen"/>
+    </div>
 
     <!-- 2 columns (content + sidebar) -->
     <div id="cols" class="box">
@@ -24,10 +31,14 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title"
-                th:text="'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname}">Profil</h3>
+            <h3 id="content-title">Passwort den Sicherheitsregeln anpassen</h3>
 
             <div id="content-in">
+
+                <p>
+                    Die Sicherheitsregeln für Passwörter wurden geändert. Daher ist eine Anpassung des Passwortes an die
+                    aktuellen Regeln erforderlich.
+                </p>
 
                 <p>
                     Folgendes ist bei der Passwortwahl zu beachten:
@@ -48,12 +59,8 @@
                     </li>
                 </ul>
 
-                <form method="post" th:action="${isOwnProfile ? '/changedownpw' : '/changedpw'}">
+                <form method="post" action="/adjustpw">
                     <table class="table-style01 t-left noborder">
-                        <tr th:if="${isOwnProfile}">
-                            <td><label for="oldPW">Altes Passwort:</label></td>
-                            <td><input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort" required="required"/></td>
-                        </tr>
                         <tr>
                             <td style="width:30%"><label for="newPW">Neues Passwort:</label></td>
                             <td>
@@ -66,15 +73,10 @@
                         </tr>
                     </table>
 
-                    <input name="uai" id="uai" type="hidden" th:if="${!isOwnProfile}"
-                           th:value="${user.userAccount.identifier}"/>
-
                     <p>
                         <button type="submit" name="submit" class="myButton" th:value="#{profil.changePW.submit}"
-                                value="Passwort speichern">Passwort speichern
+                                value="Passwort ändern">Passwort ändern
                         </button>
-                        <a th:href="(${isOwnProfile} ? '/profile' : '/staff/' + ${user.userAccount.identifier})"
-                           class="myButton">Zurück</a>
                     </p>
                 </form>
 

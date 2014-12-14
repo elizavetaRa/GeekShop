@@ -44,12 +44,18 @@ public class User {
     @ManyToMany
     private List<Joke> recentJokes;
 
+    private boolean pwHasToBeChanged;
+    @OneToOne(cascade = CascadeType.ALL)
+    private PasswordAttributes passwordAttributes;
+
 
     @Deprecated
     protected User() {
+        this.recentJokes = new LinkedList<Joke>();
+        this.pwHasToBeChanged = false;
     }
 
-    public User(UserAccount userAccount, Gender gender, Date birthday,
+    public User(UserAccount userAccount, String password, Gender gender, Date birthday,
                 MaritalStatus maritalStatus, String phone,
                 String street, String houseNr, String postcode, String place) {
         Assert.notNull(userAccount, "UserAccount must not be null.");
@@ -64,6 +70,10 @@ public class User {
         this.place = place;
 
         this.recentJokes = new LinkedList<Joke>();
+        this.pwHasToBeChanged = false;
+        this.passwordAttributes = new PasswordAttributes(
+                PasswordRules.containsUpperAndLower(password), PasswordRules.containsDigits(password),
+                PasswordRules.containsSpecialCharacters(password), password.length());
     }
 
 
@@ -165,5 +175,25 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public boolean pwHasToBeChanged() {
+        return pwHasToBeChanged;
+    }
+
+    public void setPwHasToBeChanged(boolean hasToBeChanged) {
+        this.pwHasToBeChanged = hasToBeChanged;
+    }
+
+    public PasswordAttributes getPasswordAttributes() {
+        return passwordAttributes;
+    }
+
+    public void setPasswordAttributes(PasswordAttributes passwordAttributes) {
+        this.passwordAttributes = passwordAttributes;
+    }
+
+    public String toString() {
+        return userAccount.getFirstname() + " " + userAccount.getLastname();
     }
 }

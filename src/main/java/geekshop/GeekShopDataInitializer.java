@@ -83,9 +83,9 @@ public class GeekShopDataInitializer implements DataInitializer {
     public void initialize() {
 
         initializeCatalog();
+        initializePasswordRules();
         initializeUsers();
         initializeJokes();
-        initializePasswordRules();
         initializeTestOrders(); // nur zu Testzwecken
         initializeMessages();
     }
@@ -148,6 +148,13 @@ public class GeekShopDataInitializer implements DataInitializer {
         }
     }
 
+    private void initializePasswordRules() {
+        if (passRulesRepo.count() > 0)
+            return;
+
+        passRulesRepo.save(new PasswordRules());
+    }
+
     private void initializeUsers() {
 
         if (userAccountManager.findByUsername("owner").isPresent())
@@ -188,12 +195,16 @@ public class GeekShopDataInitializer implements DataInitializer {
         userAccountManager.save(ua4);
 
 
-        User owner = new User(ownerAccount, Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.UNKNOWN,
+        User owner = new User(ownerAccount, "123", Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.UNKNOWN,
                 "123456789", "Ownerstreet", "0", "01234", "Ownercity");
-        User u1 = new User(ua1, Gender.MALE, cal.getTime(), MaritalStatus.UNMARRIED, phone, street, houseNr, postcode, place);
-        User u2 = new User(ua2, Gender.FEMALE, cal.getTime(), MaritalStatus.MARRIED, phone, street, houseNr, postcode, place);
-        User u3 = new User(ua3, Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.DIVORCED, phone, street, houseNr, postcode, place);
-        User u4 = new User(ua4, Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.WIDOWED, phone, street, houseNr, postcode, place);
+        User u1 = new User(ua1, "123", Gender.MALE, cal.getTime(), MaritalStatus.UNMARRIED, phone, street, houseNr, postcode, place);
+        u1.setPwHasToBeChanged(true);
+        User u2 = new User(ua2, "123", Gender.FEMALE, cal.getTime(), MaritalStatus.MARRIED, phone, street, houseNr, postcode, place);
+        u2.setPwHasToBeChanged(true);
+        User u3 = new User(ua3, "123", Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.DIVORCED, phone, street, houseNr, postcode, place);
+        u3.setPwHasToBeChanged(true);
+        User u4 = new User(ua4, "123", Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.WIDOWED, phone, street, houseNr, postcode, place);
+        u4.setPwHasToBeChanged(true);
 
         userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }
@@ -259,14 +270,6 @@ public class GeekShopDataInitializer implements DataInitializer {
                         "– Wenn er nachsieht, ob an den anderen Reifen der gleiche Fehler auftritt."
         ));
     }
-
-    private void initializePasswordRules() {
-        if (passRulesRepo.count() > 0)
-            return;
-
-        passRulesRepo.save(new PasswordRules());
-    }
-
 
     private void initializeTestOrders() { // nur zu Testzwecken
 
