@@ -111,7 +111,10 @@ class OwnerController {
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId){
 
         GSOrder order = orderRepo.findOne(reclaimId).get();
-
+//
+//        Iterable<GSOrderLine> orderLine =  order.getOrderLines();
+//        for (GSOrderLine line : order.get)
+//        GSProduct product = orderLine.getP
         Message message = messageRepo.findOne(msgId).get();
         model.addAttribute("rid", reclaimId);
         model.addAttribute("message", message);
