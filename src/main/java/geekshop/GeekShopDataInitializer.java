@@ -9,6 +9,7 @@ import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.inventory.Inventory;
+import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.Cash;
@@ -86,8 +87,8 @@ public class GeekShopDataInitializer implements DataInitializer {
         initializeUsers();
         initializeJokes();
         initializePasswordRules();
-        initializeMessages();
         initializeTestOrders(); // nur zu Testzwecken
+        initializeMessages();
     }
 
     private void initializeCatalog() {
@@ -267,13 +268,6 @@ public class GeekShopDataInitializer implements DataInitializer {
         passRulesRepo.save(new PasswordRules());
     }
 
-    private void initializeMessages() {
-        if (messageRepo.count() > 0)
-            return;
-
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
-        messageRepo.save(new Message(MessageKind.RECLAIM, "Testreclaim (noch Weiterleitung auf catalog)", "productsearch"));
-    }
 
     private void initializeTestOrders() { // nur zu Testzwecken
 
@@ -304,5 +298,14 @@ public class GeekShopDataInitializer implements DataInitializer {
                 System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
             }
         }
+    }
+
+    private void initializeMessages() {
+        if (messageRepo.count() > 0)
+            return;
+
+        OrderIdentifier order = orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().next().getId();
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
+        messageRepo.save(new Message(MessageKind.RECLAIM, "Testreclaim (noch Weiterleitung auf catalog)", order));
     }
 }

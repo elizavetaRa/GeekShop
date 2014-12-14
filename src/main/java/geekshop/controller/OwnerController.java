@@ -105,6 +105,14 @@ class OwnerController {
         }
     }
 
+    @RequestMapping("/showreclaim/{rid}")
+    public String showReclaim(Model model, @PathVariable("rid") String reclaimId){
+
+       // GSOrder order = orderRepo.findOne();
+
+        return "showreclaim";
+    }
+
     @RequestMapping("/jokes")
     public String jokes(Model model) {
         model.addAttribute("jokes", jokeRepo.findAll());

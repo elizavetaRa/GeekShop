@@ -22,7 +22,7 @@ import javax.transaction.Transactional;
 public class MessageReclaimTest {
     @Test(expected = IllegalArgumentException.class)
     public void emptyReclaimLink() {
-        new Message(MessageKind.RECLAIM, "Test", "");
+//        new Message(MessageKind.RECLAIM, "Test", "");
 
     }
 
