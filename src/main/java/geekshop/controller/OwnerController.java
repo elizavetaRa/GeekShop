@@ -6,6 +6,7 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.useraccount.UserAccount;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -105,13 +107,29 @@ class OwnerController {
         }
     }
 
-    @RequestMapping("/showreclaim/{rid}")
-    public String showReclaim(Model model, @PathVariable("rid") String reclaimId){
+    @RequestMapping("/showreclaim/msgId={msgid}/reclaim={rid}")
+    public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId){
 
-       // GSOrder order = orderRepo.findOne();
+        GSOrder order = orderRepo.findOne(reclaimId).get();
+
+        Message message = messageRepo.findOne(msgId).get();
+        model.addAttribute("rid", reclaimId);
+        model.addAttribute("message", message);
+        model.addAttribute("order", order);
 
         return "showreclaim";
     }
+
+    @RequestMapping(value = "/showreclaim/msgId={msgid}/reclaim={rid}/{accept}")
+    public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId, @PathVariable("accept") String accept){
+        messageRepo.delete(msgId);
+        if (accept.equals("True")){
+            //ReaddItemstoStock
+        }
+
+        return "redirect:/messages";
+    }
+
 
     @RequestMapping("/jokes")
     public String jokes(Model model) {

@@ -25,7 +25,7 @@ public class Message {
     private MessageKind messageKind;
     private String messageText;
 
-    private String reclaimLink;
+    private String reclaimId;
 
 
     @Deprecated
@@ -48,9 +48,9 @@ public class Message {
         this.messageText = messageText;
 
         if (messageKind == MessageKind.RECLAIM) {
-            this.reclaimLink = "/showreclaim/" + reclaimId.toString();
+            this.reclaimId = reclaimId.toString();
         } else {
-            this.reclaimLink = null;
+            this.reclaimId = null;
         }
 
     }
@@ -73,7 +73,7 @@ public class Message {
         return id;
     }
 
-    public String getReclaimLink() {
-        return reclaimLink;
+    public String getReclaimId() {
+        return reclaimId;
     }
 }
