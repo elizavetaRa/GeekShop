@@ -14,5 +14,5 @@ import org.salespointframework.core.SalespointRepository;
 
 public interface SuperCategoryRepository extends SalespointRepository<SuperCategory, Long> {
 
-    User findByName(String name);
+    SuperCategory findByName(String name);
 }

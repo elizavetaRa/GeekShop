@@ -34,21 +34,21 @@ public class MessageRepositoryTest {
     @Test
     public void createAndDeleteEnty() {
         Message testNotification = new Message(MessageKind.NOTIFICATION, "Test");
-        Message testReclaim = new Message(MessageKind.RECLAIM, "Test", "Reclaimlink");
+//        Message testReclaim = new Message(MessageKind.RECLAIM, "Test", "Reclaimlink");
         messageRepo.save(testNotification);
-        messageRepo.save(testReclaim);
+//        messageRepo.save(testReclaim);
 
         assertThat(messageRepo.findAll(), hasItem(testNotification));
-        assertThat(messageRepo.findAll(), hasItem(testReclaim));
+//        assertThat(messageRepo.findAll(), hasItem(testReclaim));
 
 
         Long notiId = testNotification.getId();
-        Long reclId = testReclaim.getId();
+//        Long reclId = testReclaim.getId();
         messageRepo.delete(notiId);
-        messageRepo.delete(reclId);
+//        messageRepo.delete(reclId);
 
         assertThat(messageRepo.findAll(), not(hasItem(testNotification)));
-        assertThat(messageRepo.findAll(), not(hasItem(testReclaim)));
+//        assertThat(messageRepo.findAll(), not(hasItem(testReclaim)));
 
     }
 

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('orders')"></div>
+
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title" th:text="'Reklamation der Rechnung '">Reklamation ID1</h3>
+
+            <div id="content-in">
+
+                <table class="table-style01">
+                    <tr>
+                        <th style="width:6em">Datum</th>
+                        <th>Verkäufer</th>
+                        <th style="width:4em">Anzahl</th>
+                        <th style="width:6em">Gesamtpreis</th>
+                    </tr>
+
+
+                </table>
+
+                <button id="exportXml" class="myButton">Genehmigen</button>
+                <button id="exportXml" class="myButton">Abweisen</button>
+
+
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

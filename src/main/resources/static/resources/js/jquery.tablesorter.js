@@ -905,6 +905,7 @@
         is: function (s) {
             return /^[£$€?.]/.test(s);
         }, format: function (s) {
+            s=s.replace('.', ',');
             return $.tablesorter.formatFloat(s.replace(new RegExp(/[£$€]/g), ""));
         }, type: "numeric"
     });
