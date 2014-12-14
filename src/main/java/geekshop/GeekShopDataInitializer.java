@@ -282,7 +282,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 //        System.out.println("orderManager.completeOrder(order): " + orderManager.completeOrder(order).getStatus().toString());
 //        System.out.println("order paid: " + order.isPaid());
 //        System.out.println("order completed: " + order.isCompleted());
-//        orderManager.save(order); // speichere die Order im OrderManager
+        orderManager.save(order); // speichere die Order im OrderManager, damit dateCreated angelegt wird
         orderRepo.save(order);
 
 //        orderLine.increaseReclaimedAmount(BigDecimal.valueOf(5)); // reklamiere 5 Stück
