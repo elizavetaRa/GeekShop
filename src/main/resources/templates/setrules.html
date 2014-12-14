@@ -30,7 +30,7 @@
 
                 <form method="post" action="/setrules">
                     <p>
-                        <input type="checkbox" name="upperLower" id="upperLower" value="true" th:checked="${passwordRules.upperAndLowerNecessary}"/>
+                        <input type="checkbox" name="upperLower" id="upperLower" value="true" th:checked="${passwordRules.areUpperAndLowerNecessary()}"/>
                         <label for="upperLower">Groß- und Kleinbuchstaben erforderlich</label>
                     </p>
 

@@ -4,17 +4,18 @@ package geekshop.controller;
  * Created by Basti on 20.11.2014.
  */
 
-import geekshop.model.GSProduct;
-import geekshop.model.SubCategory;
-import geekshop.model.SubCategoryRepository;
-import geekshop.model.SuperCategoryRepository;
+import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Optional;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.catalog.Catalog}.
@@ -30,17 +31,27 @@ class CatalogController {
     private final Catalog<GSProduct> catalog;
     private final SuperCategoryRepository supRepo;
     private final SubCategoryRepository subRepo;
+    private final UserRepository userRepo;
+    private final PasswordRules passwordRules;
 
     @Autowired
-    public CatalogController(Catalog<GSProduct> catalog, SuperCategoryRepository supRepo, SubCategoryRepository subRepo) {
+    public CatalogController(Catalog<GSProduct> catalog, SuperCategoryRepository supRepo, SubCategoryRepository subRepo, UserRepository userRepo, PasswordRulesRepository passRulesRepo) {
         this.catalog = catalog;
         this.supRepo = supRepo;
         this.subRepo = subRepo;
+        this.userRepo = userRepo;
+        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
     }
 
 
     @RequestMapping("/productsearch")
-    public String catalog(Model model) {
+    public String catalog(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
         model.addAttribute("catalog", catalog.findAll());
@@ -48,12 +59,18 @@ class CatalogController {
     }
 
     @RequestMapping("/productsearch/{subCategory}")
-    public String profile(Model model, @PathVariable("subCategory") String subCategory) {
-            model.addAttribute("specCategory", subRepo.findByName(subCategory));
-            model.addAttribute("superCategories", supRepo.findAll());
-            model.addAttribute("subCategories", subRepo.findAll());
-            model.addAttribute("catalog", catalog.findAll());
-            model.addAttribute("count", subRepo.findByName(subCategory).getProducts().size());
+    public String profile(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+        model.addAttribute("specCategory", subRepo.findByName(subCategory));
+        model.addAttribute("superCategories", supRepo.findAll());
+        model.addAttribute("subCategories", subRepo.findAll());
+        model.addAttribute("catalog", catalog.findAll());
+        model.addAttribute("count", subRepo.findByName(subCategory).getProducts().size());
         return "categorysearch";
     }
 
