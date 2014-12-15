@@ -13,7 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 /**
- * An extension of {@link org.salespointframework.catalog.Product} extended by {@link geekshop.model.SubCategory}.
+ * An extension of {@link org.salespointframework.catalog.Product} extended by a {@link geekshop.model.SubCategory} the product is related to and a unique product number.
  *
  * @author Marcus Kammerdiener
  * @author Sebastian D&ouml;ring

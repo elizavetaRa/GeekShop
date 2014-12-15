@@ -98,13 +98,12 @@ class CartController {
 
     /**
      * Adds a {@link Product} to the {@link Cart}. Note how the type of the parameter taking the request parameter
-     * {@code pid} is {@link Product}. For all domain types extening {@link AbstractEntity} (directly or indirectly) a tiny
+     * {@code pid} is {@link Product}. For all domain types extening {@link org.salespointframework.core.AbstractEntity} (directly or indirectly) a tiny
      * Salespoint extension will directly load the object instance from the database. If the identifier provided is
      * invalid (invalid format or no {@link Product} with the id found), {@literal null} will be handed into the method.
      *
      * @param product
      * @param number
-     * @param session
      * @param model
      * @return
      */
@@ -225,7 +224,6 @@ class CartController {
      * Checks out the current state of the {@link Cart}. Using a method parameter of type {@code Optional<UserAccount>}
      * annotated with {@link LoggedIn} you can access the {@link UserAccount} of the currently logged in user.
      *
-     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      * @return
      */

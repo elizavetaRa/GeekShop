@@ -5,7 +5,7 @@ package geekshop.model;
  */
 
 /**
- * Enumeration for the marital status of the {@link User}s.
+ * Enumeration representing the {@link User}'s marital status.
  *
  * @author Sebastian D&ouml;ring
  */

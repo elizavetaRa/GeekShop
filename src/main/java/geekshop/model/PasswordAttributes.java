@@ -8,13 +8,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+/**
+ * Represents the attributes of an password to easily determine whether this password matches the password rules.
+ *
+ * @author Sebastian D&ouml;ring
+ */
 
 @Entity
 public class PasswordAttributes {
     @Id
     @GeneratedValue
     private Long id;
-
 
     private boolean hasUpperAndLower;
     private boolean hasDigits;

@@ -78,7 +78,9 @@ public class GeekShopDataInitializer implements DataInitializer {
 
     }
 
-
+    /**
+     * Overriding method of {@link org.salespointframework.core.DataInitializer} triggering several initializing methods.
+     */
     @Override
     public void initialize() {
 
@@ -90,12 +92,14 @@ public class GeekShopDataInitializer implements DataInitializer {
         initializeMessages();
     }
 
+    /**
+     * Initializes {@link SuperCategory}s, {@link SubCategory}s and {@link GSProduct}s in {@link org.salespointframework.catalog.Catalog} as well as {@link GSInventoryItem}s in {@link Inventory}.
+     */
     private void initializeCatalog() {
 
         // Skip creation if database was already populated
         if (catalog.findAll().iterator().hasNext())
             return;
-
 
         SuperCategory sup1 = new SuperCategory("SuperCategory1");
         SuperCategory sup2 = new SuperCategory("SuperCategory2");
@@ -148,6 +152,9 @@ public class GeekShopDataInitializer implements DataInitializer {
         }
     }
 
+    /**
+     * Initializes {@link PasswordRules} in {@link PasswordRulesRepository}.
+     */
     private void initializePasswordRules() {
         if (passRulesRepo.count() > 0)
             return;
@@ -155,6 +162,9 @@ public class GeekShopDataInitializer implements DataInitializer {
         passRulesRepo.save(new PasswordRules());
     }
 
+    /**
+     * Initializes {@link User}s in {@link UserRepository}.
+     */
     private void initializeUsers() {
 
         if (userAccountManager.findByUsername("owner").isPresent())
@@ -209,6 +219,9 @@ public class GeekShopDataInitializer implements DataInitializer {
         userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }
 
+    /**
+     * Initializes {@link Joke}s in {@link JokeRepository}.
+     */
     private void initializeJokes() {
         if (jokeRepo.count() > 0)
             return;
@@ -271,6 +284,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         ));
     }
 
+
     private void initializeTestOrders() { // nur zu Testzwecken
 
         if (orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().hasNext())
@@ -302,6 +316,9 @@ public class GeekShopDataInitializer implements DataInitializer {
         }
     }
 
+    /**
+     * Initializes {@link Message}s in {@link MessageRepository}.
+     */
     private void initializeMessages() {
         if (messageRepo.count() > 0)
             return;
