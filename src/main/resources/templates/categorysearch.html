@@ -59,9 +59,14 @@
                 float:right; height: 100%; padding-left: 10px;">
 
 
-                    <form method="post" th:action="${'/extendedsearch'}">
-                        <input value="suchen" th:value="${suchen}" name="suchen" id="suchen" type="text" size="15" maxlength="40" required="required"/>
-                        <button th:action="${'/extendedsearch'}" id="searchCatalog" name="searchCatalog" type="submit">suchen</button>
+                    <form method="get" th:action="${'/extendedsearchname'}">
+                        <input value="suchen" th:value="${suchen}" name="suchen" id="suchen" type="text" size="25" maxlength="40" required="required" placeholder="Suche nach Artikelname"/>
+                        <button th:action="${'/extendedsearchname'}" id="searchCatalogName" name="searchCatalogName" type="submit">suchen</button>
+                    </form>
+
+                    <form method="get" th:action="${'/extendedsearchid'}">
+                        <input value="suchen" th:value="${suchenI}" name="suchenI" id="suchenI" type="text" size="25" maxlength="40" required="required" placeholder="Suche nach Artikelnummer"/>
+                        <button th:action="${'/extendedsearchid'}" id="searchCatalogID" name="searchCatalogID" type="submit">suchen</button>
                     </form>
 
                     <label>sortieren nach</label>

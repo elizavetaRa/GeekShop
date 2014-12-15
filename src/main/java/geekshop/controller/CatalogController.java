@@ -72,8 +72,8 @@ class CatalogController {
         return "categorysearch";
     }
 
-    @RequestMapping("/productsearch/extended/{searchTerm}")
-    public String searchEntry(Model model, @PathVariable("searchTerm") String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+    @RequestMapping("/productsearch/name/{searchTerm}")
+    public String searchEntryByName(Model model, @PathVariable("searchTerm") String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -81,22 +81,43 @@ class CatalogController {
             return AccountController.adjustPW(model, user, passwordRules);
 
 //        List<GSProduct> list = searchForProducts(searchTerm);
-        model.addAttribute("foundProducts", searchForProducts(searchTerm));
+        model.addAttribute("foundProducts", searchForProductName(searchTerm));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
         return "extendedsearch";
     }
 
-    @RequestMapping(value = "/extendedsearch", method = RequestMethod.POST)
-    public String searchProduct(@RequestParam Map<String, String> formData) {
-        String temp = formData.get("suchen");
-//        List<GSProduct> foundProducts = searchForProducts(formData.get("suchen"));
-//        model.addAttribute("searched", foundProducts);
-        return "redirect:/productsearch/extended/" + temp;
+
+    @RequestMapping("/productsearch/id/{searchTerm}")
+    public String searchEntryByID(Model model, @PathVariable("searchTerm") String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+//        List<GSProduct> list = searchForProducts(searchTerm);
+        model.addAttribute("foundProducts", searchForProductID(searchTerm));
+        model.addAttribute("superCategories", supRepo.findAll());
+        model.addAttribute("subCategories", subRepo.findAll());
+        return "extendedsearch";
     }
 
 
-    private List<GSProduct> searchForProducts(String searchTerm) {
+    @RequestMapping(value = "/extendedsearchname", method = RequestMethod.GET)
+    public String searchProductByName(@RequestParam Map<String, String> formData) {
+        String temp = formData.get("suchen");
+        return "redirect:/productsearch/name/" + temp;
+    }
+
+    @RequestMapping(value = "/extendedsearchid", method = RequestMethod.GET)
+    public String searchProductByID(@RequestParam Map<String, String> formData) {
+        String temp = formData.get("suchenI");
+        return "redirect:/productsearch/id/" + temp;
+    }
+
+
+    private List<GSProduct> searchForProductName(String searchTerm) {
         Iterable<GSProduct> allProducts = catalog.findAll();
         List<GSProduct> foundProducts = new LinkedList<GSProduct>();
         for (GSProduct product : allProducts) {
@@ -106,5 +127,18 @@ class CatalogController {
         }
         return foundProducts;
     }
+
+    private List<GSProduct> searchForProductID (String searchTerm) {
+        Iterable<GSProduct> allProducts = catalog.findAll();
+        List<GSProduct> foundProducts = new LinkedList<GSProduct>();
+        for (GSProduct product : allProducts) {
+            if(product.geekIDToString(product.getGeekID()).contains(searchTerm)) {
+                foundProducts.add(product);
+            }
+        }
+        return foundProducts;
+    }
+
+
 
 }
