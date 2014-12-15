@@ -166,14 +166,28 @@ class OwnerController {
         return "redirect:/jokes";
     }
 
-    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.DELETE)
     public String deleteJoke(@PathVariable("id") Long id) {
-        jokeRepo.delete(id);
+        Joke joke = jokeRepo.findJokeById(id);
+        Iterable<User> allUsers = userRepo.findAll();
+        for (User user : allUsers) {
+            List<Joke> recentJokes = user.getRecentJokes();
+            recentJokes.removeAll(Collections.singletonList(joke));
+            userRepo.save(user);
+        }
+
+        jokeRepo.delete(joke);
         return "redirect:/jokes";
     }
 
-    @RequestMapping(value = "/deljokes", method = RequestMethod.POST)
+    @RequestMapping(value = "/deljokes", method = RequestMethod.DELETE)
     public String deleteAllJokes() {
+        Iterable<User> allUsers = userRepo.findAll();
+        for (User user : allUsers) {
+            List<Joke> recentJokes = user.getRecentJokes();
+            recentJokes.clear();
+            userRepo.save(user);
+        }
         jokeRepo.deleteAll();
         return "redirect:/jokes";
     }

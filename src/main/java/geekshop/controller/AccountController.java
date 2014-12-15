@@ -85,7 +85,9 @@ class AccountController {
         } else {
             Joke joke = getRandomJoke(recentJokes);
 
-            user.addJoke(joke);
+            if (joke != null)
+                user.addJoke(joke);
+
             user.setCurrentSessionId(httpSession.getId());
             userRepo.save(user);
 
@@ -103,6 +105,8 @@ class AccountController {
 
         Joke joke;
         if (allJokes.isEmpty()) {
+            if (recentJokes.isEmpty())
+                return null;
             joke = recentJokes.get(0);
         } else {
             int random = (new Random()).nextInt(allJokes.size());
@@ -209,9 +213,21 @@ class AccountController {
         if (userAccount.hasRole(role)) {
             return "redirect:/staff";
         } else {
-            Long id = userRepo.findByUserAccount(userAccount).getId();
-            userRepo.delete(id);
+            dismiss(userRepo.findByUserAccount(userAccount));
+            return "redirect:/staff";
         }
+    }
+
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping(value = "/firestaff", method = RequestMethod.DELETE)
+    public String fireAll() {
+        Iterable<User> allEmployees = userRepo.findAll();
+        for (User user : allEmployees) {
+            if (user.getUserAccount().hasRole(new Role("ROLE_OWNER")))
+                continue;
+            dismiss(user);
+        }
+
         return "redirect:/staff";
     }
 
@@ -436,6 +452,15 @@ class AccountController {
         userRepo.save(user);
 
         return true;
+    }
+
+    private void dismiss(User user) {
+        UserAccount userAccount = user.getUserAccount();
+        userRepo.delete(user);
+        userAccount.remove(new Role("ROLE_EMPLOYEE"));
+        uam.save(userAccount);
+        uam.disable(userAccount.getIdentifier());
+        uam.changePassword(userAccount, passwordRules.generateRandomPassword());
     }
 
     private List<User> getEmployees() {
