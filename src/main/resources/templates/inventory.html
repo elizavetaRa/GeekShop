@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('inventory')"></div>
+
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Bisherige Verkäufe</h3>
+
+            <div id="content-in">
+
+                <table class="table-style01">
+                    <thead>
+                    <tr>
+                        <th style="width:3em">Kategorie</th>
+                        <th>Unterkategorie</th>
+                        <th style="width:16em">Produkt</th>
+                        <th style="width:8em">Bestand</th>
+                        <th style="width:8em">Preis</th>
+                        <th style="width:12em"></th>
+
+                    </tr>
+                    <tbody>
+                    <tr class="highlight">
+                        <td class="t-left" colspan="5">Kleidung</td>       //Kategorie
+
+                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
+                    </tr>
+
+                    <tr>                      //Unterkategorie
+                        <td></td>
+                        <td   bgcolor="#E5F4FA"class="t-left" colspan="4" >T-Shirts</td>
+                        <td bgcolor="#E5F4FA"><button class="MyButton" >bearbeiten</button> <button class="MyButton">löschen</button></td>
+
+
+                    </tr>
+                    <tr>                               //Produkt
+                        <td colspan="2"></td>
+                        <td>Grünes T-Shirt</td>
+                        <td>100</td>
+                        <td>10€</td>
+                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td>ROtes T-Shirt</td>
+                        <td>100</td>
+                        <td>10€</td>
+                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td>Schwarzes T-Shirt</td>
+                        <td>100</td>
+                        <td>10€</td>
+                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
+
+                    </tr>
+
+                    <tr>                      //Unterkategorie
+                        <td></td>
+                        <td   bgcolor="#E5F4FA"class="t-left" colspan="4" >Pullis</td>
+                        <td bgcolor="#E5F4FA"><button class="MyButton" >bearbeiten</button> <button class="MyButton">löschen</button></td>
+
+
+                    </tr>
+                    <tr>                               //Produkt
+                        <td colspan="2"></td>
+                        <td>warmer Pulli</td>
+                        <td>100</td>
+                        <td>10€</td>
+                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
+
+                    </tr>
+
+
+
+
+                    </tbody>
+
+
+
+                </table>
+
+                <button id="exportXml" class="myButton">Als XML exportieren</button>
+
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

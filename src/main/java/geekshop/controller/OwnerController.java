@@ -46,10 +46,14 @@ class OwnerController {
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
     private final PasswordRules passwordRules;
+    private final SubCategoryRepository subCategoryRepo;
+    private final SuperCategoryRepository superCategoryRepo;
 
 
     @Autowired
-    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo, PasswordRulesRepository passRulesRepo) {
+    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
+                           UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
+                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,SuperCategoryRepository superCategoryRepo) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
@@ -58,6 +62,8 @@ class OwnerController {
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
+        this.subCategoryRepo=subCategoryRepo;
+        this.superCategoryRepo=superCategoryRepo;
     }
 
 
@@ -112,18 +118,17 @@ class OwnerController {
     @RequestMapping("/showreclaim/msgId={msgid}/reclaim={rid}")
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId) {
 
-        Set<GSProduct> products = new HashSet<>();
+        Set<ReclaimTupel> products = new HashSet<>();
         GSOrder order = orderRepo.findOne(reclaimId).get();
 
         for (OrderLine line : order.getOrderLines()) {
-            products.add(catalog.findOne(line.getProductIdentifier()).get());
+            products.add(new ReclaimTupel(catalog.findOne(line.getProductIdentifier()).get(), line));
         }
         Message message = messageRepo.findOne(msgId).get();
         model.addAttribute("rid", reclaimId);
         model.addAttribute("message", message);
         model.addAttribute("products", products);
         model.addAttribute("order", order);
-        GSProduct test = null;
 
         return "showreclaim";
     }
@@ -223,4 +228,12 @@ class OwnerController {
         return date;
 
     }
+
+    @RequestMapping("/inventory")
+    public String inventory(Model model) {
+        model.addAttribute("subcategories", subCategoryRepo.findAll());
+        model.addAttribute("supercategories", superCategoryRepo.findAll());
+        return "inventory";
+    }
+
 }
