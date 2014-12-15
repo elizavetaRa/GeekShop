@@ -27,7 +27,7 @@
             <h2 id="content-title">Dein Begrüßungswitz</h2>
 
             <!-- Perex -->
-            <div id="perex" class="box" th:utext="${#strings.replace(joke.text, T(java.lang.System).getProperty('line.separator'), '&lt;br/&gt;')}">
+            <div id="perex" class="box" th:utext="${joke} ? ${#strings.replace(joke.text, T(java.lang.System).getProperty('line.separator'), '&lt;br/&gt;')}">
 
                 <p>
                 Frau: „Ich habe das neuste Windows-System.“<br/>

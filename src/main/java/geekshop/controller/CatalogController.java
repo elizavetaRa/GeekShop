@@ -14,7 +14,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -59,7 +64,7 @@ class CatalogController {
     }
 
     @RequestMapping("/productsearch/{subCategory}")
-    public String profile(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
+    public String catgory(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -69,10 +74,75 @@ class CatalogController {
         model.addAttribute("specCategory", subRepo.findByName(subCategory));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
-        model.addAttribute("catalog", catalog.findAll());
-        model.addAttribute("count", subRepo.findByName(subCategory).getProducts().size());
         return "categorysearch";
     }
+
+    @RequestMapping("/productsearch/name/{searchTerm}")
+    public String searchEntryByName(Model model, @PathVariable("searchTerm") String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+//        List<GSProduct> list = searchForProducts(searchTerm);
+        model.addAttribute("foundProducts", searchForProductName(searchTerm));
+        model.addAttribute("superCategories", supRepo.findAll());
+        model.addAttribute("subCategories", subRepo.findAll());
+        return "extendedsearch";
+    }
+
+
+    @RequestMapping("/productsearch/id/{searchTerm}")
+    public String searchEntryByID(Model model, @PathVariable("searchTerm") String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+        model.addAttribute("foundProducts", searchForProductID(searchTerm));
+        model.addAttribute("superCategories", supRepo.findAll());
+        model.addAttribute("subCategories", subRepo.findAll());
+        return "extendedsearch";
+    }
+
+
+    @RequestMapping(value = "/extendedsearchname", method = RequestMethod.GET)
+    public String searchProductByName(@RequestParam Map<String, String> formData) {
+        String temp = formData.get("suchen");
+        return "redirect:/productsearch/name/" + temp;
+    }
+
+    @RequestMapping(value = "/extendedsearchid", method = RequestMethod.GET)
+    public String searchProductByID(@RequestParam Map<String, String> formData) {
+        String temp = formData.get("suchenI");
+        return "redirect:/productsearch/id/" + temp;
+    }
+
+
+    private List<GSProduct> searchForProductName(String searchTerm) {
+        Iterable<GSProduct> allProducts = catalog.findAll();
+        List<GSProduct> foundProducts = new LinkedList<GSProduct>();
+        for (GSProduct product : allProducts) {
+            if(product.getName().contains(searchTerm)) {
+                foundProducts.add(product);
+            }
+        }
+        return foundProducts;
+    }
+
+    private List<GSProduct> searchForProductID (String searchTerm) {
+        Iterable<GSProduct> allProducts = catalog.findAll();
+        List<GSProduct> foundProducts = new LinkedList<GSProduct>();
+        for (GSProduct product : allProducts) {
+            if(product.productNumberToString(product.getProductNumber()).contains(searchTerm)) {
+                foundProducts.add(product);
+            }
+        }
+        return foundProducts;
+    }
+
 
 
 }

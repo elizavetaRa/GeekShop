@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
- * A Spring MVC controller to manage the {@link User}s.
+ * A Spring MVC controller to manage shop owner and employees.
  *
  * @author Felix D&ouml;ring
  * @author Sebastian D&ouml;ring
@@ -39,7 +39,7 @@ class AccountController {
     private final MessageRepository messageRepo;
 
     /**
-     * Creates a new {@link AccountController} with the given {@link UserRepository} and {@link JokeRepository}.
+     * Creates a new {@link AccountController}.
      *
      * @param userRepo      must not be {@literal null}.
      * @param jokeRepo      must not be {@literal null}.
@@ -69,6 +69,10 @@ class AccountController {
     }
 
     //region Login/Logout
+
+    /**
+     * Shows the start page with the welome joke.
+     */
     @RequestMapping({"/", "/index"})
     public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
 
@@ -85,7 +89,9 @@ class AccountController {
         } else {
             Joke joke = getRandomJoke(recentJokes);
 
-            user.addJoke(joke);
+            if (joke != null)
+                user.addJoke(joke);
+
             user.setCurrentSessionId(httpSession.getId());
             userRepo.save(user);
 
@@ -94,6 +100,9 @@ class AccountController {
         return "welcome";
     }
 
+    /**
+     * Determines a random {@link Joke} out of the {@link JokeRepository} which is not contained in the list of recent jokes.
+     */
     private Joke getRandomJoke(List<Joke> recentJokes) {
         List<Joke> allJokes = new LinkedList<Joke>();
         for (Joke j : jokeRepo.findAll()) {
@@ -103,6 +112,8 @@ class AccountController {
 
         Joke joke;
         if (allJokes.isEmpty()) {
+            if (recentJokes.isEmpty())
+                return null;
             joke = recentJokes.get(0);
         } else {
             int random = (new Random()).nextInt(allJokes.size());
@@ -111,6 +122,9 @@ class AccountController {
         return joke;
     }
 
+    /**
+     * Redirects to logout template and beforehand sends a {@link Message} to the shop owner if the password does not match the current password rules.
+     */
     @RequestMapping("/logoff")
     public String logout(@LoggedIn Optional<UserAccount> userAccount) {
 
@@ -123,6 +137,11 @@ class AccountController {
         return "redirect:/logout";
     }
 
+    /**
+     * In case of invalid password of the user logging in, this method is called from within a mapping method.
+     *
+     * @return the template demanding the user to change the password according to the current password rules.
+     */
     public static String adjustPW(Model model, User user, PasswordRules passwordRules) {
 
         model.addAttribute("passwordRules", passwordRules);
@@ -130,11 +149,17 @@ class AccountController {
         return "adjustpw";
     }
 
+    /**
+     * Redirects to start page if {@code /adjustpw} is directly requested.
+     */
     @RequestMapping("/adjustpw")
     public String adjustPW() {
         return "redirect:/";
     }
 
+    /**
+     * Saves the changed password of a user demanded after login to change his password which did not match the password rules.
+     */
     @RequestMapping(value = "/adjustpw", method = RequestMethod.POST)
     public String adjustPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
 
@@ -149,6 +174,9 @@ class AccountController {
     //endregion
 
     //region Staff (owner functions)
+    /**
+     * Shows the overview of all employees.
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/staff")
     public String staff(Model model) {
@@ -159,6 +187,9 @@ class AccountController {
         return "staff";
     }
 
+    /**
+     * Shows an employee's profile.
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/staff/{uai}")
     public String showEmployee(Model model, @PathVariable("uai") UserAccountIdentifier uai) {
@@ -171,6 +202,11 @@ class AccountController {
         return "profile";
     }
 
+    /**
+     * Shows the form for adding a new employee.
+     * @param model
+     * @return
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/addemployee")
     public String hire(Model model) {
@@ -178,6 +214,9 @@ class AccountController {
         return "profile";
     }
 
+    /**
+     * Saves the new employee's data. The shop owner gets a message containing the initial password of the new user.
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
     public String hire(@RequestParam Map<String, String> formData) {
@@ -195,12 +234,15 @@ class AccountController {
         uam.save(ua);
         userRepo.save(user);
 
-        String messageText = "Startpasswort des Nutzers " + formData.get("username") + ": " + password;
+        String messageText = "Startpasswort des neuen Angestellten " + user + ": " + password;
         messageRepo.save(new Message(MessageKind.NOTIFICATION, messageText));
 
         return "redirect:/staff";
     }
 
+    /**
+     * Dismisses an employee.
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/staff/{uai}", method = RequestMethod.DELETE)
     public String fire(@PathVariable("uai") UserAccountIdentifier uai) {
@@ -209,9 +251,24 @@ class AccountController {
         if (userAccount.hasRole(role)) {
             return "redirect:/staff";
         } else {
-            Long id = userRepo.findByUserAccount(userAccount).getId();
-            userRepo.delete(id);
+            dismiss(userRepo.findByUserAccount(userAccount));
+            return "redirect:/staff";
         }
+    }
+
+    /**
+     *  Dismisses all employees.
+     */
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping(value = "/firestaff", method = RequestMethod.DELETE)
+    public String fireAll() {
+        Iterable<User> allEmployees = userRepo.findAll();
+        for (User user : allEmployees) {
+            if (user.getUserAccount().hasRole(new Role("ROLE_OWNER")))
+                continue;
+            dismiss(user);
+        }
+
         return "redirect:/staff";
     }
 
@@ -227,6 +284,9 @@ class AccountController {
 //        return "redirect:/staff";
 //    }
 
+    /**
+     * Depending on {@code page}, it shows the form either for data modification or for password change of an employee.
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/staff/{uai}/{page}")
     public String profileChange(Model model, @PathVariable("uai") UserAccountIdentifier uai, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
@@ -249,6 +309,9 @@ class AccountController {
     //endregion
 
     //region Setting PasswordRules (owner functions)
+    /**
+     * Shows the form for changing the password safety rules.
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/setrules")
     public String setPWRules(Model model) {
@@ -258,6 +321,11 @@ class AccountController {
         return "setrules";
     }
 
+    /**
+     * Saves the changed password rules and marks all users whose password does not match the new rules.
+     * @param map
+     * @return
+     */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/setrules", method = RequestMethod.POST)
     public String setPWRules(@RequestParam Map<String, String> map) {
@@ -288,6 +356,9 @@ class AccountController {
     //endregion
 
     //region Profile
+    /**
+     * Shows the user's profile page.
+     */
     @RequestMapping("/profile")
     public String profile(Model model, @LoggedIn Optional<UserAccount> userAccount) {
 
@@ -304,6 +375,9 @@ class AccountController {
         return "profile";
     }
 
+    /**
+     * Depending on {@code page}, it shows the form either for data modification or for password change.
+     */
     @RequestMapping("/profile/{page}")
     public String profileChange(Model model, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
 
@@ -329,6 +403,10 @@ class AccountController {
     //endregion
 
     //region General account methods
+
+    /**
+     * Saves the new user data changed by the shop owner or by the user himself. If the user changed his data, a message will be sent to the shop owner.
+     */
     @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
     public String changedData(Model model, @RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
 
@@ -363,6 +441,9 @@ class AccountController {
             return "redirect:/staff/" + uai;
     }
 
+    /**
+     * Saves the new password changed by the user himself. If the user changed his password, a message will be sent to the shop owner.
+     */
     @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
     public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
 
@@ -386,6 +467,9 @@ class AccountController {
         return "redirect:/profile";
     }
 
+    /**
+     * Saves the new password changed by the shop owner.
+     */
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
     public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
 
@@ -402,6 +486,9 @@ class AccountController {
         return "redirect:/staff/" + uai.toString();
     }
 
+    /**
+     * Does the real work by changing the user's password and updating his {@link PasswordAttributes}.
+     */
     private boolean changePassword(Model model, User user, String newPW, String retypePW) {
 
         if (newPW.trim().isEmpty()) {
@@ -438,6 +525,21 @@ class AccountController {
         return true;
     }
 
+    /**
+     * Does the real dismissal work.
+     */
+    private void dismiss(User user) {
+        UserAccount userAccount = user.getUserAccount();
+        userRepo.delete(user);
+        userAccount.remove(new Role("ROLE_EMPLOYEE"));
+        uam.save(userAccount);
+        uam.disable(userAccount.getIdentifier());
+        uam.changePassword(userAccount, passwordRules.generateRandomPassword());
+    }
+
+    /**
+     * Creates a list of all employees needed for staff overview.
+     */
     private List<User> getEmployees() {
         Iterable<User> allUsers = userRepo.findAll();
         List<User> employees = new LinkedList<User>();

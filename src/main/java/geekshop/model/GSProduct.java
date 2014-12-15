@@ -11,10 +11,9 @@ import org.springframework.util.Assert;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import java.util.ArrayList;
 
 /**
- * An extension of {@link org.salespointframework.catalog.Product} extended by {@link geekshop.model.SubCategory}.
+ * An extension of {@link org.salespointframework.catalog.Product} extended by a {@link geekshop.model.SubCategory} the product is related to and a unique product number.
  *
  * @author Marcus Kammerdiener
  * @author Sebastian D&ouml;ring
@@ -23,7 +22,7 @@ import java.util.ArrayList;
 @Entity
 public class GSProduct extends Product{
 
-    private int geekID;
+    private int productNumber;
     @ManyToOne
     private SubCategory subCategory;
 
@@ -31,19 +30,23 @@ public class GSProduct extends Product{
     protected GSProduct() {
     }
 
-    public GSProduct (String name, Money price, SubCategory subCategory, int geekID) {
+    public GSProduct (String name, Money price, SubCategory subCategory, int productNumber) {
         super (name, price, Units.METRIC);
         Assert.notNull(subCategory, "SubCategory must be not null.");
         this.subCategory = subCategory;
-        this.geekID = geekID;
+        this.productNumber = productNumber;
     }
 
     public SubCategory getSubCategory() {
         return subCategory;
     }
 
-    public int getGeekID() {
-        return geekID;
+    public int getProductNumber() {
+        return productNumber;
+    }
+
+    public String productNumberToString(int geekID) {
+        return geekID + "";
     }
 
     public String getStringPrice() {

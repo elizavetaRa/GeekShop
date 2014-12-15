@@ -32,40 +32,39 @@
 
                 <div>
 
-                    <table class="table-style01 alternatRows">
+                    <table class="table-style01 firstLeft alternatRows">
                         <tr>
-                            <th><input type="checkbox" id="selectAll"/></th>
-                            <th>Text</th>
+                            <!--<th><input type="checkbox" id="selectAll"/></th>-->
+                            <th class="t-center">Text</th>
                             <th></th>
-
                         </tr>
                         <tr th:each="joke : ${jokes}">
-                            <td class="t-center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>
-                            </td>
+                            <!--<td class="t-center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>-->
+                            <!--</td>-->
                             <td class="t-left">
-                                <p name="joke[]" cols="50" rows="4" th:utext="${joke.text}">Es war dunkel, feucht und
+                                <p name="joke[]" cols="50" rows="4" th:utext="${#strings.replace(joke.text, T(java.lang.System).getProperty('line.separator'), '&lt;br/&gt;')}">Es war dunkel, feucht und
                                     neblig ...</p>
                             </td>
                             <td>
-                                <form th:action="@{/jokes/} + ${joke.id}" method="post">
-                                <button type="submit" class="myButton">Ändern</button>
+                                <a th:href="@{/jokes/} + ${joke.id}" class="myButton">Ändern</a>
+                                <form th:action="@{/jokes/} + ${joke.id}" th:method="delete">
+                                    <button type="submit" class="myButton">Löschen</button>
                                 </form>
                             </td>
                         </tr>
                     </table>
                 </div>
 
-                <form method="post" id="Joke" th:action="@{/newjoke}" style="display: inline-block">
-                    <div class="form-group" style="display: block">
-                        <label for="newJoke">Neuer Witz</label><br/>
-                        <textarea name="newJoke" id="newJoke" class="form-control" type="text" />
-                    </div>
-                    <button id="add" class="myButton">Neuen Witz hinzufügen</button>
-                </form>
-                <form method="delete" id="delJokes" th:action="@{/deljokes}" style="display: inline-block; margin-left: 4em">
-                    <button id="delete" class="myButton">Markierte löschen</button>
-                </form>
+                <a href="/newjoke" class="myButton">Witz hinzufügen</a>
 
+                <!--<form method="delete" id="delJokes" th:action="@{/deljokes}"-->
+                <!--style="display: inline-block; margin-left: 4em">-->
+                <!--<button id="delete" class="myButton">Markierte löschen</button>-->
+                <!--</form>-->
+
+                <form th:method="delete" id="delJokes" th:action="@{/deljokes}">
+                    <button id="deleteAll" class="myButton">Alle Witze löschen</button>
+                </form>
 
             </div>
             <!-- content-in-->

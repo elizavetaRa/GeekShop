@@ -5,7 +5,7 @@ package geekshop.model;
  */
 
 /**
- * Enumeration for the gender of the {@link User}s.
+ * Enumeration representing the {@link User}'s gender.
  *
  * @author Sebastian D&ouml;ring
  */

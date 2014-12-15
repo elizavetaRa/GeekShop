@@ -44,10 +44,14 @@ class OwnerController {
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
     private final PasswordRules passwordRules;
+    private final SubCategoryRepository subCategoryRepo;
+    private final SuperCategoryRepository superCategoryRepo;
 
 
     @Autowired
-    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo, PasswordRulesRepository passRulesRepo) {
+    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
+                           UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
+                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,SuperCategoryRepository superCategoryRepo) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
@@ -56,6 +60,8 @@ class OwnerController {
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
+        this.subCategoryRepo=subCategoryRepo;
+        this.superCategoryRepo=superCategoryRepo;
     }
 
 
@@ -139,13 +145,18 @@ class OwnerController {
         return "jokes";
     }
 
+    @RequestMapping("/newjoke")
+    public String newJoke() {
+        return "editjoke";
+    }
+
     @RequestMapping(value = "/newjoke", method = RequestMethod.POST)
-    public String newJoke(@RequestParam("newJoke") String text) {
+    public String newJoke(@RequestParam("jokeText") String text) {
         jokeRepo.save(new Joke(text));
         return "redirect:/jokes";
     }
 
-    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
+    @RequestMapping("/jokes/{id}")
     public String showJoke(Model model, @PathVariable("id") Long id) {
         Joke joke = jokeRepo.findJokeById(id);
         model.addAttribute("joke", joke);
@@ -157,6 +168,32 @@ class OwnerController {
         Joke joke = jokeRepo.findJokeById(id);
         joke.setText(jokeText);
         jokeRepo.save(joke);
+        return "redirect:/jokes";
+    }
+
+    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.DELETE)
+    public String deleteJoke(@PathVariable("id") Long id) {
+        Joke joke = jokeRepo.findJokeById(id);
+        Iterable<User> allUsers = userRepo.findAll();
+        for (User user : allUsers) {
+            List<Joke> recentJokes = user.getRecentJokes();
+            recentJokes.removeAll(Collections.singletonList(joke));
+            userRepo.save(user);
+        }
+
+        jokeRepo.delete(joke);
+        return "redirect:/jokes";
+    }
+
+    @RequestMapping(value = "/deljokes", method = RequestMethod.DELETE)
+    public String deleteAllJokes() {
+        Iterable<User> allUsers = userRepo.findAll();
+        for (User user : allUsers) {
+            List<Joke> recentJokes = user.getRecentJokes();
+            recentJokes.clear();
+            userRepo.save(user);
+        }
+        jokeRepo.deleteAll();
         return "redirect:/jokes";
     }
 
@@ -186,4 +223,12 @@ class OwnerController {
         return date;
 
     }
+
+    @RequestMapping("/inventory")
+    public String inventory(Model model) {
+        model.addAttribute("subcategories", subCategoryRepo.findAll());
+        model.addAttribute("supercategories", superCategoryRepo.findAll());
+        return "inventory";
+    }
+
 }

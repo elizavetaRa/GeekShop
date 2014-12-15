@@ -25,13 +25,13 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title" th:text="'Witz ' + ${joke.id} + ' editieren'">Profil</h3>
+            <h3 id="content-title" th:text="${joke} ? 'Witz ' + ${joke.id} + ' editieren' : 'Witz hinzufügen'">Profil</h3>
 
             <div id="content-in">
 
-                <form th:action="@{/editjoke/} + ${joke.id}" method="post">
-                    <textarea id="jokeText" name="jokeText" th:text="${joke.text}" style="height: 4cm"></textarea>
-                    <button type="submit" class="myButton">Editieren</button>
+                <form th:action="${joke} ? (@{/editjoke/} + ${joke.id}) : '/newjoke'" method="post">
+                    <textarea id="jokeText" name="jokeText" th:text="${joke} ? ${joke.text}" style="height: 4cm"></textarea>
+                    <button type="submit" class="myButton" th:text="${joke} ? 'Editieren' : 'Witz speichern'">Editieren</button>
 
                 </form>
 
