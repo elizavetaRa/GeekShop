@@ -44,10 +44,14 @@ class OwnerController {
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
     private final PasswordRules passwordRules;
+    private final SubCategoryRepository subCategoryRepo;
+    private final SuperCategoryRepository superCategoryRepo;
 
 
     @Autowired
-    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog, UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager, MessageRepository messageRepo, PasswordRulesRepository passRulesRepo) {
+    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
+                           UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
+                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,SuperCategoryRepository superCategoryRepo) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
@@ -56,6 +60,8 @@ class OwnerController {
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
+        this.subCategoryRepo=subCategoryRepo;
+        this.superCategoryRepo=superCategoryRepo;
     }
 
 
@@ -218,4 +224,12 @@ class OwnerController {
         return date;
 
     }
+
+    @RequestMapping("/inventory")
+    public String inventory(Model model) {
+        model.addAttribute("subcategories", subCategoryRepo.findAll());
+        model.addAttribute("supercategories", superCategoryRepo.findAll());
+        return "inventory";
+    }
+
 }
