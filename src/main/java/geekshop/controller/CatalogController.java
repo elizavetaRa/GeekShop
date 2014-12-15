@@ -101,7 +101,6 @@ class CatalogController {
         if (user.pwHasToBeChanged())
             return AccountController.adjustPW(model, user, passwordRules);
 
-//        List<GSProduct> list = searchForProducts(searchTerm);
         model.addAttribute("foundProducts", searchForProductID(searchTerm));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
