@@ -45,7 +45,7 @@ public class GSProduct extends Product{
         return productNumber;
     }
 
-    public String geekIDToString(int geekID) {
+    public String productNumberToString(int geekID) {
         return geekID + "";
     }
 
