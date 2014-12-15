@@ -107,18 +107,17 @@ class OwnerController {
     @RequestMapping("/showreclaim/msgId={msgid}/reclaim={rid}")
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId) {
 
-        Set<GSProduct> products = new HashSet<>();
+        Set<ReclaimTupel> products = new HashSet<>();
         GSOrder order = orderRepo.findOne(reclaimId).get();
 
         for (OrderLine line : order.getOrderLines()) {
-            products.add(catalog.findOne(line.getProductIdentifier()).get());
+            products.add(new ReclaimTupel(catalog.findOne(line.getProductIdentifier()).get(), line));
         }
         Message message = messageRepo.findOne(msgId).get();
         model.addAttribute("rid", reclaimId);
         model.addAttribute("message", message);
         model.addAttribute("products", products);
         model.addAttribute("order", order);
-        GSProduct test = null;
 
         return "showreclaim";
     }
