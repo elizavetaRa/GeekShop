@@ -140,13 +140,18 @@ class OwnerController {
         return "jokes";
     }
 
+    @RequestMapping("/newjoke")
+    public String newJoke() {
+        return "editjoke";
+    }
+
     @RequestMapping(value = "/newjoke", method = RequestMethod.POST)
-    public String newJoke(@RequestParam("newJoke") String text) {
+    public String newJoke(@RequestParam("jokeText") String text) {
         jokeRepo.save(new Joke(text));
         return "redirect:/jokes";
     }
 
-    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
+    @RequestMapping("/jokes/{id}")
     public String showJoke(Model model, @PathVariable("id") Long id) {
         Joke joke = jokeRepo.findJokeById(id);
         model.addAttribute("joke", joke);
@@ -158,6 +163,18 @@ class OwnerController {
         Joke joke = jokeRepo.findJokeById(id);
         joke.setText(jokeText);
         jokeRepo.save(joke);
+        return "redirect:/jokes";
+    }
+
+    @RequestMapping(value = "/jokes/{id}", method = RequestMethod.POST)
+    public String deleteJoke(@PathVariable("id") Long id) {
+        jokeRepo.delete(id);
+        return "redirect:/jokes";
+    }
+
+    @RequestMapping(value = "/deljokes", method = RequestMethod.POST)
+    public String deleteAllJokes() {
+        jokeRepo.deleteAll();
         return "redirect:/jokes";
     }
 
