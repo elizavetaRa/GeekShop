@@ -27,7 +27,7 @@
 
             <div id="content-in">
 
-                <table class="table-style01">
+                <table class="table-style01" th:each="gsProductOrders : ${orders}">
                     <tr>
                         <th style="width:6em">Datum</th>
                         <th>Verkäufer</th>
@@ -36,44 +36,18 @@
                         <!--<th style="width:5em">Reklamation</th>-->
                     </tr>
                     <tr class="highlight">
-                        <td class="t-left" colspan="2">Binäre Armbanduhr</td>
-                        <td>01<sub>2</sub></td>
-                        <td>010000<sub>2</sub> €</td>
-                    </tr>
-                    <tr>
-                        <td>10.01.10</td>
-                        <td>owner</td>
-                        <td>10<sub>2</sub></td>
-                        <td>100000<sub>2</sub> €</td>
-                        <!--<td>nein</td>-->
-                    </tr>
-                    <tr>
-                        <td>11.01.10</td>
-                        <td>hans</td>
-                        <td>–01<sub>2</sub></td>
-                        <td>–010000<sub>2</sub> €</td>
-                        <!--<td>ja</td>-->
-                    </tr>
-                    <tr class="highlight">
-                        <td class="t-left" colspan="2">Minzpastillen (mit VIEL Koffein), 73 Stück à 1337 mg</td>
-                        <td>3</td>
-                        <td>126 €</td>
-                    </tr>
-                    <tr>
-                        <td>14.03.15</td>
-                        <td>hans</td>
-                        <td>1</td>
-                        <td>42 €</td>
-                        <!--<td>nein</td>-->
-                    </tr>
-                    <tr>
-                        <td>22.07.15</td>
-                        <td>hans</td>
-                        <td>2</td>
-                        <td>84 €</td>
-                        <!--<td>nein</td>-->
+                        <td class="t-left" colspan="2" th:text="${gsProductOrders.key.name}">PRODUKTNAME</td>
+                        <td th:text="${gsProductOrders.value.totalQuantity}">GESAMTANZAHL</td>
+                        <td th:text="${gsProductOrders.value.totalPrice}">GESAMTPREIS</td>
                     </tr>
 
+                    <tr th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
+                        <td th:text="${gsProductOrder.date}">DATUM</td>
+                        <td th:text="${gsProductOrder.seller.userAccount.identifier}">VERKÄUFER</td>
+                        <td th:text="${gsProductOrder.orderLine.quantity.amount}">ANZAHL</td>
+                        <td th:text="${gsProductOrder.orderLine.price}">PREIS</td>
+                        <!--<td>nein</td>-->
+                    </tr>
                 </table>
 
                 <button id="exportXml" class="myButton">Als XML exportieren</button>
