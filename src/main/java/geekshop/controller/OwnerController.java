@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -108,25 +105,28 @@ class OwnerController {
     }
 
     @RequestMapping("/showreclaim/msgId={msgid}/reclaim={rid}")
-    public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId){
+    public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId) {
 
+        Set<GSProduct> products = new HashSet<>();
         GSOrder order = orderRepo.findOne(reclaimId).get();
-//
-//        Iterable<GSOrderLine> orderLine =  order.getOrderLines();
-//        for (GSOrderLine line : order.get)
-//        GSProduct product = orderLine.getP
+
+        for (OrderLine line : order.getOrderLines()) {
+            products.add(catalog.findOne(line.getProductIdentifier()).get());
+        }
         Message message = messageRepo.findOne(msgId).get();
         model.addAttribute("rid", reclaimId);
         model.addAttribute("message", message);
+        model.addAttribute("products", products);
         model.addAttribute("order", order);
+        GSProduct test = null;
 
         return "showreclaim";
     }
 
     @RequestMapping(value = "/showreclaim/msgId={msgid}/reclaim={rid}/{accept}")
-    public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId, @PathVariable("accept") String accept){
+    public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId, @PathVariable("accept") String accept) {
         messageRepo.delete(msgId);
-        if (accept.equals("True")){
+        if (accept.equals("True")) {
             //ReaddItemstoStock
         }
 

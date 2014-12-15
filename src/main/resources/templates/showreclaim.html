@@ -28,12 +28,16 @@
 
             <div id="content-in">
 
-                <table class="table-style01">
+                <table class="table-style01 alternatRows">
                     <tr>
-                        <th style="width:6em">Datum</th>
-                        <th>Verkäufer</th>
+                        <th style="width:6em">Produkt</th>
                         <th style="width:4em">Anzahl</th>
                         <th style="width:6em">Gesamtpreis</th>
+                    </tr>
+                    <tr th:each="product : ${products}">
+                        <th th:utext="${product.getName()}">Produkt</th>
+                        <th></th>
+                        <th th:utext="${product.getStringPrice()}"></th>
                     </tr>
 
 
