@@ -96,7 +96,6 @@ class CatalogController {
         if (user.pwHasToBeChanged())
             return AccountController.adjustPW(model, user, passwordRules);
 
-//        List<GSProduct> list = searchForProducts(searchTerm);
         model.addAttribute("foundProducts", searchForProductID(searchTerm));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
@@ -132,7 +131,7 @@ class CatalogController {
         Iterable<GSProduct> allProducts = catalog.findAll();
         List<GSProduct> foundProducts = new LinkedList<GSProduct>();
         for (GSProduct product : allProducts) {
-            if(product.geekIDToString(product.getGeekID()).contains(searchTerm)) {
+            if(product.productNumberToString(product.getProductNumber()).contains(searchTerm)) {
                 foundProducts.add(product);
             }
         }
