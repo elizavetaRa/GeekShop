@@ -47,7 +47,7 @@
 
                         <li><h5 th:text="${superCategory.name}">Kleidung für Nerds</h5>
                             <ul th:each="subCategory: ${superCategory.subCategories}">
-                                <li><a th:href="'productsearch/' + ${subCategory.name}" th:text="${subCategory.name}">T-Shirts</a></li>
+                                <li><a th:href="'/productsearch/' + ${subCategory.name}" th:text="${subCategory.name}">T-Shirts</a></li>
                             </ul>
                         </li>
 
@@ -59,8 +59,10 @@
                 float:right; height: 100%; padding-left: 10px;">
 
 
-                    <input name="suchen" id="suchen" type="text" size="15" maxlength="40" required="required"/>
-                    <button id="searchCatalog" name="searchCatalog" type="submit">suchen</button>
+                    <form method="post" th:action="${'/extendedsearch'}">
+                        <input value="suchen" th:value="${suchen}" name="suchen" id="suchen" type="text" size="15" maxlength="40" required="required"/>
+                        <button th:action="${'/extendedsearch'}" id="searchCatalog" name="searchCatalog" type="submit">suchen</button>
+                    </form>
 
                     <label>sortieren nach</label>
                     <select name="sortieren" id="sortieren">

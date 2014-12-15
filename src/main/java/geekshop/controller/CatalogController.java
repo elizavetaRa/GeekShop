@@ -6,16 +6,16 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.catalog.Product;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.catalog.Catalog}.
@@ -59,7 +59,7 @@ class CatalogController {
     }
 
     @RequestMapping("/productsearch/{subCategory}")
-    public String profile(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
+    public String catgory(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -69,10 +69,42 @@ class CatalogController {
         model.addAttribute("specCategory", subRepo.findByName(subCategory));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
-        model.addAttribute("catalog", catalog.findAll());
-        model.addAttribute("count", subRepo.findByName(subCategory).getProducts().size());
         return "categorysearch";
     }
 
+    @RequestMapping("/productsearch/extended/{searchTerm}")
+    public String searchEntry(Model model, @PathVariable("searchTerm") String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+//        List<GSProduct> list = searchForProducts(searchTerm);
+        model.addAttribute("foundProducts", searchForProducts(searchTerm));
+        model.addAttribute("superCategories", supRepo.findAll());
+        model.addAttribute("subCategories", subRepo.findAll());
+        return "extendedsearch";
+    }
+
+    @RequestMapping(value = "/extendedsearch", method = RequestMethod.POST)
+    public String searchProduct(@RequestParam Map<String, String> formData) {
+        String temp = formData.get("suchen");
+//        List<GSProduct> foundProducts = searchForProducts(formData.get("suchen"));
+//        model.addAttribute("searched", foundProducts);
+        return "redirect:/productsearch/extended/" + temp;
+    }
+
+
+    private List<GSProduct> searchForProducts(String searchTerm) {
+        Iterable<GSProduct> allProducts = catalog.findAll();
+        List<GSProduct> foundProducts = new LinkedList<GSProduct>();
+        for (GSProduct product : allProducts) {
+            if(product.getName().contains(searchTerm)) {
+                foundProducts.add(product);
+            }
+        }
+        return foundProducts;
+    }
 
 }
