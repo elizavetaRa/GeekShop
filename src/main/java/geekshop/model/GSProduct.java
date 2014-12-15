@@ -46,6 +46,10 @@ public class GSProduct extends Product{
         return geekID;
     }
 
+    public String geekIDToString(int geekID) {
+        return geekID + "";
+    }
+
     public String getStringPrice() {
         String[] array;
         String temp;
