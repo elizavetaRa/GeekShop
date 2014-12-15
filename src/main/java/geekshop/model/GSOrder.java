@@ -6,9 +6,9 @@ package geekshop.model;
 
 import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.order.Order;
+import org.salespointframework.order.OrderLine;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.useraccount.UserAccount;
-import org.springframework.util.Assert;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -40,41 +40,50 @@ public class GSOrder extends Order {
         this.reclaimedOrder = null;
     }
 
-    public GSOrder(String orderNumber, UserAccount ua, OrderType type) {
+    public GSOrder(String orderNumber, UserAccount ua) {
         super(ua);
-        initializeGSOrder(type);
 
         this.orderNumber = new SalespointIdentifier(orderNumber);
         this.reclaimedOrder = null;
+        initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(String orderNumber, UserAccount ua, OrderType type, GSOrder reclaimedOrder) {
+    public GSOrder(String orderNumber, UserAccount ua, GSOrder reclaimedOrder) {
         super(ua);
-        initializeGSOrder(type);
 
         this.orderNumber = new SalespointIdentifier(orderNumber);
         this.reclaimedOrder = reclaimedOrder;
+        initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(String orderNumber, UserAccount ua, OrderType type, PaymentMethod paymentMethod) {
+    public GSOrder(String orderNumber, UserAccount ua, PaymentMethod paymentMethod) {
         super(ua, paymentMethod);
-        initializeGSOrder(type);
 
         this.orderNumber = new SalespointIdentifier(orderNumber);
         this.reclaimedOrder = null;
+        initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(String orderNumber, UserAccount ua, OrderType type, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
+    public GSOrder(String orderNumber, UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
         super(ua, paymentMethod);
-        initializeGSOrder(type);
 
         this.orderNumber = new SalespointIdentifier(orderNumber);
         this.reclaimedOrder = reclaimedOrder;
+        initializeGSOrder(reclaimedOrder);
     }
 
-    private void initializeGSOrder(OrderType type) {
-        Assert.notNull(type, "OrderType must not be null.");
-        this.type = type;
+    private void initializeGSOrder(GSOrder reclaimedOrder) {
+
+        ////////////////////////////////////// Validierung! ////////////////////////////////////////
+
+        if (reclaimedOrder == null) {
+            this.type = OrderType.NORMAL;
+        } else {
+            if (reclaimedOrder.getOrderType() == OrderType.RECLAIM)
+                throw new IllegalArgumentException("Eine Reklamation darf sich nicht auf eine Reklamation beziehen!");
+
+            this.type = OrderType.RECLAIM;
+        }
     }
 
 
@@ -92,5 +101,12 @@ public class GSOrder extends Order {
 
     public GSOrder getReclaimedOrder() {
         return reclaimedOrder;
+    }
+
+    public void add(OrderLine orderLine) {
+        if (type == OrderType.RECLAIM && orderLine instanceof GSOrderLine) {
+            ((GSOrderLine) orderLine).setType(OrderType.RECLAIM);
+        }
+        super.add(orderLine);
     }
 }

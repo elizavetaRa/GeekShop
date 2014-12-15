@@ -291,16 +291,34 @@ public class GeekShopDataInitializer implements DataInitializer {
             return;
 
         UserAccount ua = userAccountManager.findByUsername("owner").get(); // suche UserAccount von owner
-        GSProduct prod = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
-        GSOrder order = new GSOrder("1", ua, OrderType.NORMAL, Cash.CASH); // erzeuge GSOrder
-        GSOrderLine orderLine = new GSOrderLine(prod, Units.TEN);
-        order.add(orderLine); // füge GSOrderLine hinzu
+        GSProduct prod1 = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
+        GSProduct prod2 = catalog.findByName("Product2").iterator().next(); // suche Product1 (siehe initializeCatalog)
+        GSOrder order1 = new GSOrder("1", ua, Cash.CASH); // erzeuge GSOrder
+        GSOrder order2 = new GSOrder("2", ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
+        GSOrder order3 = new GSOrder("3", ua, Cash.CASH);
+        GSOrder order4 = new GSOrder("4", ua, Cash.CASH, order1);
+        GSOrderLine orderLine11 = new GSOrderLine(prod1, Units.TEN);
+        GSOrderLine orderLine12 = new GSOrderLine(prod2, Units.TEN);
+        GSOrderLine orderLine21 = new GSOrderLine(prod2, Units.ONE);
+        GSOrderLine orderLine31 = new GSOrderLine(prod1, Units.of(5));
+        GSOrderLine orderLine41 = new GSOrderLine(prod1, Units.TEN);
+        order1.add(orderLine11); // füge GSOrderLine hinzu
+        order1.add(orderLine12);
+        order2.add(orderLine21);
+        order3.add(orderLine31);
+        order4.add(orderLine41);
 //        System.out.println("orderManager.payOrder(order): " + orderManager.payOrder(order));
 //        System.out.println("orderManager.completeOrder(order): " + orderManager.completeOrder(order).getStatus().toString());
 //        System.out.println("order paid: " + order.isPaid());
 //        System.out.println("order completed: " + order.isCompleted());
-        orderManager.save(order); // speichere die Order im OrderManager, damit dateCreated angelegt wird
-        orderRepo.save(order);
+        orderManager.save(order1); // speichere die Order im OrderManager, damit dateCreated angelegt wird
+        orderManager.save(order2); // speichere die Order im OrderManager, damit dateCreated angelegt wird
+        orderManager.save(order3); // speichere die Order im OrderManager, damit dateCreated angelegt wird
+        orderManager.save(order4); // speichere die Order im OrderManager, damit dateCreated angelegt wird
+        orderRepo.save(order1);
+        orderRepo.save(order2);
+        orderRepo.save(order3);
+        orderRepo.save(order4);
 
 //        orderLine.increaseReclaimedAmount(BigDecimal.valueOf(5)); // reklamiere 5 Stück
 //        orderManager.save(order);
@@ -311,7 +329,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         for (GSOrder o : orderRepo.findAll()) { // iteriere über alle gespeicherten Orders
             System.out.println("+++++ " + o + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ")");
             for (OrderLine ol : o.getOrderLines()) {
-                System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
+//                System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
             }
         }
     }

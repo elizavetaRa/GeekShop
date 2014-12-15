@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -75,9 +77,9 @@ class OwnerController {
 //        orderManager.save(recOrder);
 
         for (GSOrder order : orderRepo.findAll()) {
-            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
+//            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
                 createProductOrder(map, order);
-            }
+//            }
         }
 
 //        for (GSOrder order : orderManager.find(OrderStatus.COMPLETED)) {
@@ -92,10 +94,13 @@ class OwnerController {
     }
 
     private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
-        LocalDateTime date = order.getDateCreated();    // date
+        LocalDateTime ldt = order.getDateCreated();    // date
+        ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
+        Date date = Date.from(zdt.toInstant());
+
         UserAccount ua = order.getUserAccount();
         User seller = userRepo.findByUserAccount(ua);   // seller
-        for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respetive map entry
+        for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respective map entry
             GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, seller);
             GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
             GSProductOrders prodOrders = map.get(product);
