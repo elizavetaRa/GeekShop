@@ -229,11 +229,11 @@ class OwnerController {
 
     }
 
-    @RequestMapping("/inventory")
+    @RequestMapping("/range")
     public String inventory(Model model) {
         model.addAttribute("subcategories", subCategoryRepo.findAll());
         model.addAttribute("supercategories", superCategoryRepo.findAll());
-        return "inventory";
+        return "range";
     }
 
 }
