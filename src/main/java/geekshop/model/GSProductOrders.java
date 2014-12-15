@@ -30,7 +30,6 @@ public class GSProductOrders {
         this.productOrders = new LinkedList<GSProductOrder>();
     }
 
-
     public Money getTotalPrice() {
         return totalPrice;
     }
@@ -46,6 +45,8 @@ public class GSProductOrders {
     public void setTotalQuantity(Quantity totalQuantity) {
         this.totalQuantity = totalQuantity;
     }
+
+    public List<GSProductOrder> getProductOrders() { return productOrders; }
 
     public void addProductOrder(GSProductOrder productOrder) {
         productOrders.add(productOrder);
