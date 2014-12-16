@@ -27,27 +27,30 @@
 
             <div id="content-in">
 
-                <table class="table-style01" th:each="gsProductOrders : ${orders}">
+                <table class="table-style01">
                     <tr>
-                        <th style="width:6em">Datum</th>
+                        <th style="width:8em">Datum</th>
                         <th>Verkäufer</th>
                         <th style="width:4em">Anzahl</th>
                         <th style="width:6em">Gesamtpreis</th>
                         <!--<th style="width:5em">Reklamation</th>-->
                     </tr>
-                    <tr class="highlight">
+                    <tbody th:remove="tag" th:each="gsProductOrders : ${orders}">
+                    <tr class="highlight" th:with="productOrders = ${gsProductOrders.value}">
                         <td class="t-left" colspan="2" th:text="${gsProductOrders.key.name}">PRODUKTNAME</td>
-                        <td th:text="${gsProductOrders.value.totalQuantity}">GESAMTANZAHL</td>
-                        <td th:text="${gsProductOrders.value.totalPrice}">GESAMTPREIS</td>
+                        <td th:text="${productOrders.totalQuantity}">GESAMTANZAHL</td>
+                        <td th:text="${productOrders.totalPrice}">GESAMTPREIS</td>
                     </tr>
-
-                    <tr th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
-                        <td th:text="${gsProductOrder.date}">DATUM</td>
-                        <td th:text="${gsProductOrder.seller.userAccount.identifier}">VERKÄUFER</td>
-                        <td th:text="${gsProductOrder.orderLine.quantity.amount}">ANZAHL</td>
-                        <td th:text="${gsProductOrder.orderLine.price}">PREIS</td>
+                    <div th:remove="tag" th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
+                    <tr th:with="ol = ${gsProductOrder.orderLine}">
+                        <td th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM</td>
+                        <td th:text="${gsProductOrder.seller}">VERKÄUFER</td>
+                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' + ol.quantity.amount : ol.quantity.amount}">ANZAHL</td>
+                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' + ol.price : ol.price}">PREIS</td>
                         <!--<td>nein</td>-->
                     </tr>
+                    </div>
+                    </tbody>
                 </table>
 
                 <button id="exportXml" class="myButton">Als XML exportieren</button>

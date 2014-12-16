@@ -1,12 +1,8 @@
 package geekshop.model;
 
-/*
- * Created by Basti on 08.12.2014.
- */
-
 import org.springframework.util.Assert;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * A helper class to encapsulate a {@link GSOrderLine} related to a specific {@link org.salespointframework.catalog.Product} as well as the date sold and the seller.
@@ -17,7 +13,7 @@ import java.time.LocalDateTime;
 public class GSProductOrder {
 
     private GSOrderLine orderLine;
-    private LocalDateTime date;
+    private Date date;
     private User seller;
 
 
@@ -25,7 +21,7 @@ public class GSProductOrder {
     protected GSProductOrder() {
     }
 
-    public GSProductOrder(GSOrderLine orderLine, LocalDateTime date, User seller) {
+    public GSProductOrder(GSOrderLine orderLine, Date date, User seller) {
         Assert.notNull(orderLine, "OrderLine must not be null!");
         Assert.notNull(date, "Date must not be null!");
         Assert.notNull(seller, "Seller must not be null!");
@@ -44,11 +40,11 @@ public class GSProductOrder {
         this.orderLine = orderLine;
     }
 
-    public LocalDateTime getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

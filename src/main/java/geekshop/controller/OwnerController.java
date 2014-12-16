@@ -1,9 +1,5 @@
 package geekshop.controller;
 
-/*
- * Created by Basti on 20.11.2014.
- */
-
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.order.OrderIdentifier;
@@ -23,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -51,7 +49,8 @@ class OwnerController {
     @Autowired
     public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
                            UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
-                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,SuperCategoryRepository superCategoryRepo) {
+                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,
+                           SuperCategoryRepository superCategoryRepo) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
@@ -60,8 +59,8 @@ class OwnerController {
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
-        this.subCategoryRepo=subCategoryRepo;
-        this.superCategoryRepo=superCategoryRepo;
+        this.subCategoryRepo = subCategoryRepo;
+        this.superCategoryRepo = superCategoryRepo;
     }
 
 
@@ -81,9 +80,9 @@ class OwnerController {
 //        orderManager.save(recOrder);
 
         for (GSOrder order : orderRepo.findAll()) {
-            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
-                createProductOrder(map, order);
-            }
+//            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
+            createProductOrder(map, order);
+//            }
         }
 
 //        for (GSOrder order : orderManager.find(OrderStatus.COMPLETED)) {
@@ -98,10 +97,13 @@ class OwnerController {
     }
 
     private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
-        LocalDateTime date = order.getDateCreated();    // date
+        LocalDateTime ldt = order.getDateCreated();    // date
+        ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
+        Date date = Date.from(zdt.toInstant());
+
         UserAccount ua = order.getUserAccount();
         User seller = userRepo.findByUserAccount(ua);   // seller
-        for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respetive map entry
+        for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respective map entry
             GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, seller);
             GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
             GSProductOrders prodOrders = map.get(product);
@@ -113,18 +115,17 @@ class OwnerController {
     @RequestMapping("/showreclaim/msgId={msgid}/reclaim={rid}")
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId) {
 
-        Set<GSProduct> products = new HashSet<>();
+        Set<ReclaimTupel> products = new HashSet<>();
         GSOrder order = orderRepo.findOne(reclaimId).get();
 
         for (OrderLine line : order.getOrderLines()) {
-            products.add(catalog.findOne(line.getProductIdentifier()).get());
+            products.add(new ReclaimTupel(catalog.findOne(line.getProductIdentifier()).get(), line));
         }
         Message message = messageRepo.findOne(msgId).get();
         model.addAttribute("rid", reclaimId);
         model.addAttribute("message", message);
         model.addAttribute("products", products);
         model.addAttribute("order", order);
-        GSProduct test = null;
 
         return "showreclaim";
     }
@@ -225,11 +226,11 @@ class OwnerController {
 
     }
 
-    @RequestMapping("/inventory")
+    @RequestMapping("/range")
     public String inventory(Model model) {
         model.addAttribute("subcategories", subCategoryRepo.findAll());
         model.addAttribute("supercategories", superCategoryRepo.findAll());
-        return "inventory";
+        return "range";
     }
 
 }

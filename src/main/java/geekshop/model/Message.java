@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by h4llow3En on 05/12/14.
- */
-
 import org.salespointframework.order.OrderIdentifier;
 import org.springframework.util.Assert;
 
@@ -44,6 +40,7 @@ public class Message {
     public Message(MessageKind messageKind, String messageText, OrderIdentifier reclaimId) {
         Assert.hasText(messageText, "messageText must not be null.");
         Assert.notNull(messageKind, "messageKind must not be null.");
+        Assert.notNull(reclaimId, "reclaimID must not be null.");
         this.messageKind = messageKind;
         this.messageText = messageText;
 

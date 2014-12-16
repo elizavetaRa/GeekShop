@@ -3,6 +3,7 @@ package geekshop.model;
 import geekshop.GeekShop;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.salespointframework.order.OrderIdentifier;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -22,7 +23,8 @@ import javax.transaction.Transactional;
 public class MessageReclaimTest {
     @Test(expected = IllegalArgumentException.class)
     public void emptyReclaimLink() {
-//        new Message(MessageKind.RECLAIM, "Test", "");
+        OrderIdentifier identifier = null;
+        new Message(MessageKind.RECLAIM, "Test", identifier);
 
     }
 

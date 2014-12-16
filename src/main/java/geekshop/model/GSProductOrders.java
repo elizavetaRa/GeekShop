@@ -1,14 +1,9 @@
 package geekshop.model;
 
-/*
- * Created by Basti on 08.12.2014.
- */
-
 import org.joda.money.Money;
 import org.salespointframework.quantity.Quantity;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +18,6 @@ public class GSProductOrders {
     private Money totalPrice;
     private Quantity totalQuantity;
     private List<GSProductOrder> productOrders;
-
 
 
     public GSProductOrders() {
@@ -46,22 +40,25 @@ public class GSProductOrders {
         this.totalQuantity = totalQuantity;
     }
 
-    public List<GSProductOrder> getProductOrders() { return productOrders; }
+    public List<GSProductOrder> getProductOrders() {
+        return productOrders;
+    }
 
     public void addProductOrder(GSProductOrder productOrder) {
         productOrders.add(productOrder);
         GSOrderLine ol = productOrder.getOrderLine();
 
-        // amount = total amount - reclaimed amount
-        BigDecimal amount = ol.getQuantity().getAmount().subtract(ol.getReclaimedAmount());
+        BigDecimal amount = ol.getQuantity().getAmount();
+        if (ol.getType() == OrderType.RECLAIM)
+            amount = amount.multiply(BigDecimal.valueOf(-1));
 
         totalQuantity = new Quantity(
                 totalQuantity == null ? amount : totalQuantity.getAmount().add(amount),
                 ol.getQuantity().getMetric(), ol.getQuantity().getRoundingStrategy());
 
-        // price = unit price * amount
-        BigDecimal unitPrice = ol.getPrice().getAmount().divide(ol.getQuantity().getAmount());
-        Money price = Money.of(ol.getPrice().getCurrencyUnit(), unitPrice.multiply(amount), RoundingMode.HALF_DOWN);
+        Money price = ol.getPrice();
+        if (ol.getType() == OrderType.RECLAIM)
+            price = price.multipliedBy(-1);
 
         if (totalPrice == null) {
             totalPrice = price;

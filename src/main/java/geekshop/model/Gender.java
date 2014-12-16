@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by Basti on 24.11.2014.
- */
-
 /**
  * Enumeration representing the {@link User}'s gender.
  *

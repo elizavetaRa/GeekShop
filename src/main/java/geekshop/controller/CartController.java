@@ -1,9 +1,5 @@
 package geekshop.controller;
 
-/*
- * Created by Basti on 20.11.2014.
- */
-
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
@@ -195,7 +191,7 @@ class CartController {
                                             @RequestParam("nameoncard") String nameOnCard,
                                             @RequestParam("billingadress") String billingAddress,
                                             @RequestParam("cardverificationcode") String cardVerificationCode
-                                            ) {
+    ) {
 
         PaymentMethod paymentMethod;
         LocalDateTime dateWritten = LocalDateTime.now();

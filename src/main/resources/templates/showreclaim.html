@@ -32,12 +32,14 @@
                     <tr>
                         <th style="width:6em">Produkt</th>
                         <th style="width:4em">Anzahl</th>
-                        <th style="width:6em">Gesamtpreis</th>
+                        <th style="width:6em">Einzelpreis</th>
+                        <th style="width:6em">Gesamt</th>
                     </tr>
                     <tr th:each="product : ${products}">
-                        <th th:utext="${product.getName()}">Produkt</th>
-                        <th></th>
-                        <th th:utext="${product.getStringPrice()}"></th>
+                        <th th:utext="${product.getProduct().getName()}">Produkt</th>
+                        <th th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</th>
+                        <th th:utext="${product.getProduct().getStringPrice()}"></th>
+                        <th th:utext="${product.getOrderLine().getPrice().getAmount().toString()} + ' EUR'"></th>
                     </tr>
 
 

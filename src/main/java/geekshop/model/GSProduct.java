@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by Marc on 02.12.2014.
- */
-
 import org.joda.money.Money;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.quantity.Units;
