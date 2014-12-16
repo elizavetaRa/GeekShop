@@ -1,5 +1,9 @@
 package geekshop.controller;
 
+/*
+ * Created by Basti on 20.11.2014.
+ */
+
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
@@ -176,23 +180,11 @@ class CartController {
     }
 
 
-    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
-    public PaymentMethod strToPaymentMethod(@RequestParam("strpayment") String strPayment,
-                                            @RequestParam("accountname") String accountName,
-                                            @RequestParam("accountnumber") String accountNumber,
-                                            @RequestParam("chequenumber") String chequeNumber,
-                                            @RequestParam("payee") String payee,
-                                            @RequestParam("bankname") String bankName,
-                                            @RequestParam("bankaddress") String bankAddress,
-                                            @RequestParam("bankid") String bankIdentificationNumber,
-                                            @RequestParam("cardname") String cardName,
-                                            @RequestParam("cardassociationname") String cardAssociationName,
-                                            @RequestParam("cardnumber") String cardNumber,
-                                            @RequestParam("nameoncard") String nameOnCard,
-                                            @RequestParam("billingadress") String billingAddress,
-                                            @RequestParam("cardverificationcode") String cardVerificationCode
-    ) {
-
+ /*   @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
+   public PaymentMethod setPaymentMethod(@RequestParam("strpayment") String strPayment,
+     ) {
+        Payment payment= new() Payment;
+        String a=" ";
         PaymentMethod paymentMethod;
         LocalDateTime dateWritten = LocalDateTime.now();
         LocalDateTime validFrom = LocalDateTime.parse("2013-12-18T14:30");  //später ändern
@@ -200,7 +192,7 @@ class CartController {
         org.joda.money.Money dailyWithdrawalLimit = org.joda.money.Money.parse("1000");
         org.joda.money.Money creditLimit = org.joda.money.Money.parse("1000");
 
-        if (strPayment.equals("Barzahlung")) {
+        if (strPayment.equals()) {
             paymentMethod = new Cash();
             return paymentMethod;
         } else if (strPayment.equals("Lastshriftverfahren")) {
@@ -214,6 +206,9 @@ class CartController {
         }
         return new Cash();
     }
+*/
+
+
 
 
     /**
@@ -223,7 +218,8 @@ class CartController {
      * @param userAccount must not be {@literal null}.
      * @return
      */
-    public String buy(Model model, @ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount) {
+
+ /*   public String buy(Model model, @ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount, Payment payment) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -236,21 +232,35 @@ class CartController {
 //                    // (｡◕‿◕｡)
 //                    // Mit commit wird der Warenkorb in die Order überführt, diese wird dann bezahlt und abgeschlossen.
 //                    // Orders können nur abgeschlossen werden, wenn diese vorher bezahlt wurden.
-//                    Order order = new GSOrder(userAccount, Cash.CASH);
+
+
+
+   /*             GSOrder order = new GSOrder(userAccount.get(), setPaymetMethod(payment));
+
+                   cart.addItemsTo(order);
+
+
+                     LocalDateTime time= LocalDateTime.now();           //setting time of buying
+//                    order.setDatecreated(time);
+
+        LocalDateTime timeup= time.plusDays(14);
+
+
+           Interval interval=new Interval(time, time);
 //
-//                    cart.addItemsTo(GSOrder);
-//
-//                    orderManager.payOrder(GSOrder);
-//                    //  orderManager.completeOrder(GSOrder);
-//                    orderManager.save(GSOrder);
+//                    orderManager.payOrder(order);
+//                    //  orderManager.completeOrder(order);
+//                    orderManager.save(order);
+
 //
 //                    cart.clear();
+
 //
 //                    return "redirect:/";
 //                }).orElse("redirect:/cart");
 
         return "cart";
-    }
+    }  */
 
 //        public void acceptReclaim(){
 //            //orderline.state='reclaimed';
