@@ -35,7 +35,8 @@
                             <td th:utext="${message.messageText}">Hans hat seine Daten geändert.</td>
                             <td style="width: 100px;">
                                 <form th:method="post" th:if="${message.kindToString() == 'RECLAIM'}"
-                                      th:action="'/showreclaim/msgId=' + ${message.id} + '/reclaim=' + ${message.reclaimId}">
+                                      th:action="'/showreclaim/reclaim=' + ${message.reclaimId}">
+                                    <input name="msgId" type="hidden" th:value="${message.id}"/>
                                     <button id="shwoReclaim" class="myButton">Ansehen</button>
                                 </form>
                                 <form th:method="delete" th:if="${message.kindToString() != 'RECLAIM'}"

@@ -45,10 +45,14 @@
 
                 </table>
 
-                <form th:action="'/showreclaim/msgId=' + ${message.id} + '/reclaim=' + ${rid} + '/True'">
+                <form th:method="delete" th:action="'/showreclaim/reclaim=' + ${rid}">
+                    <input name="msgId" type="hidden" th:value="${message.id}"/>
+                    <input name="accept" type="hidden" th:value="true"/>
                     <button id="accept" class="myButton">Genehmigen</button>
                 </form>
-                <form th:action="'/showreclaim/msgId=' + ${message.id} + '/reclaim=' + ${rid} + '/False'">
+                <form th:method="delete" th:action="'/showreclaim/reclaim=' + ${rid}">
+                <input name="msgId" type="hidden" th:value="${message.id}"/>
+                <input name="accept" type="hidden" th:value="false"/>
                     <button id="decline" class="myButton">Abweisen</button>
                 </form>
 

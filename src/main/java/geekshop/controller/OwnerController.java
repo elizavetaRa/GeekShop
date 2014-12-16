@@ -112,8 +112,8 @@ class OwnerController {
         }
     }
 
-    @RequestMapping("/showreclaim/msgId={msgid}/reclaim={rid}")
-    public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId) {
+    @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.POST)
+    public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId) {
 
         Set<ReclaimTupel> products = new HashSet<>();
         GSOrder order = orderRepo.findOne(reclaimId).get();
@@ -130,10 +130,10 @@ class OwnerController {
         return "showreclaim";
     }
 
-    @RequestMapping(value = "/showreclaim/msgId={msgid}/reclaim={rid}/{accept}")
-    public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @PathVariable("msgid") Long msgId, @PathVariable("accept") String accept) {
+    @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)
+    public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
-        if (accept.equals("True")) {
+        if (accept == true) {
             //ReaddItemstoStock
         }
 
