@@ -36,10 +36,10 @@
                         <th style="width:6em">Gesamt</th>
                     </tr>
                     <tr th:each="product : ${products}">
-                        <th th:utext="${product.getProduct().getName()}">Produkt</th>
-                        <th th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</th>
-                        <th th:utext="${product.getProduct().getStringPrice()}"></th>
-                        <th th:utext="${product.getOrderLine().getPrice().getAmount().toString()} + ' EUR'"></th>
+                        <td th:utext="${product.getProduct().getName()}">Produkt</td>
+                        <td th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</td>
+                        <td th:utext="${product.getProduct().getStringPrice()}"></td>
+                        <td th:utext="${product.getOrderLine().getPrice().getAmount().toString()} + ' EUR'"></td>
                     </tr>
 
 
