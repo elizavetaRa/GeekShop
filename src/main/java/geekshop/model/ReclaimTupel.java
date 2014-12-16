@@ -10,7 +10,6 @@ public class ReclaimTupel {
 
     private GSProduct product;
     private OrderLine orderLine;
-
     private ReclaimTupel(){}
 
     public ReclaimTupel (GSProduct product, OrderLine orderLine){
