@@ -66,19 +66,24 @@
                     </tfoot>
                 </table>
 
+                <form id="buyit" th:action="@{/checkout}" style="display: inline-block; float: left">
+
                 <label for="paymentMethod">Zahlmethode:</label><br/>
                 <select name="paymentMethod" id="paymentMethod" onchange="process_select(this,1)">
-                    <option value="Barzahlung">Bahrzahlung</option>
-                    <option value="Kreditkarte">Kreditkarte</option>
-                    <option value="Lastschriftverfahren">Lastschriftverfahren</option>
+                 <option th:each="pm: ${T(geekshop.model.Payment).values()}"
+                         th:value="${pm}" th:text="${pm.value}"
+                         th:selected="${pm == paymentMethod}"></option>
+                    <!-- <option value="Barzahlung">Bahrzahlung</option>
+                    -<option value="Kreditkarte">Kreditkarte</option>
+                     <option value="Lastschriftverfahren">Lastschriftverfahren</option>-->
                 </select> <br/><br/>
 
-                <div id="Barzahlung_1">Sie haben Die Zahlmethode Barzahlung gewählt</div>
 
+          <!--      <div id="Barzahlung_1">Sie haben Die Zahlmethode Barzahlung gewählt</div>-->
 
-                <div id="Kreditkarte_1" style="display:none">
-                    <div>Sie haben die Zahlmethode Kreditkarte gewählt.</div>
-                    <div><p>
+        <!--        <div id="Kreditkarte_1" style="display:none">
+                    <div>Sie haben die Zahlmethode Kreditkarte gewählt.</div>-->
+            <!--        <div><p>
                         <label for="cardname">Card name:</label><br/>
                         <input name="cardname" id="cardname" type="text" size="30" maxlength="30"
                                required="required"/>
@@ -141,14 +146,14 @@
                                    required="required"/>
                         </p>
 
-                    </div>
-                    <br/>
-                </div>
+                    </div>-->
+                   
 
 
-                <div id="Lastschriftverfahren_1" style="display:none">
-                    <div>Sie haben die Zahlmethode Lastschriftverfahren gewählt.</div>
-                    <div>
+
+            <!--    <div id="Lastschriftverfahren_1" style="display:none">
+                    <div>Sie haben die Zahlmethode Lastschriftverfahren gewählt.</div>-->
+                  <!--  <div>
 
                         <p>
                             <label for="accoutname">Account name:</label><br/>
@@ -199,19 +204,19 @@
                                    required="required"/>
                         </p>
 
-                    </div>
-                    <br/>
-                </div>
+                    </div>  -->
 
 
-                <form id="buyit" th:action="@{/checkout}" style="display: inline-block; float: left">
-                    <input type="submit" class="myButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerufsrecht.'); this.disabled=true;
-                    document.getElementById('printit').disabled=false;" style="margin-left: 1%"/>
+
+
+
+                    <input type="submit" class="myButton" value="kaufen" id="buy" onclick="alert('Gekauft! Sie haben 14 Tage Widerufsrecht.'); this.disabled=true;"
+                 style="margin-left: 1%"/>
                 </form>
-                <form id="printthis" style=" margin-left: 1%;">
+             <!--   <form id="printthis" style=" margin-left: 1%;">
                     <input type="button" id="printit" value="drucken"
                            onclick="window.print()" disabled="true" class="myButton"/>
-                </form>
+                </form>-->
 
 
             </div>

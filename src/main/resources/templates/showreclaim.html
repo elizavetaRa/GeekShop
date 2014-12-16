@@ -36,19 +36,23 @@
                         <th style="width:6em">Gesamt</th>
                     </tr>
                     <tr th:each="product : ${products}">
-                        <th th:utext="${product.getProduct().getName()}">Produkt</th>
-                        <th th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</th>
-                        <th th:utext="${product.getProduct().getStringPrice()}"></th>
-                        <th th:utext="${product.getOrderLine().getPrice().getAmount().toString()} + ' EUR'"></th>
+                        <td th:utext="${product.getProduct().getName()}">Produkt</td>
+                        <td th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</td>
+                        <td th:utext="${product.getProduct().getStringPrice()}"></td>
+                        <td th:utext="${product.getOrderLine().getPrice().getAmount().toString()} + ' EUR'"></td>
                     </tr>
 
 
                 </table>
 
-                <form th:action="'/showreclaim/msgId=' + ${message.id} + '/reclaim=' + ${rid} + '/True'">
+                <form th:method="delete" th:action="'/showreclaim/reclaim=' + ${rid}">
+                    <input name="msgId" type="hidden" th:value="${message.id}"/>
+                    <input name="accept" type="hidden" th:value="true"/>
                     <button id="accept" class="myButton">Genehmigen</button>
                 </form>
-                <form th:action="'/showreclaim/msgId=' + ${message.id} + '/reclaim=' + ${rid} + '/False'">
+                <form th:method="delete" th:action="'/showreclaim/reclaim=' + ${rid}">
+                <input name="msgId" type="hidden" th:value="${message.id}"/>
+                <input name="accept" type="hidden" th:value="false"/>
                     <button id="decline" class="myButton">Abweisen</button>
                 </form>
 

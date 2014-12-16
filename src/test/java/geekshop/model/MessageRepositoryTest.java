@@ -1,11 +1,10 @@
 package geekshop;
 
-import geekshop.model.Message;
-import geekshop.model.MessageKind;
-import geekshop.model.MessageRepository;
+import geekshop.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.salespointframework.order.OrderIdentifier;
+import org.salespointframework.useraccount.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,12 +31,16 @@ public class MessageRepositoryTest {
 
     @Autowired
     MessageRepository messageRepo;
+    @Autowired
+    UserRepository userRepo;
+    @Autowired
+    GSOrderRepository orderRepo;
 
     @Test
     public void createAndDeleteEnty() {
-        OrderIdentifier identifier = new OrderIdentifier();
+        GSOrder order = new GSOrder("test", userRepo.findAll().iterator().next().getUserAccount(), orderRepo.findByType(OrderType.RECLAIM).iterator().next());
         Message testNotification = new Message(MessageKind.NOTIFICATION, "Test");
-        Message testReclaim = new Message(MessageKind.RECLAIM, "Test", identifier);
+        Message testReclaim = new Message(MessageKind.RECLAIM, "Test", order);
         messageRepo.save(testNotification);
         messageRepo.save(testReclaim);
 
