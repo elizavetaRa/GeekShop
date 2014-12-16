@@ -165,6 +165,8 @@ class AccountController {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
+        user.setChangePw(false);
+
         changePassword(model, user, newPW, retypePW);
 
         messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
@@ -351,6 +353,9 @@ class AccountController {
             }
         }
 
+        for (User user : userRepo.findAll()){
+            user.setChangePw(true);
+        }
         return "redirect:/staff";
     }
     //endregion

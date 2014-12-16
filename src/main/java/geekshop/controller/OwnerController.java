@@ -53,7 +53,8 @@ class OwnerController {
     @Autowired
     public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
                            UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
-                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,SuperCategoryRepository superCategoryRepo) {
+                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,
+                           SuperCategoryRepository superCategoryRepo) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
@@ -62,8 +63,8 @@ class OwnerController {
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
-        this.subCategoryRepo=subCategoryRepo;
-        this.superCategoryRepo=superCategoryRepo;
+        this.subCategoryRepo = subCategoryRepo;
+        this.superCategoryRepo = superCategoryRepo;
     }
 
 
@@ -84,7 +85,7 @@ class OwnerController {
 
         for (GSOrder order : orderRepo.findAll()) {
 //            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
-                createProductOrder(map, order);
+            createProductOrder(map, order);
 //            }
         }
 

@@ -36,6 +36,7 @@ public class User {
     private String houseNr;
     private String postcode;
     private String place;
+    private Boolean changePw;
     @Enumerated(EnumType.STRING)
     private Gender gender;
     @Enumerated(EnumType.STRING)
@@ -68,6 +69,7 @@ public class User {
         this.houseNr = houseNr;
         this.postcode = postcode;
         this.place = place;
+        this.changePw = true;
 
         this.recentJokes = new LinkedList<Joke>();
         this.pwHasToBeChanged = false;
@@ -195,5 +197,13 @@ public class User {
 
     public String toString() {
         return userAccount.getFirstname() + " " + userAccount.getLastname();
+    }
+
+    public void setChangePw(Boolean changePw) {
+        this.changePw = changePw;
+    }
+
+    public Boolean getChangePw() {
+        return changePw;
     }
 }

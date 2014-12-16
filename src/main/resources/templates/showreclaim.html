@@ -39,7 +39,7 @@
                         <th th:utext="${product.getProduct().getName()}">Produkt</th>
                         <th th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</th>
                         <th th:utext="${product.getProduct().getStringPrice()}"></th>
-                        <th th:utext="${product.getProduct().getPrice().multipliedBy(product.getOrderLine().getQuantity().getAmount().longValue()).getAmount().toString()} + ' EUR'"></th>
+                        <th th:utext="${product.getOrderLine().getPrice().getAmount().toString()} + ' EUR'"></th>
                     </tr>
 
 
