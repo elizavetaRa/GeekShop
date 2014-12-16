@@ -40,6 +40,7 @@ public class Message {
     public Message(MessageKind messageKind, String messageText, OrderIdentifier reclaimId) {
         Assert.hasText(messageText, "messageText must not be null.");
         Assert.notNull(messageKind, "messageKind must not be null.");
+        Assert.notNull(reclaimId, "reclaimID must not be null.");
         this.messageKind = messageKind;
         this.messageText = messageText;
 

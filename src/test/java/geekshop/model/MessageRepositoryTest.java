@@ -5,10 +5,12 @@ import geekshop.model.MessageKind;
 import geekshop.model.MessageRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.salespointframework.order.OrderIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.persistence.criteria.Order;
 import javax.transaction.Transactional;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -33,22 +35,23 @@ public class MessageRepositoryTest {
 
     @Test
     public void createAndDeleteEnty() {
+        OrderIdentifier identifier = new OrderIdentifier();
         Message testNotification = new Message(MessageKind.NOTIFICATION, "Test");
-//        Message testReclaim = new Message(MessageKind.RECLAIM, "Test", "Reclaimlink");
+        Message testReclaim = new Message(MessageKind.RECLAIM, "Test", identifier);
         messageRepo.save(testNotification);
-//        messageRepo.save(testReclaim);
+        messageRepo.save(testReclaim);
 
         assertThat(messageRepo.findAll(), hasItem(testNotification));
-//        assertThat(messageRepo.findAll(), hasItem(testReclaim));
+        assertThat(messageRepo.findAll(), hasItem(testReclaim));
 
 
         Long notiId = testNotification.getId();
-//        Long reclId = testReclaim.getId();
+        Long reclId = testReclaim.getId();
         messageRepo.delete(notiId);
-//        messageRepo.delete(reclId);
+        messageRepo.delete(reclId);
 
         assertThat(messageRepo.findAll(), not(hasItem(testNotification)));
-//        assertThat(messageRepo.findAll(), not(hasItem(testReclaim)));
+        assertThat(messageRepo.findAll(), not(hasItem(testReclaim)));
 
     }
 
