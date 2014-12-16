@@ -16,6 +16,7 @@ import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
+import org.salespointframework.time.Interval;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,9 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Optional;
+import java.util.TimeZone;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.order.Cart}.
@@ -45,6 +48,8 @@ class CartController {
     private final Catalog<GSProduct> catalog;
     private final PasswordRules passwordRules;
     private final UserRepository userRepo;
+    private final GSOrderRepository orderRepo;
+
 
     /**
      * Creates a new {@link CartController} with the given {@link OrderManager}.
@@ -52,7 +57,7 @@ class CartController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, PasswordRulesRepository passRulesRepo, UserRepository userRepo) {
+    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, PasswordRulesRepository passRulesRepo, UserRepository userRepo, GSOrderRepository orderRepo) {
 
         Assert.notNull(orderManager, "OrderManager must not be null!");
         this.orderManager = orderManager;
@@ -61,6 +66,7 @@ class CartController {
         this.catalog = catalog;
         this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.userRepo = userRepo;
+        this.orderRepo= orderRepo;
     }
 
     /**
@@ -73,6 +79,7 @@ class CartController {
     public Cart initializeCart() {
         return new Cart();
     }
+
 
     @RequestMapping("/cart")
     public String cart(Model model, @LoggedIn Optional<UserAccount> userAccount) {
@@ -180,33 +187,36 @@ class CartController {
     }
 
 
- /*   @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
-   public PaymentMethod setPaymentMethod(@RequestParam("strpayment") String strPayment,
-     ) {
-        Payment payment= new() Payment;
-        String a=" ";
+    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
+    public PaymentMethod strToPaymentMethod(@RequestParam ("paymentMethod") String strPayment,
+                                            @RequestParam ("accountname") String accountName,
+                                            @RequestParam ("accountnumber")String accountNumber,
+                                            @RequestParam ("chequenumber") String chequeNumber,
+                                            @RequestParam ("payee") String payee,
+                                            @RequestParam ("bankname") String bankName,
+                                            @RequestParam ("bankaddress") String bankAddress,
+                                            @RequestParam ("bankid")String bankIdentificationNumber,
+                                            @RequestParam ("cardname")String cardName,
+                                            @RequestParam ("cardassociationname") String cardAssociationName,
+                                            @RequestParam ("cardnumber")String cardNumber,
+                                            @RequestParam ("nameoncard")String nameOnCard,
+                                            @RequestParam ("billingadress")String billingAddress,
+                                            @RequestParam ("cardverificationcode")String cardVerificationCode) {
         PaymentMethod paymentMethod;
-        LocalDateTime dateWritten = LocalDateTime.now();
-        LocalDateTime validFrom = LocalDateTime.parse("2013-12-18T14:30");  //später ändern
-        LocalDateTime expiryDate = LocalDateTime.parse("2020-12-18T14:30");  //später ändern
-        org.joda.money.Money dailyWithdrawalLimit = org.joda.money.Money.parse("1000");
-        org.joda.money.Money creditLimit = org.joda.money.Money.parse("1000");
+        LocalDateTime dateWritten= LocalDateTime.now();
+        LocalDateTime validFrom= LocalDateTime.parse("2013-12-18T14:30");  //später ändern
+        LocalDateTime expiryDate=LocalDateTime.parse("2020-12-18T14:30");  //später ändern
+        org.joda.money.Money dailyWithdrawalLimit=  org.joda.money.Money.parse("1000");
+        org.joda.money.Money creditLimit=  org.joda.money.Money.parse("1000");
 
-        if (strPayment.equals()) {
-            paymentMethod = new Cash();
-            return paymentMethod;
-        } else if (strPayment.equals("Lastshriftverfahren")) {
-            paymentMethod = new Cheque(accountName, accountNumber, chequeNumber, payee, dateWritten, bankName,
-                    bankAddress, bankIdentificationNumber);
-            return paymentMethod;
-        } else if (strPayment.equals("Kreditkarte")) {
-            paymentMethod = new CreditCard(cardName, cardAssociationName, cardNumber,
-                    nameOnCard, billingAddress, validFrom, expiryDate, cardVerificationCode, dailyWithdrawalLimit, creditLimit);
-            return paymentMethod;
-        }
+        if (strPayment.equals("Barzahlung")) {paymentMethod = new Cash(); return paymentMethod;}
+        else if (strPayment.equals("Lastshriftverfahren")) {paymentMethod = new Cheque(accountName, accountNumber, chequeNumber,payee, dateWritten, bankName,
+                bankAddress,bankIdentificationNumber); return paymentMethod;}
+        else if (strPayment.equals("Kreditkarte")) {paymentMethod= new CreditCard(cardName, cardAssociationName, cardNumber,
+                nameOnCard, billingAddress, validFrom, expiryDate, cardVerificationCode, dailyWithdrawalLimit, creditLimit); return paymentMethod;}
         return new Cash();
     }
-*/
+
 
 
 
@@ -219,7 +229,21 @@ class CartController {
      * @return
      */
 
- /*   public String buy(Model model, @ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount, Payment payment) {
+    @RequestMapping("/orderoverview")
+    public String orderoverview(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        if (user.pwHasToBeChanged())
+            return AccountController.adjustPW(model, user, passwordRules);
+
+        return "orderoverview";
+    }
+
+
+
+    @RequestMapping(value = "/buy", method = RequestMethod.POST)
+  public String buy(Model model, @ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount, String strPayment) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -227,40 +251,43 @@ class CartController {
             return AccountController.adjustPW(model, user, passwordRules);
 
 
-//                return userAccount.map(account -> {
-//
-//                    // (｡◕‿◕｡)
+               return userAccount.map(account -> {
+
+//                  // (｡◕‿◕｡)
 //                    // Mit commit wird der Warenkorb in die Order überführt, diese wird dann bezahlt und abgeschlossen.
 //                    // Orders können nur abgeschlossen werden, wenn diese vorher bezahlt wurden.
 
 
 
-   /*             GSOrder order = new GSOrder(userAccount.get(), setPaymetMethod(payment));
-
-                   cart.addItemsTo(order);
-
-
-                     LocalDateTime time= LocalDateTime.now();           //setting time of buying
-//                    order.setDatecreated(time);
-
-        LocalDateTime timeup= time.plusDays(14);
+           long orderNumber= Calendar.getInstance(TimeZone.getDefault()).getTime().getTime();
+           String strNumber= Long.toString(orderNumber);      //generating new orderIdentifier
 
 
-           Interval interval=new Interval(time, time);
-//
-//                    orderManager.payOrder(order);
-//                    //  orderManager.completeOrder(order);
-//                    orderManager.save(order);
+          // GSOrder order = new GSOrder( orderNumber, userAccount.get(), strToPaymentMethod(strPayment, ));
 
-//
-//                    cart.clear();
+      //     cart.addItemsTo(order);
 
-//
-//                    return "redirect:/";
-//                }).orElse("redirect:/cart");
+          // LocalDateTime time= LocalDateTime.now();           //setting time of buying
+         //  order.setDateCreated(time);
 
-        return "cart";
-    }  */
+       // LocalDateTime timeup= time.plusDays(14);
+
+
+        //  Interval interval=new Interval(time, time);
+
+  //                orderManager.payOrder(order);
+                 //  orderManager.completeOrder(order);
+   //                 orderManager.save(order);
+    //               orderRepo.save(order);
+
+
+                   cart.clear();
+
+                 return "orderoverview";
+               }).orElse("redirect:/cart");
+
+        //return "orderoverview";
+    }
 
 //        public void acceptReclaim(){
 //            //orderline.state='reclaimed';
