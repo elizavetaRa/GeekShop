@@ -1,6 +1,5 @@
 package geekshop.model;
 
-import org.salespointframework.order.OrderIdentifier;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -37,7 +36,7 @@ public class Message {
 
     }
 
-    public Message(MessageKind messageKind, String messageText, OrderIdentifier reclaimId) {
+    public Message(MessageKind messageKind, String messageText, GSOrder reclaimId) {
         Assert.hasText(messageText, "messageText must not be null.");
         Assert.notNull(messageKind, "messageKind must not be null.");
         Assert.notNull(reclaimId, "reclaimID must not be null.");
@@ -45,7 +44,7 @@ public class Message {
         this.messageText = messageText;
 
         if (messageKind == MessageKind.RECLAIM) {
-            this.reclaimId = reclaimId.toString();
+            this.reclaimId = reclaimId.getIdentifier().toString();
         } else {
             this.reclaimId = null;
         }

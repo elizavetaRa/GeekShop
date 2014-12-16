@@ -337,7 +337,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (messageRepo.count() > 0)
             return;
 
-        OrderIdentifier order = orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().next().getId();
+        GSOrder order = orderRepo.findByType(OrderType.RECLAIM).iterator().next();
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
         messageRepo.save(new Message(MessageKind.RECLAIM, "Testreclaim (noch Weiterleitung auf catalog)", order));
     }
