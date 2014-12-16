@@ -16,19 +16,18 @@
     <div th:replace="header :: #header"></div>
 
     <!-- Navigation -->
-    <div th:replace="navigation :: nav ('inventory')"></div>
+    <div th:replace="navigation :: nav ('range')"></div>
 
     <div id="cols" class="box">
 
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Bisherige Verkäufe</h3>
+            <h3 id="content-title">Sortimentverwaltung</h3>
 
             <div id="content-in">
 
                 <table class="table-style01">
-                    <thead>
                     <tr>
                         <th style="width:3em">Kategorie</th>
                         <th>Unterkategorie</th>
@@ -36,73 +35,83 @@
                         <th style="width:8em">Bestand</th>
                         <th style="width:8em">Preis</th>
                         <th style="width:12em"></th>
-
                     </tr>
-                    <tbody>
+
                     <tr class="highlight">
-                        <td class="t-left" colspan="5">Kleidung</td>       //Kategorie
+                        <td class="t-left" colspan="5">Kleidung</td>
+                        <!--Kategorie-->
 
-                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
+                        <td>
+                            <button class="MyButton">bearbeiten</button>
+                            <button class="MyButton">löschen</button>
+                        </td>
                     </tr>
 
-                    <tr>                      //Unterkategorie
+                    <tr>                      <!--Unterkategorie-->
                         <td></td>
-                        <td   bgcolor="#E5F4FA"class="t-left" colspan="4" >T-Shirts</td>
-                        <td bgcolor="#E5F4FA"><button class="MyButton" >bearbeiten</button> <button class="MyButton">löschen</button></td>
-
-
+                        <td bgcolor="#E5F4FA" class="t-left" colspan="4">T-Shirts</td>
+                        <td bgcolor="#E5F4FA">
+                            <button class="MyButton">bearbeiten</button>
+                            <button class="MyButton">löschen</button>
+                        </td>
                     </tr>
-                    <tr>                               //Produkt
+
+                    <tr>                               <!--Produkt-->
                         <td colspan="2"></td>
                         <td>Grünes T-Shirt</td>
                         <td>100</td>
                         <td>10€</td>
-                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
-
+                        <td>
+                            <button class="MyButton">bearbeiten</button>
+                            <button class="MyButton">löschen</button>
+                        </td>
                     </tr>
+
                     <tr>
                         <td colspan="2"></td>
                         <td>ROtes T-Shirt</td>
                         <td>100</td>
                         <td>10€</td>
-                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
-
+                        <td>
+                            <button class="MyButton">bearbeiten</button>
+                            <button class="MyButton">löschen</button>
+                        </td>
                     </tr>
+
                     <tr>
                         <td colspan="2"></td>
                         <td>Schwarzes T-Shirt</td>
                         <td>100</td>
                         <td>10€</td>
-                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
-
+                        <td>
+                            <button class="MyButton">bearbeiten</button>
+                            <button class="MyButton">löschen</button>
+                        </td>
                     </tr>
 
-                    <tr>                      //Unterkategorie
+                    <tr>                      <!--Unterkategorie-->
                         <td></td>
-                        <td   bgcolor="#E5F4FA"class="t-left" colspan="4" >Pullis</td>
-                        <td bgcolor="#E5F4FA"><button class="MyButton" >bearbeiten</button> <button class="MyButton">löschen</button></td>
-
-
+                        <td bgcolor="#E5F4FA" class="t-left" colspan="4">Pullis</td>
+                        <td bgcolor="#E5F4FA">
+                            <button class="MyButton">bearbeiten</button>
+                            <button class="MyButton">löschen</button>
+                        </td>
                     </tr>
-                    <tr>                               //Produkt
+
+                    <tr>                               <!--Produkt-->
                         <td colspan="2"></td>
                         <td>warmer Pulli</td>
                         <td>100</td>
                         <td>10€</td>
-                        <td><button class="MyButton">bearbeiten</button> <button class="MyButton">löschen</button></td>
+                        <td>
+                            <button class="MyButton">bearbeiten</button>
+                            <button class="MyButton">löschen</button>
+                        </td>
 
                     </tr>
-
-
-
-
-                    </tbody>
-
-
-
                 </table>
 
-                <button id="exportXml" class="myButton">Als XML exportieren</button>
+                <!--<button id="exportXml" class="myButton">Als XML exportieren</button>-->
 
             </div>
 
