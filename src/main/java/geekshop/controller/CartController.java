@@ -16,13 +16,11 @@ import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
-import org.salespointframework.time.Interval;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,24 +80,12 @@ class CartController {
 
 
     @RequestMapping("/cart")
-    public String cart(Model model, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+    public String cart() {
         return "cart";
     }
 
     @RequestMapping("/reclaim")
-    public String reclaim(Model model, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+    public String reclaim() {
         return "reclaim";
     }
 
@@ -116,14 +102,7 @@ class CartController {
      */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart,
-                                   Model model, @LoggedIn Optional<UserAccount> userAccount) {
-
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart) {
 
         if (number <= 0) {
             number = 1;
@@ -140,49 +119,25 @@ class CartController {
 
 
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
-    public String deleteAll(Model model, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+    public String deleteAll(@ModelAttribute Cart cart) {
         cart.clear();
         return "redirect:/cart";
     }
 
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart) {
         cart.removeItem(identifier);
         return "redirect:/cart";
     }
 
 
     @RequestMapping(value = "/cart", method = RequestMethod.GET)
-    public String basket(Model model, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+    public String basket() {
         return "cart";
     }
 
     @RequestMapping("/checkout")
-    public String checkout(Model model, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+    public String checkout() {
         return "checkout";
     }
 
@@ -230,26 +185,14 @@ class CartController {
      */
 
     @RequestMapping("/orderoverview")
-    public String orderoverview(Model model, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+    public String orderoverview() {
         return "orderoverview";
     }
 
 
 
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
-  public String buy(Model model, @ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount, String strPayment) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
-
+  public String buy(@ModelAttribute Cart cart, @LoggedIn final Optional<UserAccount> userAccount) {
 
                return userAccount.map(account -> {
 

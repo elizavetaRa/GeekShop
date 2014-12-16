@@ -2,8 +2,6 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
-import org.salespointframework.useraccount.UserAccount;
-import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -11,10 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.catalog.Catalog}.
@@ -64,12 +62,7 @@ class CatalogController {
      */
 
     @RequestMapping("/productsearch/{subCategory}")
-    public String catgory(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
+    public String catgory(Model model, @PathVariable("subCategory") String subCategory) {
 
         model.addAttribute("catalog", subRepo.findByName(subCategory).getProducts());
         model.addAttribute("superCategories", supRepo.findAll());
@@ -82,12 +75,7 @@ class CatalogController {
      */
 
     @RequestMapping("/productsearch")
-    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return AccountController.adjustPW(model, user, passwordRules);
+    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm) {
 
         if (searchTerm == null) {
             model.addAttribute("catalog", catalog.findAll());

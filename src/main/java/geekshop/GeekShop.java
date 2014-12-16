@@ -59,7 +59,7 @@ public class GeekShop {
             http.csrf().disable();
 
             http.authorizeRequests().antMatchers("/**").permitAll().and().
-                    formLogin().loginPage("/login").loginProcessingUrl("/login").and().
+                    formLogin().loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/", true).and().
                     logout()/*.logoutUrl("/logout").logoutSuccessUrl("/")*/;
         }
     }

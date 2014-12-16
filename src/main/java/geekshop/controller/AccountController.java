@@ -67,15 +67,21 @@ class AccountController {
     //region Login/Logout
 
     /**
-     * Shows the start page with the welome joke.
+     * Shows the start page with the welome joke or, if the user's password does not match the current password rules, redirects to the respective page demanding the user to change the password according to the current password rules.
      */
     @RequestMapping({"/", "/index"})
     public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
-        if (user.pwHasToBeChanged())
-            return adjustPW(model, user, passwordRules);
+        if (!passwordRules.isValidPassword(user.getPasswordAttributes())) {
+            if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
+                messageRepo.save(new Message(MessageKind.NOTIFICATION, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
+            } else {
+                model.addAttribute("passwordRules", passwordRules);
+                return "adjustpw";
+            }
+        }
 
         String sessionId = user.getCurrentSessionId();
         List<Joke> recentJokes = user.getRecentJokes();
@@ -116,33 +122,6 @@ class AccountController {
             joke = allJokes.get(random);
         }
         return joke;
-    }
-
-    /**
-     * Redirects to logout template and beforehand sends a {@link Message} to the shop owner if the password does not match the current password rules.
-     */
-    @RequestMapping("/logoff")
-    public String logout(@LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (userAccount.get().hasRole(new Role("ROLE_OWNER")) && !passwordRules.isValidPassword(user.getPasswordAttributes())) {
-            messageRepo.save(new Message(MessageKind.NOTIFICATION, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
-        }
-
-        return "redirect:/logout";
-    }
-
-    /**
-     * In case of invalid password of the user logging in, this method is called from within a mapping method.
-     *
-     * @return the template demanding the user to change the password according to the current password rules.
-     */
-    public static String adjustPW(Model model, User user, PasswordRules passwordRules) {
-
-        model.addAttribute("passwordRules", passwordRules);
-
-        return "adjustpw";
     }
 
     /**
@@ -322,9 +301,6 @@ class AccountController {
 
     /**
      * Saves the changed password rules and marks all users whose password does not match the new rules.
-     *
-     * @param map
-     * @return
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/setrules", method = RequestMethod.POST)
@@ -344,13 +320,6 @@ class AccountController {
         passwordRules.setMinLength(minLength);
         passRulesRepo.save(passwordRules);
 
-        for (User user : userRepo.findAll()) {
-            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER")) && !passwordRules.isValidPassword(user.getPasswordAttributes())) {
-                user.setPwHasToBeChanged(true);
-                userRepo.save(user);
-            }
-        }
-
         return "redirect:/staff";
     }
     //endregion
@@ -365,11 +334,7 @@ class AccountController {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
-        if (user.pwHasToBeChanged())
-            return adjustPW(model, user, passwordRules);
-
         model.addAttribute("user", user);
-
         model.addAttribute("isOwnProfile", true);
         model.addAttribute("inEditingMode", false);
 
@@ -383,9 +348,6 @@ class AccountController {
     public String profileChange(Model model, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return adjustPW(model, user, passwordRules);
 
         if (page.equals("changedata")) {
             model.addAttribute("user", user);
@@ -409,16 +371,11 @@ class AccountController {
      * Saves the new user data changed by the shop owner or by the user himself. If the user changed his data, a message will be sent to the shop owner.
      */
     @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
-    public String changedData(Model model, @RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
-
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return adjustPW(model, user, passwordRules);
+    public String changedData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
 
         String uai = formData.get("uai");
         UserAccount ua = uam.findByUsername(uai).get();
-        user = userRepo.findByUserAccount(ua);
+        User user = userRepo.findByUserAccount(ua);
 
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
@@ -450,9 +407,6 @@ class AccountController {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
-        if (user.pwHasToBeChanged())
-            return adjustPW(model, user, passwordRules);
-
         if (oldPW.trim().isEmpty()) {
             System.out.println("Passwort ist leer!");
             model.addAttribute("error", "Passwort ist leer!");
@@ -474,13 +428,8 @@ class AccountController {
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
     public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
 
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (user.pwHasToBeChanged())
-            return adjustPW(model, user, passwordRules);
-
         UserAccount ua = uam.get(uai).get();
-        user = userRepo.findByUserAccount(ua);
+        User user = userRepo.findByUserAccount(ua);
 
         changePassword(model, user, newPW, retypePW);
 
