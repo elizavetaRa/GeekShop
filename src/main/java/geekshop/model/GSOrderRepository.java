@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by Basti on 09.12.2014.
- */
-
 import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.core.SalespointRepository;
 import org.salespointframework.order.OrderIdentifier;

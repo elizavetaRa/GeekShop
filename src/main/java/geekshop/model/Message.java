@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by h4llow3En on 05/12/14.
- */
-
 import org.salespointframework.order.OrderIdentifier;
 import org.springframework.util.Assert;
 

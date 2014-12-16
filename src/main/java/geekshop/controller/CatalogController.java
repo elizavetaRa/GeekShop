@@ -1,9 +1,5 @@
 package geekshop.controller;
 
-/*
- * Created by Basti on 20.11.2014.
- */
-
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.useraccount.UserAccount;
@@ -125,24 +121,23 @@ class CatalogController {
         Iterable<GSProduct> allProducts = catalog.findAll();
         List<GSProduct> foundProducts = new LinkedList<GSProduct>();
         for (GSProduct product : allProducts) {
-            if(product.getName().contains(searchTerm)) {
+            if (product.getName().contains(searchTerm)) {
                 foundProducts.add(product);
             }
         }
         return foundProducts;
     }
 
-    private List<GSProduct> searchForProductID (String searchTerm) {
+    private List<GSProduct> searchForProductID(String searchTerm) {
         Iterable<GSProduct> allProducts = catalog.findAll();
         List<GSProduct> foundProducts = new LinkedList<GSProduct>();
         for (GSProduct product : allProducts) {
-            if(product.productNumberToString(product.getProductNumber()).contains(searchTerm)) {
+            if (product.productNumberToString(product.getProductNumber()).contains(searchTerm)) {
                 foundProducts.add(product);
             }
         }
         return foundProducts;
     }
-
 
 
 }

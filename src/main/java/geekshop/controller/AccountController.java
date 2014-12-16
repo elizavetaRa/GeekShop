@@ -1,9 +1,5 @@
 package geekshop.controller;
 
-/*
- * Created by h4llow3En on 17/11/14.
- */
-
 import geekshop.model.*;
 import org.salespointframework.useraccount.*;
 import org.salespointframework.useraccount.web.LoggedIn;
@@ -176,6 +172,7 @@ class AccountController {
     //endregion
 
     //region Staff (owner functions)
+
     /**
      * Shows the overview of all employees.
      */
@@ -206,6 +203,7 @@ class AccountController {
 
     /**
      * Shows the form for adding a new employee.
+     *
      * @param model
      * @return
      */
@@ -259,7 +257,7 @@ class AccountController {
     }
 
     /**
-     *  Dismisses all employees.
+     * Dismisses all employees.
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/firestaff", method = RequestMethod.DELETE)
@@ -311,6 +309,7 @@ class AccountController {
     //endregion
 
     //region Setting PasswordRules (owner functions)
+
     /**
      * Shows the form for changing the password safety rules.
      */
@@ -325,6 +324,7 @@ class AccountController {
 
     /**
      * Saves the changed password rules and marks all users whose password does not match the new rules.
+     *
      * @param map
      * @return
      */
@@ -353,7 +353,7 @@ class AccountController {
             }
         }
 
-        for (User user : userRepo.findAll()){
+        for (User user : userRepo.findAll()) {
             user.setChangePw(true);
         }
         return "redirect:/staff";
@@ -361,6 +361,7 @@ class AccountController {
     //endregion
 
     //region Profile
+
     /**
      * Shows the user's profile page.
      */

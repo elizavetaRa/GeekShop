@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by Lisa on 30.11.2014.
- */
-
 import org.salespointframework.catalog.Product;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Quantity;

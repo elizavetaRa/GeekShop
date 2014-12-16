@@ -1,9 +1,5 @@
 package geekshop.controller;
 
-/*
- * Created by Basti on 20.11.2014.
- */
-
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.order.OrderIdentifier;

@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by Basti on 24.11.2014.
- */
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

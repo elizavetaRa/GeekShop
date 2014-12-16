@@ -1,9 +1,5 @@
 package geekshop.model;
 
-/*
- * Created by Created by Basti on 07.12.2014.
- */
-
 import org.salespointframework.core.SalespointRepository;
 
 /**

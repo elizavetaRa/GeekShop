@@ -3,9 +3,6 @@ package geekshop.model;
 import org.salespointframework.order.OrderLine;
 import org.springframework.util.Assert;
 
-/**
- * Created by h4llow3En on 15/12/14.
- */
 public class ReclaimTupel {
 
     private GSProduct product;
