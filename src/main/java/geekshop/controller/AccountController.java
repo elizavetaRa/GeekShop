@@ -433,6 +433,8 @@ class AccountController {
 
         changePassword(model, user, newPW, retypePW);
 
+        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Neues Passwort von Nutzer " + user + ": " + newPW));
+
         return "redirect:/staff/" + uai.toString();
     }
 
@@ -469,7 +471,6 @@ class AccountController {
         pwAttributes.setHasDigits(PasswordRules.containsDigits(newPW));
         pwAttributes.setHasSpecialCharacters(PasswordRules.containsSpecialCharacters(newPW));
         pwAttributes.setLength(newPW.length());
-        user.setPwHasToBeChanged(false);
         userRepo.save(user);
 
         return true;
