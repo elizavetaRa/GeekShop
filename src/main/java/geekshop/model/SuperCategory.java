@@ -4,8 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class representing a {@link SuperCategory} which contains {@link SubCategory}s.
@@ -22,7 +22,7 @@ public class SuperCategory {
 
     private String name;
     @OneToMany
-    private Set<SubCategory> subCategories;
+    private List<SubCategory> subCategories;
 
     @Deprecated
     protected SuperCategory() {
@@ -30,18 +30,22 @@ public class SuperCategory {
 
     public SuperCategory(String name) {
         this.name = name;
-        this.subCategories = new HashSet<SubCategory>();
+        this.subCategories = new LinkedList<SubCategory>();
     }
 
     public String getName() {
         return name;
     }
 
-    public Set<SubCategory> getSubCategories() {
+    public List<SubCategory> getSubCategories() {
         return subCategories;
     }
 
     public boolean addSubCategory(SubCategory subCategory) {
         return subCategories.add(subCategory);
+    }
+
+    public Long getId() {
+        return id;
     }
 }

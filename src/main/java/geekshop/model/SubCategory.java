@@ -1,8 +1,8 @@
 package geekshop.model;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class representing a {@link SubCategory} which contains {@link org.salespointframework.catalog.Product}s.
@@ -21,7 +21,7 @@ public class SubCategory {
     @ManyToOne
     private SuperCategory superCategory;
     @OneToMany
-    private Set<GSProduct> products;
+    private List<GSProduct> products;
 
     @Deprecated
     protected SubCategory() {
@@ -30,7 +30,7 @@ public class SubCategory {
     public SubCategory(String name, SuperCategory supc) {
         this.name = name;
         this.superCategory = supc;
-        this.products = new HashSet<GSProduct>();
+        this.products = new LinkedList<GSProduct>();
     }
 
     public String getName() {
@@ -41,11 +41,15 @@ public class SubCategory {
         return superCategory;
     }
 
-    public Set<GSProduct> getProducts() {
+    public List<GSProduct> getProducts() {
         return products;
     }
 
     public boolean addProduct(GSProduct product) {
         return products.add(product);
+    }
+
+    public Long getId() {
+        return id;
     }
 }

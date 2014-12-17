@@ -2,6 +2,7 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
@@ -232,5 +233,68 @@ class OwnerController {
         model.addAttribute("supercategories", superCategoryRepo.findAll());
         return "range";
     }
+
+    @RequestMapping(value = "/range/delsuper", method = RequestMethod.DELETE)
+    public String delSuper(@RequestParam("superName") String superName){
+
+        SuperCategory superCategory = superCategoryRepo.findByName(superName);
+
+        List<SubCategory> sub = superCategory.getSubCategories();
+
+        int i = 0;
+
+        while (!sub.isEmpty()){
+
+            delSub(sub.remove(i));
+
+        }
+
+        superCategoryRepo.delete(superCategory.getId());
+        return "redirect:/range";
+    }
+
+    @RequestMapping(value = "/range/delsub", method = RequestMethod.DELETE)
+    public String delSubRequest(@RequestParam("subName") String subName){
+
+        SubCategory subCategory = subCategoryRepo.findByName(subName);
+
+        SuperCategory superCategory = subCategory.getSuperCategory();
+
+        superCategory.getSubCategories().remove(subCategory);
+
+
+        delSub(subCategory);
+
+
+        return "redirect:/range";
+    }
+
+    @RequestMapping(value = "/range/delproduct", method = RequestMethod.DELETE)
+    public String delProductRequest(@RequestParam("productIdent") ProductIdentifier productIdentifier){
+        GSProduct product = catalog.findOne(productIdentifier).get();
+        product.getSubCategory().getProducts().remove(product.getSubCategory().getProducts().indexOf(product));
+        delProduct(productIdentifier);
+
+        return "redirect:/range";
+    }
+
+    public void delSub(SubCategory subCategory){
+        for (GSProduct product : subCategory.getProducts()){
+            ProductIdentifier productIdentifier = product.getIdentifier();
+            delProduct(productIdentifier);
+        }
+        Long id = subCategory.getId();
+        subCategoryRepo.delete(id);
+
+    }
+
+    public void delProduct(ProductIdentifier productIdentifier){
+        GSProduct product = catalog.findOne(productIdentifier).get();
+        product.setInRange(false);
+        product.setSubCategory(null);
+    }
+
+
+
 
 }
