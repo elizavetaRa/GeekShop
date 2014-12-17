@@ -241,7 +241,7 @@ class AccountController {
     public String fireAll() {
         Iterable<User> allEmployees = userRepo.findAll();
         for (User user : allEmployees) {
-            if (user.getUserAccount().hasRole(new Role("ROLE_OWNER")))
+            if (user.getUserAccount().hasRole(new Role("ROLE_OWNER")) && user.getUserAccount().isEnabled())
                 continue;
             dismiss(user);
         }
@@ -481,7 +481,7 @@ class AccountController {
      */
     private void dismiss(User user) {
         UserAccount userAccount = user.getUserAccount();
-        userRepo.delete(user);
+//        userRepo.delete(user);
         userAccount.remove(new Role("ROLE_EMPLOYEE"));
         uam.save(userAccount);
         uam.disable(userAccount.getIdentifier());
@@ -495,7 +495,7 @@ class AccountController {
         Iterable<User> allUsers = userRepo.findAll();
         List<User> employees = new LinkedList<User>();
         for (User user : allUsers) {
-            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER"))) {
+            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER")) && user.getUserAccount().isEnabled()) {
                 employees.add(user);
             }
         }
