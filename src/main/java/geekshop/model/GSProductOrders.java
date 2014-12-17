@@ -1,7 +1,9 @@
 package geekshop.model;
 
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.salespointframework.quantity.Quantity;
+import org.salespointframework.quantity.Units;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -21,6 +23,8 @@ public class GSProductOrders {
 
 
     public GSProductOrders() {
+        this.totalPrice = Money.zero(CurrencyUnit.EUR);
+        this.totalQuantity = Units.ZERO;
         this.productOrders = new LinkedList<GSProductOrder>();
     }
 
@@ -52,18 +56,14 @@ public class GSProductOrders {
         if (ol.getType() == OrderType.RECLAIM)
             amount = amount.multiply(BigDecimal.valueOf(-1));
 
-        totalQuantity = new Quantity(
-                totalQuantity == null ? amount : totalQuantity.getAmount().add(amount),
+        totalQuantity = new Quantity(totalQuantity.getAmount().add(amount),
                 ol.getQuantity().getMetric(), ol.getQuantity().getRoundingStrategy());
 
         Money price = ol.getPrice();
         if (ol.getType() == OrderType.RECLAIM)
             price = price.multipliedBy(-1);
 
-        if (totalPrice == null) {
-            totalPrice = price;
-        } else {
-            totalPrice = Money.total(totalPrice, price);
-        }
+
+        totalPrice = Money.total(totalPrice, price);
     }
 }

@@ -38,8 +38,8 @@
                     <tr th:each="product : ${products}">
                         <td th:utext="${product.getProduct().getName()}">Produkt</td>
                         <td th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</td>
-                        <td th:utext="${product.getProduct().getStringPrice()}"></td>
-                        <td th:utext="${product.getOrderLine().getPrice().getAmount().toString()} + ' EUR'"></td>
+                        <td th:utext="${T(geekshop.model.GSProduct).moneyToString(product.getProduct().price)}"></td>
+                        <td th:utext="${T(geekshop.model.GSProduct).moneyToString(product.getOrderLine().price)}"></td>
                     </tr>
 
 

@@ -48,7 +48,7 @@
                             <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
                             <td><input type="number" name="number" th:value="${cartitem.quantity.amount}" min="1"
                                        max=""/></td>
-                            <td th:text="${cartitem.price}">209,19 EUR</td>
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.price)}">209,19 EUR</td>
                             <td>
 
 
@@ -66,7 +66,7 @@
                         <tfoot>
                         <tr>
                             <td colspan="3" class="t-right">Summe Warenkorb:</td>
-                            <td th:text="${cart.price}">269,47 EUR</td>
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</td>
                         </tr>
                         </tfoot>
                     </table>

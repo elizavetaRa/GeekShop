@@ -1,6 +1,8 @@
 package geekshop.model;
 
 import org.joda.money.Money;
+import org.joda.money.format.MoneyFormatter;
+import org.joda.money.format.MoneyFormatterBuilder;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.quantity.Units;
 import org.springframework.util.Assert;
@@ -67,5 +69,10 @@ public class GSProduct extends Product{
 
     public void setInRange(Boolean inRange) {
         this.inRange = inRange;
+    }
+
+    public static String moneyToString(Money money) {
+        MoneyFormatter moneyFormatter = new MoneyFormatterBuilder().appendAmountLocalized().appendLiteral(" ").appendCurrencySymbolLocalized().toFormatter();
+        return moneyFormatter.print(money);
     }
 }

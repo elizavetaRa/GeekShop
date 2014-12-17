@@ -90,7 +90,7 @@
                                 <td th:text="${product.name}">Digitalkamera</td>
                                 <td th:text="${product.productNumber}">12345678</td>
                                 <td><input type="number" name="number" value="1" min="1" max="5"/></td>
-                                <td class="sorter:'currency'" th:text="${product.price}">123 €</td>
+                                <td class="sorter:'currency'" th:text="${T(geekshop.model.GSProduct).moneyToString(product.price)}">123 €</td>
                                 <td>
                                     <input type="hidden" name="pid" th:value="${product.identifier}"/>
                                     <button id="tocart" name="tocart" type="submit">+</button>
