@@ -92,7 +92,7 @@ class CatalogController {
         if (searchTerm == null) {
             model.addAttribute("catalog", catalog.findAll());
         } else
-            model.addAttribute("catalog", search(searchTerm));
+            model.addAttribute("catalog", sortByName(search(searchTerm), "asf"));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
         return "productsearch";
@@ -113,6 +113,24 @@ class CatalogController {
 
         }
         return foundProducts;
+    }
+
+    private Set<GSProduct> sortByName(Set<GSProduct> foundProducts, String direction) {
+        List<String> toSort = new ArrayList<>();
+        Set<GSProduct> sortedProducts = new HashSet<GSProduct>();
+        for (GSProduct product : foundProducts) {
+            toSort.add(product.getName());
+        }
+        if (direction.equals("ascending"))
+            Collections.sort(toSort);
+        else {
+            Collections.sort(toSort);
+            Collections.reverse(toSort);
+        }
+        for (String sorted : toSort) {
+            sortedProducts.add(catalog.findByName(sorted).iterator().next());
+        }
+        return sortedProducts;
     }
 
 }
