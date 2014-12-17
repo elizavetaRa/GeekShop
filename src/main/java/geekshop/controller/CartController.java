@@ -91,13 +91,7 @@ class CartController {
         return "cart";
     }
 
-    @RequestMapping("/reclaim")
-    public String reclaim(@LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
 
-        return "reclaim";
-    }
 
     /**
      * Adds a {@link Product} to the {@link Cart}. Note how the type of the parameter taking the request parameter
