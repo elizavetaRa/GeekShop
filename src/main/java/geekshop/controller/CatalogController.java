@@ -1,9 +1,6 @@
 package geekshop.controller;
 
-import geekshop.model.GSProduct;
-import geekshop.model.SubCategoryRepository;
-import geekshop.model.SuperCategoryRepository;
-import geekshop.model.UserRepository;
+import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -78,7 +75,7 @@ class CatalogController {
      */
 
     @RequestMapping("/productsearch")
-    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm, @RequestParam(value = "sorting", required = false) String sorting, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
