@@ -168,3 +168,19 @@ dl#news dd span.date {padding-right:10px; background:url("../images/date.gif") 1
  */
 #joke{position: absolute; width: 899px; height: 504px; top: 8%; background:url("../images/joke.gif");
     background-size:70%; border-radius: 12px; color: black;  text-align: center; padding-right: 10px; padding-left:10px;}
+
+/*
+ * Message counter
+ */
+#cntMessages {position: absolute;
+    font-weight: normal;
+    display: block;
+    top: 3px;
+    right: 3px;
+    background: #a00;
+    color: white;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    line-height: 15px;
+    font-size: 80%;}

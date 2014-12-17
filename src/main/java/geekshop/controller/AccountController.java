@@ -67,9 +67,17 @@ class AccountController {
      * Shows the start page with the welome joke or, if the user's password does not match the current password rules, redirects to the respective page demanding the user to change the password according to the current password rules.
      */
     @RequestMapping({"/", "/index"})
-    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
+    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession session) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
+
+        // add user for full name in header to the session
+        session.setAttribute("user", user);
+
+        // add message repository to the session to display current number of messages
+        session.setAttribute("msgRepo", messageRepo);
+
+        // check whether user's password matches the current password rules
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
 
         if (!passwordRules.isValidPassword(user.getPasswordAttributes())) {
@@ -86,10 +94,11 @@ class AccountController {
             userRepo.save(user);
         }
 
+        // arrange new welcome joke
         String sessionId = user.getCurrentSessionId();
         List<Joke> recentJokes = user.getRecentJokes();
 
-        if (httpSession.getId().equals(sessionId)) {
+        if (session.getId().equals(sessionId)) {
             model.addAttribute("joke", user.getLastJoke());
         } else {
             Joke joke = getRandomJoke(recentJokes);
@@ -97,7 +106,7 @@ class AccountController {
             if (joke != null)
                 user.addJoke(joke);
 
-            user.setCurrentSessionId(httpSession.getId());
+            user.setCurrentSessionId(session.getId());
             userRepo.save(user);
 
             model.addAttribute("joke", joke);

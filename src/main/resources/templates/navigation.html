@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Geek-Shop Think NERD</title>
     <link th:replace="header :: main-css"/>
     <link th:replace="header :: scheme-css"/>
@@ -10,30 +10,53 @@
 
 <body>
 
-    <!-- Navigation -->
-    <div th:fragment="nav (page)" id="nav">
+<!-- Navigation -->
+<div th:fragment="nav (page)" id="nav">
 
-        <ul class="box">
-            <!--<li id="nav-active"><a>Begrüßung</a></li>-->
-            <li th:attr="class=(${page == 'productsearch'} ? 'nav-active' : null)" style="width:14%"><a th:href="@{/productsearch}">Artikelsuche</a></li>
-            <li th:attr="class=(${page == 'reclaim'} ? 'nav-active' : null)" style="width:14%"><a th:href="@{/reclaim}">Reklamation</a></li>
-            <li th:attr="class=(${page == 'cart'} ? 'nav-active' : null)" style="width:14%"><a th:href="@{/cart}">Warenkorb</a></li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'orders' || page == 'range' || page == 'staff' || page == 'jokes'} ? 'nav-active' : null)" style="width:14%">
-                <a href="#">Verwaltung</a>
-                <ul>
-                    <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'orders'} ? 'nav-active' : null)"><a th:href="@{/orders}">Verkäufe</a></li>
-                    <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'range'} ? 'nav-active' : null)"><a th:href="@{/range}">Sortiment</a></li>
-                    <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'staff'} ? 'nav-active' : null)"><a th:href="@{/staff}">Personal</a></li>
-                    <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'jokes'} ? 'nav-active' : null)"><a th:href="@{/jokes}">Witze</a></li>
-                </ul>
-            </li>
-            <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'messages'} ? 'nav-active' : null)" style="width:20%"><a th:href="@{/messages}">Benachrichtigungen</a></li>
-            <li th:attr="class=(${page == 'profile'} ? 'nav-active' : null)" style="width:13%"><a th:href="@{/profile}">Mein Profil</a></li>
-            <li style="width:11%"><a th:href="@{/logout}">Logout</a></li>
-        </ul>
+    <ul class="box">
+        <!--<li id="nav-active"><a>Begrüßung</a></li>-->
+        <li th:attr="class=(${page == 'productsearch'} ? 'nav-active' : null)" style="width:14%">
+            <a th:href="@{/productsearch}">Artikelsuche</a>
+        </li>
+        <li th:attr="class=(${page == 'reclaim'} ? 'nav-active' : null)" style="width:14%">
+            <a th:href="@{/reclaim}">Reklamation</a>
+        </li>
+        <li th:attr="class=(${page == 'cart'} ? 'nav-active' : null)" style="width:14%">
+            <a th:href="@{/cart}">Warenkorb</a>
+        </li>
+        <li sec:authorize="hasRole('ROLE_OWNER')" style="width:14%"
+            th:attr="class=(${page == 'orders' || page == 'range' || page == 'staff' || page == 'jokes'} ? 'nav-active' : null)">
+            <a href="#">Verwaltung</a>
+            <ul>
+                <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'orders'} ? 'nav-active' : null)">
+                    <a th:href="@{/orders}">Verkäufe</a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'range'} ? 'nav-active' : null)">
+                    <a th:href="@{/range}">Sortiment</a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'staff'} ? 'nav-active' : null)">
+                    <a th:href="@{/staff}">Personal</a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'jokes'} ? 'nav-active' : null)">
+                    <a th:href="@{/jokes}">Witze</a>
+                </li>
+            </ul>
+        </li>
+        <li sec:authorize="hasRole('ROLE_OWNER')" th:attr="class=(${page == 'messages'} ? 'nav-active' : null)"
+            style="width:20%">
+            <a th:href="@{/messages}">
+                Benachrichtigungen
+                <span id="cntMessages" th:if="${session.msgRepo} and ${session.msgRepo.count()} > 0" th:text="${session.msgRepo} ? ${session.msgRepo.count()}"></span>
+            </a>
+        </li>
+        <li th:attr="class=(${page == 'profile'} ? 'nav-active' : null)" style="width:13%">
+            <a th:href="@{/profile}">Mein Profil</a>
+        </li>
+        <li style="width:11%"><a th:href="@{/logout}">Logout</a></li>
+    </ul>
 
-        <hr class="noscreen" />
-    </div>
+    <hr class="noscreen"/>
+</div>
 
 </body>
 </html>
