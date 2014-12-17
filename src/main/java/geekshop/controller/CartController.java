@@ -7,6 +7,7 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
+import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.OrderManager;
@@ -40,6 +41,7 @@ import java.util.TimeZone;
 @Controller
 @PreAuthorize("isAuthenticated()")
 @SessionAttributes("cart")
+
 class CartController {
     private PaymentMethod paymentMethod;
     private final OrderManager<GSOrder> orderManager;
@@ -48,7 +50,7 @@ class CartController {
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
-    private GSOrder lastorder;
+
 
 
     /**
@@ -81,15 +83,14 @@ class CartController {
     }
 
 
+
+
     @RequestMapping("/cart")
     public String cart() {
         return "cart";
     }
 
-    @RequestMapping("/reclaim")
-    public String reclaim() {
-        return "reclaim";
-    }
+
 
     /**
      * Adds a {@link Product} to the {@link Cart}. Note how the type of the parameter taking the request parameter
@@ -118,6 +119,9 @@ class CartController {
         return "redirect:/productsearch";
 
     }
+
+
+
 
 
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
@@ -200,22 +204,13 @@ class CartController {
     public String buy(@ModelAttribute Cart cart, @RequestParam Map<String, String> map, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
 
         return userAccount.map(account -> {
-
-
             long orderNumber = Calendar.getInstance(TimeZone.getDefault()).getTime().getTime();
             String strNumber = Long.toString(orderNumber);      //generating new orderIdentifier
 
             PaymentMethod cash = new Cash();
 
-
             GSOrder order = new GSOrder(strNumber, userAccount.get(), /*strToPaymentMethod(strPayment, )*/ cash);
-
             cart.addItemsTo(order);
-
-            System.out.println(order.getOrderNumber() + " OrderNumber " + order.getDateCreated() + " Datum");
-
-
-
 
             orderManager.payOrder(order);
             //  orderManager.completeOrder(order);
@@ -231,7 +226,39 @@ class CartController {
 
     }
 
-//        public void acceptReclaim(){
+
+
+ //   @RequestMapping(value = "/searchorder", method = RequestMethod.POST)
+
+//    public GSOrder searchOrderByNumber(String orderNumber, Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrdernumber)
+//    {
+//      //  Iterable<GSOrder> allOrders = orderRepo.findAll();
+//
+//        if (orderRepo.findByOrderNumber(new SalespointIdentifier(orderNumber))!= null) {
+//
+//
+//        }
+//        if (searchOrdernumber == null) {
+//            return "redirect:/reclaim";
+//        } else
+//            model.addAttribute("catalog", sortProductByName(search(searchTerm), "asc"));
+//        model.addAttribute("superCategories", supRepo.findAll());
+//        model.addAttribute("subCategories", subRepo.findAll());
+//
+//
+//        return "redirect:/reclaim";
+//
+//    }
+
+
+}
+
+
+
+
+
+
+    // public void reclaim(){
 //            //orderline.state='reclaimed';
 //  LocalDateTime timeup= time.plusDays(14);
 
@@ -239,4 +266,3 @@ class CartController {
     //Interval interval=new Interval(time, timeup);
 //        }
 
-}

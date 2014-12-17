@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <link th:replace="header :: tree-css"/>
+    <script th:replace="header :: jquery-js"></script>
+    <!--<script th:replace="header :: selectAll-js"></script>-->
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('cart')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Reklamationswarenkorb</h3>
+
+            <div id="content-in">
+
+                <div th:unless="${cart.empty}">
+                    <table class="table-style01 alternatRows">
+                        <thead>
+                        <tr>
+                            <!--  <th><input type="checkbox" id="selectAll"/></th>-->
+                            <th scope="col">Produkt</th>
+                            <th scope="col">Anzahl</th>
+                            <th scope="col">Preis</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody th:remove="all-but-first">
+                        <tr th:each="cartitem : ${reclaimcart}">
+
+                            <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
+                            <td><input type="number" name="number" th:value="${cartitem.quantity.amount}" min="1"
+                                       max=""/></td>
+                            <td th:text="${cartitem.price}">209,19 EUR</td>
+                            <td>
+
+
+                                <form th:action="@{/deletecartitem/}" th:object="${cartitem}" method="post">
+                                    <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
+                                    <button class="myButton" type="submit">Löschen</button>
+                                </form>
+
+                            </td>
+                        </tr>
+
+
+                        </tbody>
+
+                        <tfoot>
+                        <tr>
+                            <td colspan="3" class="t-right">Summe Warenkorb:</td>
+                            <td th:text="${cart.price}">269,47 EUR</td>
+                        </tr>
+                        </tfoot>
+                    </table>
+
+                    <form th:method="delete" th:action="@{/deleteallitems}">
+                        <button id="delete" class="myButton marginButton">Warenkorb leeren</button>
+                    </form>
+
+
+                    <form th:action="@{/checkout}">
+                        <button id="checkout" class="myButton" type="submit">reklamieren
+                        </button>
+                    </form>
+                </div>
+                <!--  th:unless="${cart.empty}"-->
+
+                <p th:if="${cart.empty}">Warenkorb ist leer.</p>
+
+                <hr class="noscreen"/>
+
+
+            </div>
+            <!-- /content-in -->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+
+        <hr class="noscreen"/>
+
+    </div>
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>
