@@ -17,6 +17,7 @@ import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
+import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.order.Cart}.
@@ -40,7 +38,7 @@ import java.util.TimeZone;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
-@SessionAttributes("reclaimcart")
+@SessionAttributes("cart")
 
 class ReclaimController {
     private PaymentMethod paymentMethod;
@@ -77,16 +75,15 @@ class ReclaimController {
         return "reclaim";
     }
 
-    @ModelAttribute("reclaimcart")
+    @ModelAttribute("cart")
     public Cart initializeReclaimCart() {
         return new Cart();
     }
 
 
-
     @RequestMapping("/reclaimcart")
     public String reclaimcart() {
-        return "reclaimcart";
+        return "cart";
     }
 
     /**
@@ -103,7 +100,7 @@ class ReclaimController {
 
 
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
-    public String addProductToReclaimCart(@RequestParam("rpid") Product product, @RequestParam("rnumber") long number, @ModelAttribute Cart reclaimcart) {
+    public String addProductToReclaimCart(@RequestParam("rpid") Product product, @RequestParam("rnumber") long number, @ModelAttribute Cart cart) {
 
         if (number <= 0) {
             number = 1;
@@ -113,36 +110,34 @@ class ReclaimController {
         }
 
 
-        reclaimcart.addOrUpdateItem(product, Units.of(number));
+        cart.addOrUpdateItem(product, Units.of(number));
         return "redirect:/reclaim";
 
     }
 
 
     @RequestMapping(value = "/deleteallreclaimitems", method = RequestMethod.DELETE)
-    public String deleteAll(@ModelAttribute Cart reclaimcart) {
-        reclaimcart.clear();
-        return "redirect:/reclaimcart";
+    public String deleteAll(@ModelAttribute Cart cart) {
+        cart.clear();
+        return "redirect:/cart";
     }
 
     @RequestMapping(value = "/deletereclaimitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart reclaimcart) {
-        reclaimcart.removeItem(identifier);
-        return "redirect:/reclaimcart";
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart) {
+        cart.removeItem(identifier);
+        return "redirect:/cart";
     }
 
 
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.GET)
     public String reclaimbasket() {
-        return "reclaimcart";
+        return "cart";
     }
 
 //    @RequestMapping("/checkout")
 //    public String checkout() {
 //        return "checkout";
 //    }
-
-
 
 
     /**
@@ -159,38 +154,28 @@ class ReclaimController {
     }
 
 
+    @RequestMapping("/ordersearch")
+    public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrdernumber, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
+        SalespointIdentifier id = new SalespointIdentifier(searchOrdernumber);
+        System.out.println("Soll nach dieser NUmmer suchen:  " + id);
+        Iterator<GSOrder> allOrders = orderRepo.findAll().iterator();
+        while (allOrders.hasNext()) {
+            System.out.println("in der Schleife  ");
+            GSOrder tempOrder = allOrders.next();
+            System.out.println("Aktuelle OrderNumber "+ tempOrder.getOrderNumber());
+            if (tempOrder.getOrderNumber().equals(id)) {
 
-
-
-    //   @RequestMapping(value = "/searchorder", method = RequestMethod.POST)
-
-//    public GSOrder searchOrderByNumber(String orderNumber, Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrdernumber)
-//    {
-//      //  Iterable<GSOrder> allOrders = orderRepo.findAll();
-//
-//        if (orderRepo.findByOrderNumber(new SalespointIdentifier(orderNumber))!= null) {
-//
-//
-//        }
-//        if (searchOrdernumber == null) {
-//            return "redirect:/reclaim";
-//        } else
-//            model.addAttribute("catalog", sortProductByName(search(searchTerm), "asc"));
-//        model.addAttribute("superCategories", supRepo.findAll());
-//        model.addAttribute("subCategories", subRepo.findAll());
-//
-//
-//        return "redirect:/reclaim";
-//
-//    }
-
-
-}
-
-
-
-
+                model.addAttribute("reclaimingorder", tempOrder);
+                System.out.println("Order gefunden:  " + tempOrder.getOrderNumber());
+                return "redirect:/reclaim";
+            }
+        }
+        System.out.println("nichts gefunden");
+        return "redirect:/reclaim";
+    }
 
 
 // public void reclaim(){
@@ -201,3 +186,4 @@ class ReclaimController {
 //Interval interval=new Interval(time, timeup);
 //        }
 
+}

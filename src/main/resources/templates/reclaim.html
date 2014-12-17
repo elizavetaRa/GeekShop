@@ -30,10 +30,11 @@
             <h3 id="content-title">Reklamation</h3>
 
             <div id="content-in">
+
                 <form method="get" action="/ordersearch">
-                    <label >Rechnungsnummer eingeben:  </label>
-                   <!-- <input value="suchen" th:value="${suchen}" name="ordernumr" id="ordernum" type="text" size="25" maxlength="40" required="required" placeholder="Reklamation"/>-->
-                    <button id="searchOrder" type="submit">suchen</button>
+                    <input value="suchen" th:value="${suchen}" name="searchordernumber" id="searchordernumber" type="text" size="25" maxlength="40" required="required" placeholder="Reklamation"/>
+                    <button id="searchCatalog" type="submit">suchen</button>
+                </form>
 
 
                 <table class="table-style01">
@@ -50,19 +51,19 @@
 
                     <tbody>
 
-                    <!--<tr th:each="orderline : ${order.orderLines}">-->
+                    <tr th:each="orderline : ${reclaimingorder}">
 
-                        <!--<td th:text="${orderline.productName}">USB-Ventilator</td>-->
-                        <!--<td th:text="${orderline.quantity.amount}">2</td>-->
-                        <!--<td th:text="${orderline.price}">15 EUR</td>-->
-                    <!--</tr>-->
+                     <td th:text="${orderline.productName}">USB-Ventilator</td>
+                     <td th:text="${orderline.quantity.amount}">2</td>
+                      <td th:text="${orderline.price}">15 EUR</td>
+                    </tr>
 
                     </tbody>
 
                 </table>
 
                 <button id="toreclaimcart" class="myButton">Bestellung reklamieren</button>
-                </form>
+
 
             </div>
 
