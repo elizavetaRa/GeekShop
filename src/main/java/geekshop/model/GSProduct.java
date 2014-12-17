@@ -52,13 +52,14 @@ public class GSProduct extends Product{
         return geekID + "";
     }
 
-    public String getStringPrice() {
+    public double getPriceDouble() {
         String[] array;
         String temp;
         temp = getPrice().toString();
         array = temp.split(" ");
-        temp = array[1]+ " " +array[0];
-        return temp;
+        temp = array[1];
+        double value = Double.parseDouble(temp);
+        return value;
     }
 
     public Boolean isInRange() {
