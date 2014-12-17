@@ -95,40 +95,47 @@ ul.ul-style01 ul li {background:url("../images/ul-style01-sub.gif") 0 5px no-rep
 #main {position: relative; width:910px; height:100%; min-height:400px; margin:0 auto; text-align:left;}
 
     #header {position:relative; height:100px; background:url("../images/header.jpg") 0 0 no-repeat; overflow:hidden;}
-    
+
         #logo {position:absolute; top:30px; left:80px; margin:0; font-size:200%; letter-spacing:-1px; font-weight:normal;}
         #logo span {font-weight:bold;}
         #logo a {text-decoration:none;}
-        
+
         #slogan {position:absolute; top:40px; right:15px; width:230px; font-size:120%; font-weight:normal; font-style:italic; text-align:center;}
 
     #nav {padding:0 6px 5px 6px; background:url("../images/nav.gif") 0 100% no-repeat;}
-    
+
         #nav ul {margin:0; padding:0; list-style:none;}
-        #nav ul li {display:inline; margin:0; padding:0;}
-        #nav ul li a {display:block; /*min-width:100px;*/ float:left; padding:12px 1% 12px 1%; background:url("../images/nav-link.gif") 0 0 repeat-y; text-align:center; text-decoration:none;}
+        #nav ul li {float:left; position:relative; margin:0; padding:0;}
+        #nav ul li a {display:block; /*min-width:100px;*/ float:left; position: relative; width:100%; height:45px; line-height:45px; /*padding:12px 0;*/ background:url("../images/nav-link.gif") 0 0 repeat-y; text-align:center; text-decoration:none;}
         #nav ul li:first-child a {background:none;}
-        #nav ul li#nav-active a {font-weight:bold; text-decoration:none;}
+        #nav ul li.nav-active > a {font-weight:bold; text-decoration:none; color:black;}
+
+        #nav ul li:focus > ul, #nav ul li:hover > ul, #nav ul li:active > ul {display:block;}
+        #nav ul li ul {display:none; position:absolute; top:45px; left:1px; width:100%; z-index:2; background:#E0E0E0;
+            -webkit-border-radius:0 0 7px 7px; -moz-border-radius:0 0 7px 7px; border-radius:0 0 7px 7px;
+            -webkit-box-shadow: 0 3px 4px #555; -moz-box-shadow: 0 3px 4px #555; box-shadow: 0 3px 4px #555;}
+        #nav ul li ul li {float:none; display:block;}
+        #nav ul li ul li a {border-top:1px solid #aaa; background:none;}
 
     #cols {position:absolute; top:150px; bottom:27px;/*77px;*/ background:url("../images/cols.gif") 0 0 repeat-y;}
 
         #content {position:relative; height:100%; float:left; width:910px; overflow:hidden;}
-        
+
             #content #content-title {margin:0; padding:15px 15px 10px 20px; height:30px; line-height:30px; background:url("../images/content-title.gif") 0 0 no-repeat; font-size:140%; font-weight:normal;}
             #content #content-in {position:absolute; top:55px; bottom:0; width: 870px; overflow: auto; padding:10px 15px 10px 20px;}
-        
+
         #aside {position:relative; height:100%; float:right; width:255px; overflow:hidden;}
-        
+
             #aside #aside-title {margin:0; padding:15px 15px 10px 15px; height:30px; line-height:30px; background:url("../images/aside-title.gif") 0 0 no-repeat; font-size:140%; font-weight:normal;}
             #aside .aside-in {position:absolute; top: 55px; bottom: 0; width: 230px; overflow: auto; padding:10px;}
             #aside .aside-box {padding:10px; background:url("../images/aside-box.jpg") 0 0 no-repeat;}
             #aside .title {margin:0 5px 0 0; padding:10px 15px; background:url("../images/aside-title-02.gif") 0 0 repeat-x; font-size:100%;}
 
     #cols-bottom {position: absolute; bottom:15px;/*65px;*/ width:910px; height:12px; background:url("../images/cols-bottom.gif") 0 0 no-repeat; font-size:0;}
-    
+
     #footer {position: absolute; bottom: 5px; width:870px; height:40px; padding:20px 20px 0 20px; background:url("../images/footer.gif") 0 0 no-repeat;}
     #footer p {margin:0;}
- 
+
 /* ----------------------------------------------------------------------------------------------------------
 5) Page: Home
 ---------------------------------------------------------------------------------------------------------- */

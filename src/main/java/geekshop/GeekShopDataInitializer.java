@@ -5,7 +5,6 @@ import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.inventory.Inventory;
-import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.Cash;
@@ -204,13 +203,9 @@ public class GeekShopDataInitializer implements DataInitializer {
         User owner = new User(ownerAccount, "123", Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.UNKNOWN,
                 "123456789", "Ownerstreet", "0", "01234", "Ownercity");
         User u1 = new User(ua1, "123", Gender.MALE, cal.getTime(), MaritalStatus.UNMARRIED, phone, street, houseNr, postcode, place);
-        u1.setPwHasToBeChanged(true);
         User u2 = new User(ua2, "123", Gender.FEMALE, cal.getTime(), MaritalStatus.MARRIED, phone, street, houseNr, postcode, place);
-        u2.setPwHasToBeChanged(true);
         User u3 = new User(ua3, "123", Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.DIVORCED, phone, street, houseNr, postcode, place);
-        u3.setPwHasToBeChanged(true);
         User u4 = new User(ua4, "123", Gender.SOMETHING_ELSE, cal.getTime(), MaritalStatus.WIDOWED, phone, street, houseNr, postcode, place);
-        u4.setPwHasToBeChanged(true);
 
         userRepo.save(Arrays.asList(owner, u1, u2, u3, u4));
     }
