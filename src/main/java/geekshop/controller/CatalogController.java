@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.catalog.Catalog}.
@@ -78,9 +77,9 @@ class CatalogController {
     public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm) {
 
         if (searchTerm == null) {
-            model.addAttribute("catalog", catalog.findAll());
+            model.addAttribute("catalog", sortProductByName(catalog.findAll(), "asc"));
         } else
-            model.addAttribute("catalog", sortByName(search(searchTerm), "asf"));
+            model.addAttribute("catalog", sortProductByName(search(searchTerm), "asc"));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
         return "productsearch";
@@ -103,22 +102,36 @@ class CatalogController {
         return foundProducts;
     }
 
-    private Set<GSProduct> sortByName(Set<GSProduct> foundProducts, String direction) {
-        List<String> toSort = new ArrayList<>();
-        Set<GSProduct> sortedProducts = new HashSet<GSProduct>();
+    private List<GSProduct> sortProductByName(Iterable<GSProduct> foundProducts, String direction) {
+        List<GSProduct> sortedProducts = new LinkedList<>();
         for (GSProduct product : foundProducts) {
-            toSort.add(product.getName());
+            sortedProducts.add(product);
         }
-        if (direction.equals("ascending"))
-            Collections.sort(toSort);
+        if (direction.equals("asc"))
+            Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (a.getName().compareTo(b.getName())));
         else {
-            Collections.sort(toSort);
-            Collections.reverse(toSort);
-        }
-        for (String sorted : toSort) {
-            sortedProducts.add(catalog.findByName(sorted).iterator().next());
+            Collections.sort(sortedProducts, Collections.reverseOrder());
         }
         return sortedProducts;
     }
+
+/*
+    private List<GSProduct> sortProductByProductNumber(Set<GSProduct> foundProducts, String direction) {
+        List<Integer> toSort = new ArrayList<>();
+        List<GSProduct> sortedProducts = new ArrayList<>();
+        for (GSProduct product : foundProducts) {
+            toSort.add(product.getProductNumber());
+        }
+        if (direction.equals("asc"))
+            Collections.sort(toSort);
+        else {
+            Collections.sort(toSort, Collections.reverseOrder());
+        }
+        for (int sorted : toSort) {
+            sortedProducts.add(catalog.findBy(sorted).iterator().next());
+        }
+        return sortedProducts;
+    }
+*/
 
 }
