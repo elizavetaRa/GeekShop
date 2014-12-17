@@ -5,6 +5,9 @@ import geekshop.model.SubCategoryRepository;
 import geekshop.model.SuperCategoryRepository;
 import geekshop.model.UserRepository;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.useraccount.Role;
+import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -60,7 +63,9 @@ class CatalogController {
      */
 
     @RequestMapping("/productsearch/{subCategory}")
-    public String catgory(Model model, @PathVariable("subCategory") String subCategory) {
+    public String catgory(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         model.addAttribute("catalog", subRepo.findByName(subCategory).getProducts());
         model.addAttribute("superCategories", supRepo.findAll());
@@ -73,7 +78,9 @@ class CatalogController {
      */
 
     @RequestMapping("/productsearch")
-    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm) {
+    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         if (searchTerm == null) {
             model.addAttribute("catalog", sortProductByName(catalog.findAll(), "asc"));

@@ -67,24 +67,38 @@ class AccountController {
      * Shows the start page with the welome joke or, if the user's password does not match the current password rules, redirects to the respective page demanding the user to change the password according to the current password rules.
      */
     @RequestMapping({"/", "/index"})
-    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
+    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession session) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
+
+        // add user for full name in header to the session
+        session.setAttribute("user", user);
+
+        // add message repository to the session to display current number of messages
+        session.setAttribute("msgRepo", messageRepo);
+
+        // check whether user's password matches the current password rules
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
 
         if (!passwordRules.isValidPassword(user.getPasswordAttributes())) {
             if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
                 messageRepo.save(new Message(MessageKind.NOTIFICATION, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
             } else {
+                userAccount.get().add(new Role("ROLE_INSECURE_PASSWORD"));
+                userRepo.save(user);
                 model.addAttribute("passwordRules", passwordRules);
                 return "adjustpw";
             }
+        } else if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD"))) {
+            userAccount.get().remove(new Role("ROLE_INSECURE_PASSWORD"));
+            userRepo.save(user);
         }
 
+        // arrange new welcome joke
         String sessionId = user.getCurrentSessionId();
         List<Joke> recentJokes = user.getRecentJokes();
 
-        if (httpSession.getId().equals(sessionId)) {
+        if (session.getId().equals(sessionId)) {
             model.addAttribute("joke", user.getLastJoke());
         } else {
             Joke joke = getRandomJoke(recentJokes);
@@ -92,7 +106,7 @@ class AccountController {
             if (joke != null)
                 user.addJoke(joke);
 
-            user.setCurrentSessionId(httpSession.getId());
+            user.setCurrentSessionId(session.getId());
             userRepo.save(user);
 
             model.addAttribute("joke", joke);
@@ -330,6 +344,8 @@ class AccountController {
      */
     @RequestMapping("/profile")
     public String profile(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -345,6 +361,8 @@ class AccountController {
      */
     @RequestMapping("/profile/{page}")
     public String profileChange(Model model, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -371,6 +389,8 @@ class AccountController {
      */
     @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
     public String changedData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         String uai = formData.get("uai");
         UserAccount ua = uam.findByUsername(uai).get();
@@ -402,7 +422,10 @@ class AccountController {
      * Saves the new password changed by the user himself. If the user changed his password, a message will be sent to the shop owner.
      */
     @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
+    @PreAuthorize("!hasRole('ROLE_INSECURE_PASSWORD')")
     public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -425,7 +448,10 @@ class AccountController {
      * Saves the new password changed by the shop owner.
      */
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
+    @PreAuthorize("!hasRole('ROLE_INSECURE_PASSWORD')")
     public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         UserAccount ua = uam.get(uai).get();
         User user = userRepo.findByUserAccount(ua);

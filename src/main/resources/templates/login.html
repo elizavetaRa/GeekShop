@@ -27,11 +27,11 @@
         <section class="main">
             <form method="post" class="form-1" id="form" th:action="@{/login}">
                 <p class="field">
-                    <input name="username" id="username" type="text" placeholder="Benutzername"/>
+                    <input name="username" id="username" type="text" placeholder="Benutzername" required="required"/>
                     <i class="icon-user icon-large"></i>
                 </p>
                 <p class="field">
-                    <input name="password" id="password" type="password" placeholder="Passwort" />
+                    <input name="password" id="password" type="password" placeholder="Passwort" required="required"/>
                     <i class="icon-lock icon-large"></i>
                 </p>
                 <p class="submit">
