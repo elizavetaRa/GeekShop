@@ -46,7 +46,6 @@ class CartController {
     private final Inventory<GSInventoryItem> inventory;
     private final BusinessTime businessTime;
     private final Catalog<GSProduct> catalog;
-    private final PasswordRules passwordRules;
     private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
     private GSOrder lastorder;
@@ -58,14 +57,13 @@ class CartController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, PasswordRulesRepository passRulesRepo, UserRepository userRepo, GSOrderRepository orderRepo) {
+    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
 
         Assert.notNull(orderManager, "OrderManager must not be null!");
         this.orderManager = orderManager;
         this.inventory = inventory;
         this.businessTime = businessTime;
         this.catalog = catalog;
-        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.userRepo = userRepo;
         this.orderRepo = orderRepo;
 

@@ -29,7 +29,6 @@ class AccountController {
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
     private final PasswordRulesRepository passRulesRepo;
-    private final PasswordRules passwordRules;
     private final UserAccountManager uam;
     private final AuthenticationManager authManager;
     private final MessageRepository messageRepo;
@@ -50,7 +49,6 @@ class AccountController {
         Assert.notNull(userRepo, "UserRepository must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
         Assert.notNull(passRulesRepo, "PasswordRulesRepository must not be null!");
-        Assert.isTrue(passRulesRepo.findAll().iterator().hasNext(), "PasswordRulesRepository should contain PasswordRules!");
         Assert.notNull(uam, "UserAccountManager must not be null!");
         Assert.notNull(authManager, "AuthenticationManager must not be null!");
         Assert.notNull(messageRepo, "MessageRepo must not be null!");
@@ -58,7 +56,6 @@ class AccountController {
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
         this.passRulesRepo = passRulesRepo;
-        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.uam = uam;
         this.authManager = authManager;
         this.messageRepo = messageRepo;
@@ -73,6 +70,7 @@ class AccountController {
     public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
+        PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
 
         if (!passwordRules.isValidPassword(user.getPasswordAttributes())) {
             if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
@@ -198,7 +196,7 @@ class AccountController {
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
     public String hire(@RequestParam Map<String, String> formData) {
 
-        String password = passwordRules.generateRandomPassword();
+        String password = passRulesRepo.findOne("passwordRules").get().generateRandomPassword();
         UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
@@ -278,7 +276,7 @@ class AccountController {
             return "profile";
         } else { // password change
             model.addAttribute("isOwnProfile", false);
-            model.addAttribute("passwordRules", passwordRules);
+            model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
 
             return "changepw";
         }
@@ -294,7 +292,7 @@ class AccountController {
     @RequestMapping("/setrules")
     public String setPWRules(Model model) {
 
-        model.addAttribute("passwordRules", passwordRules);
+        model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
 
         return "setrules";
     }
@@ -314,6 +312,7 @@ class AccountController {
         if (minLength < 1)
             minLength = 1;
 
+        PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         passwordRules.setUpperAndLowerNecessary(upperLower);
         passwordRules.setDigitsNecessary(digits);
         passwordRules.setSpecialCharactersNecessary(specialChars);
@@ -358,7 +357,7 @@ class AccountController {
         } else { // password change
             model.addAttribute("user", user);
             model.addAttribute("isOwnProfile", true);
-            model.addAttribute("passwordRules", passwordRules);
+            model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
 
             return "changepw";
         }
@@ -457,7 +456,7 @@ class AccountController {
             return false;
         }
 
-        if (!passwordRules.isValidPassword(newPW)) {
+        if (!passRulesRepo.findOne("passwordRules").get().isValidPassword(newPW)) {
             System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
             model.addAttribute("error", "Neues Passwort entspricht nicht den Sicherheitsregeln!");
 
@@ -485,7 +484,7 @@ class AccountController {
         userAccount.remove(new Role("ROLE_EMPLOYEE"));
         uam.save(userAccount);
         uam.disable(userAccount.getIdentifier());
-        uam.changePassword(userAccount, passwordRules.generateRandomPassword());
+        uam.changePassword(userAccount, passRulesRepo.findOne("passwordRules").get().generateRandomPassword());
     }
 
     /**

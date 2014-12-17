@@ -1,14 +1,10 @@
 package geekshop;
 
-import org.salespointframework.Salespoint;
+import org.salespointframework.EnableSalespoint;
 import org.salespointframework.SalespointSecurityConfiguration;
 import org.salespointframework.SalespointWebConfiguration;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.orm.jpa.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -20,11 +16,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
  * @author Sebastian D&ouml;ring
  */
 
-@Configuration
-@EnableAutoConfiguration
-@EntityScan(basePackageClasses = {Salespoint.class, GeekShop.class})
-@EnableJpaRepositories(basePackageClasses = {Salespoint.class, GeekShop.class})
-@ComponentScan
+@EnableSalespoint
 public class GeekShop {
 
     public static void main(String[] args) {

@@ -1,6 +1,9 @@
 package geekshop.controller;
 
-import geekshop.model.*;
+import geekshop.model.GSProduct;
+import geekshop.model.SubCategoryRepository;
+import geekshop.model.SuperCategoryRepository;
+import geekshop.model.UserRepository;
 import org.salespointframework.catalog.Catalog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,32 +31,28 @@ class CatalogController {
     private final SuperCategoryRepository supRepo;
     private final SubCategoryRepository subRepo;
     private final UserRepository userRepo;
-    private final PasswordRules passwordRules;
 
     /**
      * Creates a new {@link CatalogController}.
      *
-     * @param catalog       must not be {@literal null}.
-     * @param supRepo       must not be {@literal null}.
-     * @param subRepo       must not be {@literal null}.
-     * @param userRepo      must not be {@literal null}.
-     * @param passRulesRepo must not be {@literal null}.
+     * @param catalog  must not be {@literal null}.
+     * @param supRepo  must not be {@literal null}.
+     * @param subRepo  must not be {@literal null}.
+     * @param userRepo must not be {@literal null}.
      */
 
 
     @Autowired
-    public CatalogController(Catalog<GSProduct> catalog, SuperCategoryRepository supRepo, SubCategoryRepository subRepo, UserRepository userRepo, PasswordRulesRepository passRulesRepo) {
+    public CatalogController(Catalog<GSProduct> catalog, SuperCategoryRepository supRepo, SubCategoryRepository subRepo, UserRepository userRepo) {
         Assert.notNull(catalog, "Catalog must not be Null");
         Assert.notNull(supRepo, "SupRepo must not be Null");
         Assert.notNull(subRepo, "SubRepo must not be Null");
         Assert.notNull(userRepo, "UserRepo must not be Null");
-        Assert.notNull(passRulesRepo, "PassRulesRepo must not be Null");
 
         this.catalog = catalog;
         this.supRepo = supRepo;
         this.subRepo = subRepo;
         this.userRepo = userRepo;
-        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
     }
 
     /**
