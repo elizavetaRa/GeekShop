@@ -227,7 +227,7 @@ class OwnerController {
     }
 
     @RequestMapping("/range")
-    public String inventory(Model model) {
+    public String range(Model model) {
         model.addAttribute("subcategories", subCategoryRepo.findAll());
         model.addAttribute("supercategories", superCategoryRepo.findAll());
         return "range";

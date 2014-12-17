@@ -40,7 +40,6 @@ public class User {
     @ManyToMany
     private List<Joke> recentJokes;
 
-    private boolean pwHasToBeChanged;
     @OneToOne(cascade = CascadeType.ALL)
     private PasswordAttributes passwordAttributes;
 
@@ -48,7 +47,6 @@ public class User {
     @Deprecated
     protected User() {
         this.recentJokes = new LinkedList<Joke>();
-        this.pwHasToBeChanged = false;
     }
 
     public User(UserAccount userAccount, String password, Gender gender, Date birthday,
@@ -66,7 +64,6 @@ public class User {
         this.place = place;
 
         this.recentJokes = new LinkedList<Joke>();
-        this.pwHasToBeChanged = false;
         this.passwordAttributes = new PasswordAttributes(
                 PasswordRules.containsUpperAndLower(password), PasswordRules.containsDigits(password),
                 PasswordRules.containsSpecialCharacters(password), password.length());
@@ -171,14 +168,6 @@ public class User {
 
     public Long getId() {
         return id;
-    }
-
-    public boolean pwHasToBeChanged() {
-        return pwHasToBeChanged;
-    }
-
-    public void setPwHasToBeChanged(boolean hasToBeChanged) {
-        this.pwHasToBeChanged = hasToBeChanged;
     }
 
     public PasswordAttributes getPasswordAttributes() {
