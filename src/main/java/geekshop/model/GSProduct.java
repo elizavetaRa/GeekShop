@@ -22,6 +22,8 @@ public class GSProduct extends Product{
     @ManyToOne
     private SubCategory subCategory;
 
+    private Boolean inRange;
+
     @Deprecated
     protected GSProduct() {
     }
@@ -31,10 +33,15 @@ public class GSProduct extends Product{
         Assert.notNull(subCategory, "SubCategory must be not null.");
         this.subCategory = subCategory;
         this.productNumber = productNumber;
+        this.inRange = true;
     }
 
     public SubCategory getSubCategory() {
         return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory){
+        this.subCategory = subCategory;
     }
 
     public int getProductNumber() {
@@ -54,4 +61,11 @@ public class GSProduct extends Product{
         return temp;
     }
 
+    public Boolean isInRange() {
+        return inRange;
+    }
+
+    public void setInRange(Boolean inRange) {
+        this.inRange = inRange;
+    }
 }
