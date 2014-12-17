@@ -16,6 +16,7 @@ import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
+import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,12 +83,18 @@ class CartController {
 
 
     @RequestMapping("/cart")
-    public String cart() {
+    public String cart(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         return "cart";
     }
 
     @RequestMapping("/reclaim")
-    public String reclaim() {
+    public String reclaim(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         return "reclaim";
     }
 
@@ -104,7 +111,9 @@ class CartController {
      */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart) {
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         if (number <= 0) {
             number = 1;
@@ -121,25 +130,37 @@ class CartController {
 
 
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
-    public String deleteAll(@ModelAttribute Cart cart) {
+    public String deleteAll(@ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         cart.clear();
         return "redirect:/cart";
     }
 
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart) {
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         cart.removeItem(identifier);
         return "redirect:/cart";
     }
 
 
     @RequestMapping(value = "/cart", method = RequestMethod.GET)
-    public String basket() {
+    public String basket(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         return "cart";
     }
 
     @RequestMapping("/checkout")
-    public String checkout() {
+    public String checkout(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         return "checkout";
     }
 
@@ -191,13 +212,18 @@ class CartController {
      */
 
     @RequestMapping("/orderoverview")
-    public String orderoverview() {
+    public String orderoverview(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         return "orderoverview";
     }
 
 
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
     public String buy(@ModelAttribute Cart cart, @RequestParam Map<String, String> map, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         return userAccount.map(account -> {
 
@@ -213,8 +239,6 @@ class CartController {
             cart.addItemsTo(order);
 
             System.out.println(order.getOrderNumber() + " OrderNumber " + order.getDateCreated() + " Datum");
-
-
 
 
             orderManager.payOrder(order);
