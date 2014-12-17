@@ -40,6 +40,7 @@
             <div id="content-in">
                 <h4>Übersicht</h4>
 
+               <div th:unless="${cart.empty}">
                 <table class="table-style01 alternatRows">
                     <thead>
                     <tr>
@@ -213,7 +214,8 @@
                 </form>
 
 
-
+                   </div>
+               <p th:if="${cart.empty}">Nichts zu zeigen</p>
             </div>  <!--/content-in-->
 
             <hr class="noscreen"/>
