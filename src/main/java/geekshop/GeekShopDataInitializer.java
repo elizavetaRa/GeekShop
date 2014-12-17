@@ -284,10 +284,10 @@ public class GeekShopDataInitializer implements DataInitializer {
         UserAccount ua = userAccountManager.findByUsername("owner").get(); // suche UserAccount von owner
         GSProduct prod1 = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
         GSProduct prod2 = catalog.findByName("Product2").iterator().next(); // suche Product1 (siehe initializeCatalog)
-        GSOrder order1 = new GSOrder("1", ua, Cash.CASH); // erzeuge GSOrder
-        GSOrder order2 = new GSOrder("2", ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
-        GSOrder order3 = new GSOrder("3", ua, Cash.CASH);
-        GSOrder order4 = new GSOrder("4", ua, Cash.CASH, order1);
+        GSOrder order1 = new GSOrder(1, ua, Cash.CASH); // erzeuge GSOrder
+        GSOrder order2 = new GSOrder(2, ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
+        GSOrder order3 = new GSOrder(3, ua, Cash.CASH);
+        GSOrder order4 = new GSOrder(4, ua, Cash.CASH, order1);
         GSOrderLine orderLine11 = new GSOrderLine(prod1, Units.TEN);
         GSOrderLine orderLine12 = new GSOrderLine(prod2, Units.TEN);
         GSOrderLine orderLine21 = new GSOrderLine(prod2, Units.ONE);
@@ -318,7 +318,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 //        order.setOrderType(OrderType.RECLAIM);
 
         for (GSOrder o : orderRepo.findAll()) { // iteriere über alle gespeicherten Orders
-            System.out.println("+++++ " + o + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ")");
+            System.out.println("+++++ Order " + o.getOrderNumber() + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ")");
             for (OrderLine ol : o.getOrderLines()) {
 //                System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
             }

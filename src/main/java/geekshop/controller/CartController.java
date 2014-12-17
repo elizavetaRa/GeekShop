@@ -7,9 +7,9 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
-import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
+import org.salespointframework.order.CartItem;
 import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.Cash;
 import org.salespointframework.payment.Cheque;
@@ -28,10 +28,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.order.Cart}.
@@ -225,12 +222,19 @@ class CartController {
 
         return userAccount.map(account -> {
             long orderNumber = Calendar.getInstance(TimeZone.getDefault()).getTime().getTime();
-            String strNumber = Long.toString(orderNumber);      //generating new orderIdentifier
+//            String strNumber = Long.toString(orderNumber);      //generating new orderIdentifier
 
             PaymentMethod cash = new Cash();
 
-            GSOrder order = new GSOrder(strNumber, userAccount.get(), /*strToPaymentMethod(strPayment, )*/ cash);
-            cart.addItemsTo(order);
+            GSOrder order = new GSOrder((int)orderNumber, userAccount.get(), /*strToPaymentMethod(strPayment, )*/ cash);
+
+            // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
+
+            for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
+                CartItem cartItem = iterator.next();
+                order.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
+            }
+
 
             System.out.println(order.getOrderNumber() + " OrderNumber " + order.getDateCreated() + " Datum");
 
