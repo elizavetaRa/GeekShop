@@ -1,9 +1,6 @@
 package geekshop.controller;
 
-import geekshop.model.GSProduct;
-import geekshop.model.SubCategoryRepository;
-import geekshop.model.SuperCategoryRepository;
-import geekshop.model.UserRepository;
+import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
@@ -73,21 +70,32 @@ class CatalogController {
         return "productsearch";
     }
 
-    /**
+     /**
      * shows the search Page with all {@Link Products} which contain the searchTerm in their name
      */
 
     @RequestMapping("/productsearch")
-    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm, @LoggedIn Optional<UserAccount> userAccount) {
+    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm, @RequestParam(value = "sorting", required = false) String sorting, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         if (searchTerm == null) {
-            model.addAttribute("catalog", sortProductByName(catalog.findAll(), "asc"));
+            if ((sorting == null) || (sorting.matches("Name"))) {
+                model.addAttribute("catalog", sortProductByName(catalog.findAll()));
+            }
+            else if (sorting.matches("Artikelnummer")) {
+                model.addAttribute("catalog", sortProductByProductNumber(catalog.findAll()));
+            }
+            else if (sorting.matches("Preis+absteigend")){
+                model.addAttribute("catalog", sortProductByPrice(catalog.findAll(), "desc"));
+            }
+            else if (sorting.matches("Preis+aufsteigend")) {
+                model.addAttribute("catalog", sortProductByPrice(catalog.findAll(), "asc"));
+            }
         } else
-            model.addAttribute("catalog", sortProductByName(search(searchTerm), "asc"));
+            model.addAttribute("catalog", sortProductByName(search(searchTerm)));
         model.addAttribute("superCategories", supRepo.findAll());
-        model.addAttribute("subCategories", subRepo.findAll());
+        model.addAttribute("subCategories", sortSubCategoryByName(subRepo.findAll()));
         return "productsearch";
     }
 
@@ -108,36 +116,44 @@ class CatalogController {
         return foundProducts;
     }
 
-    private List<GSProduct> sortProductByName(Iterable<GSProduct> foundProducts, String direction) {
+    private List<GSProduct> sortProductByName(Iterable<GSProduct> foundProducts) {
         List<GSProduct> sortedProducts = new LinkedList<>();
         for (GSProduct product : foundProducts) {
             sortedProducts.add(product);
         }
-        if (direction.equals("asc"))
-            Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (a.getName().compareTo(b.getName())));
-        else {
-            Collections.sort(sortedProducts, Collections.reverseOrder());
-        }
+        Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (a.getName().compareTo(b.getName())));
         return sortedProducts;
     }
 
-/*
-    private List<GSProduct> sortProductByProductNumber(Set<GSProduct> foundProducts, String direction) {
-        List<Integer> toSort = new ArrayList<>();
-        List<GSProduct> sortedProducts = new ArrayList<>();
+
+    private List<GSProduct> sortProductByProductNumber(Iterable<GSProduct> foundProducts) {
+        List<GSProduct> sortedProducts = new LinkedList<>();
         for (GSProduct product : foundProducts) {
-            toSort.add(product.getProductNumber());
+            sortedProducts.add(product);
         }
-        if (direction.equals("asc"))
-            Collections.sort(toSort);
-        else {
-            Collections.sort(toSort, Collections.reverseOrder());
-        }
-        for (int sorted : toSort) {
-            sortedProducts.add(catalog.findBy(sorted).iterator().next());
-        }
+        Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Integer.compare(a.getProductNumber(), b.getProductNumber())));
         return sortedProducts;
     }
-*/
 
+    private List<GSProduct> sortProductByPrice(Iterable<GSProduct> foundProducts, String direction) {
+        List<GSProduct> sortedProducts = new LinkedList<>();
+        for (GSProduct product : foundProducts) {
+            sortedProducts.add(product);
+        }
+        if (direction == "asc")
+        Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Double.compare(a.getPriceDouble(), b.getPriceDouble())));
+        else Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Double.compare(b.getPriceDouble(), a.getPriceDouble())));
+        return sortedProducts;
+    }
+
+
+    private List<SubCategory> sortSubCategoryByName(Iterable<SubCategory> foundCategories) {
+        List<SubCategory> sortedSubCategory = new LinkedList<>();
+        for (SubCategory subCategory : foundCategories) {
+            sortedSubCategory.add(subCategory);
+        }
+        Collections.sort(sortedSubCategory, (SubCategory a, SubCategory b) -> (a.getName().compareTo(b.getName())));
+
+        return sortedSubCategory;
+    }
 }

@@ -64,15 +64,16 @@
                         <button id="searchCatalog" type="submit">suchen</button>
                     </form>
 
-
+                    <form method="get" action="/productsearch">
                     <label>sortieren nach</label>
-                    <select name="sortieren" id="sortieren">
-                        <option selected="selected">Name</option>
-                        <option>Preis aufsteigend</option>
-                        <option>Preis absteigend</option>
-                        <option>Artikelnummer</option>
+                    <select name="sorting" id="sorting">
+                        <option name="name">Name</option>
+                        <option name="priceasc">Preis aufsteigend</option>
+                        <option name="pricedesc">Preis absteigend</option>
+                        <option name="prodnum">Artikelnummer</option>
                     </select>
                         <button id="sortProducts" type="submit">sortieren</button>
+                    </form>
 
                     <table id="searchTable" class="table-style01 alternatRows">
                         <thead>
