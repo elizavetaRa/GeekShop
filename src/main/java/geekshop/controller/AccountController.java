@@ -29,7 +29,6 @@ class AccountController {
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
     private final PasswordRulesRepository passRulesRepo;
-    private final PasswordRules passwordRules;
     private final UserAccountManager uam;
     private final AuthenticationManager authManager;
     private final MessageRepository messageRepo;
@@ -50,7 +49,6 @@ class AccountController {
         Assert.notNull(userRepo, "UserRepository must not be null!");
         Assert.notNull(jokeRepo, "JokeRepository must not be null!");
         Assert.notNull(passRulesRepo, "PasswordRulesRepository must not be null!");
-        Assert.isTrue(passRulesRepo.findAll().iterator().hasNext(), "PasswordRulesRepository should contain PasswordRules!");
         Assert.notNull(uam, "UserAccountManager must not be null!");
         Assert.notNull(authManager, "AuthenticationManager must not be null!");
         Assert.notNull(messageRepo, "MessageRepo must not be null!");
@@ -58,7 +56,6 @@ class AccountController {
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
         this.passRulesRepo = passRulesRepo;
-        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.uam = uam;
         this.authManager = authManager;
         this.messageRepo = messageRepo;
@@ -70,23 +67,38 @@ class AccountController {
      * Shows the start page with the welome joke or, if the user's password does not match the current password rules, redirects to the respective page demanding the user to change the password according to the current password rules.
      */
     @RequestMapping({"/", "/index"})
-    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession httpSession) {
+    public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession session) {
 
         User user = userRepo.findByUserAccount(userAccount.get());
+
+        // add user for full name in header to the session
+        session.setAttribute("user", user);
+
+        // add message repository to the session to display current number of messages
+        session.setAttribute("msgRepo", messageRepo);
+
+        // check whether user's password matches the current password rules
+        PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
 
         if (!passwordRules.isValidPassword(user.getPasswordAttributes())) {
             if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
                 messageRepo.save(new Message(MessageKind.NOTIFICATION, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
             } else {
+                userAccount.get().add(new Role("ROLE_INSECURE_PASSWORD"));
+                userRepo.save(user);
                 model.addAttribute("passwordRules", passwordRules);
                 return "adjustpw";
             }
+        } else if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD"))) {
+            userAccount.get().remove(new Role("ROLE_INSECURE_PASSWORD"));
+            userRepo.save(user);
         }
 
+        // arrange new welcome joke
         String sessionId = user.getCurrentSessionId();
         List<Joke> recentJokes = user.getRecentJokes();
 
-        if (httpSession.getId().equals(sessionId)) {
+        if (session.getId().equals(sessionId)) {
             model.addAttribute("joke", user.getLastJoke());
         } else {
             Joke joke = getRandomJoke(recentJokes);
@@ -94,7 +106,7 @@ class AccountController {
             if (joke != null)
                 user.addJoke(joke);
 
-            user.setCurrentSessionId(httpSession.getId());
+            user.setCurrentSessionId(session.getId());
             userRepo.save(user);
 
             model.addAttribute("joke", joke);
@@ -198,7 +210,7 @@ class AccountController {
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
     public String hire(@RequestParam Map<String, String> formData) {
 
-        String password = passwordRules.generateRandomPassword();
+        String password = passRulesRepo.findOne("passwordRules").get().generateRandomPassword();
         UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
@@ -241,7 +253,7 @@ class AccountController {
     public String fireAll() {
         Iterable<User> allEmployees = userRepo.findAll();
         for (User user : allEmployees) {
-            if (user.getUserAccount().hasRole(new Role("ROLE_OWNER")))
+            if (user.getUserAccount().hasRole(new Role("ROLE_OWNER")) && user.getUserAccount().isEnabled())
                 continue;
             dismiss(user);
         }
@@ -278,7 +290,7 @@ class AccountController {
             return "profile";
         } else { // password change
             model.addAttribute("isOwnProfile", false);
-            model.addAttribute("passwordRules", passwordRules);
+            model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
 
             return "changepw";
         }
@@ -294,7 +306,7 @@ class AccountController {
     @RequestMapping("/setrules")
     public String setPWRules(Model model) {
 
-        model.addAttribute("passwordRules", passwordRules);
+        model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
 
         return "setrules";
     }
@@ -314,6 +326,7 @@ class AccountController {
         if (minLength < 1)
             minLength = 1;
 
+        PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         passwordRules.setUpperAndLowerNecessary(upperLower);
         passwordRules.setDigitsNecessary(digits);
         passwordRules.setSpecialCharactersNecessary(specialChars);
@@ -331,6 +344,8 @@ class AccountController {
      */
     @RequestMapping("/profile")
     public String profile(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -346,6 +361,8 @@ class AccountController {
      */
     @RequestMapping("/profile/{page}")
     public String profileChange(Model model, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -358,7 +375,7 @@ class AccountController {
         } else { // password change
             model.addAttribute("user", user);
             model.addAttribute("isOwnProfile", true);
-            model.addAttribute("passwordRules", passwordRules);
+            model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
 
             return "changepw";
         }
@@ -372,6 +389,8 @@ class AccountController {
      */
     @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
     public String changedData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         String uai = formData.get("uai");
         UserAccount ua = uam.findByUsername(uai).get();
@@ -403,7 +422,10 @@ class AccountController {
      * Saves the new password changed by the user himself. If the user changed his password, a message will be sent to the shop owner.
      */
     @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
+    @PreAuthorize("!hasRole('ROLE_INSECURE_PASSWORD')")
     public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
@@ -426,7 +448,10 @@ class AccountController {
      * Saves the new password changed by the shop owner.
      */
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
+    @PreAuthorize("!hasRole('ROLE_INSECURE_PASSWORD')")
     public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
         UserAccount ua = uam.get(uai).get();
         User user = userRepo.findByUserAccount(ua);
@@ -457,7 +482,7 @@ class AccountController {
             return false;
         }
 
-        if (!passwordRules.isValidPassword(newPW)) {
+        if (!passRulesRepo.findOne("passwordRules").get().isValidPassword(newPW)) {
             System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
             model.addAttribute("error", "Neues Passwort entspricht nicht den Sicherheitsregeln!");
 
@@ -481,11 +506,11 @@ class AccountController {
      */
     private void dismiss(User user) {
         UserAccount userAccount = user.getUserAccount();
-        userRepo.delete(user);
+//        userRepo.delete(user);
         userAccount.remove(new Role("ROLE_EMPLOYEE"));
         uam.save(userAccount);
         uam.disable(userAccount.getIdentifier());
-        uam.changePassword(userAccount, passwordRules.generateRandomPassword());
+        uam.changePassword(userAccount, passRulesRepo.findOne("passwordRules").get().generateRandomPassword());
     }
 
     /**
@@ -495,7 +520,7 @@ class AccountController {
         Iterable<User> allUsers = userRepo.findAll();
         List<User> employees = new LinkedList<User>();
         for (User user : allUsers) {
-            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER"))) {
+            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER")) && user.getUserAccount().isEnabled()) {
                 employees.add(user);
             }
         }

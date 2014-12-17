@@ -38,15 +38,15 @@
                     <tbody th:remove="tag" th:each="gsProductOrders : ${orders}">
                     <tr class="highlight" th:with="productOrders = ${gsProductOrders.value}">
                         <td class="t-left" colspan="2" th:text="${gsProductOrders.key.name}">PRODUKTNAME</td>
-                        <td th:text="${productOrders.totalQuantity}">GESAMTANZAHL</td>
-                        <td th:text="${productOrders.totalPrice}">GESAMTPREIS</td>
+                        <td th:text="${productOrders.totalQuantity.amount}">GESAMTANZAHL</td>
+                        <td th:text="${T(geekshop.model.GSProduct).moneyToString(productOrders.totalPrice)}">GESAMTPREIS</td>
                     </tr>
                     <div th:remove="tag" th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
                     <tr th:with="ol = ${gsProductOrder.orderLine}">
                         <td th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM</td>
                         <td th:text="${gsProductOrder.seller}">VERKÄUFER</td>
-                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' + ol.quantity.amount : ol.quantity.amount}">ANZAHL</td>
-                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' + ol.price : ol.price}">PREIS</td>
+                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${ol.quantity.amount}">ANZAHL</td>
+                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(ol.price)}">PREIS</td>
                         <!--<td>nein</td>-->
                     </tr>
                     </div>

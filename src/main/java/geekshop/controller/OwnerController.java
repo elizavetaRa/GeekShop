@@ -42,7 +42,6 @@ class OwnerController {
     private final JokeRepository jokeRepo;
     private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
-    private final PasswordRules passwordRules;
     private final SubCategoryRepository subCategoryRepo;
     private final SuperCategoryRepository superCategoryRepo;
 
@@ -50,7 +49,7 @@ class OwnerController {
     @Autowired
     public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
                            UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
-                           MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCategoryRepo,
+                           MessageRepository messageRepo, SubCategoryRepository subCategoryRepo,
                            SuperCategoryRepository superCategoryRepo) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
@@ -59,7 +58,6 @@ class OwnerController {
         this.jokeRepo = jokeRepo;
         this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
-        this.passwordRules = passRulesRepo.findOne("passwordRules").get();
         this.subCategoryRepo = subCategoryRepo;
         this.superCategoryRepo = superCategoryRepo;
     }
@@ -235,7 +233,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/delsuper", method = RequestMethod.DELETE)
-    public String delSuper(@RequestParam("superName") String superName){
+    public String delSuper(@RequestParam("superName") String superName) {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superName);
 
@@ -243,7 +241,7 @@ class OwnerController {
 
         int i = 0;
 
-        while (!sub.isEmpty()){
+        while (!sub.isEmpty()) {
 
             delSub(sub.remove(i));
 
@@ -254,7 +252,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/delsub", method = RequestMethod.DELETE)
-    public String delSubRequest(@RequestParam("subName") String subName){
+    public String delSubRequest(@RequestParam("subName") String subName) {
 
         SubCategory subCategory = subCategoryRepo.findByName(subName);
 
@@ -270,7 +268,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/delproduct", method = RequestMethod.DELETE)
-    public String delProductRequest(@RequestParam("productIdent") ProductIdentifier productIdentifier){
+    public String delProductRequest(@RequestParam("productIdent") ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.getSubCategory().getProducts().remove(product.getSubCategory().getProducts().indexOf(product));
         delProduct(productIdentifier);
@@ -278,8 +276,8 @@ class OwnerController {
         return "redirect:/range";
     }
 
-    public void delSub(SubCategory subCategory){
-        for (GSProduct product : subCategory.getProducts()){
+    public void delSub(SubCategory subCategory) {
+        for (GSProduct product : subCategory.getProducts()) {
             ProductIdentifier productIdentifier = product.getIdentifier();
             delProduct(productIdentifier);
         }
@@ -288,13 +286,11 @@ class OwnerController {
 
     }
 
-    public void delProduct(ProductIdentifier productIdentifier){
+    public void delProduct(ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.setInRange(false);
         product.setSubCategory(null);
     }
-
-
 
 
 }

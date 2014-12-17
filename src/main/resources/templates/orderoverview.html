@@ -47,7 +47,7 @@
                     <tr th:each="orderline : ${order.orderLines}">
                         <td th:text="${orderline.productName}">USB-Ventilator</td>
                         <td th:text="${orderline.quantity.amount}">2</td>
-                        <td th:text="${orderline.price}">15 EUR</td>
+                        <td th:text="${T(geekshop.model.GSProduct).moneyToString(orderline.price)}">15 EUR</td>
                     </tr>
 
                     </tbody>
@@ -55,7 +55,7 @@
                     <tfoot>
                     <tr>
                         <td colspan="2" class="t-right">Gesamtpreis:</td>
-                        <td th:text="${order.totalPrice}">269,47 EUR</td>
+                        <td th:text="${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">269,47 EUR</td>
                     </tr>
                     </tfoot>
 

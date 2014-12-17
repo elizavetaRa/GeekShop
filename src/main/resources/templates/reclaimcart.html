@@ -27,7 +27,7 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Warenkorb</h3>
+            <h3 id="content-title">Reklamationswarenkorb</h3>
 
             <div id="content-in">
 
@@ -43,7 +43,7 @@
                         </tr>
                         </thead>
                         <tbody th:remove="all-but-first">
-                        <tr th:each="cartitem : ${cart}">
+                        <tr th:each="cartitem : ${reclaimcart}">
 
                             <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
                             <td><input type="number" name="number" th:value="${cartitem.quantity.amount}" min="1"
@@ -77,7 +77,7 @@
 
 
                     <form th:action="@{/checkout}">
-                        <button id="checkout" class="myButton" type="submit">zur Kasse
+                        <button id="checkout" class="myButton" type="submit">reklamieren
                         </button>
                     </form>
                 </div>
