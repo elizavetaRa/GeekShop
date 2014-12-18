@@ -31,18 +31,18 @@
 
                 <div th:each="message : ${ownermessage}">
                     <table class="table-style01 alternatRows">
-                        <tr th:if="${message.kindToString() == 'PASSWORD'}" style="background: #BE190C; border-color: #BE190C">
+                        <tr th:if="${message.messageKind == T(geekshop.model.MessageKind).PASSWORD}" style="background: #BE190C; border-color: #BE190C">
                             <td th:utext="${message.messageText}">Passowrt aendern!</td>
                         </tr>
-                        <tr th:if="${message.kindToString() != 'PASSWORD'}" style="background: #EFEFEF; border-color: #EFEFEF;">
+                        <tr th:if="${message.messageKind != T(geekshop.model.MessageKind).PASSWORD}" style="background: #EFEFEF; border-color: #EFEFEF;">
                             <td th:utext="${message.messageText}">Hans hat seine Daten geändert.</td>
                             <td style="width: 100px;">
-                                <form th:method="post" th:if="${message.kindToString() == 'RECLAIM'}"
+                                <form th:method="post" th:if="${message.messageKind == T(geekshop.model.MessageKind).RECLAIM}"
                                       th:action="'/showreclaim/reclaim=' + ${message.reclaimId}">
                                     <input name="msgId" type="hidden" th:value="${message.id}"/>
                                     <button id="shwoReclaim" class="myButton">Ansehen</button>
                                 </form>
-                                <form th:method="delete" th:if="${message.kindToString() == 'NOTIFICATION'}"
+                                <form th:method="delete" th:if="${message.messageKind == T(geekshop.model.MessageKind).NOTIFICATION}"
                                       th:action="@{/messages/} + ${message.id}">
                                     <button id="delMessage" class="myButton" style="margin-left: 1%">Löschen</button>
                                 </form>
