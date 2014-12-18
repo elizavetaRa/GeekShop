@@ -3,9 +3,13 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
+import org.salespointframework.inventory.Inventory;
+import org.salespointframework.inventory.InventoryItem;
 import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
+import org.salespointframework.quantity.Quantity;
+import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +48,14 @@ class OwnerController {
     private final MessageRepository messageRepo;
     private final SubCategoryRepository subCategoryRepo;
     private final SuperCategoryRepository superCategoryRepo;
+    private final Inventory<GSInventoryItem> inventory;
 
 
     @Autowired
     public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
                            UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
                            MessageRepository messageRepo, SubCategoryRepository subCategoryRepo,
-                           SuperCategoryRepository superCategoryRepo) {
+                           SuperCategoryRepository superCategoryRepo, Inventory<GSInventoryItem> inventory) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
@@ -60,6 +65,7 @@ class OwnerController {
         this.messageRepo = messageRepo;
         this.subCategoryRepo = subCategoryRepo;
         this.superCategoryRepo = superCategoryRepo;
+        this.inventory = inventory;
     }
 
 
@@ -125,7 +131,14 @@ class OwnerController {
         if (accept == true) {
             orderManager.payOrder(order);
             orderRepo.save(order);
-            //ReaddItemstoStock
+
+            for (OrderLine line : order.getOrderLines()){
+                Quantity quantity = line.getQuantity();
+                GSInventoryItem item = inventory.findByProductIdentifier(line.getProductIdentifier()).get();
+                item.increaseQuantity(quantity);
+                inventory.save(item);
+            }
+
         } else {
 
             orderManager.cancelOrder(order);
@@ -223,9 +236,10 @@ class OwnerController {
 
     @RequestMapping("/range")
     public String range(Model model) {
-        model.addAttribute("subcategories", subCategoryRepo.findAll());
+        model.addAttribute("inventory", inventory);
         model.addAttribute("supercategories", superCategoryRepo.findAll());
         return "range";
+
     }
 
     @RequestMapping(value = "/range/delsuper", method = RequestMethod.DELETE)
@@ -233,16 +247,17 @@ class OwnerController {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superName);
 
-        List<SubCategory> sub = superCategory.getSubCategories();
+//        List<SubCategory> sub = superCategory.getSubCategories();
 
-        int i = 0;
 
-        while (!sub.isEmpty()) {
+        while (!superCategory.getSubCategories().isEmpty()) {
 
-            delSub(sub.remove(i));
+            SubCategory subCategory = superCategory.getSubCategories().get(superCategory.getSubCategories().indexOf(superCategory.getSubCategories().get(0)));
+            superCategory.getSubCategories().remove(subCategory);
+            delSub(subCategory);
 
         }
-
+        superCategoryRepo.save(superCategory);
         superCategoryRepo.delete(superCategory.getId());
         return "redirect:/range";
     }
@@ -254,7 +269,7 @@ class OwnerController {
 
         SuperCategory superCategory = subCategory.getSuperCategory();
 
-        superCategory.getSubCategories().remove(subCategory);
+//        superCategory.getSubCategories().remove(subCategory);
 
 
         delSub(subCategory);
@@ -267,25 +282,38 @@ class OwnerController {
     public String delProductRequest(@RequestParam("productIdent") ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.getSubCategory().getProducts().remove(product.getSubCategory().getProducts().indexOf(product));
+        subCategoryRepo.save(product.getSubCategory());
         delProduct(productIdentifier);
 
         return "redirect:/range";
     }
 
-    public void delSub(SubCategory subCategory) {
-        for (GSProduct product : subCategory.getProducts()) {
+    private void delSub(SubCategory subCategory) {
+        while (!subCategory.getProducts().isEmpty()) {
+            GSProduct product = subCategory.getProducts().get(0);
             ProductIdentifier productIdentifier = product.getIdentifier();
+            subCategory.getProducts().remove(product);
             delProduct(productIdentifier);
+            subCategoryRepo.save(subCategory);
         }
         Long id = subCategory.getId();
+        subCategory.getSuperCategory().getSubCategories().remove(subCategory);
+        superCategoryRepo.save(subCategory.getSuperCategory());
+        subCategoryRepo.save(subCategory);
         subCategoryRepo.delete(id);
 
     }
 
-    public void delProduct(ProductIdentifier productIdentifier) {
+    private void delProduct(ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.setInRange(false);
         product.setSubCategory(null);
+        Quantity quantity = Units.of(-1L);
+        GSInventoryItem item = inventory.findByProductIdentifier(productIdentifier).get();
+        item.setMinimalQuantity(quantity);
+        item.decreaseQuantity(item.getQuantity());
+        catalog.save(product);
+
     }
 
 
