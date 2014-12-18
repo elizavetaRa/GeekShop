@@ -132,8 +132,14 @@ class OwnerController {
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
+        GSOrder order = orderRepo.findOne(reclaimId).get();
         if (accept == true) {
+//            orderManager.completeOrder()
             //ReaddItemstoStock
+        } else {
+
+            orderManager.cancelOrder(order);
+            orderRepo.save(order);
         }
 
         return "redirect:/messages";
