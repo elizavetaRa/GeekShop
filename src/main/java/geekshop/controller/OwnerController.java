@@ -123,7 +123,8 @@ class OwnerController {
         messageRepo.delete(msgId);
         GSOrder order = orderRepo.findOne(reclaimId).get();
         if (accept == true) {
-//            orderManager.completeOrder()
+            orderManager.payOrder(order);
+            orderRepo.save(order);
             //ReaddItemstoStock
         } else {
 

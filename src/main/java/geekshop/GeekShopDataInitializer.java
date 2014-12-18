@@ -306,12 +306,8 @@ public class GeekShopDataInitializer implements DataInitializer {
         orderManager.save(order2); // speichere die Order im OrderManager, damit dateCreated angelegt wird
         orderManager.save(order3); // speichere die Order im OrderManager, damit dateCreated angelegt wird
         orderManager.save(order4); // speichere die Order im OrderManager, damit dateCreated angelegt wird
-        orderManager.completeOrder(order1);
-        orderManager.completeOrder(order3);
-        orderManager.completeOrder(order4); // Nicht order2, da noch nicht bestaetigte ReclaimOrder!
-        orderManager.save(order1);
-        orderManager.save(order3);
-        orderManager.save(order4);
+        orderManager.payOrder(order1);
+        orderManager.payOrder(order3); // Nicht order2 und order4, da noch nicht bestaetigte ReclaimOrder!
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
@@ -338,8 +334,11 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (messageRepo.count() > 0)
             return;
 
-        GSOrder order = orderRepo.findByType(OrderType.RECLAIM).iterator().next();
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
-        messageRepo.save(new Message(MessageKind.RECLAIM, "Testreclaim (noch Weiterleitung auf catalog)", order));
+
+        for (GSOrder order : orderRepo.findByType(OrderType.RECLAIM)){
+            String messageText = "Es wurden Produkte der Rechnung " + order.getOrderNumber() + " zurück gegeben.";
+            messageRepo.save(new Message(MessageKind.RECLAIM, messageText, order));
+        }
     }
 }
