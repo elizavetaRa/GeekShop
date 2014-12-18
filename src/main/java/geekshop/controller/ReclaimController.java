@@ -44,7 +44,7 @@ class ReclaimController {
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
-    private GSOrder lastorder;
+
 
 
     /**
@@ -158,17 +158,19 @@ class ReclaimController {
         int id = Integer.parseInt(searchOrdernumber);
         System.out.println("Soll nach dieser NUmmer suchen:  " + id);
         Iterator<GSOrder> allOrders = orderRepo.findAll().iterator();
-        while (allOrders.hasNext()) {
+        while (allOrders.hasNext()) {                              //iteriert über alle Orders, sucht nach einer mit eingegebener searchOrdernumber
             System.out.println("in der Schleife  ");
             GSOrder tempOrder = allOrders.next();
             System.out.println("Aktuelle OrderNumber "+ tempOrder.getOrderNumber());
-            if (tempOrder.getOrderNumber() == id) {
+            if ((tempOrder.getOrderNumber() == id) && (!tempOrder.isCompleted()) && (!tempOrder.isCanceled()) ) {  //wenn gefunden, nicht schon reklamiert und nicht completed, setzt Attribut reclaimorder
 
-                model.addAttribute("reclaimingorder", tempOrder);
-                System.out.println("Order gefunden:  " + tempOrder.getOrderNumber());
+                model.addAttribute("reclaimorder", orderRepo.findOne(tempOrder.getId()).get());
+                System.out.println("Order gefunden:  " + orderRepo.findOne(tempOrder.getId()).get().toString());
                 return "redirect:/reclaim";
             }
         }
+
+
         System.out.println("nichts gefunden");
         return "redirect:/reclaim";
     }
