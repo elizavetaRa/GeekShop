@@ -81,13 +81,13 @@ class CatalogController {
 
         if (searchTerm == null) {
             if ((sorting == null) || (sorting.equals("name"))) {
-                model.addAttribute("catalog", sortProductByName(catalog.findAll()));
+                model.addAttribute("catalog", sortProductByName(findAllProducts()));
             } else if (sorting.equals("prodnum")) {
-                model.addAttribute("catalog", sortProductByProductNumber(catalog.findAll()));
+                model.addAttribute("catalog", sortProductByProductNumber(findAllProducts()));
             } else if (sorting.equals("pricedesc")) {
-                model.addAttribute("catalog", sortProductByPrice(catalog.findAll(), "desc"));
+                model.addAttribute("catalog", sortProductByPrice(findAllProducts(), "desc"));
             } else if (sorting.equals("priceasc")) {
-                model.addAttribute("catalog", sortProductByPrice(catalog.findAll(), "asc"));
+                model.addAttribute("catalog", sortProductByPrice(findAllProducts(), "asc"));
             }
         } else if ((sorting == null) || (sorting.equals("name"))) {
             model.addAttribute("catalog", sortProductByName(search(searchTerm)));
@@ -104,7 +104,7 @@ class CatalogController {
     }
 
     private Set<GSProduct> search(String searchTerm) {
-        Iterable<GSProduct> allProducts = catalog.findAll();
+        Iterable<GSProduct> allProducts = findAllProducts();
         Set<GSProduct> foundProducts = new HashSet<GSProduct>();
         for (GSProduct product : allProducts) {
             if (product.getName().toLowerCase().contains(searchTerm.toLowerCase()))
@@ -160,5 +160,14 @@ class CatalogController {
         Collections.sort(sortedSubCategory, (SubCategory a, SubCategory b) -> (a.getName().compareTo(b.getName())));
 
         return sortedSubCategory;
+    }
+
+    private Iterable<GSProduct> findAllProducts() {
+        Collection<GSProduct> products = new HashSet<>();
+        for (GSProduct p : catalog.findAll()) {
+            if (p.isInRange())
+                products.add(p);
+        }
+        return products;
     }
 }
