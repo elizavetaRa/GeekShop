@@ -15,8 +15,8 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Integration tests for {@link geekshop.model.MessageRepository}.
- * <p>
- * *
+ *
+ *
  *
  * @author Felix D&ouml;ring
  */
@@ -35,7 +35,7 @@ public class MessageRepositoryTest {
 
     @Test
     public void createAndDeleteEnty() {
-        GSOrder order = new GSOrder(0, userRepo.findAll().iterator().next().getUserAccount(), orderRepo.findByType(OrderType.RECLAIM).iterator().next());
+        GSOrder order = orderRepo.findByType(OrderType.RECLAIM).iterator().next();
         Message testNotification = new Message(MessageKind.NOTIFICATION, "Test");
         Message testReclaim = new Message(MessageKind.RECLAIM, "Test", order);
         messageRepo.save(testNotification);

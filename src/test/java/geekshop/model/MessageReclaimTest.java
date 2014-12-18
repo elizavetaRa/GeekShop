@@ -10,8 +10,8 @@ import javax.transaction.Transactional;
 
 /**
  * Empty ReclaimLink Test for {@link geekshop.model.MessageRepository}.
- * <p>
- * *
+ *
+ *
  *
  * @author Felix D&ouml;ring
  */
