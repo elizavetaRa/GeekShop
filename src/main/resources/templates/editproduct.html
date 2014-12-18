@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('range')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title"
+                th:text="(${product} ? 'Artikel ' + ${product.name} + ' bearbeiten' : 'Artikel hinzufügen')">Profil</h3>
+
+            <div id="content-in">
+
+                <form th:action="(${product} ? '/changedproduct' : '/addproduct')" method="post">
+                    <table class="table-style01 t-left noborder">
+                        <tr>
+                            <td>
+                                <label for="firstname" class="highlight">Vorname:</label>
+                            </td>
+                            <td th:with="firstname = (${user} ? ${user.userAccount.firstname})">
+                                <p th:if="${!inEditingMode}" th:text="${firstname}"></p>
+                                <input name="firstname" id="firstname" type="text" size="30" maxlength="30"
+                                       value="Max" th:if="${inEditingMode}" th:value="${firstname}"
+                                       required="required"/>
+                            </td>
+
+                            <td class="indent">
+                                <label for="lastname" class="highlight">Nachname:</label>
+                            </td>
+                            <td th:with="lastname = (${user} ? ${user.userAccount.lastname})">
+                                <p th:if="${!inEditingMode}" th:text="${lastname}"></p>
+                                <input name="lastname" id="lastname" type="text" size="30" maxlength="40"
+                                       value="Mustermann" th:if="${inEditingMode}" th:value="${lastname}"
+                                       required="required"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="username" class="highlight">Benutzername:</label>
+                            </td>
+                            <td th:with="username = (${user} ? ${user.userAccount.identifier})">
+                                <p th:if="${!inEditingMode}" th:text="${username}"></p>
+                                <input name="username" id="username" type="text" size="30" maxlength="30"
+                                       value="max" th:if="${inEditingMode}" th:value="${username}"
+                                       th:disabled="${user}"/>
+                            </td>
+
+                            <td class="indent">
+                                <label for="email" class="highlight">E-Mail-Adresse:</label>
+                            </td>
+                            <td th:with="email = (${user} ? ${user.userAccount.email})">
+                                <p th:if="${!inEditingMode}" th:text="${email}"></p>
+                                <input name="email" id="email" type="text" size="30" maxlength="40"
+                                       value="max@example.com" th:if="${inEditingMode}" th:value="${email}"
+                                       required="required"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="gender" class="highlight">Geschlecht:</label>
+                            </td>
+                            <td th:with="gender = (${user} ? ${user.gender})">
+                                <p th:if="${!inEditingMode}" th:text="${gender.value}"></p>
+                                <select name="gender" id="gender" th:if="${inEditingMode}">
+                                    <option th:each="g : ${T(geekshop.model.Gender).values()}"
+                                            th:value="${g}" th:text="${g.value}"
+                                            th:selected="${g == gender}"></option>
+                                </select>
+                            </td>
+
+                            <td class="indent">
+                                <label for="birthday" class="highlight">Geburtsdatum:</label>
+                            </td>
+                            <td th:with="date = (${user} ? ${#dates.format(user.birthday, 'dd.MM.yyyy')})">
+                                <p th:if="${!inEditingMode}" th:text="${date}"></p>
+                                <input type="text" name="birthday" id="birthday" value="24.02.1955"
+                                       th:if="${inEditingMode}" th:value="${date}"
+                                       pattern="^(31|30|[012][1-9]|[1-9])[\.-\/](0[1-9]|1[012]|[1-9])[\.-\/]((18|19|20)\d{2}|\d{2})$"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="maritalStatus" class="highlight">Familienstand:</label>
+                            </td>
+                            <td th:with="maritalStatus = (${user} ? ${user.maritalStatus})">
+                                <p th:if="${!inEditingMode}" th:text="${maritalStatus.value}"></p>
+                                <select name="maritalStatus" id="maritalStatus" th:if="${inEditingMode}">
+                                    <option th:each="ms : ${T(geekshop.model.MaritalStatus).values()}"
+                                            th:value="${ms}" th:text="${ms.value}"
+                                            th:selected="${ms == maritalStatus}"></option>
+                                </select>
+                            </td>
+
+                            <td class="indent">
+                                <label for="phone" class="highlight">Telefonnummer:</label>
+                            </td>
+                            <td th:with="phone = (${user} ? ${user.phone})">
+                                <p th:if="${!inEditingMode}" th:text="${phone}"></p>
+                                <input name="phone" id="phone" type="text" size="30" maxlength="13"
+                                       value="110" required="required" pattern="\d+" th:if="${inEditingMode}"
+                                       th:value="${phone}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="t-left">
+                                <label for="street" class="highlight">Straße:</label>
+                            </td>
+                            <td th:with="street = (${user} ? ${user.street})">
+                                <p th:if="${!inEditingMode}" th:text="${street}"></p>
+                                <input name="street" id="street" type="text" size="15" maxlength="40"
+                                       value="Wall Street" required="required" th:if="${inEditingMode}"
+                                       th:value="${street}"/>
+                            </td>
+
+                            <td class="indent">
+                                <label for="houseNr" class="highlight">Hausnummer:</label>
+                            </td>
+                            <td th:with="houseNr = (${user} ? ${user.houseNr})">
+                                <p th:if="${!inEditingMode}" th:text="${houseNr}"></p>
+                                <input name="houseNr" id="houseNr" type="text" size="15" maxlength="40" value="2"
+                                       required="required" th:if="${inEditingMode}" th:value="${houseNr}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="postcode" class="highlight">PLZ:</label>
+                            </td>
+                            <td th:with="postcode = (${user} ? ${user.postcode})">
+                                <p th:if="${!inEditingMode}" th:text="${postcode}"></p>
+                                <input name="postcode" id="postcode" type="text" size="7" maxlength="5"
+                                       value="4815162342" pattern="\d{5}" required="required"
+                                       th:if="${inEditingMode}" th:value="${postcode}"/>
+                            </td>
+
+                            <td class="indent">
+                                <label for="place" class="highlight">Ort:</label>
+                            </td>
+                            <td th:with="place = (${user} ? ${user.place})">
+                                <p th:if="${!inEditingMode}" th:text="${place}"></p>
+                                <input name="place" id="place" type="text" size="15" maxlength="40" value="City"
+                                       required="required" th:if="${inEditingMode}" th:value="${place}"/>
+                            </td>
+
+                        </tr>
+                    </table>
+                    <input name="uai" type="hidden" th:if="${user}" th:value="${user.userAccount.identifier}"/>
+                    <button type="submit" name="save" id="save" class="myButton" th:if="${inEditingMode}">Speichern
+                    </button>
+                    <a th:href="${path}" th:if="${inEditingMode}" class="myButton">Zurück</a>
+                </form>
+
+                <form th:action="${path} + '/changedata'" method="post" class="f-left" th:if="${!inEditingMode}">
+                    <input name="uai" type="hidden" th:value="${user.userAccount.identifier}"/>
+                    <button type="submit" name="changeData" id="changeData" class="myButton marginButton">
+                        Daten bearbeiten
+                    </button>
+                </form>
+                <form th:action="${path} + '/changepw'" method="post" th:if="${!inEditingMode}">
+                    <input name="uai" type="hidden" th:value="${user.userAccount.identifier}"/>
+                    <button type="submit" name="changePW" id="changePW" class="myButton">
+                        Passwort ändern
+                    </button>
+                </form>
+
+            </div>
+            <!-- /content-in -->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>
