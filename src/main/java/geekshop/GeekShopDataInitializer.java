@@ -306,6 +306,12 @@ public class GeekShopDataInitializer implements DataInitializer {
         orderManager.save(order2); // speichere die Order im OrderManager, damit dateCreated angelegt wird
         orderManager.save(order3); // speichere die Order im OrderManager, damit dateCreated angelegt wird
         orderManager.save(order4); // speichere die Order im OrderManager, damit dateCreated angelegt wird
+        orderManager.completeOrder(order1);
+        orderManager.completeOrder(order3);
+        orderManager.completeOrder(order4); // Nicht order2, da noch nicht bestaetigte ReclaimOrder!
+        orderManager.save(order1);
+        orderManager.save(order3);
+        orderManager.save(order4);
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
