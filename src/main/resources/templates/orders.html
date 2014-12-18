@@ -53,7 +53,11 @@
                     </tbody>
                 </table>
 
-                <button id="exportXml" class="myButton">Als XML exportieren</button>
+                <form th:action="@{/exportXML}" th:method="post">
+                    <button id="export" class="myButton marginButton" type="submit">
+                        Als XML exportieren
+                    </button>
+                </form>
 
             </div>
 
