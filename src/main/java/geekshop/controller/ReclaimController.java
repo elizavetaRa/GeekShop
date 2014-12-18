@@ -23,7 +23,6 @@ import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Iterator;
 import java.util.Optional;
 
 /**
@@ -35,7 +34,6 @@ import java.util.Optional;
 @Controller
 @PreAuthorize("isAuthenticated()")
 @SessionAttributes("cart")
-
 class ReclaimController {
     private PaymentMethod paymentMethod;
     private final OrderManager<GSOrder> orderManager;
@@ -44,7 +42,6 @@ class ReclaimController {
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
-
 
 
     /**
@@ -156,23 +153,40 @@ class ReclaimController {
             return "redirect:/";
 
         int id = Integer.parseInt(searchOrdernumber);
-        System.out.println("Soll nach dieser NUmmer suchen:  " + id);
-        Iterator<GSOrder> allOrders = orderRepo.findAll().iterator();
-        while (allOrders.hasNext()) {                              //iteriert über alle Orders, sucht nach einer mit eingegebener searchOrdernumber
-            System.out.println("in der Schleife  ");
-            GSOrder tempOrder = allOrders.next();
-            System.out.println("Aktuelle OrderNumber "+ tempOrder.getOrderNumber());
-            if ((tempOrder.getOrderNumber() == id) && (!tempOrder.isCompleted()) && (!tempOrder.isCanceled()) ) {  //wenn gefunden, nicht schon reklamiert und nicht completed, setzt Attribut reclaimorder
-
-                model.addAttribute("reclaimorder", tempOrder);
-                System.out.println("Order gefunden:  " + tempOrder);
-                return "reclaim";
-            }
+        Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(id);
+        if (!optOrder.isPresent()) {
+            System.out.println("Keine Rechung gefunden!");
+        } else if (optOrder.get().getOrderType() == OrderType.RECLAIM) {
+            System.out.println("Rechnung " + id + " ist schon eine Reklamation!");
+        } else if (optOrder.get().isCompleted()) { // Es muss noch überprüft werden, ob es innerhalb der 14 Tage liegt!!! Wenn nicht, muss die Order completed werden.
+            System.out.println("Rechnung " + id + " liegt nicht mehr innerhalb des 14-Tage-Fensters!");
+        } else if (optOrder.get().isCanceled()) {
+            System.out.println("Rechnung " + id + " wurde storniert!");
+        } else {
+            model.addAttribute("reclaimorder", optOrder.get());
         }
 
-
-        System.out.println("nichts gefunden");
         return "reclaim";
+
+
+//        int id = Integer.parseInt(searchOrdernumber);
+//        System.out.println("Soll nach dieser NUmmer suchen:  " + id);
+//        Iterator<GSOrder> allOrders = orderRepo.findAll().iterator();
+//        while (allOrders.hasNext()) {                              //iteriert über alle Orders, sucht nach einer mit eingegebener searchOrdernumber
+//            System.out.println("in der Schleife  ");
+//            GSOrder tempOrder = allOrders.next();
+//            System.out.println("Aktuelle OrderNumber "+ tempOrder.getOrderNumber());
+//            if ((tempOrder.getOrderNumber() == id) && (!tempOrder.isCompleted()) && (!tempOrder.isCanceled()) ) {  //wenn gefunden, nicht schon reklamiert und nicht completed, setzt Attribut reclaimorder
+//
+//                model.addAttribute("reclaimorder", tempOrder);
+//                System.out.println("Order gefunden:  " + tempOrder);
+//                return "reclaim";
+//            }
+//        }
+
+
+//        System.out.println("nichts gefunden");
+//        return "reclaim";
     }
 
 
