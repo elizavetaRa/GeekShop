@@ -70,7 +70,7 @@ class CatalogController {
         return "productsearch";
     }
 
-     /**
+    /**
      * shows the search Page with all {@Link Products} which contain the searchTerm in their name
      */
 
@@ -80,26 +80,24 @@ class CatalogController {
             return "redirect:/";
 
         if (searchTerm == null) {
-            if ((sorting == null) || (sorting.matches("Name"))) {
+            if ((sorting == null) || (sorting.equals("name"))) {
                 model.addAttribute("catalog", sortProductByName(catalog.findAll()));
-            }
-            else if (sorting.matches("Artikelnummer")) {
+            } else if (sorting.equals("prodnum")) {
                 model.addAttribute("catalog", sortProductByProductNumber(catalog.findAll()));
-            }
-            else if (sorting.matches("Preis absteigend")){
+            } else if (sorting.equals("pricedesc")) {
                 model.addAttribute("catalog", sortProductByPrice(catalog.findAll(), "desc"));
-            }
-            else if (sorting.matches("Preis aufsteigend")) {
+            } else if (sorting.equals("priceasc")) {
                 model.addAttribute("catalog", sortProductByPrice(catalog.findAll(), "asc"));
             }
-        }
-        else if ((sorting == null) || (sorting.matches("Name")))
+        } 
+        else  if ((sorting == null) || (sorting.equals("name"))) {
             model.addAttribute("catalog", sortProductByName(search(searchTerm)));
-        else if (sorting.matches("Artikelnummer"))
+        }
+        else if (sorting.equals("prodnum"))
             model.addAttribute("catalog", sortProductByProductNumber(search(searchTerm)));
-        else if (sorting.matches("Preis absteigend"))
+        else if (sorting.equals("pricedesc"))
             model.addAttribute("catalog", sortProductByPrice(search(searchTerm), "desc"));
-        else if (sorting.matches("Preis aufsteigend"))
+        else if (orting.equals("priceasc"))
             model.addAttribute("catalog", sortProductByPrice(search(searchTerm), "asc"));
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", sortSubCategoryByName(subRepo.findAll()));
@@ -148,8 +146,9 @@ class CatalogController {
             sortedProducts.add(product);
         }
         if (direction == "asc")
-        Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Double.compare(a.getPriceDouble(), b.getPriceDouble())));
-        else Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Double.compare(b.getPriceDouble(), a.getPriceDouble())));
+            Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Double.compare(a.getPrice().getAmount().doubleValue(), b.getPrice().getAmount().doubleValue())));
+        else
+            Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Double.compare(b.getPrice().getAmount().doubleValue(), a.getPrice().getAmount().doubleValue())));
         return sortedProducts;
     }
 

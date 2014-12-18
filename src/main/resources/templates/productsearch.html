@@ -63,10 +63,10 @@
                         <input value="suchen" th:value="${param.searchTerm} ? ${param.searchTerm[0]}" name="searchTerm" id="searchTerm" type="text" size="25" maxlength="40" placeholder="Artikelsuche"/>
                     <label>sortieren nach</label>
                     <select name="sorting" id="sorting">
-                        <option name="name">Name</option>
-                        <option name="priceasc">Preis aufsteigend</option>
-                        <option name="pricedesc">Preis absteigend</option>
-                        <option name="prodnum">Artikelnummer</option>
+                        <option value="name" th:selected="${param.sorting} and (${param.sorting[0]} == 'name')">Name</option>
+                        <option value="priceasc" th:selected="${param.sorting} and (${param.sorting[0]} == 'priceasc')">Preis aufsteigend</option>
+                        <option value="pricedesc" th:selected="${param.sorting} and (${param.sorting[0]} == 'pricedesc')">Preis absteigend</option>
+                        <option value="prodnum" th:selected="${param.sorting} and (${param.sorting[0]} == 'prodnum')">Artikelnummer</option>
                     </select>
                         <button id="searchAndSortProducts" type="submit">suchen</button>
                     </form>

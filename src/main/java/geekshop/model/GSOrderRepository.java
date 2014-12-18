@@ -1,6 +1,5 @@
 package geekshop.model;
 
-import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.core.SalespointRepository;
 import org.salespointframework.order.OrderIdentifier;
 
@@ -14,7 +13,7 @@ import java.util.Optional;
 
 public interface GSOrderRepository extends SalespointRepository<GSOrder, OrderIdentifier> {
 
-    Optional<GSOrder> findByOrderNumber(SalespointIdentifier orderNumber);
+    Optional<GSOrder> findByOrderNumber(int orderNumber);
     Iterable<GSOrder> findByType(OrderType type);
     Iterable<GSOrder> findByReclaimedOrder(GSOrder reclaimedOrder);
 }

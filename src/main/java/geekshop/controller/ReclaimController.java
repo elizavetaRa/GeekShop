@@ -7,13 +7,9 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
-import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.OrderManager;
-import org.salespointframework.payment.Cash;
-import org.salespointframework.payment.Cheque;
-import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
@@ -27,8 +23,8 @@ import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.order.Cart}.
@@ -159,14 +155,14 @@ class ReclaimController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        SalespointIdentifier id = new SalespointIdentifier(searchOrdernumber);
+        int id = Integer.parseInt(searchOrdernumber);
         System.out.println("Soll nach dieser NUmmer suchen:  " + id);
         Iterator<GSOrder> allOrders = orderRepo.findAll().iterator();
         while (allOrders.hasNext()) {
             System.out.println("in der Schleife  ");
             GSOrder tempOrder = allOrders.next();
             System.out.println("Aktuelle OrderNumber "+ tempOrder.getOrderNumber());
-            if (tempOrder.getOrderNumber().equals(id)) {
+            if (tempOrder.getOrderNumber() == id) {
 
                 model.addAttribute("reclaimingorder", tempOrder);
                 System.out.println("Order gefunden:  " + tempOrder.getOrderNumber());

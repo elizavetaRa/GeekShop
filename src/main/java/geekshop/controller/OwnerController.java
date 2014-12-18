@@ -73,22 +73,11 @@ class OwnerController {
             map.put(product, new GSProductOrders());
         }
 
-//        GSOrder recOrder = orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().next();
-//        GSOrderLine recOl = (GSOrderLine) recOrder.getOrderLines().iterator().next();
-//        recOl.increaseReclaimedAmount(BigDecimal.valueOf(5));
-//        orderManager.save(recOrder);
-
         for (GSOrder order : orderRepo.findAll()) {
-//            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
-            createProductOrder(map, order);
-//            }
+            if (!order.isOpen() && !order.isCanceled()) {    // open and canceled orders ought not to be shown
+                createProductOrder(map, order);
+            }
         }
-
-//        for (GSOrder order : orderManager.find(OrderStatus.COMPLETED)) {
-//            if (order.getOrderType() != OrderType.RECLAIM) {    // reclaim orders ought not to be shown
-//                createProductOrder(map, order);
-//            }
-//        }
 
         model.addAttribute("orders", map);
 
@@ -132,8 +121,14 @@ class OwnerController {
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
+        GSOrder order = orderRepo.findOne(reclaimId).get();
         if (accept == true) {
+//            orderManager.completeOrder()
             //ReaddItemstoStock
+        } else {
+
+            orderManager.cancelOrder(order);
+            orderRepo.save(order);
         }
 
         return "redirect:/messages";

@@ -1,6 +1,5 @@
 package geekshop.model;
 
-import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.order.Order;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.payment.PaymentMethod;
@@ -21,7 +20,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class GSOrder extends Order {
 
-    private final SalespointIdentifier orderNumber;
+    private int orderNumber;
 
     @Enumerated(EnumType.STRING)
     private OrderType type;
@@ -32,38 +31,38 @@ public class GSOrder extends Order {
 
     @Deprecated
     protected GSOrder() {
-        this.orderNumber = new SalespointIdentifier();
+        this.orderNumber = 0;
         this.reclaimedOrder = null;
     }
 
-    public GSOrder(String orderNumber, UserAccount ua) {
+    public GSOrder(int orderNumber, UserAccount ua) {
         super(ua);
 
-        this.orderNumber = new SalespointIdentifier(orderNumber);
+        this.orderNumber = orderNumber;
         this.reclaimedOrder = null;
         initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(String orderNumber, UserAccount ua, GSOrder reclaimedOrder) {
+    public GSOrder(int orderNumber, UserAccount ua, GSOrder reclaimedOrder) {
         super(ua);
 
-        this.orderNumber = new SalespointIdentifier(orderNumber);
+        this.orderNumber = orderNumber;
         this.reclaimedOrder = reclaimedOrder;
         initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(String orderNumber, UserAccount ua, PaymentMethod paymentMethod) {
+    public GSOrder(int orderNumber, UserAccount ua, PaymentMethod paymentMethod) {
         super(ua, paymentMethod);
 
-        this.orderNumber = new SalespointIdentifier(orderNumber);
+        this.orderNumber = orderNumber;
         this.reclaimedOrder = null;
         initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(String orderNumber, UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
+    public GSOrder(int orderNumber, UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
         super(ua, paymentMethod);
 
-        this.orderNumber = new SalespointIdentifier(orderNumber);
+        this.orderNumber = orderNumber;
         this.reclaimedOrder = reclaimedOrder;
         initializeGSOrder(reclaimedOrder);
     }
@@ -83,7 +82,7 @@ public class GSOrder extends Order {
     }
 
 
-    public SalespointIdentifier getOrderNumber() {
+    public int getOrderNumber() {
         return orderNumber;
     }
 
