@@ -59,7 +59,7 @@
                             <td th:with="username = (${user} ? ${user.userAccount.identifier})">
                                 <p th:if="${!inEditingMode}" th:text="${username}"></p>
                                 <input name="username" id="username" type="text" size="30" maxlength="30"
-                                       value="max" th:if="${inEditingMode}" th:value="${username}"
+                                       value="max" required="required" pattern=".{3,}" th:if="${inEditingMode}" th:value="${username}"
                                        th:disabled="${user}"/>
                             </td>
 

@@ -211,7 +211,9 @@ class AccountController {
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
     public String hire(@RequestParam Map<String, String> formData) {
 
-        String password = passRulesRepo.findOne("passwordRules").get().generateRandomPassword();
+        PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
+        String password = passwordRules.generateRandomPassword();
+        password = password.substring(0, passwordRules.getMinLength() - 1); // create insecure password to force the new employee to change this initial password
         UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
@@ -324,8 +326,8 @@ class AccountController {
         boolean digits = map.get("digits") != null && Boolean.parseBoolean(map.get("digits"));
         boolean specialChars = map.get("specialChars") != null && Boolean.parseBoolean(map.get("specialChars"));
 
-        if (minLength < 1)
-            minLength = 1;
+        if (minLength < 6)
+            minLength = 6;
 
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         passwordRules.setUpperAndLowerNecessary(upperLower);
