@@ -9,3 +9,4 @@ Dokumente/tex/Protokolle/*.pdf
 geekshop.iml
 .idea/
 db/
+src/main/resources/application.properties
