@@ -20,7 +20,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -72,6 +84,15 @@ class OwnerController {
     @RequestMapping("/orders")
     public String orders(Model model) {
 
+        Map<GSProduct, GSProductOrders> map = putMap();
+
+        model.addAttribute("orders", map);
+
+        return "orders";
+    }
+
+    private Map<GSProduct, GSProductOrders> putMap() {
+
         Map<GSProduct, GSProductOrders> map = new HashMap<GSProduct, GSProductOrders>();
 
         // for each GSProduct create map entry
@@ -80,14 +101,10 @@ class OwnerController {
         }
 
         for (GSOrder order : orderRepo.findAll()) {
-            if (!order.isOpen() && !order.isCanceled()) {    // open and canceled orders ought not to be shown
-                createProductOrder(map, order);
-            }
+            createProductOrder(map, order);
         }
 
-        model.addAttribute("orders", map);
-
-        return "orders";
+        return map;
     }
 
     private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
@@ -104,6 +121,104 @@ class OwnerController {
             if (prodOrders != null)
                 prodOrders.addProductOrder(productOrder);
         }
+    }
+
+    @RequestMapping(value = "/exportXML", method = RequestMethod.POST)
+    public String exportXML() {
+
+        Map<GSProduct, GSProductOrders> map = putMap();
+
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Document doc = docBuilder.newDocument();
+            Element rootElement = doc.createElement("Sales");
+            doc.appendChild(rootElement);
+
+            for (Map.Entry<GSProduct, GSProductOrders> entry : map.entrySet()) {
+                // root elements
+                Element Product = doc.createElement(entry.getKey().getName());
+                rootElement.appendChild(Product);
+
+
+                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++){
+                    GSProductOrder element = entry.getValue().getProductOrders().get(i);
+
+                    // ProductOrder elements
+                    Element Productorder = doc.createElement("Productorder");
+                    Product.appendChild(Productorder);
+
+                    // set attribute to Productorder element
+                    Attr attr = doc.createAttribute("ID");
+                    attr.setValue(String.valueOf(i));
+                    Productorder.setAttributeNode(attr);
+
+                    // Date elements
+                    Element date = doc.createElement("Date");
+                    date.appendChild(doc.createTextNode(element.getDate().toString()));
+                    Productorder.appendChild(date);
+
+                    // Seller elements
+                    Element seller = doc.createElement("Seller");
+                    seller.appendChild(doc.createTextNode(element.getSeller().toString()));
+                    Productorder.appendChild(seller);
+
+                    // Quantity elements
+                    Element quantity = doc.createElement("Quantity");
+                    quantity.appendChild(doc.createTextNode(element.getOrderLine().getQuantity().toString()));
+                    Productorder.appendChild(quantity);
+
+                    // Price elements
+                    Element price = doc.createElement("Price");
+                    price.appendChild(doc.createTextNode(element.getOrderLine().getPrice().toString()));
+                    Productorder.appendChild(price);
+                }
+
+
+                // Total elements
+                Element total = doc.createElement("Total");
+                Product.appendChild(total);
+
+
+                if(!entry.getValue().getProductOrders().isEmpty()) {
+                    Attr attr = doc.createAttribute("Quantity");
+                    attr.setValue(entry.getValue().getTotalQuantity().toString());
+                    total.setAttributeNode(attr);
+                } else {
+                    Attr attr = doc.createAttribute("Quantity");
+                    attr.setValue(String.valueOf(0));
+                    total.setAttributeNode(attr);
+                }
+
+                // Total Price elements
+                if(!entry.getValue().getProductOrders().isEmpty()) {
+                    Attr attr = doc.createAttribute("Price");
+                    attr.setValue(entry.getValue().getTotalPrice().toString());
+                    total.setAttributeNode(attr);
+                } else {
+                    Attr attr = doc.createAttribute("Price");
+                    attr.setValue(String.valueOf(0));
+                    total.setAttributeNode(attr);
+                }
+
+            }
+
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("Sales.xml"));
+
+            transformer.transform(source, result);
+
+        } catch (ParserConfigurationException pce) {
+            pce.printStackTrace();
+        } catch (TransformerException tfe) {
+            tfe.printStackTrace();
+        }
+
+        return "redirect:/orders";
     }
 
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.POST)
