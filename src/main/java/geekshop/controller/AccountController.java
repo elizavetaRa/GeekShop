@@ -82,7 +82,7 @@ class AccountController {
 
         if (!passwordRules.isValidPassword(user.getPasswordAttributes())) {
             if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
-                messageRepo.save(new Message(MessageKind.NOTIFICATION, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
+                messageRepo.save(new Message(MessageKind.PASSWORD, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
             } else {
                 userAccount.get().add(new Role("ROLE_INSECURE_PASSWORD"));
                 userRepo.save(user);
