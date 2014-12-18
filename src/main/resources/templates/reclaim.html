@@ -49,9 +49,9 @@
                     </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody th:if="${reclaimorder}">
 
-                    <tr th:each="orderline : ${reclaimingorder}">
+                    <tr th:each="orderline : ${reclaimorder.orderLines}">
 
                      <td th:text="${orderline.productName}">USB-Ventilator</td>
                      <td th:text="${orderline.quantity.amount}">2</td>

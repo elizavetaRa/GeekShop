@@ -164,15 +164,15 @@ class ReclaimController {
             System.out.println("Aktuelle OrderNumber "+ tempOrder.getOrderNumber());
             if ((tempOrder.getOrderNumber() == id) && (!tempOrder.isCompleted()) && (!tempOrder.isCanceled()) ) {  //wenn gefunden, nicht schon reklamiert und nicht completed, setzt Attribut reclaimorder
 
-                model.addAttribute("reclaimorder", orderRepo.findOne(tempOrder.getId()).get());
-                System.out.println("Order gefunden:  " + orderRepo.findOne(tempOrder.getId()).get().toString());
-                return "redirect:/reclaim";
+                model.addAttribute("reclaimorder", tempOrder);
+                System.out.println("Order gefunden:  " + tempOrder);
+                return "reclaim";
             }
         }
 
 
         System.out.println("nichts gefunden");
-        return "redirect:/reclaim";
+        return "reclaim";
     }
 
 
