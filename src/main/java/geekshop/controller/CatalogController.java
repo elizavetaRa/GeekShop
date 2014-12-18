@@ -89,16 +89,15 @@ class CatalogController {
             } else if (sorting.equals("priceasc")) {
                 model.addAttribute("catalog", sortProductByPrice(catalog.findAll(), "asc"));
             }
-        } 
-        else  if ((sorting == null) || (sorting.equals("name"))) {
+        } else if ((sorting == null) || (sorting.equals("name"))) {
             model.addAttribute("catalog", sortProductByName(search(searchTerm)));
-        }
-        else if (sorting.equals("prodnum"))
+        } else if (sorting.equals("prodnum")) {
             model.addAttribute("catalog", sortProductByProductNumber(search(searchTerm)));
-        else if (sorting.equals("pricedesc"))
+        } else if (sorting.equals("pricedesc")){
             model.addAttribute("catalog", sortProductByPrice(search(searchTerm), "desc"));
-        else if (orting.equals("priceasc"))
+        } else if (sorting.equals("priceasc")) {
             model.addAttribute("catalog", sortProductByPrice(search(searchTerm), "asc"));
+        }
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", sortSubCategoryByName(subRepo.findAll()));
         return "productsearch";
