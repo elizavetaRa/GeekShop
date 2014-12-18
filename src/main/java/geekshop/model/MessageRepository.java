@@ -7,5 +7,6 @@ import org.salespointframework.core.SalespointRepository;
  *
  * @author Felix D&ouml;ring
  */
-public interface MessageRepository extends SalespointRepository<Message, Long>{
+public interface MessageRepository extends SalespointRepository<Message, Long> {
+    Iterable<Message> findByMessageKind(MessageKind kind);
 }
