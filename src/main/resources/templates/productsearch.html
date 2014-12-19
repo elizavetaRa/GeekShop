@@ -43,15 +43,17 @@
 
                 <div style="width: 195px; border: 4px solid #02AAFC; border-radius: 6px;
                 float:left; height: 100%; padding-left: 10px;">
+                    <form method="get" action="/productsearch">
                     <ul class="ul-style01" th:each="superCategory: ${superCategories}">
 
-                        <li><h5 th:text="${superCategory.name}">Kleidung für Nerds</h5>
+                        <li><a th:href="'/productsearch/sup_' + ${superCategory.name}"><h5 th:text="${superCategory.name}">Kleidung für Nerds</h5></a>
                             <ul th:each="subCategory: ${superCategory.subCategories}">
-                                <li><a th:href="'/productsearch/' + ${subCategory.name}" th:text="${subCategory.name}">T-Shirts</a></li>
+                                <li><a th:href="'/productsearch/sub_' + ${subCategory.name}" th:text="${subCategory.name}">T-Shirts</a></li>
                             </ul>
                         </li>
 
                     </ul>
+                    </form>
                 </div>
 
 

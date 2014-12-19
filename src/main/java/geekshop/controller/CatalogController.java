@@ -59,12 +59,22 @@ class CatalogController {
      * shows the search Page with all {@Link Products} in the given {@Link SubCategory}
      */
 
-    @RequestMapping("/productsearch/{subCategory}")
-    public String catgory(Model model, @PathVariable("subCategory") String subCategory, @LoggedIn Optional<UserAccount> userAccount) {
+    @RequestMapping("/productsearch/{Category}")
+    public String catgory(Model model, @PathVariable("Category") String category, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
-
-        model.addAttribute("catalog", subRepo.findByName(subCategory).getProducts());
+        if (category.contains("sub")) {
+            String[] temp;
+            temp = category.split("_");
+            category = temp[1];
+            model.addAttribute("catalog", subRepo.findByName(category).getProducts());
+        }
+        else {
+            String[] temp;
+            temp = category.split("_");
+            category = temp[1];
+            model.addAttribute("catalog", getAllProductsInSuperCategory(supRepo.findByName(category)));
+        }
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
         return "productsearch";
@@ -160,5 +170,14 @@ class CatalogController {
         Collections.sort(sortedSubCategory, (SubCategory a, SubCategory b) -> (a.getName().compareTo(b.getName())));
 
         return sortedSubCategory;
+    }
+
+        public Set<GSProduct> getAllProductsInSuperCategory(SuperCategory superCategory) {
+        List<SubCategory> temp = superCategory.getSubCategories();
+        Set<GSProduct> products = new HashSet<GSProduct>();
+        for (SubCategory subCategory : temp) {
+            products.addAll(subCategory.getProducts());
+        }
+        return products;
     }
 }
