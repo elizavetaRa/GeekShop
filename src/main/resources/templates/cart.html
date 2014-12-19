@@ -51,7 +51,7 @@
 
 
                                 <form th:action="@{/updatecartitem/}" th:object="${cartitem}" method="post">
-                                    <input type="number" name="quantity" th:value="${cartitem.quantity.amount}" min="1" max=""/>
+                                    <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1" max=""/>
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
                                     <button class="myButton" type="submit">Aktualisieren</button>
                                 </form>

@@ -105,7 +105,7 @@ class CartController {
      */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -115,7 +115,6 @@ class CartController {
         if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
         }
-        ;
 
         cart.addOrUpdateItem(product, Units.of(number));
         return "redirect:/productsearch";
@@ -149,14 +148,14 @@ class CartController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
         int oldquantity= Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
-        int newquantity = Integer.parseInt(quantity);
+        int newquantity = Integer.parseInt(quantity); if (newquantity<=0){newquantity=0;}
         int updatequantity=newquantity-oldquantity;
-//        if (newquantity>oldquantity){updatequantity=newquantity-oldquantity;}
-//        if (newquantity<oldquantity){updatequantity=newquantity-oldquantity;}
 
+        String onLager= (inventory.findByProductIdentifier(cart.getItem(identifier).get().getProduct().getIdentifier())).get().getQuantity().getAmount().toString();
+        System.out.println("Am Lager sind so viele Produkte: "+ onLager);
+        if (Integer.parseInt(onLager)<= newquantity) {updatequantity=Integer.parseInt(onLager)-oldquantity;}
 
         cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
-        System.out.println("updated");
         return "redirect:/cart";
     }
 
