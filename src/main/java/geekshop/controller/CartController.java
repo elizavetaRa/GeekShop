@@ -15,6 +15,7 @@ import org.salespointframework.payment.Cash;
 import org.salespointframework.payment.Cheque;
 import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
+import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.Role;
@@ -27,6 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -141,6 +143,23 @@ class CartController {
         cart.removeItem(identifier);
         return "redirect:/cart";
     }
+
+    @RequestMapping(value = "/updatecartitem/", method = RequestMethod.POST)
+    public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+        int oldquantity= Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
+        int newquantity = Integer.parseInt(quantity);
+        int updatequantity=newquantity-oldquantity;
+//        if (newquantity>oldquantity){updatequantity=newquantity-oldquantity;}
+//        if (newquantity<oldquantity){updatequantity=newquantity-oldquantity;}
+
+
+        cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
+        System.out.println("updated");
+        return "redirect:/cart";
+    }
+
 
 
     @RequestMapping(value = "/cart", method = RequestMethod.GET)

@@ -82,7 +82,8 @@ class AccountController {
 
         if (!passwordRules.isValidPassword(user.getPasswordAttributes())) {
             if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
-                messageRepo.save(new Message(MessageKind.NOTIFICATION, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
+                if (!messageRepo.findByMessageKind(MessageKind.PASSWORD).iterator().hasNext())
+                    messageRepo.save(new Message(MessageKind.PASSWORD, "Passwort muss den geänderten Sicherheitsregeln entsprechend angepasst werden!"));
             } else {
                 userAccount.get().add(new Role("ROLE_INSECURE_PASSWORD"));
                 userRepo.save(user);
@@ -210,7 +211,9 @@ class AccountController {
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
     public String hire(@RequestParam Map<String, String> formData) {
 
-        String password = passRulesRepo.findOne("passwordRules").get().generateRandomPassword();
+        PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
+        String password = passwordRules.generateRandomPassword();
+        password = password.substring(0, passwordRules.getMinLength() - 1); // create insecure password to force the new employee to change this initial password
         UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
@@ -323,8 +326,8 @@ class AccountController {
         boolean digits = map.get("digits") != null && Boolean.parseBoolean(map.get("digits"));
         boolean specialChars = map.get("specialChars") != null && Boolean.parseBoolean(map.get("specialChars"));
 
-        if (minLength < 1)
-            minLength = 1;
+        if (minLength < 6)
+            minLength = 6;
 
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         passwordRules.setUpperAndLowerNecessary(upperLower);
@@ -422,7 +425,6 @@ class AccountController {
      * Saves the new password changed by the user himself. If the user changed his password, a message will be sent to the shop owner.
      */
     @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
-    @PreAuthorize("!hasRole('ROLE_INSECURE_PASSWORD')")
     public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
@@ -437,9 +439,13 @@ class AccountController {
             model.addAttribute("error", "Altes Passwort ist falsch!");
         } else {
             changePassword(model, user, newPW, retypePW);
-        }
 
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+            if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
+                messageRepo.delete(messageRepo.findByMessageKind(MessageKind.PASSWORD));
+            } else {
+                messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+            }
+        }
 
         return "redirect:/profile";
     }
@@ -448,7 +454,6 @@ class AccountController {
      * Saves the new password changed by the shop owner.
      */
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
-    @PreAuthorize("!hasRole('ROLE_INSECURE_PASSWORD')")
     public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";

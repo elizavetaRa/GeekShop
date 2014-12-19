@@ -51,12 +51,6 @@ public class Message {
 
     }
 
-
-    public String kindToString() {
-        if (messageKind.equals(MessageKind.NOTIFICATION)) return "NOTIFICATION";
-        else return "RECLAIM";
-    }
-
     public MessageKind getMessageKind() {
         return messageKind;
     }

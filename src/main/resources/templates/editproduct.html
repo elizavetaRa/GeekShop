@@ -16,7 +16,7 @@
     <div th:replace="header :: #header"></div>
 
     <!-- Navigation -->
-    <div th:replace="navigation :: nav (${isOwnProfile} ? 'profile' : 'staff')"></div>
+    <div th:replace="navigation :: nav ('range')"></div>
 
     <!-- 2 columns (content + sidebar) -->
     <div id="cols" class="box">
@@ -25,11 +25,11 @@
         <div id="content">
 
             <h3 id="content-title"
-                th:text="(${user} ? 'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname} : 'Angestellten hinzufügen')">Profil</h3>
+                th:text="(${product} ? 'Artikel ' + ${product.name} + ' bearbeiten' : 'Artikel hinzufügen')">Profil</h3>
 
-            <div id="content-in" th:with="path = (${user} ? (${isOwnProfile} ? '/profile' : '/staff/' + ${user.userAccount.identifier}) : '/staff')">
+            <div id="content-in">
 
-                <form th:action="(${user} ? '/changeddata' : '/addemployee')" method="post">
+                <form th:action="(${product} ? '/changedproduct' : '/addproduct')" method="post">
                     <table class="table-style01 t-left noborder">
                         <tr>
                             <td>
@@ -59,7 +59,7 @@
                             <td th:with="username = (${user} ? ${user.userAccount.identifier})">
                                 <p th:if="${!inEditingMode}" th:text="${username}"></p>
                                 <input name="username" id="username" type="text" size="30" maxlength="30"
-                                       value="max" required="required" pattern=".{3,}" th:if="${inEditingMode}" th:value="${username}"
+                                       value="max" th:if="${inEditingMode}" th:value="${username}"
                                        th:disabled="${user}"/>
                             </td>
 

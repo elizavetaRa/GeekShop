@@ -46,8 +46,17 @@
                         <tr th:each="cartitem : ${cart}">
 
                             <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
-                            <td><input type="number" name="number" th:value="${cartitem.quantity.amount}" min="1"
-                                       max=""/></td>
+
+                            <td>
+
+
+                                <form th:action="@{/updatecartitem/}" th:object="${cartitem}" method="post">
+                                    <input type="number" name="quantity" th:value="${cartitem.quantity.amount}" min="1" max=""/>
+                                    <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
+                                    <button class="myButton" type="submit">Aktualisieren</button>
+                                </form>
+                            </td>
+
                             <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.price)}">209,19 EUR</td>
                             <td>
 

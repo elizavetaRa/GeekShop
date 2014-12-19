@@ -9,7 +9,7 @@ package geekshop.model;
 public enum MaritalStatus {
     UNMARRIED("ledig"), MARRIED("verheiratet"), SEPARATED("getrennt lebend"), DIVORCED("geschieden"), WIDOWED("verwitwet"),
     PARTNERED("verpartnert"), NO_MORE_PARTNERED("entpartnert"), PARTNER_LEFT_BEHIND("partnerhinterblieben"),
-    UNKNOWN("unbekannt");
+    UNKNOWN("|_||\\||33|<4|\\||\\|7");
 
     private String value;
 

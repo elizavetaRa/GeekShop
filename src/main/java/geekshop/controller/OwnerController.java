@@ -3,9 +3,13 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
+import org.salespointframework.inventory.Inventory;
+import org.salespointframework.inventory.InventoryItem;
 import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
+import org.salespointframework.quantity.Quantity;
+import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +20,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -44,13 +60,14 @@ class OwnerController {
     private final MessageRepository messageRepo;
     private final SubCategoryRepository subCategoryRepo;
     private final SuperCategoryRepository superCategoryRepo;
+    private final Inventory<GSInventoryItem> inventory;
 
 
     @Autowired
     public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
                            UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
                            MessageRepository messageRepo, SubCategoryRepository subCategoryRepo,
-                           SuperCategoryRepository superCategoryRepo) {
+                           SuperCategoryRepository superCategoryRepo, Inventory<GSInventoryItem> inventory) {
         this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
@@ -60,11 +77,21 @@ class OwnerController {
         this.messageRepo = messageRepo;
         this.subCategoryRepo = subCategoryRepo;
         this.superCategoryRepo = superCategoryRepo;
+        this.inventory = inventory;
     }
 
 
     @RequestMapping("/orders")
     public String orders(Model model) {
+
+        Map<GSProduct, GSProductOrders> map = putMap();
+
+        model.addAttribute("orders", map);
+
+        return "orders";
+    }
+
+    private Map<GSProduct, GSProductOrders> putMap() {
 
         Map<GSProduct, GSProductOrders> map = new HashMap<GSProduct, GSProductOrders>();
 
@@ -74,14 +101,10 @@ class OwnerController {
         }
 
         for (GSOrder order : orderRepo.findAll()) {
-            if (!order.isOpen() && !order.isCanceled()) {    // open and canceled orders ought not to be shown
-                createProductOrder(map, order);
-            }
+            createProductOrder(map, order);
         }
 
-        model.addAttribute("orders", map);
-
-        return "orders";
+        return map;
     }
 
     private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
@@ -98,6 +121,104 @@ class OwnerController {
             if (prodOrders != null)
                 prodOrders.addProductOrder(productOrder);
         }
+    }
+
+    @RequestMapping(value = "/exportXML", method = RequestMethod.POST)
+    public String exportXML() {
+
+        Map<GSProduct, GSProductOrders> map = putMap();
+
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Document doc = docBuilder.newDocument();
+            Element rootElement = doc.createElement("Sales");
+            doc.appendChild(rootElement);
+
+            for (Map.Entry<GSProduct, GSProductOrders> entry : map.entrySet()) {
+                // root elements
+                Element Product = doc.createElement(entry.getKey().getName());
+                rootElement.appendChild(Product);
+
+
+                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++){
+                    GSProductOrder element = entry.getValue().getProductOrders().get(i);
+
+                    // ProductOrder elements
+                    Element Productorder = doc.createElement("Productorder");
+                    Product.appendChild(Productorder);
+
+                    // set attribute to Productorder element
+                    Attr attr = doc.createAttribute("ID");
+                    attr.setValue(String.valueOf(i));
+                    Productorder.setAttributeNode(attr);
+
+                    // Date elements
+                    Element date = doc.createElement("Date");
+                    date.appendChild(doc.createTextNode(element.getDate().toString()));
+                    Productorder.appendChild(date);
+
+                    // Seller elements
+                    Element seller = doc.createElement("Seller");
+                    seller.appendChild(doc.createTextNode(element.getSeller().toString()));
+                    Productorder.appendChild(seller);
+
+                    // Quantity elements
+                    Element quantity = doc.createElement("Quantity");
+                    quantity.appendChild(doc.createTextNode(element.getOrderLine().getQuantity().toString()));
+                    Productorder.appendChild(quantity);
+
+                    // Price elements
+                    Element price = doc.createElement("Price");
+                    price.appendChild(doc.createTextNode(element.getOrderLine().getPrice().toString()));
+                    Productorder.appendChild(price);
+                }
+
+
+                // Total elements
+                Element total = doc.createElement("Total");
+                Product.appendChild(total);
+
+
+                if(!entry.getValue().getProductOrders().isEmpty()) {
+                    Attr attr = doc.createAttribute("Quantity");
+                    attr.setValue(entry.getValue().getTotalQuantity().toString());
+                    total.setAttributeNode(attr);
+                } else {
+                    Attr attr = doc.createAttribute("Quantity");
+                    attr.setValue(String.valueOf(0));
+                    total.setAttributeNode(attr);
+                }
+
+                // Total Price elements
+                if(!entry.getValue().getProductOrders().isEmpty()) {
+                    Attr attr = doc.createAttribute("Price");
+                    attr.setValue(entry.getValue().getTotalPrice().toString());
+                    total.setAttributeNode(attr);
+                } else {
+                    Attr attr = doc.createAttribute("Price");
+                    attr.setValue(String.valueOf(0));
+                    total.setAttributeNode(attr);
+                }
+
+            }
+
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("Sales.xml"));
+
+            transformer.transform(source, result);
+
+        } catch (ParserConfigurationException pce) {
+            pce.printStackTrace();
+        } catch (TransformerException tfe) {
+            tfe.printStackTrace();
+        }
+
+        return "redirect:/orders";
     }
 
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.POST)
@@ -123,8 +244,16 @@ class OwnerController {
         messageRepo.delete(msgId);
         GSOrder order = orderRepo.findOne(reclaimId).get();
         if (accept == true) {
-//            orderManager.completeOrder()
-            //ReaddItemstoStock
+            orderManager.payOrder(order);
+            orderRepo.save(order);
+
+            for (OrderLine line : order.getOrderLines()){
+                Quantity quantity = line.getQuantity();
+                GSInventoryItem item = inventory.findByProductIdentifier(line.getProductIdentifier()).get();
+                item.increaseQuantity(quantity);
+                inventory.save(item);
+            }
+
         } else {
 
             orderManager.cancelOrder(order);
@@ -222,9 +351,10 @@ class OwnerController {
 
     @RequestMapping("/range")
     public String range(Model model) {
-        model.addAttribute("subcategories", subCategoryRepo.findAll());
+        model.addAttribute("inventory", inventory);
         model.addAttribute("supercategories", superCategoryRepo.findAll());
         return "range";
+
     }
 
     @RequestMapping(value = "/range/delsuper", method = RequestMethod.DELETE)
@@ -232,16 +362,17 @@ class OwnerController {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superName);
 
-        List<SubCategory> sub = superCategory.getSubCategories();
+//        List<SubCategory> sub = superCategory.getSubCategories();
 
-        int i = 0;
 
-        while (!sub.isEmpty()) {
+        while (!superCategory.getSubCategories().isEmpty()) {
 
-            delSub(sub.remove(i));
+            SubCategory subCategory = superCategory.getSubCategories().get(superCategory.getSubCategories().indexOf(superCategory.getSubCategories().get(0)));
+            superCategory.getSubCategories().remove(subCategory);
+            delSub(subCategory);
 
         }
-
+        superCategoryRepo.save(superCategory);
         superCategoryRepo.delete(superCategory.getId());
         return "redirect:/range";
     }
@@ -253,7 +384,7 @@ class OwnerController {
 
         SuperCategory superCategory = subCategory.getSuperCategory();
 
-        superCategory.getSubCategories().remove(subCategory);
+//        superCategory.getSubCategories().remove(subCategory);
 
 
         delSub(subCategory);
@@ -266,25 +397,38 @@ class OwnerController {
     public String delProductRequest(@RequestParam("productIdent") ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.getSubCategory().getProducts().remove(product.getSubCategory().getProducts().indexOf(product));
+        subCategoryRepo.save(product.getSubCategory());
         delProduct(productIdentifier);
 
         return "redirect:/range";
     }
 
-    public void delSub(SubCategory subCategory) {
-        for (GSProduct product : subCategory.getProducts()) {
+    private void delSub(SubCategory subCategory) {
+        while (!subCategory.getProducts().isEmpty()) {
+            GSProduct product = subCategory.getProducts().get(0);
             ProductIdentifier productIdentifier = product.getIdentifier();
+            subCategory.getProducts().remove(product);
             delProduct(productIdentifier);
+            subCategoryRepo.save(subCategory);
         }
         Long id = subCategory.getId();
+        subCategory.getSuperCategory().getSubCategories().remove(subCategory);
+        superCategoryRepo.save(subCategory.getSuperCategory());
+        subCategoryRepo.save(subCategory);
         subCategoryRepo.delete(id);
 
     }
 
-    public void delProduct(ProductIdentifier productIdentifier) {
+    private void delProduct(ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.setInRange(false);
         product.setSubCategory(null);
+        Quantity quantity = Units.of(-1L);
+        GSInventoryItem item = inventory.findByProductIdentifier(productIdentifier).get();
+        item.setMinimalQuantity(quantity);
+        item.decreaseQuantity(item.getQuantity());
+        catalog.save(product);
+
     }
 
 

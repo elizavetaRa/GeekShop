@@ -67,8 +67,8 @@
                     <tr th:each="product : ${sub.products}">                        <!--Produkt-->
                         <td colspan="2"></td>
                         <td th:text="${product.name}">Grünes T-Shirt</td>
-                        <td>100</td>
-                        <td>10€</td>
+                        <td th:text="${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">100</td>
+                        <td th:text="${product.moneyToString(product.getPrice())}">10€</td>
                         <td>
                             <button class="MyButton">bearbeiten</button>
                             <form th:method="delete" th:action="@{/range/delproduct}" style="display: inline-block">

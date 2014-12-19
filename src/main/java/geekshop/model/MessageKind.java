@@ -7,5 +7,5 @@ package geekshop.model;
  */
 
 public enum MessageKind {
-    RECLAIM, NOTIFICATION
+    RECLAIM, NOTIFICATION, PASSWORD
 }

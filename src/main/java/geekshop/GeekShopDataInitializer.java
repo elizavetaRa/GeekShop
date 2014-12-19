@@ -116,11 +116,11 @@ public class GeekShopDataInitializer implements DataInitializer {
         subCatRepo.save(sub4);
 
 
-        GSProduct prod1 = new GSProduct("Product1", Money.of(EUR, 29.99), sub1, 5);
-        GSProduct prod2 = new GSProduct("Product2", Money.of(EUR, 19.99), sub2, 1);
-        GSProduct prod3 = new GSProduct("Product3", Money.of(EUR, 49.99), sub2, 4);
-        GSProduct prod4 = new GSProduct("Product4", Money.of(EUR, 9.99), sub1, 3);
-        GSProduct prod5 = new GSProduct("Product5", Money.of(EUR, 39.99), sub3, 2);
+        GSProduct prod1 = new GSProduct(5, "Product1", Money.of(EUR, 29.99), sub1);
+        GSProduct prod2 = new GSProduct(1, "Product2", Money.of(EUR, 19.99), sub2);
+        GSProduct prod3 = new GSProduct(4, "Product3", Money.of(EUR, 49.99), sub2);
+        GSProduct prod4 = new GSProduct(3, "Product4", Money.of(EUR, 9.99), sub1);
+        GSProduct prod5 = new GSProduct(2, "Product5", Money.of(EUR, 39.99), sub3);
 
         catalog.save(prod1);
         catalog.save(prod2);
@@ -306,12 +306,8 @@ public class GeekShopDataInitializer implements DataInitializer {
         orderManager.save(order2); // speichere die Order im OrderManager, damit dateCreated angelegt wird
         orderManager.save(order3); // speichere die Order im OrderManager, damit dateCreated angelegt wird
         orderManager.save(order4); // speichere die Order im OrderManager, damit dateCreated angelegt wird
-        orderManager.completeOrder(order1);
-        orderManager.completeOrder(order3);
-        orderManager.completeOrder(order4); // Nicht order2, da noch nicht bestaetigte ReclaimOrder!
-        orderManager.save(order1);
-        orderManager.save(order3);
-        orderManager.save(order4);
+        orderManager.payOrder(order1);
+        orderManager.payOrder(order3); // Nicht order2 und order4, da noch nicht bestaetigte ReclaimOrder!
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
@@ -338,8 +334,11 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (messageRepo.count() > 0)
             return;
 
-        GSOrder order = orderRepo.findByType(OrderType.RECLAIM).iterator().next();
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
-        messageRepo.save(new Message(MessageKind.RECLAIM, "Testreclaim (noch Weiterleitung auf catalog)", order));
+
+        for (GSOrder order : orderRepo.findByType(OrderType.RECLAIM)){
+            String messageText = "Es wurden Produkte der Rechnung " + order.getOrderNumber() + " zurück gegeben.";
+            messageRepo.save(new Message(MessageKind.RECLAIM, messageText, order));
+        }
     }
 }

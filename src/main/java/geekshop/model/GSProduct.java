@@ -30,11 +30,11 @@ public class GSProduct extends Product{
     protected GSProduct() {
     }
 
-    public GSProduct (String name, Money price, SubCategory subCategory, int productNumber) {
+    public GSProduct(int productNumber, String name, Money price, SubCategory subCategory) {
         super (name, price, Units.METRIC);
         Assert.notNull(subCategory, "SubCategory must be not null.");
-        this.subCategory = subCategory;
         this.productNumber = productNumber;
+        this.subCategory = subCategory;
         this.inRange = true;
     }
 
