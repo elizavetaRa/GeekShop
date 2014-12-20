@@ -9,7 +9,6 @@ import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
-import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -36,7 +34,6 @@ import java.util.Optional;
 @SessionAttributes("cart")
 class ReclaimController {
     private PaymentMethod paymentMethod;
-    private final OrderManager<GSOrder> orderManager;
     private final Inventory<GSInventoryItem> inventory;
     private final BusinessTime businessTime;
     private final Catalog<GSProduct> catalog;
@@ -50,10 +47,8 @@ class ReclaimController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public ReclaimController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
+    public ReclaimController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
 
-        Assert.notNull(orderManager, "OrderManager must not be null!");
-        this.orderManager = orderManager;
         this.inventory = inventory;
         this.businessTime = businessTime;
         this.catalog = catalog;

@@ -40,4 +40,8 @@ public class GSInventoryItem extends InventoryItem {
         this.minimalQuantity = minimalQuantity;
     }
 
+    public boolean hasSufficientQuantity() {
+        return !getQuantity().subtract(this.minimalQuantity).isNegative();
+    }
+
 }

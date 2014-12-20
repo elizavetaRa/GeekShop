@@ -8,7 +8,6 @@ import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
-import org.salespointframework.order.OrderManager;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.UserAccount;
@@ -54,7 +53,6 @@ import static org.joda.money.CurrencyUnit.EUR;
 @Controller
 @PreAuthorize("hasRole('ROLE_OWNER')")
 class OwnerController {
-    private final OrderManager<GSOrder> orderManager;
     private final GSOrderRepository orderRepo;
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
@@ -67,11 +65,10 @@ class OwnerController {
 
 
     @Autowired
-    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
+    public OwnerController(GSOrderRepository orderRepo, Catalog<GSProduct> catalog,
                            UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
                            MessageRepository messageRepo, SubCategoryRepository subCategoryRepo,
                            SuperCategoryRepository superCategoryRepo, Inventory<GSInventoryItem> inventory) {
-        this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
         this.userRepo = userRepo;
@@ -104,7 +101,9 @@ class OwnerController {
         }
 
         for (GSOrder order : orderRepo.findAll()) {
-            createProductOrder(map, order);
+            if (!order.isOpen() && !order.isCanceled()) { // open and canceled orders ought not to be shown
+                createProductOrder(map, order);
+            }
         }
 
         return map;
@@ -145,7 +144,7 @@ class OwnerController {
                 rootElement.appendChild(Product);
 
 
-                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++){
+                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++) {
                     GSProductOrder element = entry.getValue().getProductOrders().get(i);
 
                     String olPrice;
@@ -196,7 +195,7 @@ class OwnerController {
                 Product.appendChild(total);
 
 
-                if(!entry.getValue().getProductOrders().isEmpty()) {
+                if (!entry.getValue().getProductOrders().isEmpty()) {
                     Attr attr = doc.createAttribute("Quantity");
                     attr.setValue(entry.getValue().getTotalQuantity().getAmount().toString());
                     total.setAttributeNode(attr);
@@ -207,7 +206,7 @@ class OwnerController {
                 }
 
                 // Total Price elements
-                if(!entry.getValue().getProductOrders().isEmpty()) {
+                if (!entry.getValue().getProductOrders().isEmpty()) {
                     Attr attr = doc.createAttribute("Price");
                     attr.setValue(entry.getValue().getTotalPrice().toString());
                     total.setAttributeNode(attr);
@@ -257,20 +256,20 @@ class OwnerController {
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
         GSOrder order = orderRepo.findOne(reclaimId).get();
-        if (accept == true) {
-            orderManager.payOrder(order);
+        if (accept) {
+            order.pay();
             orderRepo.save(order);
 
-            for (OrderLine line : order.getOrderLines()){
-                Quantity quantity = line.getQuantity();
-                GSInventoryItem item = inventory.findByProductIdentifier(line.getProductIdentifier()).get();
-                item.increaseQuantity(quantity);
-                inventory.save(item);
-            }
+//            for (OrderLine line : order.getOrderLines()){
+//                Quantity quantity = line.getQuantity();
+//                GSInventoryItem item = inventory.findByProductIdentifier(line.getProductIdentifier()).get();
+//                item.increaseQuantity(quantity);
+//                inventory.save(item);
+//            }
 
         } else {
 
-            orderManager.cancelOrder(order);
+            order.cancel();
             orderRepo.save(order);
         }
 
@@ -446,7 +445,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/editproduct/{prodId}")
-    public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId){
+    public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId) {
 
         GSProduct product = catalog.findOne(productId).get();
 
@@ -485,7 +484,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/addproduct")
-    public String addProduct(Model model){
+    public String addProduct(Model model) {
 
         model.addAttribute("superCategories", superCategoryRepo.findAll());
         model.addAttribute("isNew", true);
@@ -616,7 +615,6 @@ class OwnerController {
         model.addAttribute("isNew", true);
         return "/editsub";
     }
-
 
 
 }
