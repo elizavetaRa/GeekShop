@@ -59,13 +59,11 @@
                             </td>
                             <td th:with="superCategory = (${product} ? ${product.subCategory.getSuperCategory()})">
                                 <p th:if="${!isNew}" th:text="${superCategory.name}"></p>
-                                <select name="superCategory" id="superCategory" type="text" size="30" maxlength="40"
-                                       value="Unterkategorie" th:value="${superCategory}"
-                                       required="required">
-                                    <option th:each="super : ${superCategory}"
+                                <select name="superCategory" id="superCategory" size="20" required="required">
+                                    <option th:each="super : ${superCategories}"
                                             th:value="${super}" th:text="${super.name}"
-                                            th:selected="${super == superCategory}"></option>
-                                    </select>
+                                            th:selected="${superCategory == super}"></option>
+                                </select>
                             </td>
 
 
