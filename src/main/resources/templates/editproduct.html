@@ -85,8 +85,8 @@
                             </td>
                             <td th:with="articleNumber = (${product} ? ${product.productNumber})">
                                 <p th:if="${!isNew}" th:text="${articleNumber}"></p>
-                                <input name="articleNumber" id="articleNumber" type="number" size="1" maxlength="40"
-                                        th:value="${subCategory}"
+                                <input th:if="${isNew}" name="articleNumber" id="articleNumber" type="number" size="1" maxlength="40"
+                                        value="1"
                                        required="required"/>
                             </td>
                         </tr>
