@@ -69,145 +69,16 @@
 
                 <form method="post" id="buyit" th:action="@{/buy}" style="display: inline-block; float: left">
 
-                    <label for="paymentMethod">Zahlmethode:</label><br/>
-                    <select name="paymentMethod" id="paymentMethod" onchange="process_select(this,1)">
-                        <option value="Barzahlung" >Bahrzahlung</option> <!-- th:selected="${strpayment='Barzahlung'}"-->
-                        <option value="Kreditkarte">Kreditkarte</option>
-                        <option value="Lastschriftverfahren">Lastschriftverfahren</option>
-                    </select> <br/><br/>
+                    <label for="payment">Zahlmethode:</label><br/>
 
-                    <div id="Barzahlung_1">Sie haben Die Zahlmethode Barzahlung gewählt</div>
+                    <select name="payment" id="payment">
+                        <option th:each="p : ${T(geekshop.model.Payment).values()}"
+                                th:value="${p}" th:text="${p.value}"
+                                th:selected="${p == payment}"></option>
+                    </select>
 
-
-                    <!--<div id="Kreditkarte_1" style="display:none">
-                        <div>Sie haben die Zahlmethode Kreditkarte gewählt.</div>
-                        <div><p>
-                            <label for="cardname">Card name:</label><br/>
-                            <input name="cardname" id="cardname" type="text" size="30" maxlength="30"
-                                   required="required"/>
-                        </p>
-
-                            <p>
-                                <label for="cardassociationname">Card association name:</label><br/>
-                                <input name="cardassociationname" id="cardassociationname" type="text" size="30"
-                                       maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="cardnumber">Card number:</label><br/>
-                                <input name="cardnumber" id="cardnumber" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="nameoncard">Name on card:</label><br/>
-                                <input name="nameoncard" id="nameoncard" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="billingadress">Billing adress:</label><br/>
-                                <input name="billingadress" id="billingadress" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-
-                                <label for="validfrom">Valid from:</label><br/>
-                                <input name="validfrom" id="validfrom" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="expirydate">Expiry date:</label><br/>
-                                <input name="expirydate" id="expirydate" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-
-                                <label for="cardverificationcode">Card verification code:</label><br/>
-                                <input name="cardverificationcode" id="cardverificationcode" type="text" size="30"
-                                       maxlength="30"
-                                       required="required"/>
-                            </p>
-
-
-                            <p>
-                                <label for="dailywithdrawallimit">Daily withdrawal limit:</label><br/>
-                                <input name="dailywithdrawallimit" id="dailywithdrawallimit" type="number" size="30"
-                                       maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="creditlimit">name on card:</label><br/>
-                                <input name="creditlimit" id="creditlimit" type="number" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-
-                        </div>
-                        <br/>
-                    </div>
-
-
-                    <div id="Lastschriftverfahren_1" style="display:none">
-                        <div>Sie haben die Zahlmethode Lastschriftverfahren gewählt.</div>
-                        <div>
-
-                            <p>
-                                <label for="accoutname">Account name:</label><br/>
-                                <input name="accountname" id="accoutname" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="accountnumber">Account number:</label><br/>
-                                <input name="accountnumber" id="accountnumber" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="chequenumber">Cheque number:</label><br/>
-                                <input name="chequenumber" id="chequenumber" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="payee">Payee:</label><br/>
-                                <input name="payee" id="payee" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-
-                            <p>
-                                <label for="bankname">Bank name:</label><br/>
-                                <input name="bankname" id="bankname" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="bankaddress">Bank address:</label><br/>
-                                <input name="bankaddress" id="bankaddress" type="text" size="30" maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                            <p>
-                                <label for="bankidentificationnumber">Bank identification number:</label><br/>
-                                <input name="bankidentificationnumber" id="bankidentificationnumber" type="text" size="30"
-                                       maxlength="30"
-                                       required="required"/>
-                            </p>
-
-                        </div>
-                        <br/>
-                    </div>-->
-
-
-
-
+                    <br/>
+                    <br/>
 
                     <input type="submit" class="myButton" value="kaufen" id="checkout"
                  style="margin-left: 1%"/>
