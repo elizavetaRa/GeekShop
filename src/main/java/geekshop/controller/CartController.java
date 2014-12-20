@@ -5,16 +5,14 @@ package geekshop.controller;
  */
 
 import geekshop.model.*;
+import org.joda.money.CurrencyUnit;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.CartItem;
 import org.salespointframework.order.OrderManager;
-import org.salespointframework.payment.Cash;
-import org.salespointframework.payment.Cheque;
-import org.salespointframework.payment.CreditCard;
-import org.salespointframework.payment.PaymentMethod;
+import org.salespointframework.payment.*;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
@@ -105,7 +103,7 @@ class CartController {
      */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -115,7 +113,6 @@ class CartController {
         if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
         }
-        ;
 
         cart.addOrUpdateItem(product, Units.of(number));
         return "redirect:/productsearch";
@@ -149,14 +146,14 @@ class CartController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
         int oldquantity= Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
-        int newquantity = Integer.parseInt(quantity);
+        int newquantity = Integer.parseInt(quantity); if (newquantity<=0){newquantity=0;}
         int updatequantity=newquantity-oldquantity;
-//        if (newquantity>oldquantity){updatequantity=newquantity-oldquantity;}
-//        if (newquantity<oldquantity){updatequantity=newquantity-oldquantity;}
 
+        String onLager= (inventory.findByProductIdentifier(cart.getItem(identifier).get().getProduct().getIdentifier())).get().getQuantity().getAmount().toString();
+        System.out.println("Am Lager sind so viele Produkte: "+ onLager);
+        if (Integer.parseInt(onLager)<= newquantity) {updatequantity=Integer.parseInt(onLager)-oldquantity;}
 
         cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
-        System.out.println("updated");
         return "redirect:/cart";
     }
 
@@ -180,37 +177,39 @@ class CartController {
 
 
     @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
-    public PaymentMethod strToPaymentMethod(@RequestParam("paymentMethod") String strPayment,
-                                            @RequestParam("accountname") String accountName,
-                                            @RequestParam("accountnumber") String accountNumber,
-                                            @RequestParam("chequenumber") String chequeNumber,
-                                            @RequestParam("payee") String payee,
-                                            @RequestParam("bankname") String bankName,
-                                            @RequestParam("bankaddress") String bankAddress,
-                                            @RequestParam("bankid") String bankIdentificationNumber,
-                                            @RequestParam("cardname") String cardName,
-                                            @RequestParam("cardassociationname") String cardAssociationName,
-                                            @RequestParam("cardnumber") String cardNumber,
-                                            @RequestParam("nameoncard") String nameOnCard,
-                                            @RequestParam("billingadress") String billingAddress,
-                                            @RequestParam("cardverificationcode") String cardVerificationCode) {
-        PaymentMethod paymentMethod;
-        LocalDateTime dateWritten = LocalDateTime.now();
-        LocalDateTime validFrom = LocalDateTime.parse("2013-12-18T14:30");  //später ändern
-        LocalDateTime expiryDate = LocalDateTime.parse("2020-12-18T14:30");  //später ändern
-        org.joda.money.Money dailyWithdrawalLimit = org.joda.money.Money.parse("1000");
-        org.joda.money.Money creditLimit = org.joda.money.Money.parse("1000");
+    public PaymentMethod strToPaymentMethod(String strPayment)
+//                                            @RequestParam("accountname") String accountName,
+//                                            @RequestParam("accountnumber") String accountNumber,
+//                                            @RequestParam("chequenumber") String chequeNumber,
+//                                            @RequestParam("payee") String payee,
+//                                            @RequestParam("bankname") String bankName,
+//                                            @RequestParam("bankaddress") String bankAddress,
+//                                            @RequestParam("bankid") String bankIdentificationNumber,
+//                                            @RequestParam("cardname") String cardName,
+//                                            @RequestParam("cardassociationname") String cardAssociationName,
+//                                            @RequestParam("cardnumber") String cardNumber,
+//                                            @RequestParam("nameoncard") String nameOnCard,
+//                                            @RequestParam("billingadress") String billingAddress,
+//                                            @RequestParam("cardverificationcode") String cardVerificationCode) {
+    {  PaymentMethod paymentMethod;
 
-        if (strPayment.equals("Barzahlung")) {
+        LocalDateTime dateWritten = LocalDateTime.now();
+        LocalDateTime validFrom = LocalDateTime.parse("2013-12-18T14:30");
+        LocalDateTime expiryDate = LocalDateTime.parse("2020-12-18T14:30");
+        org.joda.money.Money dailyWithdrawalLimit = org.joda.money.Money.of(CurrencyUnit.EUR, 1000);
+        org.joda.money.Money creditLimit = org.joda.money.Money.of(CurrencyUnit.EUR,  1000);
+        String p =" ";
+        System.out.println(strPayment);
+
+        if (strPayment.equals("CASH")) {
             paymentMethod = new Cash();
             return paymentMethod;
-        } else if (strPayment.equals("Lastshriftverfahren")) {
-            paymentMethod = new Cheque(accountName, accountNumber, chequeNumber, payee, dateWritten, bankName,
-                    bankAddress, bankIdentificationNumber);
+        } else if (strPayment.equals("CHEQUE")) {
+            paymentMethod = new Cheque(p, p, p, p, dateWritten, p, p, p);
             return paymentMethod;
-        } else if (strPayment.equals("Kreditkarte")) {
-            paymentMethod = new CreditCard(cardName, cardAssociationName, cardNumber,
-                    nameOnCard, billingAddress, validFrom, expiryDate, cardVerificationCode, dailyWithdrawalLimit, creditLimit);
+        } else if (strPayment.equals("CREDITCARD") ) {
+            paymentMethod = new CreditCard(p, p, p, p, p, validFrom, expiryDate, p, dailyWithdrawalLimit, creditLimit);
+            System.out.println(strPayment+" "+ paymentMethod.toString()+"   allright");
             return paymentMethod;
         }
         return new Cash();
@@ -235,18 +234,17 @@ class CartController {
 
 
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
-    public String buy(@ModelAttribute Cart cart, @RequestParam Map<String, String> map, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
+    public String buy(@ModelAttribute Cart cart, @RequestParam /*Map<String, String> map*/ String payment, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         return userAccount.map(account -> {
             long orderNumber = Calendar.getInstance(TimeZone.getDefault()).getTime().getTime();
 //            String strNumber = Long.toString(orderNumber);      //generating new orderIdentifier
+            PaymentMethod paymentM= strToPaymentMethod(payment);
+            GSOrder order = new GSOrder((int)orderNumber, userAccount.get(), paymentM);
 
-            PaymentMethod cash = new Cash();
-
-            GSOrder order = new GSOrder((int)orderNumber, userAccount.get(), /*strToPaymentMethod(strPayment, )*/ cash);
-
+System.out.println(paymentM.toString());
             // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
 
             for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
@@ -254,17 +252,10 @@ class CartController {
                 order.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
             }
 
-
-            System.out.println(order.getOrderNumber() + " OrderNumber " + order.getDateCreated() + " Datum");
-
-
-
-
             orderManager.payOrder(order);
             //  orderManager.completeOrder(order);
             orderManager.save(order);
             orderRepo.save(order);
-
 
             cart.clear();
             model.addAttribute("order", order);

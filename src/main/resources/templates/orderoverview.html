@@ -29,8 +29,11 @@
 
                 <p>Rechnungsnummer ihrer Bestellung : <div th:text="${order.orderNumber}"></div></p>
                 <p>Gekauft am:  <div th:text="${order.dateCreated.toString()}"></div></p>
-                <p>Verkäufer:  <div th:text="${order.dateCreated.toString()}"></div></p>
+                <p>Zahlmethode:  <div th:if="${order.paymentMethod.toString()=='Cash'}">Barzahlung</div>
+                <div th:if="${order.paymentMethod.toString()=='Cheque'}">Lastschriftverfahren</div>
+                <div th:if="${order.paymentMethod.getClass().toString()=='class org.salespointframework.payment.CreditCard'}">Kreditkarte</div>
 
+                </p>
                 <table class="table-style01">
                     <thead>
                     <tr>

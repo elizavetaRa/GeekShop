@@ -1,6 +1,7 @@
 package geekshop.controller;
 
 import geekshop.model.*;
+import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
@@ -145,6 +146,18 @@ class OwnerController {
                 for (int i = 0; i < entry.getValue().getProductOrders().size(); i++){
                     GSProductOrder element = entry.getValue().getProductOrders().get(i);
 
+                    String olPrice;
+                    String olQuantity;
+
+                    if (element.getOrderLine().getType() == OrderType.RECLAIM) {
+                        Money price = element.getOrderLine().getPrice().negated();
+                        olPrice = price.toString();
+                        olQuantity = "-" + element.getOrderLine().getQuantity().toString();
+                    } else {
+                        olPrice = element.getOrderLine().getPrice().toString();
+                        olQuantity = element.getOrderLine().getQuantity().getAmount().toString();
+                    }
+
                     // ProductOrder elements
                     Element Productorder = doc.createElement("Productorder");
                     Product.appendChild(Productorder);
@@ -166,12 +179,12 @@ class OwnerController {
 
                     // Quantity elements
                     Element quantity = doc.createElement("Quantity");
-                    quantity.appendChild(doc.createTextNode(element.getOrderLine().getQuantity().toString()));
+                    quantity.appendChild(doc.createTextNode(olQuantity));
                     Productorder.appendChild(quantity);
 
                     // Price elements
                     Element price = doc.createElement("Price");
-                    price.appendChild(doc.createTextNode(element.getOrderLine().getPrice().toString()));
+                    price.appendChild(doc.createTextNode(olPrice));
                     Productorder.appendChild(price);
                 }
 
@@ -183,7 +196,7 @@ class OwnerController {
 
                 if(!entry.getValue().getProductOrders().isEmpty()) {
                     Attr attr = doc.createAttribute("Quantity");
-                    attr.setValue(entry.getValue().getTotalQuantity().toString());
+                    attr.setValue(entry.getValue().getTotalQuantity().getAmount().toString());
                     total.setAttributeNode(attr);
                 } else {
                     Attr attr = doc.createAttribute("Quantity");
@@ -198,10 +211,9 @@ class OwnerController {
                     total.setAttributeNode(attr);
                 } else {
                     Attr attr = doc.createAttribute("Price");
-                    attr.setValue(String.valueOf(0));
+                    attr.setValue("EUR 0.00");
                     total.setAttributeNode(attr);
                 }
-
             }
 
             // write the content into xml file
