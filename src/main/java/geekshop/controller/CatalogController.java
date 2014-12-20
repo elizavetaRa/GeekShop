@@ -63,16 +63,13 @@ class CatalogController {
     public String catgory(Model model, @PathVariable("Category") String category, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
-        if (category.contains("sub")) {
-            String[] temp;
-            temp = category.split("_");
-            category = temp[1];
+        String[] temp;
+        temp = category.split("_");
+        category = temp[1];
+        if (temp[0].contains("sub")) {
             model.addAttribute("catalog", subRepo.findByName(category).getProducts());
         }
         else {
-            String[] temp;
-            temp = category.split("_");
-            category = temp[1];
             model.addAttribute("catalog", getAllProductsInSuperCategory(supRepo.findByName(category)));
         }
         model.addAttribute("superCategories", supRepo.findAll());
@@ -181,7 +178,7 @@ class CatalogController {
         return products;
     }
 
-    public Set<GSProduct> getAllProductsInSuperCategory(SuperCategory superCategory) {
+    private Set<GSProduct> getAllProductsInSuperCategory(SuperCategory superCategory) {
         List<SubCategory> temp = superCategory.getSubCategories();
         Set<GSProduct> products = new HashSet<GSProduct>();
         for (SubCategory subCategory : temp) {
