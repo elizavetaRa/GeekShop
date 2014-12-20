@@ -3,7 +3,6 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
-import org.salespointframework.catalog.Product;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.OrderIdentifier;
@@ -117,7 +116,7 @@ class OwnerController {
         UserAccount ua = order.getUserAccount();
         User seller = userRepo.findByUserAccount(ua);   // seller
         for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respective map entry
-            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, seller);
+            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, order.getOrderNumber(), order.getPaymentMethod(), seller);
             GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
             GSProductOrders prodOrders = map.get(product);
             if (prodOrders != null)
