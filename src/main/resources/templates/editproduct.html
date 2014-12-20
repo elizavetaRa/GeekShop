@@ -36,7 +36,6 @@
                                 <label for="productName" class="highlight">Artikel:</label>
                             </td>
                             <td th:with="productName = (${product} ? ${product.name})">
-                                <p th:if="${!isNew}" th:text="${productName}"></p>
                                 <input name="productName" id="productName" type="text" size="30" maxlength="30"
                                        value="Artikel" th:value="${productName}"
                                        required="required"/>
@@ -46,7 +45,6 @@
                                 <label for="price" class="highlight">Preis in Euro:</label>
                             </td>
                             <td th:with="price = (${product} ? ${product.moneyToString(product.getPrice())})">
-                                <p th:if="${!isNew}" th:text="${price}"></p>
                                 <input name="price" id="price" type="text" size="30" maxlength="30"
                                        value="10" th:value="${price}"
                                        th:disabled="${user}"/>
@@ -58,7 +56,6 @@
                                 <label for="superCategory" class="highlight">Kategorie:</label>
                             </td>
                             <td th:with="superCategory = (${product} ? ${product.subCategory.getSuperCategory()})">
-                                <p th:if="${!isNew}" th:text="${superCategory.name}"></p>
                                 <select name="superCategory" id="superCategory" size="20" required="required">
                                     <option th:each="super : ${superCategories}"
                                             th:value="${super}" th:text="${super.name}"
@@ -71,9 +68,26 @@
                                 <label for="subCategory" class="highlight">Unterkategorie:</label>
                             </td>
                             <td th:with="subCategory = (${product} ? ${product.subCategory.name})">
-                                <p th:if="${!isNew}" th:text="${subCategory}"></p>
                                 <input name="subCategory" id="subCategory" type="text" size="30" maxlength="40"
                                        value="Unterkategorie" th:value="${subCategory}"
+                                       required="required"/>
+                            </td>
+                        </tr>
+                        <tr th:if="${isNew}">
+                            <td class="indent">
+                                <label for="quantity" class="highlight">Stückzahl::</label>
+                            </td>
+                            <td >
+                                <input name="quantity" id="quantity" type="number" size="1" maxlength="40"
+                                       value="1"
+                                       required="required"/>
+                            </td>
+                            <td class="indent">
+                                <label for="minQuantity" class="minQuantity">Artikelnummer:</label>
+                            </td>
+                            <td >
+                                <input name="minQuantity" id="minQuantity" type="number" size="1" maxlength="40"
+                                       value="1"
                                        required="required"/>
                             </td>
                         </tr>
@@ -82,7 +96,6 @@
                                 <label for="articleNumber" class="highlight">Artikelnummer:</label>
                             </td>
                             <td th:with="articleNumber = (${product} ? ${product.productNumber})">
-                                <p th:if="${!isNew}" th:text="${articleNumber}"></p>
                                 <input th:if="${isNew}" name="articleNumber" id="articleNumber" type="number" size="1" maxlength="40"
                                         value="1"
                                        required="required"/>

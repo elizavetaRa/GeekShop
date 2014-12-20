@@ -58,7 +58,9 @@
                         <td></td>
                         <td bgcolor="#E5F4FA" class="t-left" colspan="4" th:text="${sub.name}">T-Shirts</td>
                         <td bgcolor="#E5F4FA">
-                            <button class="MyButton">bearbeiten</button>
+                            <form th:action="@{/range/editsub/} + ${sub.name}" style="display: inline-block">
+                                <button class="MyButton">bearbeiten</button>
+                            </form>
                             <form th:method="delete" th:action="@{/range/delsub}" style="display: inline-block">
                                 <input name="subName" type="hidden" th:value="${sub.name}"/>
                                 <button class="MyButton">löschen</button>
@@ -90,9 +92,16 @@
 
                 </table>
 
+                <form th:method="get" th:action="@{/range/addsuper}" style="display: inline-block">
+                    <button id="addProd" class="myButton">Kategorie hinzufügen</button>
+                </form>
+                <form th:method="get" th:action="@{/range/addsub}" style="display: inline-block">
+                    <button id="addProd" class="myButton">Unterkategorie hinzufügen</button>
+                </form>
                 <form th:method="get" th:action="@{/range/addproduct}" style="display: inline-block">
                     <button id="addProd" class="myButton">Produkt hinzufügen</button>
                 </form>
+
 
             </div>
 

@@ -37,8 +37,16 @@ public class SubCategory {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public SuperCategory getSuperCategory() {
         return superCategory;
+    }
+
+    public void setSuperCategory(SuperCategory superCategory) {
+        this.superCategory = superCategory;
     }
 
     public List<GSProduct> getProducts() {
