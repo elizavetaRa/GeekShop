@@ -1,14 +1,22 @@
 package geekshop.model;
 
+import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Order;
 import org.salespointframework.order.OrderLine;
+import org.salespointframework.order.OrderStatus;
 import org.salespointframework.payment.PaymentMethod;
+import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.OneToOne;
+import javax.annotation.PostConstruct;
+import javax.persistence.*;
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * An extension of {@link Order} extended by {@link OrderType}.
@@ -18,9 +26,22 @@ import javax.persistence.OneToOne;
  */
 
 @Entity
+@Component // needed for autowired static fields
 public class GSOrder extends Order {
+    /*
+     * BusinessTime, GSOrderRepository, Inventory and MessageRepository are static because JPA is creating a separate entity instance,
+     * i.e. not using the Spring managed bean and so it's required for the context to be shared.
+     */
+    @Transient
+    private static BusinessTime businessTime;
+    @Transient
+    private static GSOrderRepository orderRepo;
+    @Transient
+    private static Inventory<GSInventoryItem> inventory;
+    @Transient
+    private static MessageRepository messageRepo;
 
-    private int orderNumber;
+    private long orderNumber;
 
     @Enumerated(EnumType.STRING)
     private OrderType type;
@@ -31,38 +52,34 @@ public class GSOrder extends Order {
 
     @Deprecated
     protected GSOrder() {
-        this.orderNumber = 0;
         this.reclaimedOrder = null;
+        initializeGSOrder(null);
     }
 
-    public GSOrder(int orderNumber, UserAccount ua) {
+    public GSOrder(UserAccount ua) {
         super(ua);
 
-        this.orderNumber = orderNumber;
         this.reclaimedOrder = null;
         initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(int orderNumber, UserAccount ua, GSOrder reclaimedOrder) {
+    public GSOrder(UserAccount ua, GSOrder reclaimedOrder) {
         super(ua);
 
-        this.orderNumber = orderNumber;
         this.reclaimedOrder = reclaimedOrder;
         initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(int orderNumber, UserAccount ua, PaymentMethod paymentMethod) {
+    public GSOrder(UserAccount ua, PaymentMethod paymentMethod) {
         super(ua, paymentMethod);
 
-        this.orderNumber = orderNumber;
         this.reclaimedOrder = null;
         initializeGSOrder(reclaimedOrder);
     }
 
-    public GSOrder(int orderNumber, UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
+    public GSOrder(UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
         super(ua, paymentMethod);
 
-        this.orderNumber = orderNumber;
         this.reclaimedOrder = reclaimedOrder;
         initializeGSOrder(reclaimedOrder);
     }
@@ -79,10 +96,135 @@ public class GSOrder extends Order {
 
             this.type = OrderType.RECLAIM;
         }
+
+        setOrderStatus(OrderStatus.OPEN);
+
+        orderNumber = 0L;
     }
 
 
-    public int getOrderNumber() {
+    @Override
+    public void add(OrderLine orderLine) {
+        if (type == OrderType.RECLAIM && orderLine instanceof GSOrderLine) {
+            ((GSOrderLine) orderLine).setType(OrderType.RECLAIM);
+        }
+        super.add(orderLine);
+    }
+
+    public void pay() {
+        if (getOrderStatus() != OrderStatus.OPEN)
+            throw new IllegalStateException("Order may only be paid if the OrderStatus is OPEN!");
+
+        setDateCreated(businessTime.getTime());
+        setOrderStatus(OrderStatus.PAID);
+
+        if (type == OrderType.NORMAL) {
+
+            for (OrderLine ol : getOrderLines()) {
+                GSInventoryItem inventoryItem = inventory.findByProductIdentifier(ol.getProductIdentifier()).get();
+                inventoryItem.decreaseQuantity(ol.getQuantity());
+                inventory.save(inventoryItem);
+                if (!inventoryItem.hasSufficientQuantity()) {
+                    messageRepo.save(new Message(MessageKind.NOTIFICATION,
+                            "Die verfügbare Menge des Artikels „" + ol.getProductName() + "“ " +
+                                    "(Artikelnr.: " + ((GSProduct) inventoryItem.getProduct()).getProductNumber() +
+                                    ") hat mit " + inventoryItem.getQuantity().getAmount() + " Stück " +
+                                    "die festgelegte Mindestanzahl von " + inventoryItem.getMinimalQuantity().getAmount() +
+                                    " Stück unterschritten."));
+                }
+            }
+
+        } else {
+
+            for (OrderLine ol : getOrderLines()) {
+                GSInventoryItem inventoryItem = inventory.findByProductIdentifier(ol.getProductIdentifier()).get();
+                inventoryItem.increaseQuantity(ol.getQuantity());
+                inventory.save(inventoryItem);
+            }
+
+        }
+    }
+
+    public void complete() {
+        if (getOrderStatus() != OrderStatus.PAID)
+            throw new IllegalStateException("Only paid orders may be completed!");
+
+        setOrderStatus(OrderStatus.COMPLETED);
+    }
+
+    public void cancel() {
+        if (getOrderStatus() != OrderStatus.OPEN)
+            throw new IllegalStateException("Order may only be cancelled if the OrderStatus is OPEN!");
+
+        setOrderStatus(OrderStatus.CANCELLED);
+    }
+
+
+    @Override
+    public boolean isOpen() {
+        return getOrderStatus() == OrderStatus.OPEN;
+    }
+
+    @Override
+    public boolean isPaid() {
+        return getOrderStatus() == OrderStatus.PAID || isCompleted();
+    }
+
+    @Override
+    public boolean isCompleted() {
+        if (getOrderStatus() == OrderStatus.COMPLETED)
+            return true;
+
+        if (type == OrderType.NORMAL && getDateCreated() != null) {
+            LocalDateTime todayMidnight = LocalDateTime.of(LocalDate.from(businessTime.getTime()), LocalTime.of(23, 59, 59));
+            if (ChronoUnit.DAYS.between(getDateCreated(), todayMidnight) > 14) {
+                setOrderStatus(OrderStatus.COMPLETED);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isCanceled() {
+        return getOrderStatus() == OrderStatus.CANCELLED;
+    }
+
+
+    private void setDateCreated(LocalDateTime date) {
+        setOrderField("dateCreated", date);
+    }
+
+    private void setOrderStatus(OrderStatus status) {
+        setOrderField("orderStatus", status);
+    }
+
+    private void setOrderField(String fieldName, Object newValue) {
+        Field field;
+        try {
+            field = getClass().getSuperclass().getDeclaredField(fieldName);
+        } catch (NoSuchFieldException ex) {
+            System.out.println("!!!!!!!!!!!!!! " + fieldName + " of Order could not be found. !!!!!!!!!!!!!!");
+            ex.printStackTrace();
+            return;
+        }
+        try {
+            field.setAccessible(true);
+            field.set(this, newValue);
+        } catch (IllegalAccessException ex) {
+            System.out.println("!!!!!!!!!!!!!! " + fieldName + " of Order could not be set. !!!!!!!!!!!!!!");
+            ex.printStackTrace();
+        }
+    }
+
+    public long getOrderNumber() {
+        if (orderNumber <= 0) {
+            long orderNr = 1;
+            while (orderRepo.findByOrderNumber(orderNr).isPresent())
+                orderNr++;
+            orderNumber = orderNr;
+        }
         return orderNumber;
     }
 
@@ -98,10 +240,52 @@ public class GSOrder extends Order {
         return reclaimedOrder;
     }
 
-    public void add(OrderLine orderLine) {
-        if (type == OrderType.RECLAIM && orderLine instanceof GSOrderLine) {
-            ((GSOrderLine) orderLine).setType(OrderType.RECLAIM);
-        }
-        super.add(orderLine);
+    /**
+     * {@code @PostConstruct} fires {@code init()} once the Entity has been instantiated and by referencing businessTime, orderRepo, inventory and messageRepo in it,
+     * it forces – if not injected already – the injection on the static properties for the instance created.
+     */
+    @PostConstruct
+    public void init() {
+        System.out.println("Initializing BusinessTime as [" +
+                GSOrder.businessTime + "]");
+        System.out.println("Initializing GSOrderRepository as [" +
+                GSOrder.orderRepo + "]");
+        System.out.println("Initializing Inventory as [" +
+                GSOrder.inventory + "]");
+        System.out.println("Initializing MessageRepository as [" +
+                GSOrder.messageRepo + "]");
     }
+
+    /**
+     * Sets the static field {@code businessTime}.
+     */
+    @Autowired
+    public void setBusinessTime(BusinessTime businessTime) {
+        GSOrder.businessTime = businessTime;
+    }
+
+    /**
+     * Sets the static field {@code orderRepo}.
+     */
+    @Autowired
+    public void setOrderRepo(GSOrderRepository orderRepo) {
+        GSOrder.orderRepo = orderRepo;
+    }
+
+    /**
+     * Sets the static field {@code inventory}.
+     */
+    @Autowired
+    public void setInventory(Inventory<GSInventoryItem> inventory) {
+        GSOrder.inventory = inventory;
+    }
+
+    /**
+     * Sets the static field {@code messageRepo}.
+     */
+    @Autowired
+    public void setMessageRepo(MessageRepository messageRepo) {
+        GSOrder.messageRepo = messageRepo;
+    }
+
 }

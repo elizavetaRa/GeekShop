@@ -11,8 +11,10 @@ import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.CartItem;
-import org.salespointframework.order.OrderManager;
-import org.salespointframework.payment.*;
+import org.salespointframework.payment.Cash;
+import org.salespointframework.payment.Cheque;
+import org.salespointframework.payment.CreditCard;
+import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
@@ -23,12 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.order.Cart}.
@@ -40,8 +41,6 @@ import java.util.*;
 @PreAuthorize("isAuthenticated()")
 @SessionAttributes("cart")
 class CartController {
-    private PaymentMethod paymentMethod;
-    private final OrderManager<GSOrder> orderManager;
     private final Inventory<GSInventoryItem> inventory;
     private final BusinessTime businessTime;
     private final Catalog<GSProduct> catalog;
@@ -56,10 +55,8 @@ class CartController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public CartController(OrderManager<GSOrder> orderManager, Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
+    public CartController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
 
-        Assert.notNull(orderManager, "OrderManager must not be null!");
-        this.orderManager = orderManager;
         this.inventory = inventory;
         this.businessTime = businessTime;
         this.catalog = catalog;
@@ -87,7 +84,6 @@ class CartController {
 
         return "cart";
     }
-
 
 
     /**
@@ -120,9 +116,6 @@ class CartController {
     }
 
 
-
-
-
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
     public String deleteAll(@ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -145,18 +138,22 @@ class CartController {
     public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
-        int oldquantity= Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
-        int newquantity = Integer.parseInt(quantity); if (newquantity<=0){newquantity=0;}
-        int updatequantity=newquantity-oldquantity;
+        int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
+        int newquantity = Integer.parseInt(quantity);
+        if (newquantity <= 0) {
+            newquantity = 0;
+        }
+        int updatequantity = newquantity - oldquantity;
 
-        String onLager= (inventory.findByProductIdentifier(cart.getItem(identifier).get().getProduct().getIdentifier())).get().getQuantity().getAmount().toString();
-        System.out.println("Am Lager sind so viele Produkte: "+ onLager);
-        if (Integer.parseInt(onLager)<= newquantity) {updatequantity=Integer.parseInt(onLager)-oldquantity;}
+        String onLager = (inventory.findByProductIdentifier(cart.getItem(identifier).get().getProduct().getIdentifier())).get().getQuantity().getAmount().toString();
+        System.out.println("Am Lager sind so viele Produkte: " + onLager);
+        if (Integer.parseInt(onLager) <= newquantity) {
+            updatequantity = Integer.parseInt(onLager) - oldquantity;
+        }
 
         cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
         return "redirect:/cart";
     }
-
 
 
     @RequestMapping(value = "/cart", method = RequestMethod.GET)
@@ -191,14 +188,15 @@ class CartController {
 //                                            @RequestParam("nameoncard") String nameOnCard,
 //                                            @RequestParam("billingadress") String billingAddress,
 //                                            @RequestParam("cardverificationcode") String cardVerificationCode) {
-    {  PaymentMethod paymentMethod;
+    {
+        PaymentMethod paymentMethod;
 
         LocalDateTime dateWritten = LocalDateTime.now();
         LocalDateTime validFrom = LocalDateTime.parse("2013-12-18T14:30");
         LocalDateTime expiryDate = LocalDateTime.parse("2020-12-18T14:30");
         org.joda.money.Money dailyWithdrawalLimit = org.joda.money.Money.of(CurrencyUnit.EUR, 1000);
-        org.joda.money.Money creditLimit = org.joda.money.Money.of(CurrencyUnit.EUR,  1000);
-        String p =" ";
+        org.joda.money.Money creditLimit = org.joda.money.Money.of(CurrencyUnit.EUR, 1000);
+        String p = " ";
         System.out.println(strPayment);
 
         if (strPayment.equals("CASH")) {
@@ -207,9 +205,9 @@ class CartController {
         } else if (strPayment.equals("CHEQUE")) {
             paymentMethod = new Cheque(p, p, p, p, dateWritten, p, p, p);
             return paymentMethod;
-        } else if (strPayment.equals("CREDITCARD") ) {
+        } else if (strPayment.equals("CREDITCARD")) {
             paymentMethod = new CreditCard(p, p, p, p, p, validFrom, expiryDate, p, dailyWithdrawalLimit, creditLimit);
-            System.out.println(strPayment+" "+ paymentMethod.toString()+"   allright");
+            System.out.println(strPayment + " " + paymentMethod.toString() + "   allright");
             return paymentMethod;
         }
         return new Cash();
@@ -239,12 +237,10 @@ class CartController {
             return "redirect:/";
 
         return userAccount.map(account -> {
-            long orderNumber = Calendar.getInstance(TimeZone.getDefault()).getTime().getTime();
-//            String strNumber = Long.toString(orderNumber);      //generating new orderIdentifier
-            PaymentMethod paymentM= strToPaymentMethod(payment);
-            GSOrder order = new GSOrder((int)orderNumber, userAccount.get(), paymentM);
+            PaymentMethod paymentM = strToPaymentMethod(payment);
+            GSOrder order = new GSOrder(userAccount.get(), paymentM);
 
-System.out.println(paymentM.toString());
+            System.out.println(paymentM.toString());
             // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
 
             for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
@@ -252,9 +248,8 @@ System.out.println(paymentM.toString());
                 order.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
             }
 
-            orderManager.payOrder(order);
-            //  orderManager.completeOrder(order);
-            orderManager.save(order);
+            order.pay();
+            //  order.complete();
             orderRepo.save(order);
 
             cart.clear();

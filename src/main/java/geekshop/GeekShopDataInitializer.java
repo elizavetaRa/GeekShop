@@ -6,9 +6,9 @@ import org.salespointframework.catalog.Catalog;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.OrderLine;
-import org.salespointframework.order.OrderManager;
 import org.salespointframework.payment.Cash;
 import org.salespointframework.quantity.Units;
+import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.UserAccountManager;
@@ -40,14 +40,14 @@ public class GeekShopDataInitializer implements DataInitializer {
     private final SuperCategoryRepository supCatRepo;
     private final UserAccountManager userAccountManager;
     private final UserRepository userRepo;
-    private final OrderManager<GSOrder> orderManager; // nur zu Testzwecken
     private final GSOrderRepository orderRepo; // nur zu Testzwecken
+    private final BusinessTime businessTime;
 
     @Autowired
     public GeekShopDataInitializer(Catalog<GSProduct> catalog, Inventory<GSInventoryItem> inventory, JokeRepository jokeRepo,
                                    MessageRepository messageRepo, PasswordRulesRepository passRulesRepo, SubCategoryRepository subCatRepo,
                                    SuperCategoryRepository supCatRepo, UserAccountManager userAccountManager, UserRepository userRepo,
-                                   OrderManager<GSOrder> orderManager, GSOrderRepository orderRepo) {
+                                   GSOrderRepository orderRepo, BusinessTime businessTime) {
 
         Assert.notNull(catalog, "Catalog must not be null!");
         Assert.notNull(inventory, "Inventory must not be null!");
@@ -68,9 +68,8 @@ public class GeekShopDataInitializer implements DataInitializer {
         this.supCatRepo = supCatRepo;
         this.userAccountManager = userAccountManager;
         this.userRepo = userRepo;
-        this.orderManager = orderManager;
         this.orderRepo = orderRepo;
-
+        this.businessTime = businessTime;
     }
 
     /**
@@ -140,7 +139,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 
         for (GSProduct product : catalog.findAll()) {
             if (product.getClass().equals(GSProduct.class)) {
-                GSInventoryItem inventoryItem = new GSInventoryItem(product, Units.TEN, Units.ONE);
+                GSInventoryItem inventoryItem = new GSInventoryItem(product, Units.of(20), Units.of(5));
                 inventory.save(inventoryItem);
                 System.out.println(product.getName() + ": " + product.getSubCategory());
             }
@@ -278,49 +277,36 @@ public class GeekShopDataInitializer implements DataInitializer {
 
     private void initializeTestOrders() { // nur zu Testzwecken
 
-        if (orderManager.find(userAccountManager.findByUsername("owner").get()).iterator().hasNext())
+        if (orderRepo.count() > 0)
             return;
 
         UserAccount ua = userAccountManager.findByUsername("owner").get(); // suche UserAccount von owner
         GSProduct prod1 = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
         GSProduct prod2 = catalog.findByName("Product2").iterator().next(); // suche Product1 (siehe initializeCatalog)
-        GSOrder order1 = new GSOrder(1, ua, Cash.CASH); // erzeuge GSOrder
-        GSOrder order2 = new GSOrder(2, ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
-        GSOrder order3 = new GSOrder(3, ua, Cash.CASH);
-        GSOrder order4 = new GSOrder(4, ua, Cash.CASH, order1);
+        GSOrder order1 = new GSOrder(ua, Cash.CASH); // erzeuge GSOrder
+        GSOrder order2 = new GSOrder(ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
+        GSOrder order3 = new GSOrder(ua, Cash.CASH);
+        GSOrder order4 = new GSOrder(ua, Cash.CASH, order1);
         GSOrderLine orderLine11 = new GSOrderLine(prod1, Units.TEN);
         GSOrderLine orderLine12 = new GSOrderLine(prod2, Units.TEN);
         GSOrderLine orderLine21 = new GSOrderLine(prod2, Units.ONE);
-        GSOrderLine orderLine31 = new GSOrderLine(prod1, Units.of(5));
+        GSOrderLine orderLine31 = new GSOrderLine(prod1, Units.of(6));
         GSOrderLine orderLine41 = new GSOrderLine(prod1, Units.TEN);
         order1.add(orderLine11); // füge GSOrderLine hinzu
         order1.add(orderLine12);
         order2.add(orderLine21);
         order3.add(orderLine31);
         order4.add(orderLine41);
-//        System.out.println("orderManager.payOrder(order): " + orderManager.payOrder(order));
-//        System.out.println("orderManager.completeOrder(order): " + orderManager.completeOrder(order).getStatus().toString());
-//        System.out.println("order paid: " + order.isPaid());
-//        System.out.println("order completed: " + order.isCompleted());
-        orderManager.save(order1); // speichere die Order im OrderManager, damit dateCreated angelegt wird
-        orderManager.save(order2); // speichere die Order im OrderManager, damit dateCreated angelegt wird
-        orderManager.save(order3); // speichere die Order im OrderManager, damit dateCreated angelegt wird
-        orderManager.save(order4); // speichere die Order im OrderManager, damit dateCreated angelegt wird
-        orderManager.payOrder(order1);
-        orderManager.payOrder(order3); // Nicht order2 und order4, da noch nicht bestaetigte ReclaimOrder!
+        order1.pay();
+        order3.pay();
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);
         orderRepo.save(order4);
 
-//        orderLine.increaseReclaimedAmount(BigDecimal.valueOf(5)); // reklamiere 5 Stück
-//        orderManager.save(order);
-//        orderRepo.save(order);
-//        order.add(new GSOrderLine(prod, Units.ONE));
-//        order.setOrderType(OrderType.RECLAIM);
 
         for (GSOrder o : orderRepo.findAll()) { // iteriere über alle gespeicherten Orders
-            System.out.println("+++++ Order " + o.getOrderNumber() + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ")");
+            System.out.println("+++++ Order " + o.getOrderNumber() + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ", businessTime = " + o.getDateCreated() + ")");
             for (OrderLine ol : o.getOrderLines()) {
 //                System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
             }
@@ -331,12 +317,12 @@ public class GeekShopDataInitializer implements DataInitializer {
      * Initializes {@link Message}s in {@link MessageRepository}.
      */
     private void initializeMessages() {
-        if (messageRepo.count() > 0)
+        if (messageRepo.count() > 1)
             return;
 
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
 
-        for (GSOrder order : orderRepo.findByType(OrderType.RECLAIM)){
+        for (GSOrder order : orderRepo.findByType(OrderType.RECLAIM)) {
             String messageText = "Es wurden Produkte der Rechnung " + order.getOrderNumber() + " zurück gegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, order));
         }
