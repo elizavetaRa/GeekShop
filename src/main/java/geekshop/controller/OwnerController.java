@@ -5,7 +5,6 @@ import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
-import org.salespointframework.inventory.InventoryItem;
 import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderManager;
@@ -442,7 +441,7 @@ class OwnerController {
         item.setMinimalQuantity(quantity);
         item.decreaseQuantity(item.getQuantity());
         catalog.save(product);
-
+        inventory.save(item);
     }
 
     @RequestMapping(value = "/range/editproduct/{prodId}")
@@ -451,6 +450,7 @@ class OwnerController {
         GSProduct product = catalog.findOne(productId).get();
 
         model.addAttribute("superCategory", superCategoryRepo.findAll());
+        model.addAttribute("superCategories", superCategoryRepo.findAll());
         model.addAttribute("product", product);
         model.addAttribute("isNew", false);
 
@@ -483,7 +483,7 @@ class OwnerController {
     @RequestMapping(value = "/range/addproduct")
     public String addProduct(Model model){
 
-        model.addAttribute("superCategory", superCategoryRepo.findAll());
+        model.addAttribute("superCategories", superCategoryRepo.findAll());
         model.addAttribute("isNew", true);
         return "/editproduct";
     }
