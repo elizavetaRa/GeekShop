@@ -43,10 +43,10 @@
                         <td class="t-left" colspan="5" th:text="${super.name}">Kleidung</td>
                         <td>
                             <form th:action="@{/range/editsuper/} + ${super.name}" style="display: inline-block">
-                            <button class="MyButton">bearbeiten</button>
+                                <button class="MyButton">bearbeiten</button>
                             </form>
                             <form th:method="delete" th:action="@{/range/delsuper}" style="display: inline-block">
-                                <input name="superName" type="hidden" th:value="${super.name}" />
+                                <input name="superName" type="hidden" th:value="${super.name}"/>
                                 <button class="MyButton">löschen</button>
                             </form>
                         </td>
@@ -60,21 +60,27 @@
                         <td bgcolor="#E5F4FA">
                             <button class="MyButton">bearbeiten</button>
                             <form th:method="delete" th:action="@{/range/delsub}" style="display: inline-block">
-                                <input name="subName" type="hidden" th:value="${sub.name}" />
+                                <input name="subName" type="hidden" th:value="${sub.name}"/>
                                 <button class="MyButton">löschen</button>
                             </form>
                         </td>
                     <tr th:each="product : ${sub.products}">                        <!--Produkt-->
                         <td colspan="2"></td>
                         <td th:text="${product.name}">Grünes T-Shirt</td>
-                        <td th:text="${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">100</td>
+                        <td th:text="${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">
+                            100
+                        </td>
                         <td th:text="${product.moneyToString(product.getPrice())}">10€</td>
                         <td>
-                            <button class="MyButton">bearbeiten</button>
+                            <form th:action="@{/range/editproduct/} + ${product.identifier}"
+                                  style="display: inline-block">
+                                <button class="MyButton">bearbeiten</button>
+                            </form>
                             <form th:method="delete" th:action="@{/range/delproduct}" style="display: inline-block">
-                                <input name="productIdent" type="hidden" th:value="${product.getIdentifier()}" />
+                                <input name="productIdent" type="hidden" th:value="${product.getIdentifier()}"/>
                                 <button class="MyButton">löschen</button>
-                            </form>                        </td>
+                            </form>
+                        </td>
                     </tr>
 
                     </tr>
@@ -84,7 +90,9 @@
 
                 </table>
 
-                <button id="addProd" class="myButton">Produkt hinzufügen</button>
+                <form th:method="get" th:action="@{/range/addproduct}" style="display: inline-block">
+                    <button id="addProd" class="myButton">Produkt hinzufügen</button>
+                </form>
 
             </div>
 

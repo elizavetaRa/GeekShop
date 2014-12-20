@@ -1,6 +1,7 @@
 package geekshop.controller;
 
 import geekshop.model.*;
+import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
@@ -39,6 +40,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+
+import static org.joda.money.CurrencyUnit.EUR;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -430,6 +433,50 @@ class OwnerController {
         catalog.save(product);
 
     }
+
+    @RequestMapping(value = "/range/editproduct/{prodId}")
+    public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId){
+
+        GSProduct product = catalog.findOne(productId).get();
+
+        model.addAttribute("superCategory", superCategoryRepo.findAll());
+        model.addAttribute("product", product);
+        model.addAttribute("isNew", false);
+
+
+        return "/editproduct";
+
+    }
+
+    @RequestMapping(value = "/range/editproduct", method = RequestMethod.POST)
+    public String editProduct(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
+                              @RequestParam("subCategory") String strSubcategory,
+                              @RequestParam("productId") ProductIdentifier productId){
+
+        SubCategory subCategory = subCategoryRepo.findByName(strSubcategory);
+
+        float price = Float.parseFloat(strPrice.substring(0, strPrice.indexOf(" ")));
+        GSProduct product = catalog.findOne(productId).get();
+        product.setSubCategory(subCategory);
+        product.setName(productName);
+        product.setPrice(Money.of(EUR, Math.round(price * 100) / 100.0));
+
+        catalog.save(product);
+
+
+
+        return "redirect:/range";
+
+    }
+
+    @RequestMapping(value = "/range/addproduct")
+    public String addProduct(Model model){
+
+        model.addAttribute("superCategory", superCategoryRepo.findAll());
+        model.addAttribute("isNew", true);
+        return "/editproduct";
+    }
+
 
 
 }
