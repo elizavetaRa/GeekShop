@@ -128,7 +128,7 @@ public class GSOrder extends Order {
                 if (!inventoryItem.hasSufficientQuantity()) {
                     messageRepo.save(new Message(MessageKind.NOTIFICATION,
                             "Die verfügbare Menge des Artikels „" + ol.getProductName() + "“ " +
-                                    "(Artikelnr.: " + ((GSProduct) inventoryItem.getProduct()).getProductNumber() +
+                                    "(Artikelnr. " + GSOrder.longToString(((GSProduct) inventoryItem.getProduct()).getProductNumber()) +
                                     ") hat mit " + inventoryItem.getQuantity().getAmount() + " Stück " +
                                     "die festgelegte Mindestanzahl von " + inventoryItem.getMinimalQuantity().getAmount() +
                                     " Stück unterschritten."));
