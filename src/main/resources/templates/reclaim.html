@@ -48,26 +48,29 @@
                         <th style="width:16em">Artikel</th>
                         <th style="width:8em">Anzahl</th>
                         <th style="width:8em">Preis</th>
-                        <th></th>
+                        <th>zum Warenkorb</th>
 
                     </tr>
                     </thead>
 
                     <tbody >
-
+                    <form method="post" th:action="@{/reclaimcart}">
+                      <!--  <tr name="orderNumber" th:text="'OrderNumber: '+${reclaimorder.orderNumber}">666</tr>-->
                     <tr th:each="orderline : ${reclaimorder.orderLines}">
 
 
-                     <td th:text="${orderline.productName}">USB-Ventilator</td>
-                            <form method="post" th:action="@{/reclaimcart}">
-                     <td th:text="${orderline.quantity.amount.intValueExact()}">2</td>
-                      <td th:text="${orderline.price}">15 EUR</td>
-                        <td> <input type="hidden" name="pid" th:value="${reclaimorder.orderNumber}"/>
-                            <input type="hidden" name="pid" th:value="${orderline.productIdentifier}"/>
-                            <button id="toreclaimcart" name="toreclaimcart" type="submit">+</button></td>
 
-                            </form>
-                    </tr>
+                     <td th:text="${orderline.productName}">USB-Ventilator</td>
+
+
+                     <td name="rnumber" th:text="${orderline.quantity.amount.intValueExact()}">2</td>
+                      <td th:text="${orderline.price}">15 EUR</td>
+                        <td> <input type="hidden"  name="orderNumber" th:value="${reclaimorder.orderNumber}"/>
+                            <input type="hidden" name="rpid" th:value="${orderline.productIdentifier}"/>
+                            <button id="toreclaim" name="toreclaimcart" type="submit">+</button></td>
+
+
+                    </tr></form>
 
 
                     </tbody>
@@ -76,7 +79,11 @@
 
                 </table>
 
-                <button th:if="${reclaimorder}" id="toreclaimcart" class="myButton">gesamte Bestellung reklamieren</button>
+                <form th:if="${reclaimorder}" th:method="post" th:action="@{/alltoreclaimcart}">
+                    <input type="hidden"  name="orderNumber" th:value="${reclaimorder.orderNumber}"/>
+                    <button id="toreclaimcart" class="myButton marginButton">gesamte Bestellung zum Warenkorb</button>
+                </form>
+
 
 
             </div>

@@ -95,7 +95,7 @@ class ReclaimController {
 
 
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
-    public String addProductToReclaimCart(@RequestParam("ordernumber") int num, @RequestParam("rpid") ProductIdentifier productid,
+    public String addProductToReclaimCart(@RequestParam("orderNumber") long num, @RequestParam("rpid") ProductIdentifier productid,
                                           @RequestParam("rnumber") int reclaimnumber, @RequestParam("rprice")org.joda.money.Money price,
                                           @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -104,7 +104,8 @@ class ReclaimController {
         //boolean isReclaim=true;
       //  model.addAttribute("isreclaim", isReclaim);
 
-       OrderLine line;
+//        long num=Long.parseLong(strNum);
+      OrderLine line;
 
         for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
            iterator.hasNext(); )
@@ -129,6 +130,26 @@ class ReclaimController {
         return "redirect:/reclaim";
 
     }
+
+    @RequestMapping(value="/alltoreclaimcart", method = RequestMethod.POST)
+    public String allToReclaimCart(@RequestParam("orderNumber") long num,@ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount){
+
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
+        OrderLine line;
+
+        for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
+             iterator.hasNext(); )
+        {
+            line = iterator.next();
+            cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), line.getQuantity() );
+
+            }
+        return "cart";
+    }
+
+
 
 
     @RequestMapping(value = "/deleteallreclaimitems", method = RequestMethod.DELETE)
