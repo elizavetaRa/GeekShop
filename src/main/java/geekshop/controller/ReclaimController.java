@@ -174,7 +174,7 @@ class ReclaimController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        long oNumber= Long.valueOf(searchOrderNumber).longValue();
+        long oNumber= Long.parseLong(searchOrderNumber);
         System.out.println(oNumber+" orderNumber");
        // int id = Integer.parseInt(searchOrdernumber);
         Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(oNumber);
