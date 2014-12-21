@@ -13,11 +13,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * An extension of {@link Order} extended by {@link OrderType}.
@@ -28,7 +27,7 @@ import java.util.Arrays;
 
 @Entity
 @Component // needed for autowired static fields
-public class GSOrder extends Order {
+public class GSOrder extends Order implements Comparable<GSOrder> {
     /*
      * BusinessTime, GSOrderRepository, Inventory and MessageRepository are static because JPA is creating a separate entity instance,
      * i.e. not using the Spring managed bean and so it's required for the context to be shared.
@@ -193,10 +192,6 @@ public class GSOrder extends Order {
     }
 
 
-    private void setDateCreated(LocalDateTime date) {
-        setOrderField("dateCreated", date);
-    }
-
     private void setOrderStatus(OrderStatus status) {
         setOrderField("orderStatus", status);
     }
@@ -232,6 +227,16 @@ public class GSOrder extends Order {
 
     public void setOrderType(OrderType type) {
         this.type = type;
+    }
+
+    public Date getCreationDate() {
+        LocalDateTime ldt = getDateCreated();
+        ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
+        return Date.from(zdt.toInstant());
+    }
+
+    private void setDateCreated(LocalDateTime date) {
+        setOrderField("dateCreated", date);
     }
 
     public OrderType getOrderType() {
@@ -327,4 +332,7 @@ public class GSOrder extends Order {
 //        return orderNumberString;
     }
 
+    public int compareTo(GSOrder other) {
+        return ((Long)this.orderNumber).compareTo(other.orderNumber);
+    }
 }

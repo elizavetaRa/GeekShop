@@ -81,11 +81,22 @@ class OwnerController {
 
 
     @RequestMapping("/orders")
-    public String orders(Model model) {
+    public String orders(Model model, @RequestParam(value = "sort", required = false) String sort) {
 
-        TreeMap<GSProduct, GSProductOrders> map = putMap();
-
-        model.addAttribute("orders", map);
+        if (sort != null && sort.equals("products")) {
+            TreeMap<GSProduct, GSProductOrders> map = putMap();
+            model.addAttribute("mapProductOrders", map);
+        } else {
+            TreeSet<GSOrder> orders = new TreeSet<>();
+            for (GSOrder order : orderRepo.findAll()) {
+                if (!order.isOpen() && !order.isCanceled()) { // open and canceled orders ought not to be shown
+                    orders.add(order);
+                }
+            }
+            model.addAttribute("setOrders", orders);
+            model.addAttribute("userRepo", userRepo);
+            model.addAttribute("catalog", catalog);
+        }
 
         return "orders";
     }
