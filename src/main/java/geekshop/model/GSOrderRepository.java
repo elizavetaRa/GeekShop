@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface GSOrderRepository extends SalespointRepository<GSOrder, OrderIdentifier> {
 
-    Optional<GSOrder> findByOrderNumber(int orderNumber);
+    Optional<GSOrder> findByOrderNumber(long orderNumber);
     Iterable<GSOrder> findByType(OrderType type);
     Iterable<GSOrder> findByReclaimedOrder(GSOrder reclaimedOrder);
 }

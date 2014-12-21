@@ -85,15 +85,17 @@
                         </thead>
                         <tbody>
                         <tr th:each="product : ${catalog}">
-                            <form method="post" th:action="@{/cart}">
+                            <form method="post" th:action="@{/cart}" th:with="max = ${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">
                                 <td th:text="${product.name}">Digitalkamera</td>
                                 <td th:text="${product.productNumber}">12345678</td>
-                                <td><input type="number" name="number" value="1" min="1" max="5"/></td>
+                                <td th:if="${max > 0}"><input type="number" name="number" value="1" min="1" th:max="${max}"/></td>
+                                <td th:unless="${max > 0}">0</td>
                                 <td class="sorter:'currency'" th:text="${T(geekshop.model.GSProduct).moneyToString(product.price)}">123 €</td>
-                                <td>
+                                <td th:if="${max > 0}">
                                     <input type="hidden" name="pid" th:value="${product.identifier}"/>
                                     <button id="tocart" name="tocart" type="submit">+</button>
                                 </td>
+                                <td th:unless="${max > 0}">nicht verfügbar</td>
                             </form>
                         </tr>
                         </tbody>

@@ -85,8 +85,14 @@
                     </form>
 
 
-                    <form th:action="@{/checkout}">
-                        <button id="checkout" class="myButton" type="submit">zur Kasse
+                    <form  th:action="@{/checkout}">
+                        <button id="checkout" class="myButton marginButton" type="submit">zur Kasse
+                        </button>
+                    </form>
+
+                    <form th:method="post" th:action="@{/reclaim}">
+                        <input type="hidden" name="orderNumber" th:value="${orderNumber}"/>
+                        <button id="reclaimrequest" class="myButton marginButton" type="submit">Reklamationsanfrage absenden
                         </button>
                     </form>
                 </div>

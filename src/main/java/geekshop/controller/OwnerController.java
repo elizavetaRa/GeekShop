@@ -7,7 +7,6 @@ import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.OrderIdentifier;
 import org.salespointframework.order.OrderLine;
-import org.salespointframework.order.OrderManager;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.UserAccount;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import sun.tools.jconsole.Plotter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -53,7 +53,6 @@ import static org.joda.money.CurrencyUnit.EUR;
 @Controller
 @PreAuthorize("hasRole('ROLE_OWNER')")
 class OwnerController {
-    private final OrderManager<GSOrder> orderManager;
     private final GSOrderRepository orderRepo;
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
@@ -66,11 +65,10 @@ class OwnerController {
 
 
     @Autowired
-    public OwnerController(GSOrderRepository orderRepo, OrderManager<GSOrder> orderManager, Catalog<GSProduct> catalog,
+    public OwnerController(GSOrderRepository orderRepo, Catalog<GSProduct> catalog,
                            UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
                            MessageRepository messageRepo, SubCategoryRepository subCategoryRepo,
                            SuperCategoryRepository superCategoryRepo, Inventory<GSInventoryItem> inventory) {
-        this.orderManager = orderManager;
         this.orderRepo = orderRepo;
         this.catalog = catalog;
         this.userRepo = userRepo;
@@ -103,7 +101,9 @@ class OwnerController {
         }
 
         for (GSOrder order : orderRepo.findAll()) {
-            createProductOrder(map, order);
+            if (!order.isOpen() && !order.isCanceled()) { // open and canceled orders ought not to be shown
+                createProductOrder(map, order);
+            }
         }
 
         return map;
@@ -117,7 +117,7 @@ class OwnerController {
         UserAccount ua = order.getUserAccount();
         User seller = userRepo.findByUserAccount(ua);   // seller
         for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respective map entry
-            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, seller);
+            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, order.getOrderNumber(), order.getPaymentMethod(), seller);
             GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
             GSProductOrders prodOrders = map.get(product);
             if (prodOrders != null)
@@ -144,7 +144,7 @@ class OwnerController {
                 rootElement.appendChild(Product);
 
 
-                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++){
+                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++) {
                     GSProductOrder element = entry.getValue().getProductOrders().get(i);
 
                     String olPrice;
@@ -195,7 +195,7 @@ class OwnerController {
                 Product.appendChild(total);
 
 
-                if(!entry.getValue().getProductOrders().isEmpty()) {
+                if (!entry.getValue().getProductOrders().isEmpty()) {
                     Attr attr = doc.createAttribute("Quantity");
                     attr.setValue(entry.getValue().getTotalQuantity().getAmount().toString());
                     total.setAttributeNode(attr);
@@ -206,7 +206,7 @@ class OwnerController {
                 }
 
                 // Total Price elements
-                if(!entry.getValue().getProductOrders().isEmpty()) {
+                if (!entry.getValue().getProductOrders().isEmpty()) {
                     Attr attr = doc.createAttribute("Price");
                     attr.setValue(entry.getValue().getTotalPrice().toString());
                     total.setAttributeNode(attr);
@@ -256,20 +256,20 @@ class OwnerController {
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
         GSOrder order = orderRepo.findOne(reclaimId).get();
-        if (accept == true) {
-            orderManager.payOrder(order);
+        if (accept) {
+            order.pay();
             orderRepo.save(order);
 
-            for (OrderLine line : order.getOrderLines()){
-                Quantity quantity = line.getQuantity();
-                GSInventoryItem item = inventory.findByProductIdentifier(line.getProductIdentifier()).get();
-                item.increaseQuantity(quantity);
-                inventory.save(item);
-            }
+//            for (OrderLine line : order.getOrderLines()){
+//                Quantity quantity = line.getQuantity();
+//                GSInventoryItem item = inventory.findByProductIdentifier(line.getProductIdentifier()).get();
+//                item.increaseQuantity(quantity);
+//                inventory.save(item);
+//            }
 
         } else {
 
-            orderManager.cancelOrder(order);
+            order.cancel();
             orderRepo.save(order);
         }
 
@@ -445,15 +445,14 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/editproduct/{prodId}")
-    public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId){
+    public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId) {
 
         GSProduct product = catalog.findOne(productId).get();
 
-        model.addAttribute("superCategory", superCategoryRepo.findAll());
         model.addAttribute("superCategories", superCategoryRepo.findAll());
         model.addAttribute("product", product);
+        model.addAttribute("inventory", inventory);
         model.addAttribute("isNew", false);
-
 
         return "/editproduct";
 
@@ -461,33 +460,173 @@ class OwnerController {
 
     @RequestMapping(value = "/range/editproduct", method = RequestMethod.POST)
     public String editProduct(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
-                              @RequestParam("subCategory") String strSubcategory,
+                              @RequestParam("subCategory") long subCategoryId, @RequestParam("minQuantity") long minQuantity,
+                              @RequestParam("quantity") long lgquantity,
                               @RequestParam("productId") ProductIdentifier productId){
 
-        SubCategory subCategory = subCategoryRepo.findByName(strSubcategory);
-
-        float price = Float.parseFloat(strPrice.substring(0, strPrice.indexOf(" ")));
         GSProduct product = catalog.findOne(productId).get();
-        product.setSubCategory(subCategory);
+
+        SubCategory subCategory_new = subCategoryRepo.findById(subCategoryId);
+        SubCategory subCategory_old = product.getSubCategory();
+        subCategory_old.getProducts().remove(product);
+        subCategoryRepo.save(subCategory_old);
+        subCategory_new.getProducts().add(product);
+        subCategoryRepo.save(subCategory_new);
+
+        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+        float price = Float.parseFloat(strPrice);
+
+        product.setSubCategory(subCategory_new);
         product.setName(productName);
         product.setPrice(Money.of(EUR, Math.round(price * 100) / 100.0));
 
         catalog.save(product);
 
-
+        GSInventoryItem item = inventory.findByProductIdentifier(productId).get();
+        Quantity setQuantity = Units.of(lgquantity).subtract(item.getQuantity());
+        if (setQuantity.isNegative()){
+            item.decreaseQuantity(setQuantity);
+        } else {
+            item.increaseQuantity(setQuantity);
+        }
+        item.setMinimalQuantity(Units.of(minQuantity));
+        inventory.save(item);
 
         return "redirect:/range";
 
     }
 
     @RequestMapping(value = "/range/addproduct")
-    public String addProduct(Model model){
+    public String addProduct(Model model) {
 
         model.addAttribute("superCategories", superCategoryRepo.findAll());
         model.addAttribute("isNew", true);
+
         return "/editproduct";
     }
 
+    @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
+    public String addProductToCatalog(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
+                                      @RequestParam("subCategory") long subCategoryId,
+                                      @RequestParam("productNumber") int productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity){
+
+
+        Quantity quantity = Units.of(lgquantity);
+        Quantity minQuantity = Units.of(lgminQuantity);
+
+        SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
+        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+        float price = Float.parseFloat(strPrice);
+        GSProduct product = new GSProduct(productNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
+        catalog.save(product);
+        subCategory.addProduct(product);
+        subCategoryRepo.save(subCategory);
+        GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
+        inventory.save(item);
+
+        return "redirect:/range";
+    }
+
+    @RequestMapping(value = "/range/editsuper/{super}")
+    public String editSuperCategory(Model model, @PathVariable("super") String superCatName){
+
+        SuperCategory superCategory = superCategoryRepo.findByName(superCatName);
+        model.addAttribute("super", superCategory);
+        model.addAttribute("isNew", false);
+
+        return "/editsuper";
+
+    }
+
+    @RequestMapping(value = "/range/editsuper", method = RequestMethod.POST)
+    public String editSuper(@RequestParam("name") String name, @RequestParam("superCategory") String superCat){
+
+        SuperCategory superCategory = superCategoryRepo.findByName(superCat);
+
+        superCategory.setName(name);
+
+        superCategoryRepo.save(superCategory);
+
+        return "redirect:/range";
+
+    }
+
+    @RequestMapping(value = "/range/addsuper")
+    public String addSuper(Model model){
+
+        model.addAttribute("isNew", true);
+        return "/editsuper";
+    }
+
+    @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
+    public String addSuper(@RequestParam("name") String name){
+
+        SuperCategory superCategory = new SuperCategory(name);
+        superCategoryRepo.save(superCategory);
+
+        return "redirect:/range";
+    }
+
+
+    @RequestMapping(value = "/range/editsub/{sub}")
+    public String editSubCategory(Model model, @PathVariable("sub") String subCatName){
+
+        SubCategory subCategory = subCategoryRepo.findByName(subCatName);
+        model.addAttribute("sub", subCategory);
+        model.addAttribute("superCategories", superCategoryRepo.findAll());
+        model.addAttribute("isNew", false);
+
+        return "/editsub";
+
+    }
+
+    @RequestMapping(value = "/range/editsub", method = RequestMethod.POST)
+    public String editSub(@RequestParam("name") String name, @RequestParam("subCategory") String subCat, @RequestParam("superCategory") String strSuperCat){
+
+        SubCategory subCategory = subCategoryRepo.findByName(subCat);
+        SuperCategory superCategory_new = superCategoryRepo.findByName(strSuperCat);
+        SuperCategory superCategory_old = subCategory.getSuperCategory();
+
+        subCategory.setName(name);
+        subCategory.setSuperCategory(superCategory_new);
+
+        superCategory_new.addSubCategory(subCategory);
+        superCategory_old.getSubCategories().remove(subCategory);
+
+        superCategoryRepo.save(superCategory_old);
+        superCategoryRepo.save(superCategory_new);
+
+
+
+
+        subCategoryRepo.save(subCategory);
+
+        return "redirect:/range";
+
+    }
+
+    @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
+    public String addSuper(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat){
+
+
+
+        SuperCategory superCategory = superCategoryRepo.findByName(strSuperCat);
+        SubCategory subCategory = new SubCategory(name, superCategory);
+        superCategory.addSubCategory(subCategory);
+        subCategoryRepo.save(subCategory);
+        superCategoryRepo.save(superCategory);
+
+
+        return "redirect:/range";
+    }
+
+    @RequestMapping(value = "/range/addsub")
+    public String addSub(Model model) {
+
+        model.addAttribute("superCategories", superCategoryRepo.findAll());
+        model.addAttribute("isNew", true);
+        return "/editsub";
+    }
 
 
 }

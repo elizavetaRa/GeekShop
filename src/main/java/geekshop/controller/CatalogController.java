@@ -2,6 +2,7 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.inventory.Inventory;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
@@ -31,6 +32,7 @@ class CatalogController {
     private final SuperCategoryRepository supRepo;
     private final SubCategoryRepository subRepo;
     private final UserRepository userRepo;
+    private final Inventory<GSInventoryItem> inventory;
 
     /**
      * Creates a new {@link CatalogController}.
@@ -43,16 +45,18 @@ class CatalogController {
 
 
     @Autowired
-    public CatalogController(Catalog<GSProduct> catalog, SuperCategoryRepository supRepo, SubCategoryRepository subRepo, UserRepository userRepo) {
+    public CatalogController(Catalog<GSProduct> catalog, SuperCategoryRepository supRepo, SubCategoryRepository subRepo, UserRepository userRepo, Inventory<GSInventoryItem> inventory) {
         Assert.notNull(catalog, "Catalog must not be Null");
         Assert.notNull(supRepo, "SupRepo must not be Null");
         Assert.notNull(subRepo, "SubRepo must not be Null");
         Assert.notNull(userRepo, "UserRepo must not be Null");
+        Assert.notNull(inventory, "Inventory must not be Null");
 
         this.catalog = catalog;
         this.supRepo = supRepo;
         this.subRepo = subRepo;
         this.userRepo = userRepo;
+        this.inventory = inventory;
     }
 
     /**
@@ -74,6 +78,7 @@ class CatalogController {
         }
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", subRepo.findAll());
+        model.addAttribute("inventory", inventory);
         return "productsearch";
     }
 
@@ -107,6 +112,7 @@ class CatalogController {
         }
         model.addAttribute("superCategories", supRepo.findAll());
         model.addAttribute("subCategories", sortSubCategoryByName(subRepo.findAll()));
+        model.addAttribute("inventory", inventory);
         return "productsearch";
     }
 
