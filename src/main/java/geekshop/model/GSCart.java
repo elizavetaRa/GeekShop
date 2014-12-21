@@ -1,18 +1,19 @@
 package geekshop.model;
 
 import org.salespointframework.order.Cart;
+import org.salespointframework.order.CartItem;
 
 
 /**
  * Created by Lisa on 21.12.2014.
  */
-public class GSCart extends Cart {
+public class GSCart extends Cart implements Iterable<CartItem> {
 
     private boolean reclaimModus;
 
-    public GSCart(){
-        super() ;
-        this.reclaimModus=true;
+    public GSCart() {
+        super();
+        this.reclaimModus = true;
 
     }
 
@@ -20,10 +21,12 @@ public class GSCart extends Cart {
         return reclaimModus;
     }
 
-    public void switchModus(){
+    public void switchModus() {
 
-        if (this.reclaimModus==true){this.reclaimModus=false;}
-        else this.reclaimModus=true;
+        if (this.reclaimModus) {
+            this.reclaimModus = false;
+        } else
+            this.reclaimModus = true;
 
     }
 
