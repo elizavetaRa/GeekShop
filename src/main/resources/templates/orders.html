@@ -45,7 +45,7 @@
                     <div th:remove="tag" th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
                     <tr th:with="ol = ${gsProductOrder.orderLine}">
                         <td th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM</td>
-                        <td th:text="${gsProductOrder.orderNumber}">RECHNUNG</td>
+                        <td th:text="${T(geekshop.model.GSOrder).longToString(gsProductOrder.orderNumber)}">RECHNUNG</td>
                         <td th:text="${gsProductOrder.paymentType.value}">ZAHLUNGSART</td>
                         <td th:text="${gsProductOrder.seller}">VERKÄUFER</td>
                         <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${ol.quantity.amount}">ANZAHL</td>

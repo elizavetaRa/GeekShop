@@ -23,7 +23,7 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title" th:text="'Reklamation der Rechnung ' + ${order.getOrderNumber()}">Reklamation
+            <h3 id="content-title" th:text="'Reklamation der Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.orderNumber)}">Reklamation
                 ID1</h3>
 
             <div id="content-in">

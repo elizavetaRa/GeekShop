@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
 /**
  * An extension of {@link Order} extended by {@link OrderType}.
@@ -224,6 +225,7 @@ public class GSOrder extends Order {
             while (orderRepo.findByOrderNumber(orderNr).isPresent())
                 orderNr++;
             orderNumber = orderNr;
+            orderRepo.save(this);
         }
         return orderNumber;
     }
@@ -288,29 +290,41 @@ public class GSOrder extends Order {
         GSOrder.messageRepo = messageRepo;
     }
 
-    public String orderNumbertoString() {
-        String orderNumberString;
-        int digits = 0;
-        do {
-            digits++;
-        } while((orderNumber = orderNumber / 10) != 0);
-        switch (digits){
-            case 1: orderNumberString = "000000" + String.valueOf(orderNumber);
-                    break;
-            case 2: orderNumberString = "00000" + String.valueOf(orderNumber);
-                    break;
-            case 3: orderNumberString = "0000" + String.valueOf(orderNumber);
-                    break;
-            case 4: orderNumberString = "000" + String.valueOf(orderNumber);
-                    break;
-            case 5: orderNumberString = "00" + String.valueOf(orderNumber);
-                    break;
-            case 6: orderNumberString = "0" + String.valueOf(orderNumber);
-                    break;
-            default: orderNumberString = String.valueOf(orderNumber);
-                    break;
-        }
-        return orderNumberString;
+    public static String longToString(long number) {
+        String nr = Long.toString(number);
+        int length = 7;
+        if (nr.length() >= length)
+            return nr;
+
+        StringBuilder sb = new StringBuilder(length);
+        char[] zeros = new char[length - nr.length()];
+        Arrays.fill(zeros, '0');
+        sb.append(zeros);
+        sb.append(nr);
+        return sb.toString();
+
+//        String orderNumberString;
+//        int digits = 0;
+//        do {
+//            digits++;
+//        } while((orderNumber = orderNumber / 10) != 0);
+//        switch (digits){
+//            case 1: orderNumberString = "000000" + String.valueOf(orderNumber);
+//                    break;
+//            case 2: orderNumberString = "00000" + String.valueOf(orderNumber);
+//                    break;
+//            case 3: orderNumberString = "0000" + String.valueOf(orderNumber);
+//                    break;
+//            case 4: orderNumberString = "000" + String.valueOf(orderNumber);
+//                    break;
+//            case 5: orderNumberString = "00" + String.valueOf(orderNumber);
+//                    break;
+//            case 6: orderNumberString = "0" + String.valueOf(orderNumber);
+//                    break;
+//            default: orderNumberString = String.valueOf(orderNumber);
+//                    break;
+//        }
+//        return orderNumberString;
     }
 
 }
