@@ -558,7 +558,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
-    public String addSuper(@RequestParam("name") String name){
+    public String addSuperCategory(@RequestParam("name") String name){
 
         SuperCategory superCategory = new SuperCategory(name);
         superCategoryRepo.save(superCategory);
@@ -605,7 +605,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
-    public String addSuper(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat){
+    public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat){
 
 
 
