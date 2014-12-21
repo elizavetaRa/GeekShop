@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import sun.tools.jconsole.Plotter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -91,7 +90,7 @@ class OwnerController {
         return "orders";
     }
 
-    private Map<GSProduct, GSProductOrders> putMap() {
+    public Map<GSProduct, GSProductOrders> putMap() {
 
         Map<GSProduct, GSProductOrders> map = new HashMap<GSProduct, GSProductOrders>();
 
