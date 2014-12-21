@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import sun.tools.jconsole.Plotter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -460,6 +461,7 @@ class OwnerController {
     @RequestMapping(value = "/range/editproduct", method = RequestMethod.POST)
     public String editProduct(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
                               @RequestParam("subCategory") long subCategoryId, @RequestParam("minQuantity") long minQuantity,
+                              @RequestParam("quantity") long lgquantity,
                               @RequestParam("productId") ProductIdentifier productId){
 
         GSProduct product = catalog.findOne(productId).get();
@@ -481,6 +483,12 @@ class OwnerController {
         catalog.save(product);
 
         GSInventoryItem item = inventory.findByProductIdentifier(productId).get();
+        Quantity setQuantity = Units.of(lgquantity).subtract(item.getQuantity());
+        if (setQuantity.isNegative()){
+            item.decreaseQuantity(setQuantity);
+        } else {
+            item.increaseQuantity(setQuantity);
+        }
         item.setMinimalQuantity(Units.of(minQuantity));
         inventory.save(item);
 

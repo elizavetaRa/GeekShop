@@ -32,6 +32,13 @@
                 <form th:action="(${sub} ? '/range/editsub' : '/range/addsub')" method="post">
                     <table class="table-style01 t-left noborder">
                         <tr>
+                            <td th:with="superCategory = (${sub} ? ${sub.getSuperCategory()})">
+                                <select name="superCategory" id="superCategory" size="20" required="required">
+                                    <option th:each="super : ${superCategories}"
+                                            th:value="${super.name}" th:text="${super.name}"
+                                            th:selected="${superCategory == super}"></option>
+                                </select>
+                            </td>
                             <td>
                                 <label for="name" class="highlight">Name:</label>
                             </td>
@@ -41,13 +48,7 @@
                                        value="Kategorie" th:value="${name}"
                                        required="required"/>
                             </td>
-                            <td th:with="superCategory = (${sub} ? ${sub.getSuperCategory()})">
-                                <select name="superCategory" id="superCategory" size="20" required="required">
-                                    <option th:each="super : ${superCategories}"
-                                            th:value="${super.name}" th:text="${super.name}"
-                                            th:selected="${superCategory == super}"></option>
-                                </select>
-                            </td>
+
 
                         </tr>
 
