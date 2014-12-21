@@ -288,4 +288,8 @@ public class GSOrder extends Order {
         GSOrder.messageRepo = messageRepo;
     }
 
+    public String orderNumbertoString() {
+        return String.format("%07d", orderNumber);
+    }
+
 }
