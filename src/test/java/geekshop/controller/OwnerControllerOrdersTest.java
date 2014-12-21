@@ -31,22 +31,9 @@ import static org.junit.Assert.*;
 public class OwnerControllerOrdersTest {
 
     @Autowired OwnerController controller;
-
     @Autowired AuthenticationManager authenticationManager;
-    @Autowired WebApplicationContext context;
     @Autowired FilterChainProxy securityFilterChain;
 
-    protected MockMvc mvc;
-
-    @Before
-    public void setUp() {
-
-        context.getServletContext().setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, context);
-
-        mvc = MockMvcBuilders.webAppContextSetup(context)
-                .addFilters(securityFilterChain)
-                .build();
-    }
 
     protected void login(String username, String password) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
