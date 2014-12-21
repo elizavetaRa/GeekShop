@@ -11,7 +11,9 @@ import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
+import org.salespointframework.order.CartItem;
 import org.salespointframework.order.OrderLine;
+import org.salespointframework.payment.Cash;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Metric;
 import org.salespointframework.quantity.Quantity;
@@ -119,13 +121,12 @@ class ReclaimController {
 
 
                 cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber );
-
+                model.addAttribute("orderNumber", num);
                 return "redirect:/reclaim";
             }
             else {
                 System.out.println("line nicht gefunden");
                 return "redirect:/reclaim";}
-
         }
         return "redirect:/reclaim";
 
@@ -146,23 +147,56 @@ class ReclaimController {
             cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), line.getQuantity() );
 
             }
+        model.addAttribute("orderNumber", num);
         return "cart";
     }
 
 
 
 
-    @RequestMapping(value = "/deleteallreclaimitems", method = RequestMethod.DELETE)
-    public String deleteAll(@ModelAttribute Cart cart) {
-        cart.clear();
-        return "redirect:/cart";
-    }
+   @RequestMapping(value="/reclaim", method = RequestMethod.POST)
+    public String reclaimIt(@ModelAttribute Cart cart, @RequestParam("orderNumber") long num, @LoggedIn final Optional<UserAccount> userAccount, Model model){
 
-    @RequestMapping(value = "/deletereclaimitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart) {
-        cart.removeItem(identifier);
-        return "redirect:/cart";
-    }
+       if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+           return "redirect:/";
+
+       return userAccount.map(account -> {
+
+           GSOrder reclaimorder = new GSOrder(userAccount.get(), new Cash(), orderRepo.findByOrderNumber(num).get());
+
+           // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
+
+           for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
+               CartItem cartItem = iterator.next();
+               reclaimorder.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
+           }
+
+           reclaimorder.pay();
+         //  reclaimorder.setOrderType();
+           orderRepo.save(reclaimorder);
+
+           cart.clear();
+           model.addAttribute("order", reclaimorder);
+           return "cart";
+       }).orElse("redirect:/cart");
+   }
+
+
+
+
+
+
+//    @RequestMapping(value = "/deleteallreclaimitems", method = RequestMethod.DELETE)
+//    public String deleteAll(@ModelAttribute Cart cart) {
+//        cart.clear();
+//        return "redirect:/cart";
+//    }
+//
+//    @RequestMapping(value = "/deletereclaimitem/", method = RequestMethod.POST)
+//    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart) {
+//        cart.removeItem(identifier);
+//        return "redirect:/cart";
+//    }
 
 
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.GET)
@@ -184,10 +218,10 @@ class ReclaimController {
      * @return
      */
 
-    @RequestMapping("/reclaimoverview")
-    public String reclaimoverview() {
-        return "reclaimoverview";
-    }
+//    @RequestMapping("/reclaimoverview")
+//    public String reclaimoverview() {
+//        return "reclaimoverview";
+//    }
 
 
     @RequestMapping("/ordersearch")
@@ -235,12 +269,5 @@ class ReclaimController {
     }
 
 
-// public void reclaim(){
-//            //orderline.state='reclaimed';
-//  LocalDateTime timeup= time.plusDays(14);
-
-
-//Interval interval=new Interval(time, timeup);
-//        }
 
 }
