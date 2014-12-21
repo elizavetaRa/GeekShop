@@ -83,16 +83,16 @@ class OwnerController {
     @RequestMapping("/orders")
     public String orders(Model model) {
 
-        Map<GSProduct, GSProductOrders> map = putMap();
+        TreeMap<GSProduct, GSProductOrders> map = putMap();
 
         model.addAttribute("orders", map);
 
         return "orders";
     }
 
-    public Map<GSProduct, GSProductOrders> putMap() {
+    public TreeMap<GSProduct, GSProductOrders> putMap() {
 
-        Map<GSProduct, GSProductOrders> map = new HashMap<GSProduct, GSProductOrders>();
+        TreeMap<GSProduct, GSProductOrders> map = new TreeMap<GSProduct, GSProductOrders>();
 
         // for each GSProduct create map entry
         for (GSProduct product : catalog.findAll()) {
@@ -142,9 +142,8 @@ class OwnerController {
                 Element Product = doc.createElement(entry.getKey().getName());
                 rootElement.appendChild(Product);
 
-
-                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++) {
-                    GSProductOrder element = entry.getValue().getProductOrders().get(i);
+                int i = 0;
+                for (GSProductOrder element : entry.getValue().getProductOrders()) {
 
                     String olPrice;
                     String olQuantity;
@@ -186,6 +185,8 @@ class OwnerController {
                     Element price = doc.createElement("Price");
                     price.appendChild(doc.createTextNode(olPrice));
                     Productorder.appendChild(price);
+
+                    i++;
                 }
 
 
