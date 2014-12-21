@@ -306,7 +306,7 @@ public class GeekShopDataInitializer implements DataInitializer {
 
 
         for (GSOrder o : orderRepo.findAll()) { // iteriere über alle gespeicherten Orders
-            System.out.println("+++++ Order " + o.getOrderNumber() + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ", businessTime = " + o.getDateCreated() + ")");
+            System.out.println("+++++ Order " + GSOrder.longToString(o.getOrderNumber()) + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ", businessTime = " + o.getDateCreated() + ")");
             for (OrderLine ol : o.getOrderLines()) {
 //                System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
             }
@@ -323,7 +323,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
 
         for (GSOrder order : orderRepo.findByType(OrderType.RECLAIM)) {
-            String messageText = "Es wurden Produkte der Rechnung " + order.getOrderNumber() + " zurück gegeben.";
+            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(order.getOrderNumber()) + " zurück gegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, order));
         }
     }
