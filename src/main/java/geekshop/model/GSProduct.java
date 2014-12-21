@@ -20,7 +20,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class GSProduct extends Product{
 
-    private int productNumber;
+    private long productNumber;
     @ManyToOne
     private SubCategory subCategory;
 
@@ -30,7 +30,7 @@ public class GSProduct extends Product{
     protected GSProduct() {
     }
 
-    public GSProduct(int productNumber, String name, Money price, SubCategory subCategory) {
+    public GSProduct(long productNumber, String name, Money price, SubCategory subCategory) {
         super (name, price, Units.METRIC);
         Assert.notNull(subCategory, "SubCategory must be not null.");
         this.productNumber = productNumber;
@@ -46,12 +46,8 @@ public class GSProduct extends Product{
         this.subCategory = subCategory;
     }
 
-    public int getProductNumber() {
+    public long getProductNumber() {
         return productNumber;
-    }
-
-    public String productNumberToString(int geekID) {
-        return geekID + "";
     }
 
     public double getPriceDouble() {

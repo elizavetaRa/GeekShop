@@ -72,8 +72,7 @@ class CatalogController {
         category = temp[1];
         if (temp[0].contains("sub")) {
             model.addAttribute("catalog", subRepo.findByName(category).getProducts());
-        }
-        else {
+        } else {
             model.addAttribute("catalog", getAllProductsInSuperCategory(supRepo.findByName(category)));
         }
         model.addAttribute("superCategories", supRepo.findAll());
@@ -105,7 +104,7 @@ class CatalogController {
             model.addAttribute("catalog", sortProductByName(search(searchTerm)));
         } else if (sorting.equals("prodnum")) {
             model.addAttribute("catalog", sortProductByProductNumber(search(searchTerm)));
-        } else if (sorting.equals("pricedesc")){
+        } else if (sorting.equals("pricedesc")) {
             model.addAttribute("catalog", sortProductByPrice(search(searchTerm), "desc"));
         } else if (sorting.equals("priceasc")) {
             model.addAttribute("catalog", sortProductByPrice(search(searchTerm), "asc"));
@@ -120,15 +119,15 @@ class CatalogController {
         Iterable<GSProduct> allProducts = findAllProducts();
         Set<GSProduct> foundProducts = new HashSet<GSProduct>();
         for (GSProduct product : allProducts) {
-            if (product.getName().toLowerCase().contains(searchTerm.toLowerCase()))
-                foundProducts.add(product);
-            if (product.productNumberToString(product.getProductNumber()).toLowerCase().contains(searchTerm.toLowerCase()))
-                foundProducts.add(product);
-            if (product.getSubCategory().getName().toLowerCase().contains(searchTerm.toLowerCase()))
-                foundProducts.add(product);
-            if (product.getSubCategory().getSuperCategory().getName().toLowerCase().contains(searchTerm.toLowerCase()))
-                foundProducts.add(product);
-
+            if (searchTerm.matches("\\d+")) {
+                if (product.getProductNumber() == Long.parseLong(searchTerm))
+                    foundProducts.add(product);
+            } else {
+                if (product.getName().toLowerCase().contains(searchTerm.toLowerCase())
+                        || product.getSubCategory().getName().toLowerCase().contains(searchTerm.toLowerCase())
+                        || product.getSubCategory().getSuperCategory().getName().toLowerCase().contains(searchTerm.toLowerCase()))
+                    foundProducts.add(product);
+            }
         }
         return foundProducts;
     }
@@ -148,7 +147,7 @@ class CatalogController {
         for (GSProduct product : foundProducts) {
             sortedProducts.add(product);
         }
-        Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Integer.compare(a.getProductNumber(), b.getProductNumber())));
+        Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Long.compare(a.getProductNumber(), b.getProductNumber())));
         return sortedProducts;
     }
 
