@@ -72,7 +72,7 @@
                     <label for="payment">Zahlmethode:</label><br/>
 
                     <select name="payment" id="payment">
-                        <option th:each="p : ${T(geekshop.model.Payment).values()}"
+                        <option th:each="p : ${T(geekshop.model.PaymentType).values()}"
                                 th:value="${p}" th:text="${p.value}"
                                 th:selected="${p == payment}"></option>
                     </select>

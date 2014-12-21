@@ -3,7 +3,6 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
-import org.salespointframework.catalog.Product;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.OrderIdentifier;
@@ -117,7 +116,7 @@ class OwnerController {
         UserAccount ua = order.getUserAccount();
         User seller = userRepo.findByUserAccount(ua);   // seller
         for (OrderLine ol : order.getOrderLines()) {    // add each orderline to the respective map entry
-            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, seller);
+            GSProductOrder productOrder = new GSProductOrder((GSOrderLine) ol, date, order.getOrderNumber(), order.getPaymentMethod(), seller);
             GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
             GSProductOrders prodOrders = map.get(product);
             if (prodOrders != null)
@@ -451,6 +450,7 @@ class OwnerController {
 
         model.addAttribute("superCategories", superCategoryRepo.findAll());
         model.addAttribute("product", product);
+        model.addAttribute("inventory", inventory);
         model.addAttribute("isNew", false);
 
         return "/editproduct";
@@ -459,25 +459,30 @@ class OwnerController {
 
     @RequestMapping(value = "/range/editproduct", method = RequestMethod.POST)
     public String editProduct(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
-                              @RequestParam("subCategory") String strSubCategory,
+                              @RequestParam("subCategory") long subCategoryId, @RequestParam("minQuantity") long minQuantity,
                               @RequestParam("productId") ProductIdentifier productId){
 
         GSProduct product = catalog.findOne(productId).get();
 
-        SubCategory subCategory_new = subCategoryRepo.findByName(strSubCategory);
+        SubCategory subCategory_new = subCategoryRepo.findById(subCategoryId);
         SubCategory subCategory_old = product.getSubCategory();
         subCategory_old.getProducts().remove(product);
         subCategoryRepo.save(subCategory_old);
         subCategory_new.getProducts().add(product);
         subCategoryRepo.save(subCategory_new);
 
-        float price = Float.parseFloat(strPrice.substring(0, strPrice.indexOf(" ")));
+        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+        float price = Float.parseFloat(strPrice);
 
         product.setSubCategory(subCategory_new);
         product.setName(productName);
         product.setPrice(Money.of(EUR, Math.round(price * 100) / 100.0));
 
         catalog.save(product);
+
+        GSInventoryItem item = inventory.findByProductIdentifier(productId).get();
+        item.setMinimalQuantity(Units.of(minQuantity));
+        inventory.save(item);
 
         return "redirect:/range";
 
@@ -494,25 +499,24 @@ class OwnerController {
 
     @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
     public String addProductToCatalog(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
-                                      @RequestParam("subCategory") String strSubCategory,
-                                      @RequestParam("articleNumber") int articleNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity){
+                                      @RequestParam("subCategory") long subCategoryId,
+                                      @RequestParam("productNumber") int productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity){
 
 
         Quantity quantity = Units.of(lgquantity);
         Quantity minQuantity = Units.of(lgminQuantity);
 
-        SubCategory subCategory = subCategoryRepo.findByName(strSubCategory);
-        float price = Float.parseFloat(strPrice.substring(0, strPrice.indexOf(" ")));
-        GSProduct product = new GSProduct(articleNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
+        SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
+        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+        float price = Float.parseFloat(strPrice);
+        GSProduct product = new GSProduct(productNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
         catalog.save(product);
         subCategory.addProduct(product);
         subCategoryRepo.save(subCategory);
-        GSInventoryItem item = inventory.findByProduct(product).get();
-        item.setMinimalQuantity(quantity);
-        item.increaseQuantity(quantity);
+        GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
         inventory.save(item);
 
-        return "/editproduct";
+        return "redirect:/range";
     }
 
     @RequestMapping(value = "/range/editsuper/{super}")

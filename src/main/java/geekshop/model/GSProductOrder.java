@@ -1,5 +1,8 @@
 package geekshop.model;
 
+import org.salespointframework.payment.Cheque;
+import org.salespointframework.payment.CreditCard;
+import org.salespointframework.payment.PaymentMethod;
 import org.springframework.util.Assert;
 
 import java.util.Date;
@@ -14,6 +17,8 @@ public class GSProductOrder {
 
     private GSOrderLine orderLine;
     private Date date;
+    private long orderNumber;
+    private PaymentType paymentType;
     private User seller;
 
 
@@ -21,13 +26,23 @@ public class GSProductOrder {
     protected GSProductOrder() {
     }
 
-    public GSProductOrder(GSOrderLine orderLine, Date date, User seller) {
+    public GSProductOrder(GSOrderLine orderLine, Date date, long orderNumber, PaymentMethod paymentMethod, User seller) {
         Assert.notNull(orderLine, "OrderLine must not be null!");
         Assert.notNull(date, "Date must not be null!");
+        Assert.notNull(paymentMethod, "PaymentMethod must not be null!");
         Assert.notNull(seller, "Seller must not be null!");
 
         this.orderLine = orderLine;
         this.date = date;
+        this.orderNumber = orderNumber;
+
+        if (paymentMethod instanceof Cheque)
+            this.paymentType = PaymentType.CHEQUE;
+        else if (paymentMethod instanceof CreditCard)
+            this.paymentType = PaymentType.CREDITCARD;
+        else
+            this.paymentType = PaymentType.CASH;
+
         this.seller = seller;
     }
 
@@ -46,6 +61,22 @@ public class GSProductOrder {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public long getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(long orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
     }
 
     public User getSeller() {
