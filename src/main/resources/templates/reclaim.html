@@ -63,7 +63,7 @@
                      <td th:text="${orderline.productName}">USB-Ventilator</td>
 
 
-                     <td name="rnumber" th:text="${orderline.quantity.amount.intValueExact()}">2</td>
+                     <td><input name="rnumber" id="rnumber" min="1" th:max="${orderline.quantity.amount}" th:value="${orderline.quantity.amount}"/></td>
                       <td th:text="${orderline.price}">15 EUR</td>
                         <td> <input type="hidden"  name="orderNumber" th:value="${reclaimorder.orderNumber}"/>
                             <input type="hidden" name="rpid" th:value="${orderline.productIdentifier}"/>
