@@ -13,7 +13,7 @@ import java.util.Date;
  * @author Sebastian D&ouml;ring
  */
 
-public class GSProductOrder {
+public class GSProductOrder implements Comparable<GSProductOrder> {
 
     private GSOrderLine orderLine;
     private Date date;
@@ -85,5 +85,10 @@ public class GSProductOrder {
 
     public void setSeller(User seller) {
         this.seller = seller;
+    }
+
+    @Override
+    public int compareTo(GSProductOrder other) {
+        return this.date.compareTo(other.date);
     }
 }

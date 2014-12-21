@@ -6,8 +6,7 @@ import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 
 import java.math.BigDecimal;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.TreeSet;
 
 /**
  * A helper class to encapsulate all {@link geekshop.model.GSOrder}s related to a specific {@link org.salespointframework.catalog.Product} as well as the total price and total quantity.
@@ -19,13 +18,13 @@ public class GSProductOrders {
 
     private Money totalPrice;
     private Quantity totalQuantity;
-    private List<GSProductOrder> productOrders;
+    private TreeSet<GSProductOrder> productOrders;
 
 
     public GSProductOrders() {
         this.totalPrice = Money.zero(CurrencyUnit.EUR);
         this.totalQuantity = Units.ZERO;
-        this.productOrders = new LinkedList<GSProductOrder>();
+        this.productOrders = new TreeSet<GSProductOrder>();
     }
 
     public Money getTotalPrice() {
@@ -44,7 +43,7 @@ public class GSProductOrders {
         this.totalQuantity = totalQuantity;
     }
 
-    public List<GSProductOrder> getProductOrders() {
+    public TreeSet<GSProductOrder> getProductOrders() {
         return productOrders;
     }
 
