@@ -102,15 +102,26 @@ class CartController {
     public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
+       // boolean isReclaim=false;
+       // model.addAttribute("isreclaim", isReclaim);
 
         if (number <= 0) {
-            number = 1;
+           /* number = 1;*/  return "redirect:/productsearch";
         }
         if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
         }
 
-        cart.addOrUpdateItem(product, Units.of(number));
+        System.out.println("Anzahl Produkte vor dem hinzufügen zu Cart  "+ inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact() );
+       CartItem item=  cart.addOrUpdateItem(product, Units.of(number));
+        System.out.println("zu Cart hinzugefügt:  "+ number);
+
+        if (item.getQuantity().getAmount().intValueExact() >=inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()
+                )
+        {cart.removeItem(item.getIdentifier());
+        cart.addOrUpdateItem(product, inventory.findByProduct(product).get().getQuantity());
+        }
+
         return "redirect:/productsearch";
 
     }

@@ -7,9 +7,15 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
+import org.salespointframework.catalog.ProductIdentifier;
+import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
+import org.salespointframework.order.OrderLine;
 import org.salespointframework.payment.PaymentMethod;
+import org.salespointframework.quantity.Metric;
+import org.salespointframework.quantity.Quantity;
+import org.salespointframework.quantity.RoundingStrategy;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.Role;
@@ -21,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 /**
@@ -88,17 +95,37 @@ class ReclaimController {
 
 
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
-    public String addProductToReclaimCart(@RequestParam("rpid") Product product, @RequestParam("rnumber") long number, @ModelAttribute Cart cart) {
+    public String addProductToReclaimCart(@RequestParam("ordernumber") int num, @RequestParam("rpid") ProductIdentifier productid,
+                                          @RequestParam("rnumber") int reclaimnumber, @RequestParam("rprice")org.joda.money.Money price,
+                                          @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
-        if (number <= 0) {
-            number = 1;
+        //boolean isReclaim=true;
+      //  model.addAttribute("isreclaim", isReclaim);
+
+       OrderLine line;
+
+        for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
+           iterator.hasNext(); )
+        {
+            line = iterator.next();
+            if (line.getProductIdentifier() == productid) {
+                System.out.println("richtige Orderline gefunden  " + line.toString());
+                if (reclaimnumber > line.getQuantity().getAmount().intValueExact()) {reclaimnumber=line.getQuantity().getAmount().intValueExact();}
+                if (reclaimnumber <=0) {return "redirect:/reclaim";}
+                Quantity qnumber= new Quantity(reclaimnumber, new Metric("units", "units"), RoundingStrategy.MONETARY_ROUNDING);
+
+
+                cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber );
+
+                return "redirect:/reclaim";
+            }
+            else {
+                System.out.println("line nicht gefunden");
+                return "redirect:/reclaim";}
+
         }
-        if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
-            number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
-        }
-
-
-        cart.addOrUpdateItem(product, Units.of(number));
         return "redirect:/reclaim";
 
     }
@@ -143,20 +170,22 @@ class ReclaimController {
 
 
     @RequestMapping("/ordersearch")
-    public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrdernumber, @LoggedIn Optional<UserAccount> userAccount) {
+    public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrderNumber, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        int id = Integer.parseInt(searchOrdernumber);
-        Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(id);
+        long oNumber= Long.valueOf(searchOrderNumber).longValue();
+        System.out.println(oNumber+" orderNumber");
+       // int id = Integer.parseInt(searchOrdernumber);
+        Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(oNumber);
         if (!optOrder.isPresent()) {
-            System.out.println("Keine Rechung gefunden!");
+            System.out.println("Keine Rechnung gefunden!");
         } else if (optOrder.get().getOrderType() == OrderType.RECLAIM) {
-            System.out.println("Rechnung " + id + " ist schon eine Reklamation!");
+            System.out.println("Rechnung " + oNumber + " ist schon eine Reklamation!");
         } else if (optOrder.get().isCompleted()) { // Es muss noch überprüft werden, ob es innerhalb der 14 Tage liegt!!! Wenn nicht, muss die Order completed werden.
-            System.out.println("Rechnung " + id + " liegt nicht mehr innerhalb des 14-Tage-Fensters!");
+            System.out.println("Rechnung " + oNumber + " liegt nicht mehr innerhalb des 14-Tage-Fensters!");
         } else if (optOrder.get().isCanceled()) {
-            System.out.println("Rechnung " + id + " wurde storniert!");
+            System.out.println("Rechnung " + oNumber + " wurde storniert!");
         } else {
             model.addAttribute("reclaimorder", optOrder.get());
         }
