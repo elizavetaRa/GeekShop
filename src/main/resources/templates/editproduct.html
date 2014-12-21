@@ -99,13 +99,13 @@
                             </td>
                         </tr>
 
-                        <tr th:if="${isNew}">
-                            <td>
+                        <tr >
+                            <td th:with="quantity = (${product} ? ${inventory.findByProduct(product).get().getQuantity().getAmount()} : '1')">
                                 <label for="quantity" class="highlight">Stückzahl:</label>
                             </td>
                             <td>
                                 <input name="quantity" id="quantity" type="number" size="1" maxlength="40"
-                                       value="1" min="0"
+                                       value="1" min="0" th:value="${quantity}"
                                        required="required"/>
                             </td>
                         </tr>
