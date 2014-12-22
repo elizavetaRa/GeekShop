@@ -116,25 +116,27 @@ class CartController {
 
 
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
-    public String deleteAll(@ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+    public String deleteAll(@ModelAttribute Cart cart, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         cart.clear();
+        if (cart.isEmpty()) {if (flag.isReclaimModus()==false) flag.switchModus();}
         return "redirect:/cart";
     }
 
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         cart.removeItem(identifier);
+        if (cart.isEmpty()) {if (flag.isReclaimModus()==false) flag.switchModus();}
         return "redirect:/cart";
     }
 
     @RequestMapping(value = "/updatecartitem/", method = RequestMethod.POST)
-    public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+    public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
         int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
@@ -231,11 +233,12 @@ class CartController {
 
 
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
-    public String buy(@ModelAttribute Cart cart, @RequestParam /*Map<String, String> map*/ String payment, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
+    public String buy(@ModelAttribute Cart cart, @ModelAttribute Flag flag,@RequestParam /*Map<String, String> map*/ String payment, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         return userAccount.map(account -> {
+
             PaymentMethod paymentM = strToPaymentMethod(payment);
             GSOrder order = new GSOrder(userAccount.get(), paymentM);
 
@@ -253,6 +256,7 @@ class CartController {
 
             cart.clear();
             model.addAttribute("order", order);
+            if (flag.isReclaimModus()==false) flag.switchModus();
             return "orderoverview";
         }).orElse("redirect:/cart");
 

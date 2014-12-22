@@ -92,7 +92,7 @@
                     </form>
 
                     <form th:if="${flag.isReclaimModus()}==true" th:method="post" th:action="@{/reclaim}">
-                        <input type="hidden" name="orderNumber" th:value="${orderNumber}"/>
+                        <input type="hidden" name="orderNumber" th:value="${orderNumber} ? ${T(geekshop.model.GSOrder).longToString(orderNumber)}"/>
                         <button id="reclaimrequest" class="myButton marginButton" type="submit">Weiter
                         </button>
                     </form>

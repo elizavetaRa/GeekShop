@@ -211,10 +211,11 @@ class ReclaimController {
 //        return "reclaimoverview";
 //    }
     @RequestMapping("/ordersearch")
-    public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrderNumber, @LoggedIn Optional<UserAccount> userAccount) {
+    public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrderNumber, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
+        if (flag.isReclaimModus()==false) {flag.switchModus();}
         long oNumber = Long.parseLong(searchOrderNumber);
         System.out.println(oNumber + " orderNumber");
         // int id = Integer.parseInt(searchOrdernumber);
