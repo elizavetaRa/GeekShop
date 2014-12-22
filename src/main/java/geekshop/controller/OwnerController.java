@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -145,86 +144,56 @@ class OwnerController {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
             Document doc = docBuilder.newDocument();
-            Element rootElement = doc.createElement("Sales");
+            // root element
+            Element rootElement = doc.createElement("orders");
             doc.appendChild(rootElement);
 
             for (Map.Entry<GSProduct, GSProductOrders> entry : map.entrySet()) {
-                // root elements
-                Element Product = doc.createElement(entry.getKey().getName());
-                rootElement.appendChild(Product);
+                // product elements
+                Element product = doc.createElement("product");
+                product.setAttribute("name", entry.getKey().getName());
+                product.setAttribute("productnr", Long.toString(entry.getKey().getProductNumber()));
+                product.setAttribute("totalquantity", entry.getValue().getTotalQuantity().getAmount().toString());
+                product.setAttribute("totalprice", entry.getValue().getTotalPrice().toString());
+                rootElement.appendChild(product);
 
-                int i = 0;
                 for (GSProductOrder element : entry.getValue().getProductOrders()) {
 
-                    String olPrice;
-                    String olQuantity;
-
-                    if (element.getOrderLine().getType() == OrderType.RECLAIM) {
-                        Money price = element.getOrderLine().getPrice().negated();
-                        olPrice = price.toString();
-                        olQuantity = "-" + element.getOrderLine().getQuantity().toString();
-                    } else {
-                        olPrice = element.getOrderLine().getPrice().toString();
-                        olQuantity = element.getOrderLine().getQuantity().getAmount().toString();
-                    }
-
-                    // ProductOrder elements
-                    Element Productorder = doc.createElement("Productorder");
-                    Product.appendChild(Productorder);
-
-                    // set attribute to Productorder element
-                    Attr attr = doc.createAttribute("ID");
-                    attr.setValue(String.valueOf(i));
-                    Productorder.setAttributeNode(attr);
-
-                    // Date elements
-                    Element date = doc.createElement("Date");
-                    date.appendChild(doc.createTextNode(element.getDate().toString()));
-                    Productorder.appendChild(date);
-
-                    // Seller elements
-                    Element seller = doc.createElement("Seller");
-                    seller.appendChild(doc.createTextNode(element.getSeller().toString()));
-                    Productorder.appendChild(seller);
-
-                    // Quantity elements
-                    Element quantity = doc.createElement("Quantity");
-                    quantity.appendChild(doc.createTextNode(olQuantity));
-                    Productorder.appendChild(quantity);
-
-                    // Price elements
-                    Element price = doc.createElement("Price");
-                    price.appendChild(doc.createTextNode(olPrice));
-                    Productorder.appendChild(price);
-
-                    i++;
-                }
+                    // order elements
+                    Element order = doc.createElement("order");
+                    order.setAttribute("type", element.getOrderLine().getType().toString().toLowerCase());
+                    product.appendChild(order);
 
 
-                // Total elements
-                Element total = doc.createElement("Total");
-                Product.appendChild(total);
+                    // date element
+                    Element date = doc.createElement("date");
+                    date.setTextContent(element.getDate().toString());
+                    order.appendChild(date);
 
+                    // ordernumber element
+                    Element orderNr = doc.createElement("ordernumber");
+                    orderNr.setTextContent(String.valueOf(element.getOrderNumber()));
+                    order.appendChild(orderNr);
 
-                if (!entry.getValue().getProductOrders().isEmpty()) {
-                    Attr attr = doc.createAttribute("Quantity");
-                    attr.setValue(entry.getValue().getTotalQuantity().getAmount().toString());
-                    total.setAttributeNode(attr);
-                } else {
-                    Attr attr = doc.createAttribute("Quantity");
-                    attr.setValue(String.valueOf(0));
-                    total.setAttributeNode(attr);
-                }
+                    // payment method element
+                    Element paymentmethod = doc.createElement("paymentmethod");
+                    paymentmethod.setTextContent(element.getPaymentType().getValue());
+                    order.appendChild(paymentmethod);
 
-                // Total Price elements
-                if (!entry.getValue().getProductOrders().isEmpty()) {
-                    Attr attr = doc.createAttribute("Price");
-                    attr.setValue(entry.getValue().getTotalPrice().toString());
-                    total.setAttributeNode(attr);
-                } else {
-                    Attr attr = doc.createAttribute("Price");
-                    attr.setValue("EUR 0.00");
-                    total.setAttributeNode(attr);
+                    // seller elements
+                    Element seller = doc.createElement("seller");
+                    seller.setTextContent(element.getSeller().toString());
+                    order.appendChild(seller);
+
+                    // quantity elements
+                    Element quantity = doc.createElement("quantity");
+                    quantity.appendChild(doc.createTextNode(element.getOrderLine().getQuantity().getAmount().toString()));
+                    order.appendChild(quantity);
+
+                    // price elements
+                    Element price = doc.createElement("price");
+                    price.setTextContent(element.getOrderLine().getPrice().toString());
+                    order.appendChild(price);
                 }
             }
 
@@ -232,7 +201,7 @@ class OwnerController {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("Sales.xml"));
+            StreamResult result = new StreamResult(new File("orders.xml"));
 
             transformer.transform(source, result);
 
@@ -473,7 +442,7 @@ class OwnerController {
     public String editProduct(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
                               @RequestParam("subCategory") long subCategoryId, @RequestParam("minQuantity") long minQuantity,
                               @RequestParam("quantity") long lgquantity,
-                              @RequestParam("productId") ProductIdentifier productId){
+                              @RequestParam("productId") ProductIdentifier productId) {
 
         GSProduct product = catalog.findOne(productId).get();
 
@@ -495,7 +464,7 @@ class OwnerController {
 
         GSInventoryItem item = inventory.findByProductIdentifier(productId).get();
         Quantity setQuantity = Units.of(lgquantity).subtract(item.getQuantity());
-        if (setQuantity.isNegative()){
+        if (setQuantity.isNegative()) {
             item.decreaseQuantity(setQuantity);
         } else {
             item.increaseQuantity(setQuantity);
@@ -519,7 +488,7 @@ class OwnerController {
     @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
     public String addProductToCatalog(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
                                       @RequestParam("subCategory") long subCategoryId,
-                                      @RequestParam("productNumber") int productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity){
+                                      @RequestParam("productNumber") int productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity) {
 
 
         Quantity quantity = Units.of(lgquantity);
@@ -539,7 +508,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/editsuper/{super}")
-    public String editSuperCategory(Model model, @PathVariable("super") String superCatName){
+    public String editSuperCategory(Model model, @PathVariable("super") String superCatName) {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superCatName);
         model.addAttribute("super", superCategory);
@@ -550,7 +519,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/editsuper", method = RequestMethod.POST)
-    public String editSuper(@RequestParam("name") String name, @RequestParam("superCategory") String superCat){
+    public String editSuper(@RequestParam("name") String name, @RequestParam("superCategory") String superCat) {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superCat);
 
@@ -563,14 +532,14 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/addsuper")
-    public String addSuper(Model model){
+    public String addSuper(Model model) {
 
         model.addAttribute("isNew", true);
         return "/editsuper";
     }
 
     @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
-    public String addSuperCategory(@RequestParam("name") String name){
+    public String addSuperCategory(@RequestParam("name") String name) {
 
         SuperCategory superCategory = new SuperCategory(name);
         superCategoryRepo.save(superCategory);
@@ -580,7 +549,7 @@ class OwnerController {
 
 
     @RequestMapping(value = "/range/editsub/{sub}")
-    public String editSubCategory(Model model, @PathVariable("sub") String subCatName){
+    public String editSubCategory(Model model, @PathVariable("sub") String subCatName) {
 
         SubCategory subCategory = subCategoryRepo.findByName(subCatName);
         model.addAttribute("sub", subCategory);
@@ -592,7 +561,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/editsub", method = RequestMethod.POST)
-    public String editSub(@RequestParam("name") String name, @RequestParam("subCategory") String subCat, @RequestParam("superCategory") String strSuperCat){
+    public String editSub(@RequestParam("name") String name, @RequestParam("subCategory") String subCat, @RequestParam("superCategory") String strSuperCat) {
 
         SubCategory subCategory = subCategoryRepo.findByName(subCat);
         SuperCategory superCategory_new = superCategoryRepo.findByName(strSuperCat);
@@ -608,8 +577,6 @@ class OwnerController {
         superCategoryRepo.save(superCategory_new);
 
 
-
-
         subCategoryRepo.save(subCategory);
 
         return "redirect:/range";
@@ -617,8 +584,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
-    public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat){
-
+    public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat) {
 
 
         SuperCategory superCategory = superCategoryRepo.findByName(strSuperCat);

@@ -57,7 +57,7 @@ public class OwnerControllerOrdersTest {
 
         login("owner", "123");
 
-        controller.orders(model);
+        controller.orders(model, "sort=products");
         assertTrue(model.containsAttribute("orders"));
 
     }
