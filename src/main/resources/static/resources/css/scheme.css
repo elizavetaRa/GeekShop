@@ -116,6 +116,15 @@ dl#news dd span.date {color:#0288CA;}
 
 a.myButton {color:#FFF !important; display:inline-block;}
 
+
+/*
+ * Cart button
+ */
+.cartButton {width:32px; height:32px; border:0; background:url("../images/cart.png") no-repeat; cursor:pointer;}
+.cartButton:focus, .cartButton:hover, .cartButton:active {background:url("../images/cart-add.png") no-repeat;}
+.cartButton:active {position:relative; top:1px;}
+
+
 /*
  * Messages
  */

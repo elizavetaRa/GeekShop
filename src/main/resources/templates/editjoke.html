@@ -30,10 +30,11 @@
             <div id="content-in">
 
                 <form th:action="${joke} ? (@{/editjoke/} + ${joke.id}) : '/newjoke'" method="post">
-                    <textarea id="jokeText" name="jokeText" th:text="${joke} ? ${joke.text}" style="height: 4cm"></textarea>
-                    <button type="submit" class="myButton" th:text="${joke} ? 'Editieren' : 'Witz speichern'">Editieren</button>
-
+                    <textarea id="jokeText" name="jokeText" rows="6" th:text="${joke} ? ${joke.text}"></textarea>
+                    <button type="submit" class="myButton marginButton" th:text="${joke} ? 'Editieren' : 'Witz speichern'">Editieren</button>
                 </form>
+
+                <a href="/jokes" class="myButton">Zurück</a>
 
             </div>
 

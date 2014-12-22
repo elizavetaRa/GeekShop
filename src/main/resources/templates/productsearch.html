@@ -10,6 +10,13 @@
     <script th:replace="header :: jquery-js"></script>
     <script th:replace="header :: tablesorter-js"></script>
     <script>
+        $(window).load(function(){
+            preload([
+                '/resources/images/cart.png',
+                '/resources/images/cart-add.png'
+            ]);
+        });
+
         $(document).ready(function () {
             $(".expand").click(function (e) {
                 $(this).toggleClass("expanded");
@@ -18,6 +25,12 @@
             });
             $("#searchTable").tablesorter();
         }); //$(document).ready
+
+        function preload(arrayOfImages) {
+            $(arrayOfImages).each(function(){
+                (new Image()).src = this;
+            });
+        }
     </script>
 </head>
 
@@ -87,14 +100,13 @@
                         <tr th:each="product : ${catalog}">
                             <form method="post" th:action="@{/cart}" th:with="max = ${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">
                                 <td th:text="${product.name}">Digitalkamera</td>
-                                <td th:text="${product.productNumber}">12345678</td>
+                                <td th:text="${T(geekshop.model.GSOrder).longToString(product.productNumber)}">12345678</td>
                                 <td th:if="${max > 0}"><input type="number" name="number" value="1" min="1" th:max="${max}"/></td>
                                 <td th:unless="${max > 0}">0</td>
-                                <!--<td class="sorter:'currency'" th:text="${T(geekshop.model.GSProduct).moneyToString(product.price)}">123 €</td>-->
-                                <td class="sorter:'currency'" th:text="${product.price}">123 €</td>
+                                <td class="sorter:'currency'" th:text="${T(geekshop.model.GSProduct).moneyToString(product.price)}">123 €</td>
                                 <td th:if="${max > 0}">
                                     <input type="hidden" name="pid" th:value="${product.identifier}"/>
-                                    <button id="tocart" name="tocart" type="submit">+</button>
+                                    <button id="tocart" name="tocart" type="submit" class="cartButton">&nbsp;</button>
                                 </td>
                                 <td th:unless="${max > 0}">nicht verfügbar</td>
                             </form>
