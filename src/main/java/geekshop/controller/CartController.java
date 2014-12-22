@@ -27,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.Optional;
@@ -39,21 +40,14 @@ import java.util.Optional;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
-@SessionAttributes("cart")
+@SessionAttributes(value = {"cart", "flag"})
 class CartController {
     private final Inventory<GSInventoryItem> inventory;
     private final BusinessTime businessTime;
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
-    private GSOrder lastorder;
 
-
-    /**
-     * Creates a new {@link CartController} with the given {@link OrderManager}.
-     *
-     * @param orderManager must not be {@literal null}.
-     */
     @Autowired
     public CartController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
 
@@ -76,6 +70,11 @@ class CartController {
         return new Cart();
     }
 
+    @ModelAttribute("flag")
+    public Flag initializeFlag() {
+        return new Flag();
+    }
+
 
     @RequestMapping("/cart")
     public String cart(@LoggedIn Optional<UserAccount> userAccount) {
@@ -86,24 +85,13 @@ class CartController {
     }
 
 
-    /**
-     * Adds a {@link Product} to the {@link Cart}. Note how the type of the parameter taking the request parameter
-     * {@code pid} is {@link Product}. For all domain types extening {@link org.salespointframework.core.AbstractEntity} (directly or indirectly) a tiny
-     * Salespoint extension will directly load the object instance from the database. If the identifier provided is
-     * invalid (invalid format or no {@link Product} with the id found), {@literal null} will be handed into the method.
-     *
-     * @param product
-     * @param number
-     * @param model
-     * @return
-     */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount, Model model) {
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart,@ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
-       // boolean isReclaim=false;
-       // model.addAttribute("isreclaim", isReclaim);
+
+        if(flag.isReclaimModus()==true) {flag.switchModus();}
 
         if (number <= 0) {
            /* number = 1;*/  return "redirect:/productsearch";
@@ -137,7 +125,7 @@ class CartController {
     }
 
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute GSCart cart, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -271,12 +259,5 @@ class CartController {
 
     }
 
-//        public void acceptReclaim(){
-//            //orderline.state='reclaimed';
-//  LocalDateTime timeup= time.plusDays(14);
-
-
-    //Interval interval=new Interval(time, timeup);
-//        }
 
 }

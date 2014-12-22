@@ -74,6 +74,8 @@ class AccountController {
         // add user for full name in header to the session
         session.setAttribute("user", user);
 
+        boolean isReclaim=true;
+        session.setAttribute("isReclaim", isReclaim);
         // add message repository to the session to display current number of messages
         session.setAttribute("msgRepo", messageRepo);
 

@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
-@SessionAttributes("cart")
+@SessionAttributes(value = {"cart", "flag"})
 class ReclaimController {
     private PaymentMethod paymentMethod;
     private final Inventory<GSInventoryItem> inventory;
@@ -73,6 +73,11 @@ class ReclaimController {
         return new Cart();
     }
 
+    @ModelAttribute("flag")
+    public Flag initializeFlag() {
+        return new Flag();
+    }
+
 
     @RequestMapping("/reclaimcart")
     public String reclaimcart() {
@@ -95,14 +100,11 @@ class ReclaimController {
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
     public String addProductToReclaimCart(@RequestParam("orderNumber") long num, @RequestParam("rpid") ProductIdentifier productid,
                                           @RequestParam("rnumber") int reclaimnumber,
-                                          @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+                                          @ModelAttribute Cart cart, @ModelAttribute Flag flag, Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        //boolean isReclaim=true;
-        //  model.addAttribute("isreclaim", isReclaim);
-
-//        long num=Long.parseLong(strNum);
+        if(flag.isReclaimModus()==false) {flag.switchModus();}
 
         for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
             if (line.getProductIdentifier().equals(productid)) {
@@ -144,7 +146,7 @@ class ReclaimController {
     }
 
 
-    @RequestMapping(value = "/reclaim", method = RequestMethod.POST)
+    @RequestMapping(value = "/reclaimrequest", method = RequestMethod.POST)
     public String reclaimIt(@ModelAttribute Cart cart, @RequestParam("orderNumber") long num, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
 
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))

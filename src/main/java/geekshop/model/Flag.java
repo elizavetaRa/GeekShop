@@ -1,17 +1,14 @@
 package geekshop.model;
 
-import org.salespointframework.order.Cart;
-
-
 /**
- * Created by Lisa on 21.12.2014.
+ * Created by Lisa on 22.12.2014.
  */
-public class GSCart extends Cart {
+public class Flag {
+
 
     private boolean reclaimModus;
 
-    public GSCart(){
-        super() ;
+    public Flag(){
         this.reclaimModus=true;
 
     }
@@ -27,7 +24,4 @@ public class GSCart extends Cart {
 
     }
 
-
 }
-
-

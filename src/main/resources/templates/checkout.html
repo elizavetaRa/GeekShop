@@ -61,13 +61,14 @@
 
                     <tfoot>
                     <tr>
-                        <td colspan="2" class="t-right">Gesamt:</td>
+                        <td th:unless="${flag.isReclaimModus()}==true" colspan="2" class="t-right">Gesamt:</td>
+                        <td th:if="${flag.isReclaimModus()}==true" colspan="2" class="t-right">Wird zurück gezahlt:</td>
                         <td th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</td>
                     </tr>
                     </tfoot>
                 </table>
 
-                <form method="post" id="buyit" th:action="@{/buy}" style="display: inline-block; float: left">
+                <form th:unless="${flag.isReclaimModus()}==true" method="post" id="buyit" th:action="@{/buy}" style="display: inline-block; float: left">
 
                     <label for="payment">Zahlmethode:</label><br/>
 
@@ -83,6 +84,17 @@
                     <input type="submit" class="myButton" value="kaufen" id="checkout"
                  style="margin-left: 1%"/>
                 </form>
+
+
+                   <form th:if="${flag.isReclaimModus()}==true" method="post" id="reclaimit" th:action="@{/reclaimrequest}" style="display: inline-block; float: left">
+
+                       <br/>
+                       <br/>
+
+                       <input type="submit" class="myButton" value="Reklamationsanfrage abschicken" id="reclaimrequest"
+                              style="margin-left: 1%"/>
+                   </form>
+
 
 
                    </div>
