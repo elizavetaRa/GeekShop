@@ -40,7 +40,7 @@ import java.util.Optional;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
-@SessionAttributes(value = {"cart", "flag"})
+@SessionAttributes("cart")
 class CartController {
     private final Inventory<GSInventoryItem> inventory;
     private final BusinessTime businessTime;
@@ -70,11 +70,6 @@ class CartController {
         return new Cart();
     }
 
-    @ModelAttribute("flag")
-    public Flag initializeFlag() {
-        return new Flag();
-    }
-
 
     @RequestMapping("/cart")
     public String cart(@LoggedIn Optional<UserAccount> userAccount) {
@@ -87,27 +82,29 @@ class CartController {
 
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
 
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart,@ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount, Model model) {
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        if(flag.isReclaimModus()==true) {flag.switchModus();}
+        if ((boolean) session.getAttribute("isReclaim"))
+            session.setAttribute("isReclaim", false);
 
         if (number <= 0) {
-           /* number = 1;*/  return "redirect:/productsearch";
+           /* number = 1;*/
+            return "redirect:/productsearch";
         }
         if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
         }
 
-        System.out.println("Anzahl Produkte vor dem hinzufügen zu Cart  "+ inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact() );
-       CartItem item=  cart.addOrUpdateItem(product, Units.of(number));
-        System.out.println("zu Cart hinzugefügt:  "+ number);
+        System.out.println("Anzahl Produkte vor dem hinzufügen zu Cart  " + inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact());
+        CartItem item = cart.addOrUpdateItem(product, Units.of(number));
+        System.out.println("zu Cart hinzugefügt:  " + number);
 
-        if (item.getQuantity().getAmount().intValueExact() >=inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()
-                )
-        {cart.removeItem(item.getIdentifier());
-        cart.addOrUpdateItem(product, inventory.findByProduct(product).get().getQuantity());
+        if (item.getQuantity().getAmount().intValueExact() >= inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()
+                ) {
+            cart.removeItem(item.getIdentifier());
+            cart.addOrUpdateItem(product, inventory.findByProduct(product).get().getQuantity());
         }
 
         return "redirect:/productsearch";
@@ -116,27 +113,33 @@ class CartController {
 
 
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
-    public String deleteAll(@ModelAttribute Cart cart, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
+    public String deleteAll(@ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         cart.clear();
-        if (cart.isEmpty()) {if (flag.isReclaimModus()==false) flag.switchModus();}
+        if (cart.isEmpty()) {
+            if (!((boolean) session.getAttribute("isReclaim")))
+                session.setAttribute("isReclaim", true);
+        }
         return "redirect:/cart";
     }
 
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         cart.removeItem(identifier);
-        if (cart.isEmpty()) {if (flag.isReclaimModus()==false) flag.switchModus();}
+        if (cart.isEmpty()) {
+            if (!((boolean) session.getAttribute("isReclaim")))
+                session.setAttribute("isReclaim", true);
+        }
         return "redirect:/cart";
     }
 
     @RequestMapping(value = "/updatecartitem/", method = RequestMethod.POST)
-    public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
+    public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
         int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
@@ -233,7 +236,7 @@ class CartController {
 
 
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
-    public String buy(@ModelAttribute Cart cart, @ModelAttribute Flag flag,@RequestParam /*Map<String, String> map*/ String payment, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
+    public String buy(@ModelAttribute Cart cart, HttpSession session, @RequestParam /*Map<String, String> map*/ String payment, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -256,7 +259,8 @@ class CartController {
 
             cart.clear();
             model.addAttribute("order", order);
-            if (flag.isReclaimModus()==false) flag.switchModus();
+            if (!((boolean) session.getAttribute("isReclaim")))
+                session.setAttribute("isReclaim", true);
             return "orderoverview";
         }).orElse("redirect:/cart");
 

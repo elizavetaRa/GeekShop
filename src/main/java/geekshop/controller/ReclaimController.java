@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ import java.util.Optional;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
-@SessionAttributes(value = {"cart", "flag"})
+@SessionAttributes("cart")
 class ReclaimController {
     private PaymentMethod paymentMethod;
     private final Inventory<GSInventoryItem> inventory;
@@ -73,11 +74,6 @@ class ReclaimController {
         return new Cart();
     }
 
-    @ModelAttribute("flag")
-    public Flag initializeFlag() {
-        return new Flag();
-    }
-
 
     @RequestMapping("/reclaimcart")
     public String reclaimcart() {
@@ -100,11 +96,12 @@ class ReclaimController {
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
     public String addProductToReclaimCart(@RequestParam("orderNumber") long num, @RequestParam("rpid") ProductIdentifier productid,
                                           @RequestParam("rnumber") int reclaimnumber,
-                                          @ModelAttribute Cart cart, @ModelAttribute Flag flag, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+                                          @ModelAttribute Cart cart, HttpSession session, Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        if(flag.isReclaimModus()==false) {flag.switchModus();}
+        if (!((boolean) session.getAttribute("isReclaim")))
+            session.setAttribute("isReclaim", true);
 
         for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
             if (line.getProductIdentifier().equals(productid)) {
@@ -211,11 +208,13 @@ class ReclaimController {
 //        return "reclaimoverview";
 //    }
     @RequestMapping("/ordersearch")
-    public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrderNumber, @ModelAttribute Flag flag, @LoggedIn Optional<UserAccount> userAccount) {
+    public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrderNumber, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        if (flag.isReclaimModus()==false) {flag.switchModus();}
+        if (!((boolean) session.getAttribute("isReclaim")))
+            session.setAttribute("isReclaim", true);
+        
         long oNumber = Long.parseLong(searchOrderNumber);
         System.out.println(oNumber + " orderNumber");
         // int id = Integer.parseInt(searchOrdernumber);

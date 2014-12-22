@@ -74,10 +74,11 @@ class AccountController {
         // add user for full name in header to the session
         session.setAttribute("user", user);
 
-        boolean isReclaim=true;
-        session.setAttribute("isReclaim", isReclaim);
         // add message repository to the session to display current number of messages
         session.setAttribute("msgRepo", messageRepo);
+
+        // add flag to the session marking whether we are in reclaiming process or normal process
+        session.setAttribute("isReclaim", true);
 
         // check whether user's password matches the current password rules
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();

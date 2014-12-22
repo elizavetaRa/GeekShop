@@ -53,7 +53,7 @@
                                 <form th:action="@{/updatecartitem/}" th:object="${cartitem}" method="post">
                                     <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1" max=""/>
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
-                                    <button th:unless="${flag.isReclaimModus()}==true" class="myButton" type="submit">Aktualisieren</button>
+                                    <button th:unless="${session.isReclaim}" class="myButton" type="submit">Aktualisieren</button>
                                 </form>
                             </td>
 
@@ -74,8 +74,8 @@
 
                         <tfoot>
                         <tr>
-                            <td th:unless="${flag.isReclaimModus()}==true" colspan="3" class="t-right">Summe Warenkorb:</td>
-                            <td th:if="${flag.isReclaimModus()}==true" colspan="3" class="t-right">Wird zurück gezahlt:</td>
+                            <td th:unless="${session.isReclaim}" colspan="3" class="t-right">Summe Warenkorb:</td>
+                            <td th:if="${session.isReclaim}" colspan="3" class="t-right">Wird zurück gezahlt:</td>
                             <td th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</td>
                         </tr>
                         </tfoot>
@@ -86,12 +86,12 @@
                     </form>
 
 
-                    <form th:if="${flag.isReclaimModus()}==false" th:action="@{/checkout}">
+                    <form th:if="${!session.isReclaim}" th:action="@{/checkout}">
                         <button id="checkout" class="myButton marginButton" type="submit">zur Kasse
                         </button>
                     </form>
 
-                    <form th:if="${flag.isReclaimModus()}==true" th:method="post" th:action="@{/reclaim}">
+                    <form th:if="${session.isReclaim}" th:method="post" th:action="@{/reclaim}">
                         <input type="hidden" name="orderNumber" th:value="${orderNumber} ? ${T(geekshop.model.GSOrder).longToString(orderNumber)}"/>
                         <button id="reclaimrequest" class="myButton marginButton" type="submit">Weiter
                         </button>
