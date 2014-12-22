@@ -42,7 +42,9 @@
                             + ', Zahlungsart: ' + ${order.paymentMethod} + ', Verkäufer: ' + ${userRepo.findByUserAccount(order.userAccount)} + ')&lt;/span&gt;'">
                             RECHNUNG
                         </td>
-                        <td th:text="${order.orderType == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">GESAMTPREIS</td>
+                        <td th:text="${order.orderType == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">
+                            GESAMTPREIS
+                        </td>
                     </tr>
                     <div th:remove="tag" th:each="ol : ${order.orderLines}">
                         <tr>
@@ -83,7 +85,8 @@
                     </tr>
                     <div th:remove="tag" th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
                         <tr th:with="ol = ${gsProductOrder.orderLine}">
-                            <td class="t-left indent" th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM</td>
+                            <td class="t-left indent" th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM
+                            </td>
                             <td th:text="${T(geekshop.model.GSOrder).longToString(gsProductOrder.orderNumber)}">RECHNUNG</td>
                             <td th:text="${gsProductOrder.paymentType.value}">ZAHLUNGSART</td>
                             <td th:text="${gsProductOrder.seller}">VERKÄUFER</td>
@@ -101,11 +104,9 @@
                 <a th:href="${setOrders} ? '/orders?sort=products' : '/orders?sort=orders'" class="myButton"
                    th:text="${setOrders} ? 'Nach Artikeln sortieren' : 'Nach Rechnungen sortieren'"></a>
 
-                <form th:action="@{/exportXML}" th:method="post">
-                    <button id="export" class="myButton marginButton" type="submit">
-                        Als XML exportieren
-                    </button>
-                </form>
+                <a th:href="${setOrders} ? '/exportxml?sort=orders' : '/exportxml?sort=products'" class="myButton marginButton">
+                    Als XML exportieren
+                </a>
 
             </div>
 

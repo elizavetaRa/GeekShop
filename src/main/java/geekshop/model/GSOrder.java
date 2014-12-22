@@ -4,6 +4,8 @@ import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Order;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.order.OrderStatus;
+import org.salespointframework.payment.Cheque;
+import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
@@ -245,6 +247,15 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     public GSOrder getReclaimedOrder() {
         return reclaimedOrder;
+    }
+
+    public PaymentType getPaymentType() {
+        if (getPaymentMethod() instanceof Cheque)
+            return PaymentType.CHEQUE;
+        else if (getPaymentMethod() instanceof CreditCard)
+            return PaymentType.CREDITCARD;
+        else
+            return PaymentType.CASH;
     }
 
     /**

@@ -134,9 +134,19 @@ class OwnerController {
         }
     }
 
-    @RequestMapping(value = "/exportXML", method = RequestMethod.POST)
-    public String exportXML() {
+    @RequestMapping("/exportxml")
+    public String exportXML(@RequestParam(value = "sort", required = false) String sort) {
 
+        if (sort != null && sort.equals("products")) {
+            createXMLSortedByProducts();
+            return "redirect:/orders?sort=products";
+        } else {
+            createXMLSortedByOrders();
+            return "redirect:/orders?sort=orders";
+        }
+    }
+
+    public void createXMLSortedByProducts() {
         Map<GSProduct, GSProductOrders> map = putMap();
 
         try {
@@ -171,12 +181,12 @@ class OwnerController {
                     order.appendChild(date);
 
                     // ordernumber element
-                    Element orderNr = doc.createElement("ordernumber");
+                    Element orderNr = doc.createElement("ordernr");
                     orderNr.setTextContent(String.valueOf(element.getOrderNumber()));
                     order.appendChild(orderNr);
 
                     // payment method element
-                    Element paymentmethod = doc.createElement("paymentmethod");
+                    Element paymentmethod = doc.createElement("paymenttype");
                     paymentmethod.setTextContent(element.getPaymentType().getValue());
                     order.appendChild(paymentmethod);
 
@@ -210,8 +220,78 @@ class OwnerController {
         } catch (TransformerException tfe) {
             tfe.printStackTrace();
         }
+    }
 
-        return "redirect:/orders";
+    public void createXMLSortedByOrders() {
+        TreeSet<GSOrder> orders = new TreeSet<>();
+        for (GSOrder order : orderRepo.findAll()) {
+            if (!order.isOpen() && !order.isCanceled()) { // open and canceled orders ought not to be shown
+                orders.add(order);
+            }
+        }
+
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            Document doc = docBuilder.newDocument();
+            // root element
+            Element rootElement = doc.createElement("orders");
+            doc.appendChild(rootElement);
+
+            for (GSOrder o : orders) {
+                // order elements
+                Element order = doc.createElement("order");
+                order.setAttribute("ordernr", String.valueOf(o.getOrderNumber()));
+                order.setAttribute("type", o.getOrderType().toString().toLowerCase());
+                order.setAttribute("date", o.getCreationDate().toString());
+                order.setAttribute("paymenttype", o.getPaymentType().getValue());
+                order.setAttribute("seller", userRepo.findByUserAccount(o.getUserAccount()).toString());
+                order.setAttribute("totalprice", o.getTotalPrice().toString());
+                rootElement.appendChild(order);
+
+                for (OrderLine ol : o.getOrderLines()) {
+
+                    // product elements
+                    Element product = doc.createElement("product");
+                    order.appendChild(product);
+
+
+                    // name element
+                    Element name = doc.createElement("name");
+                    name.setTextContent(ol.getProductName());
+                    product.appendChild(name);
+
+                    // productnumber element
+                    Element productNr = doc.createElement("productnr");
+                    productNr.setTextContent(String.valueOf(catalog.findOne(ol.getProductIdentifier()).get().getProductNumber()));
+                    product.appendChild(productNr);
+
+                    // quantity element
+                    Element quantity = doc.createElement("quantity");
+                    quantity.setTextContent(ol.getQuantity().getAmount().toString());
+                    product.appendChild(quantity);
+
+                    // price elements
+                    Element price = doc.createElement("price");
+                    price.setTextContent(ol.getPrice().toString());
+                    product.appendChild(price);
+                }
+            }
+
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("orders.xml"));
+
+            transformer.transform(source, result);
+
+        } catch (ParserConfigurationException pce) {
+            pce.printStackTrace();
+        } catch (TransformerException tfe) {
+            tfe.printStackTrace();
+        }
     }
 
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.POST)

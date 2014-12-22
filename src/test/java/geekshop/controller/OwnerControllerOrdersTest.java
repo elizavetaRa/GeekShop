@@ -66,9 +66,9 @@ public class OwnerControllerOrdersTest {
     public void createXML() throws Exception {
         login("owner", "123");
 
-        File file = new File("Sales.xml");
+        File file = new File("orders.xml");
 
-        controller.exportXML();
+        controller.exportXML("products");
 
         assertTrue(file.exists());
 
