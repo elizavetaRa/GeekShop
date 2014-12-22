@@ -233,6 +233,8 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     public Date getCreationDate() {
         LocalDateTime ldt = getDateCreated();
+        if (ldt == null)
+            return null;
         ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
     }
@@ -344,6 +346,18 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
     public int compareTo(GSOrder other) {
-        return ((Long)this.orderNumber).compareTo(other.orderNumber);
+        if (this.getDateCreated() == null) {
+            if (other.getDateCreated() == null) {
+                return ((Long) this.orderNumber).compareTo(other.orderNumber);
+            } else {
+                return 1;
+            }
+        } else {
+            if (other.getDateCreated() == null) {
+                return -1;
+            } else {
+                return (this.getDateCreated()).compareTo(other.getDateCreated());
+            }
+        }
     }
 }
