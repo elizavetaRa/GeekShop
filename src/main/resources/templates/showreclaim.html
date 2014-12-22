@@ -16,43 +16,42 @@
     <div th:replace="header :: #header"></div>
 
     <!-- Navigation -->
-    <div th:replace="navigation :: nav ('orders')"></div>
+    <div th:replace="navigation :: nav ('messages')"></div>
 
     <div id="cols" class="box">
 
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title" th:text="'Reklamation der Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.orderNumber)}">Reklamation
+            <h3 id="content-title"
+                th:text="'Reklamation der Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.orderNumber)}">Reklamation
                 ID1</h3>
 
             <div id="content-in">
 
                 <table class="table-style01 alternatRows">
                     <tr>
-                        <th style="width:6em">Produkt</th>
-                        <th style="width:4em">Anzahl</th>
-                        <th style="width:6em">Einzelpreis</th>
-                        <th style="width:6em">Gesamt</th>
+                        <th>Artikel</th>
+                        <th style="width:8em">Anzahl</th>
+                        <th style="width:8em">Einzelpreis</th>
+                        <th style="width:8em">Gesamt</th>
                     </tr>
                     <tr th:each="product : ${products}">
-                        <td th:utext="${product.getProduct().getName()}">Produkt</td>
-                        <td th:utext="${product.getOrderLine().getQuantity().toString()}">Anzahl</td>
-                        <td th:utext="${T(geekshop.model.GSProduct).moneyToString(product.getProduct().price)}"></td>
-                        <td th:utext="${T(geekshop.model.GSProduct).moneyToString(product.getOrderLine().price)}"></td>
+                        <td th:utext="${product.product.name}">Artikel</td>
+                        <td th:utext="${product.orderLine.quantity.amount}">Anzahl</td>
+                        <td th:utext="${T(geekshop.model.GSProduct).moneyToString(product.product.price)}"></td>
+                        <td th:utext="${T(geekshop.model.GSProduct).moneyToString(product.orderLine.price)}"></td>
                     </tr>
-
-
                 </table>
 
                 <form th:method="delete" th:action="'/showreclaim/reclaim=' + ${rid}">
                     <input name="msgId" type="hidden" th:value="${message.id}"/>
                     <input name="accept" type="hidden" th:value="true"/>
-                    <button id="accept" class="myButton">Genehmigen</button>
+                    <button id="accept" class="myButton marginButton">Genehmigen</button>
                 </form>
                 <form th:method="delete" th:action="'/showreclaim/reclaim=' + ${rid}">
-                <input name="msgId" type="hidden" th:value="${message.id}"/>
-                <input name="accept" type="hidden" th:value="false"/>
+                    <input name="msgId" type="hidden" th:value="${message.id}"/>
+                    <input name="accept" type="hidden" th:value="false"/>
                     <button id="decline" class="myButton">Abweisen</button>
                 </form>
 
