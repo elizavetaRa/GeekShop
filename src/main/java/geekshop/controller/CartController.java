@@ -125,7 +125,7 @@ class CartController {
     }
 
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
-    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute GSCart cart, @LoggedIn Optional<UserAccount> userAccount) {
+    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
