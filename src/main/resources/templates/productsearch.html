@@ -87,16 +87,14 @@
                     </form>
 
                     <table id="searchTable" class="table-style01 alternatRows">
-                        <thead>
                         <tr>
-                            <th>Artikel</th>
-                            <th>Artikelnummer</th>
-                            <th>Anzahl</th>
-                            <th>Stückpreis</th>
-                            <th>in den Warenkorb</th>
+                            <th>Artikelbezeichnung</th>
+                            <th style="width:6em">Artikelnr.</th>
+                            <th style="width:6em">Anzahl</th>
+                            <th style="width:6em">Stückpreis</th>
+                            <th style="width:2em"></th>
                         </tr>
-                        </thead>
-                        <tbody>
+
                         <tr th:each="product : ${catalog}">
                             <form method="post" th:action="@{/cart}" th:with="max = ${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">
                                 <td th:text="${product.name}">Digitalkamera</td>
@@ -111,7 +109,6 @@
                                 <td th:unless="${max > 0}">nicht verfügbar</td>
                             </form>
                         </tr>
-                        </tbody>
                     </table>
 
                 </div>
