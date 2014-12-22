@@ -27,33 +27,79 @@
 
             <div id="content-in">
 
-                <table class="table-style01">
+                <table class="table-style01" th:unless="${mapProductOrders}">
                     <tr>
-                        <th style="width:8em">Datum</th>
+                        <th>Artikelbezeichnung</th>
+                        <th style="width:8em">Artikelnummer</th>
+                        <th style="width:7em">Anzahl</th>
+                        <th style="width:8em">Gesamtpreis</th>
+                    </tr>
+                    <tbody th:remove="tag" th:each="order : ${setOrders}">
+                    <tr class="highlight">
+                        <td class="t-left" colspan="3"
+                            th:utext="'Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.orderNumber)}
+                            + ' &lt;span class=\'t-normal\'&gt;(vom ' + ${#dates.format(order.creationDate, 'dd.MM.yyyy HH:mm')}
+                            + ', Zahlungsart: ' + ${order.paymentMethod} + ', Verkäufer: ' + ${userRepo.findByUserAccount(order.userAccount)} + ')&lt;/span&gt;'">
+                            RECHNUNG
+                        </td>
+                        <td th:text="${order.orderType == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">GESAMTPREIS</td>
+                    </tr>
+                    <div th:remove="tag" th:each="ol : ${order.orderLines}">
+                        <tr>
+                            <td class="t-left indent" th:text="${ol.productName}">
+                                ARTIKELNAME
+                            </td>
+                            <td th:text="${T(geekshop.model.GSOrder).longToString(catalog.findOne(ol.productIdentifier).get().productNumber)}">
+                                ARTIKELNUMMER
+                            </td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${ol.quantity.amount}">
+                                ANZAHL
+                            </td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(ol.price)}">
+                                PREIS
+                            </td>
+                        </tr>
+                    </div>
+                    </tbody>
+                </table>
+
+                <table class="table-style01" th:if="${mapProductOrders}">
+                    <tr>
+                        <th style="width:10em">Datum</th>
                         <th style="width:7em">Rechnung</th>
                         <th style="width:7em">Zahlungsart</th>
                         <th>Verkäufer</th>
                         <th style="width:4em">Anzahl</th>
                         <th style="width:6em">Gesamtpreis</th>
                     </tr>
-                    <tbody th:remove="tag" th:each="gsProductOrders : ${orders}">
+                    <tbody th:remove="tag" th:each="gsProductOrders : ${mapProductOrders}">
                     <tr class="highlight" th:with="productOrders = ${gsProductOrders.value}">
-                        <td class="t-left" colspan="4" th:text="${gsProductOrders.key.name}">PRODUKTNAME</td>
+                        <td class="t-left" colspan="4"
+                            th:utext="${gsProductOrders.key.name} + ' &lt;span class=\'t-normal\'&gt;(Artikelnr. ' + ${T(geekshop.model.GSOrder).longToString(gsProductOrders.key.productNumber)} + ')&lt;/span&gt;'">
+                            PRODUKTNAME
+                        </td>
                         <td th:text="${productOrders.totalQuantity.amount}">GESAMTANZAHL</td>
                         <td th:text="${T(geekshop.model.GSProduct).moneyToString(productOrders.totalPrice)}">GESAMTPREIS</td>
                     </tr>
                     <div th:remove="tag" th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
-                    <tr th:with="ol = ${gsProductOrder.orderLine}">
-                        <td th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM</td>
-                        <td th:text="${gsProductOrder.orderNumber}">RECHNUNG</td>
-                        <td th:text="${gsProductOrder.paymentType.value}">ZAHLUNGSART</td>
-                        <td th:text="${gsProductOrder.seller}">VERKÄUFER</td>
-                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${ol.quantity.amount}">ANZAHL</td>
-                        <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(ol.price)}">PREIS</td>
-                    </tr>
+                        <tr th:with="ol = ${gsProductOrder.orderLine}">
+                            <td class="t-left indent" th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM</td>
+                            <td th:text="${T(geekshop.model.GSOrder).longToString(gsProductOrder.orderNumber)}">RECHNUNG</td>
+                            <td th:text="${gsProductOrder.paymentType.value}">ZAHLUNGSART</td>
+                            <td th:text="${gsProductOrder.seller}">VERKÄUFER</td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${ol.quantity.amount}">
+                                ANZAHL
+                            </td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(ol.price)}">
+                                PREIS
+                            </td>
+                        </tr>
                     </div>
                     </tbody>
                 </table>
+
+                <a th:href="${setOrders} ? '/orders?sort=products' : '/orders?sort=orders'" class="myButton"
+                   th:text="${setOrders} ? 'Nach Artikeln sortieren' : 'Nach Rechnungen sortieren'"></a>
 
                 <form th:action="@{/exportXML}" th:method="post">
                     <button id="export" class="myButton marginButton" type="submit">

@@ -56,6 +56,7 @@ table input, table select {width:100%; box-sizing:border-box;}
 .t-justify {text-align:justify !important;}
 
 .t-bold{font-weight:bold !important;}
+.t-normal{font-weight:normal !important;}
 
 .va-top {vertical-align:top;}
 .va-middle {vertical-align:middle;}

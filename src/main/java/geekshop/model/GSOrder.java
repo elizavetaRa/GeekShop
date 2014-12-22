@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * An extension of {@link Order} extended by {@link OrderType}.
@@ -27,7 +27,7 @@ import java.time.temporal.ChronoUnit;
 
 @Entity
 @Component // needed for autowired static fields
-public class GSOrder extends Order {
+public class GSOrder extends Order implements Comparable<GSOrder> {
     /*
      * BusinessTime, GSOrderRepository, Inventory and MessageRepository are static because JPA is creating a separate entity instance,
      * i.e. not using the Spring managed bean and so it's required for the context to be shared.
@@ -127,7 +127,7 @@ public class GSOrder extends Order {
                 if (!inventoryItem.hasSufficientQuantity()) {
                     messageRepo.save(new Message(MessageKind.NOTIFICATION,
                             "Die verfügbare Menge des Artikels „" + ol.getProductName() + "“ " +
-                                    "(Artikelnr.: " + ((GSProduct) inventoryItem.getProduct()).getProductNumber() +
+                                    "(Artikelnr. " + GSOrder.longToString(((GSProduct) inventoryItem.getProduct()).getProductNumber()) +
                                     ") hat mit " + inventoryItem.getQuantity().getAmount() + " Stück " +
                                     "die festgelegte Mindestanzahl von " + inventoryItem.getMinimalQuantity().getAmount() +
                                     " Stück unterschritten."));
@@ -192,10 +192,6 @@ public class GSOrder extends Order {
     }
 
 
-    private void setDateCreated(LocalDateTime date) {
-        setOrderField("dateCreated", date);
-    }
-
     private void setOrderStatus(OrderStatus status) {
         setOrderField("orderStatus", status);
     }
@@ -224,12 +220,23 @@ public class GSOrder extends Order {
             while (orderRepo.findByOrderNumber(orderNr).isPresent())
                 orderNr++;
             orderNumber = orderNr;
+            orderRepo.save(this);
         }
         return orderNumber;
     }
 
     public void setOrderType(OrderType type) {
         this.type = type;
+    }
+
+    public Date getCreationDate() {
+        LocalDateTime ldt = getDateCreated();
+        ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
+        return Date.from(zdt.toInstant());
+    }
+
+    private void setDateCreated(LocalDateTime date) {
+        setOrderField("dateCreated", date);
     }
 
     public OrderType getOrderType() {
@@ -288,29 +295,44 @@ public class GSOrder extends Order {
         GSOrder.messageRepo = messageRepo;
     }
 
-    public String orderNumbertoString() {
-        String orderNumberString;
-        int digits = 0;
-        do {
-            digits++;
-        } while((orderNumber = orderNumber / 10) != 0);
-        switch (digits){
-            case 1: orderNumberString = "000000" + String.valueOf(orderNumber);
-                    break;
-            case 2: orderNumberString = "00000" + String.valueOf(orderNumber);
-                    break;
-            case 3: orderNumberString = "0000" + String.valueOf(orderNumber);
-                    break;
-            case 4: orderNumberString = "000" + String.valueOf(orderNumber);
-                    break;
-            case 5: orderNumberString = "00" + String.valueOf(orderNumber);
-                    break;
-            case 6: orderNumberString = "0" + String.valueOf(orderNumber);
-                    break;
-            default: orderNumberString = String.valueOf(orderNumber);
-                    break;
-        }
-        return orderNumberString;
+    public static String longToString(long number) {
+        String nr = Long.toString(number);
+        int length = 7;
+        if (nr.length() >= length)
+            return nr;
+
+        StringBuilder sb = new StringBuilder(length);
+        char[] zeros = new char[length - nr.length()];
+        Arrays.fill(zeros, '0');
+        sb.append(zeros);
+        sb.append(nr);
+        return sb.toString();
+
+//        String orderNumberString;
+//        int digits = 0;
+//        do {
+//            digits++;
+//        } while((orderNumber = orderNumber / 10) != 0);
+//        switch (digits){
+//            case 1: orderNumberString = "000000" + String.valueOf(orderNumber);
+//                    break;
+//            case 2: orderNumberString = "00000" + String.valueOf(orderNumber);
+//                    break;
+//            case 3: orderNumberString = "0000" + String.valueOf(orderNumber);
+//                    break;
+//            case 4: orderNumberString = "000" + String.valueOf(orderNumber);
+//                    break;
+//            case 5: orderNumberString = "00" + String.valueOf(orderNumber);
+//                    break;
+//            case 6: orderNumberString = "0" + String.valueOf(orderNumber);
+//                    break;
+//            default: orderNumberString = String.valueOf(orderNumber);
+//                    break;
+//        }
+//        return orderNumberString;
     }
 
+    public int compareTo(GSOrder other) {
+        return ((Long)this.orderNumber).compareTo(other.orderNumber);
+    }
 }

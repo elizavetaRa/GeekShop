@@ -178,7 +178,8 @@ public class User {
         this.passwordAttributes = passwordAttributes;
     }
 
+    @Override
     public String toString() {
-        return userAccount.getFirstname() + " " + userAccount.getLastname();
+        return userAccount.getFirstname() + (userAccount.getLastname().isEmpty() ? "" : " " + userAccount.getLastname());
     }
 }

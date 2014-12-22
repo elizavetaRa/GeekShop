@@ -81,18 +81,29 @@ class OwnerController {
 
 
     @RequestMapping("/orders")
-    public String orders(Model model) {
+    public String orders(Model model, @RequestParam(value = "sort", required = false) String sort) {
 
-        Map<GSProduct, GSProductOrders> map = putMap();
-
-        model.addAttribute("orders", map);
+        if (sort != null && sort.equals("products")) {
+            TreeMap<GSProduct, GSProductOrders> map = putMap();
+            model.addAttribute("mapProductOrders", map);
+        } else {
+            TreeSet<GSOrder> orders = new TreeSet<>();
+            for (GSOrder order : orderRepo.findAll()) {
+                if (!order.isOpen() && !order.isCanceled()) { // open and canceled orders ought not to be shown
+                    orders.add(order);
+                }
+            }
+            model.addAttribute("setOrders", orders);
+            model.addAttribute("userRepo", userRepo);
+            model.addAttribute("catalog", catalog);
+        }
 
         return "orders";
     }
 
-    public Map<GSProduct, GSProductOrders> putMap() {
+    public TreeMap<GSProduct, GSProductOrders> putMap() {
 
-        Map<GSProduct, GSProductOrders> map = new HashMap<GSProduct, GSProductOrders>();
+        TreeMap<GSProduct, GSProductOrders> map = new TreeMap<GSProduct, GSProductOrders>();
 
         // for each GSProduct create map entry
         for (GSProduct product : catalog.findAll()) {
@@ -142,9 +153,8 @@ class OwnerController {
                 Element Product = doc.createElement(entry.getKey().getName());
                 rootElement.appendChild(Product);
 
-
-                for (int i = 0; i < entry.getValue().getProductOrders().size(); i++) {
-                    GSProductOrder element = entry.getValue().getProductOrders().get(i);
+                int i = 0;
+                for (GSProductOrder element : entry.getValue().getProductOrders()) {
 
                     String olPrice;
                     String olQuantity;
@@ -186,6 +196,8 @@ class OwnerController {
                     Element price = doc.createElement("Price");
                     price.appendChild(doc.createTextNode(olPrice));
                     Productorder.appendChild(price);
+
+                    i++;
                 }
 
 
@@ -558,7 +570,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
-    public String addSuper(@RequestParam("name") String name){
+    public String addSuperCategory(@RequestParam("name") String name){
 
         SuperCategory superCategory = new SuperCategory(name);
         superCategoryRepo.save(superCategory);
@@ -605,7 +617,7 @@ class OwnerController {
     }
 
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
-    public String addSuper(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat){
+    public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat){
 
 
 
