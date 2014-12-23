@@ -205,20 +205,16 @@ class ReclaimController {
 
             reclaimorder.pay();
             reclaimorder.setOrderType(OrderType.RECLAIM);
-
             orderRepo.save(reclaimorder);
 
-
-            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(/*reclaimorder*/orderRepo.findByOrderNumber(num).get().getOrderNumber()) + " zurückgegeben.";
+            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(reclaimorder.getOrderNumber()) + " zurückgegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, reclaimorder));
 
             cart.clear();
-            session.removeAttribute("ro");                //makes possible starting of new reclaim
             model.addAttribute("order", reclaimorder);
             return "orderoverview";
         }).orElse("orderoverview");
     }
-
 
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.GET)
     public String reclaimbasket() {
