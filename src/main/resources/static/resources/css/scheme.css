@@ -124,6 +124,7 @@ a.myButton {color:#FFF !important; display:inline-block;}
 .cartButton:focus, .cartButton:hover, .cartButton:active {background:url("../images/cart-add.png") no-repeat;}
 .cartButton:active {position:relative; top:1px;}
 
+.cartButtonUnavailable {width:32px; height:32px; display:block; background:url("../images/cart-unavailable.png") no-repeat;}
 
 /*
  * Messages

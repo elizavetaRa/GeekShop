@@ -100,13 +100,13 @@
                                 <td th:text="${product.name}">Digitalkamera</td>
                                 <td th:text="${T(geekshop.model.GSOrder).longToString(product.productNumber)}">12345678</td>
                                 <td th:if="${max > 0}"><input type="number" name="number" value="1" min="1" th:max="${max}"/></td>
-                                <td th:unless="${max > 0}">0</td>
+                                <td th:unless="${max > 0}">&mdash;</td>
                                 <td class="sorter:'currency'" th:text="${T(geekshop.model.GSProduct).moneyToString(product.price)}">123 €</td>
                                 <td th:if="${max > 0}">
                                     <input type="hidden" name="pid" th:value="${product.identifier}"/>
-                                    <button id="tocart" name="tocart" type="submit" class="cartButton">&nbsp;</button>
+                                    <button id="tocart" name="tocart" type="submit" title="in den Warenkorb" class="cartButton">&nbsp;</button>
                                 </td>
-                                <td th:unless="${max > 0}">nicht verfügbar</td>
+                                <td th:unless="${max > 0}"><span class="cartButtonUnavailable" title="Artikel nicht verfügbar"></span></td>
                             </form>
                         </tr>
                     </table>
