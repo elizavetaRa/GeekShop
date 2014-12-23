@@ -48,13 +48,21 @@
                             <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
 
                             <td>
+                                <form th:if="${!session.isReclaim}" th:action="@{/updatecartitem/}" th:object="${cartitem}" method="post">
+                                <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1" max=""/>
+                                <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
+                                <button class="myButton" type="submit">Aktualisieren</button>
 
-
-                                <form th:action="@{/updatecartitem/}" th:object="${cartitem}" method="post">
-                                    <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1" max=""/>
-                                    <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
-                                    <button th:unless="${session.isReclaim}" class="myButton" type="submit">Aktualisieren</button>
                                 </form>
+
+                                <!--<form th:if="${session.isReclaim}" th:action="@{/updatereclaimcartitem/}" th:object="${cartitem}" method="post">-->
+                                    <!--<input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1" max=""/>-->
+                                    <p th:if="${session.isReclaim}" name="quantity"  th:text="${cartitem.quantity.amount}" >1</p>
+                                    <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
+                                    <!--<input  name="orderNumber" th:value="${orderNumber} ? ${T(geekshop.model.GSOrder).longToString(orderNumber)}"/>-->
+                                    <!--<button class="myButton" type="submit">Aktualisieren</button>-->
+
+                                <!--</form>-->
                             </td>
 
                             <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.price)}">209,19 EUR</td>

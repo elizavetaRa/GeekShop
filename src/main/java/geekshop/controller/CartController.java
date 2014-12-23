@@ -135,6 +135,7 @@ class CartController {
             if (!((boolean) session.getAttribute("isReclaim")))
                 session.setAttribute("isReclaim", true);
         }
+
         return "redirect:/cart";
     }
 

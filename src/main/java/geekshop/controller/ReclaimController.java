@@ -118,6 +118,7 @@ class ReclaimController {
                 Quantity qnumber = new Quantity(reclaimnumber, line.getQuantity().getMetric(), line.getQuantity().getRoundingStrategy());
                 cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber);
                 model.addAttribute("orderNumber", num);
+                session.setAttribute("oN", num);
 
                 return "redirect:/reclaim";
             }
@@ -127,7 +128,7 @@ class ReclaimController {
     }
 
     @RequestMapping(value = "/alltoreclaimcart", method = RequestMethod.POST)
-    public String allToReclaimCart(@RequestParam("orderNumber") long num, @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+    public String allToReclaimCart(@RequestParam("orderNumber") long num, @ModelAttribute Cart cart, Model model, HttpSession session,@LoggedIn Optional<UserAccount> userAccount) {
 
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
@@ -142,6 +143,7 @@ class ReclaimController {
         }
 
         model.addAttribute("orderNumber", num);
+        session.setAttribute("oN", num);
         return "cart";
     }
 
@@ -171,6 +173,9 @@ class ReclaimController {
             reclaimorder.pay();
             reclaimorder.setOrderType(OrderType.RECLAIM);
             orderRepo.save(reclaimorder);
+            if (reclaimorder.isOpen()){
+                System.out.println("reclaimoder is open");
+            }
 
             String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(/*reclaimorder*/orderRepo.findByOrderNumber(num).get().getOrderNumber()) + " zurückgegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, reclaimorder));
@@ -182,42 +187,11 @@ class ReclaimController {
     }
 
 
-//    @RequestMapping(value = "/deleteallreclaimitems", method = RequestMethod.DELETE)
-//    public String deleteAll(@ModelAttribute Cart cart) {
-//        cart.clear();
-//        return "redirect:/cart";
-//    }
-//
-//    @RequestMapping(value = "/deletereclaimitem/", method = RequestMethod.POST)
-//    public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart) {
-//        cart.removeItem(identifier);
-//        return "redirect:/cart";
-//    }
-
-
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.GET)
     public String reclaimbasket() {
         return "cart";
     }
 
-//    @RequestMapping("/checkout")
-//    public String checkout() {
-//        return "checkout";
-//    }
-
-
-    /**
-     * Checks out the current state of the {@link Cart}. Using a method parameter of type {@code Optional<UserAccount>}
-     * annotated with {@link LoggedIn} you can access the {@link UserAccount} of the currently logged in user.
-     *
-     * @param userAccount must not be {@literal null}.
-     * @return
-     */
-
-//    @RequestMapping("/reclaimoverview")
-//    public String reclaimoverview() {
-//        return "reclaimoverview";
-//    }
     @RequestMapping("/ordersearch")
     public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrderNumber, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -252,26 +226,6 @@ class ReclaimController {
         }
 
         return "reclaim";
-
-
-//        int id = Integer.parseInt(searchOrdernumber);
-//        System.out.println("Soll nach dieser NUmmer suchen:  " + id);
-//        Iterator<GSOrder> allOrders = orderRepo.findAll().iterator();
-//        while (allOrders.hasNext()) {                              //iteriert über alle Orders, sucht nach einer mit eingegebener searchOrdernumber
-//            System.out.println("in der Schleife  ");
-//            GSOrder tempOrder = allOrders.next();
-//            System.out.println("Aktuelle OrderNumber "+ tempOrder.getOrderNumber());
-//            if ((tempOrder.getOrderNumber() == id) && (!tempOrder.isCompleted()) && (!tempOrder.isCanceled()) ) {  //wenn gefunden, nicht schon reklamiert und nicht completed, setzt Attribut reclaimorder
-//
-//                model.addAttribute("reclaimorder", tempOrder);
-//                System.out.println("Order gefunden:  " + tempOrder);
-//                return "reclaim";
-//            }
-//        }
-
-
-//        System.out.println("nichts gefunden");
-//        return "reclaim";
     }
 
     @RequestMapping("/rcheckout")
@@ -285,5 +239,39 @@ class ReclaimController {
         return "checkout";
     }
 
+
+//    @RequestMapping(value = "/updatereclaimcartitem/", method = RequestMethod.POST)
+//    public String updateReclaimCartItem(@RequestParam String identifier, @RequestParam String quantity, @RequestParam ("orderNumber") String strNumber, @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+//        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+//            return "redirect:/";
+//
+//        System.out.println("eingelesene Quantity "+quantity);
+//        int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
+//        int newquantity = Integer.parseInt(quantity);
+//        if (newquantity <= 0) {
+//            newquantity = 0;
+//        }
+//        int updatequantity = newquantity - oldquantity;
+//
+//        long num = Long.parseLong(strNumber);
+//        OrderLine line;
+//        int inOrder = 0;
+//        for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
+//             iterator.hasNext(); ) {
+//            line = iterator.next();                                                         //search Product of cartItem in order to compare quantity
+//            if (line.getProductName() == cart.getItem(identifier).get().getProductName()) {
+//                inOrder = line.getQuantity().getAmount().intValueExact();
+//                System.out.println("In Order: " + inOrder);
+//                break;
+//            }
+//        }
+//
+//        if (inOrder <= newquantity) {
+//            updatequantity = inOrder - oldquantity;
+//        }
+//        //  model.addAttribute("orderNumber", num);
+//        cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
+//        return "redirect:/cart";
+//    }
 
 }
