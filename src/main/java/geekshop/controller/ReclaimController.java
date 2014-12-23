@@ -105,6 +105,7 @@ class ReclaimController {
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
         model.addAttribute("reclaimorder", orderRepo.findByOrderNumber(num).get());
+        session.setAttribute("ro", orderRepo.findByOrderNumber(num).get());
 
         for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
             if (line.getProductIdentifier().equals(productid)) {
@@ -112,13 +113,14 @@ class ReclaimController {
                 if (reclaimnumber > line.getQuantity().getAmount().intValueExact()) {
                     reclaimnumber = line.getQuantity().getAmount().intValueExact();
                 }
+
                 if (reclaimnumber <= 0) {
                     return "redirect:/reclaim";
                 }
                 Quantity qnumber = new Quantity(reclaimnumber, line.getQuantity().getMetric(), line.getQuantity().getRoundingStrategy());
                 cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber);
                 model.addAttribute("orderNumber", num);
-                session.setAttribute("oN", num);
+                session.setAttribute("oN", num);        //picks up ordernumber for next steps
 
                 return "redirect:/reclaim";
             }
@@ -133,11 +135,13 @@ class ReclaimController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
+        cart.clear(); //to avoid false quantity
         OrderLine line;
 
         for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
              iterator.hasNext(); ) {
             line = iterator.next();
+
             cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), line.getQuantity());
 
         }
@@ -181,6 +185,7 @@ class ReclaimController {
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, reclaimorder));
 
             cart.clear();
+            session.removeAttribute("ro");
             model.addAttribute("order", reclaimorder);
             return "orderoverview";
         }).orElse("orderoverview");
@@ -221,8 +226,8 @@ class ReclaimController {
             String canceled= "";
             model.addAttribute("canceled", canceled);
         } else {
-            model.addAttribute("furtherreclaim",true);
             model.addAttribute("reclaimorder", optOrder.get());
+            session.setAttribute("ro",optOrder.get());
         }
 
         return "reclaim";

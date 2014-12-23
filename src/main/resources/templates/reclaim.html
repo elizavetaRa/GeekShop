@@ -33,7 +33,7 @@
 
                 <p th:if="${cart.empty}==false and ${!session.isReclaim}">Hinweis: Der Kaufvorgang muss abgeschlossen sein.</p><br/>
 
-                <form th:if="${session.isReclaim} and ${cart.empty}" method="get" action="/ordersearch">
+                <form th:if="${session.isReclaim} and ${cart.empty} and ${session.ro}==null" method="get" action="/ordersearch">
                     <input value="suchen" th:value="${suchen}" name="searchordernumber" id="searchordernumber" type="text" size="25" maxlength="40" required="required" placeholder="Rechnungsnummer"/>
                     <button id="searchCatalog" type="submit">suchen</button>
                 </form>
@@ -45,7 +45,7 @@
                 <div th:if="${toolate}">Rechnung liegt nicht mehr innerhalb des 14-Tage-Fensters!</div>
                 <div th:if="${canceled}">Rechnung wurde storniert</div>
 
-                <table th:if="${reclaimorder}or ${orderNumber} " class="table-style01">
+                <table th:if="${session.ro} " class="table-style01">
                     <thead>
                     <tr>
 
@@ -60,7 +60,7 @@
                     <tbody >
                     <form method="post" th:action="@{/reclaimcart}">
                       <!--  <tr name="orderNumber" th:text="'OrderNumber: '+${reclaimorder.orderNumber}">666</tr>-->
-                    <tr th:each="orderline : ${reclaimorder.orderLines}">
+                    <tr th:each="orderline : ${session.ro.orderLines}">
 
 
                      <td th:text="${orderline.productName}">USB-Ventilator</td>
@@ -68,7 +68,7 @@
 
                      <td><input name="rnumber" id="rnumber" min="1" th:max="${orderline.quantity.amount}" th:value="${orderline.quantity.amount}"/></td>
                       <td th:text="${orderline.price}">15 EUR</td>
-                        <td> <input type="hidden"  name="orderNumber" th:value="${T(geekshop.model.GSOrder).longToString(reclaimorder.orderNumber)}"/>
+                        <td> <input type="hidden"  name="orderNumber" th:value="${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"/>
                             <input type="hidden" name="rpid" th:value="${orderline.productIdentifier}"/>
                             <button id="toreclaim" name="toreclaimcart" type="submit" title="in den Warenkorb" class="cartButton">+</button></td>
 
@@ -82,8 +82,8 @@
 
                 </table>
 
-                <form th:if="${reclaimorder}or ${orderNumber} " th:method="post" th:action="@{/alltoreclaimcart}">
-                    <input type="hidden"  name="orderNumber" th:value="${reclaimorder.orderNumber}"/>
+                <form th:if="${session.ro}or ${orderNumber} " th:method="post" th:action="@{/alltoreclaimcart}">
+                    <input type="hidden"  name="orderNumber" th:value="${session.ro.orderNumber}"/>
                     <button id="toreclaimcart" class="myButton marginButton">gesamte Bestellung zum Warenkorb</button>
                 </form>
 
