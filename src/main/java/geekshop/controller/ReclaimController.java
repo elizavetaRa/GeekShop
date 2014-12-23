@@ -172,7 +172,7 @@ class ReclaimController {
             reclaimorder.setOrderType(OrderType.RECLAIM);
             orderRepo.save(reclaimorder);
 
-            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(reclaimorder.getOrderNumber()) + " zurückgegeben.";
+            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(/*reclaimorder*/orderRepo.findByOrderNumber(num).get().getOrderNumber()) + " zurückgegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, reclaimorder));
 
             cart.clear();
