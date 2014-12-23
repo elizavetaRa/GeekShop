@@ -261,6 +261,7 @@ class CartController {
             model.addAttribute("order", order);
             if (!((boolean) session.getAttribute("isReclaim")))
                 session.setAttribute("isReclaim", true);
+                session.setAttribute("overview", true);
             return "orderoverview";
         }).orElse("redirect:/cart");
 

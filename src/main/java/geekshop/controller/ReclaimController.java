@@ -102,6 +102,7 @@ class ReclaimController {
 
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
+        model.addAttribute("reclaimorder", orderRepo.findByOrderNumber(num).get());
 
         for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
             if (line.getProductIdentifier().equals(productid)) {
@@ -113,10 +114,9 @@ class ReclaimController {
                     return "redirect:/reclaim";
                 }
                 Quantity qnumber = new Quantity(reclaimnumber, line.getQuantity().getMetric(), line.getQuantity().getRoundingStrategy());
-
-
                 cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber);
                 model.addAttribute("orderNumber", num);
+
                 return "redirect:/reclaim";
             }
         }
@@ -138,19 +138,25 @@ class ReclaimController {
             cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), line.getQuantity());
 
         }
+
         model.addAttribute("orderNumber", num);
         return "cart";
     }
 
 
     @RequestMapping(value = "/reclaimrequest", method = RequestMethod.POST)
-    public String reclaimIt(@ModelAttribute Cart cart, @RequestParam("orderNumber") long num, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
+    public String reclaimIt(@ModelAttribute Cart cart, @RequestParam("orderNumber") String strNum, HttpSession session, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
 
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         return userAccount.map(account -> {
 
+            if (((boolean) session.getAttribute("overview")))
+                session.setAttribute("overview", false);
+
+            System.out.println("strNum:  "+strNum);
+            long num= Long.parseLong(strNum);
             GSOrder reclaimorder = new GSOrder(userAccount.get(), new Cash(), orderRepo.findByOrderNumber(num).get());
 
             // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
@@ -161,13 +167,13 @@ class ReclaimController {
             }
 
             reclaimorder.pay();
-            //  reclaimorder.setOrderType();
+            reclaimorder.setOrderType(OrderType.RECLAIM);
             orderRepo.save(reclaimorder);
-
+            System.out.println("reclaimorder:  "+reclaimorder.toString());
             cart.clear();
             model.addAttribute("order", reclaimorder);
-            return "cart";
-        }).orElse("redirect:/cart");
+            return "orderoverview";
+        }).orElse("orderoverview");
     }
 
 
@@ -221,13 +227,22 @@ class ReclaimController {
         Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(oNumber);
         if (!optOrder.isPresent()) {
             System.out.println("Keine Rechnung gefunden!");
+            String noOrder= "";
+            model.addAttribute("noorder", noOrder);
         } else if (optOrder.get().getOrderType() == OrderType.RECLAIM) {
             System.out.println("Rechnung " + oNumber + " ist schon eine Reklamation!");
+            String alreadyReclaim= "";
+            model.addAttribute("alreadyreclaim", alreadyReclaim);
         } else if (optOrder.get().isCompleted()) { // Es muss noch überprüft werden, ob es innerhalb der 14 Tage liegt!!! Wenn nicht, muss die Order completed werden.
             System.out.println("Rechnung " + oNumber + " liegt nicht mehr innerhalb des 14-Tage-Fensters!");
+            String toolate= "";
+            model.addAttribute("toolate", toolate);
         } else if (optOrder.get().isCanceled()) {
             System.out.println("Rechnung " + oNumber + " wurde storniert!");
+            String canceled= "";
+            model.addAttribute("canceled", canceled);
         } else {
+            model.addAttribute("furtherreclaim",true);
             model.addAttribute("reclaimorder", optOrder.get());
         }
 
@@ -252,6 +267,17 @@ class ReclaimController {
 
 //        System.out.println("nichts gefunden");
 //        return "reclaim";
+    }
+
+    @RequestMapping("/rcheckout")
+    public String checkout(@LoggedIn Optional<UserAccount> userAccount, @RequestParam("orderNumber") String strNumber, Model model) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
+        long orderNumber= Long.parseLong(strNumber);
+        model.addAttribute("orderNumber", orderNumber);
+
+        return "checkout";
     }
 
 

@@ -80,6 +80,9 @@ class AccountController {
         // add flag to the session marking whether we are in reclaiming process or normal process
         session.setAttribute("isReclaim", true);
 
+        //add flag for correct orderoverview
+        session.setAttribute("overview", true);
+
         // check whether user's password matches the current password rules
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
 

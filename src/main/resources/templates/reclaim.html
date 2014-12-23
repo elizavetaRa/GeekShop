@@ -33,14 +33,19 @@
 
                 <p th:if="${cart.empty}==false and ${!session.isReclaim}">Hinweis: Der Kaufvorgang muss abgeschlossen sein.</p><br/>
 
-                <form th:if="${session.isReclaim}" method="get" action="/ordersearch">
+                <form th:if="${session.isReclaim} and ${cart.empty}" method="get" action="/ordersearch">
                     <input value="suchen" th:value="${suchen}" name="searchordernumber" id="searchordernumber" type="text" size="25" maxlength="40" required="required" placeholder="Rechnungsnummer"/>
                     <button id="searchCatalog" type="submit">suchen</button>
                 </form>
 
 
 
-                <table th:if="${reclaimorder}" class="table-style01">
+                <div th:if="${noorder}">keine Rechnung gefunden</div>
+                <div th:if="${alreadyreclaim}">Rechnung ist schon eine Reklamation</div>
+                <div th:if="${toolate}">Rechnung liegt nicht mehr innerhalb des 14-Tage-Fensters!</div>
+                <div th:if="${canceled}">Rechnung wurde storniert</div>
+
+                <table th:if="${reclaimorder}or ${orderNumber} " class="table-style01">
                     <thead>
                     <tr>
 
@@ -78,7 +83,7 @@
 
                 </table>
 
-                <form th:if="${reclaimorder}" th:method="post" th:action="@{/alltoreclaimcart}">
+                <form th:if="${reclaimorder}or ${orderNumber} " th:method="post" th:action="@{/alltoreclaimcart}">
                     <input type="hidden"  name="orderNumber" th:value="${reclaimorder.orderNumber}"/>
                     <button id="toreclaimcart" class="myButton marginButton">gesamte Bestellung zum Warenkorb</button>
                 </form>
