@@ -132,11 +132,10 @@ class ReclaimController {
                 if (reclaimnumber > line.getQuantity().getAmount().intValueExact()) {
                     reclaimnumber = line.getQuantity().getAmount().intValueExact();
                 }
-                for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
-                    CartItem cartItem = iterator.next();
-                    if (cartItem.getProduct().getIdentifier().equals(line.getProductIdentifier())){
-                        if ((cartItem.getQuantity().getAmount().intValueExact()+reclaimnumber)>line.getQuantity().getAmount().intValueExact()){
-                           reclaimnumber=line.getQuantity().getAmount().intValueExact()-cartItem.getQuantity().getAmount().intValueExact();
+                for (CartItem cartItem : cart) {
+                    if (cartItem.getProduct().getIdentifier().equals(line.getProductIdentifier())) {
+                        if ((cartItem.getQuantity().getAmount().intValueExact() + reclaimnumber) > line.getQuantity().getAmount().intValueExact()) {
+                            reclaimnumber = line.getQuantity().getAmount().intValueExact() - cartItem.getQuantity().getAmount().intValueExact();
                             break;
 
                         }
@@ -151,8 +150,9 @@ class ReclaimController {
                 session.setAttribute("oN", num);        //picks up ordernumber for next steps
 
                 return "redirect:/reclaim";
+
             }
-            break;
+
         }
         return "redirect:/reclaim";
 

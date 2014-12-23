@@ -100,7 +100,6 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         }
 
         setOrderStatus(OrderStatus.OPEN);
-        setDateCreated(businessTime.getTime());
 
         orderNumber = 0L;
     }
@@ -282,6 +281,8 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     @Autowired
     public void setBusinessTime(BusinessTime businessTime) {
         GSOrder.businessTime = businessTime;
+
+        setDateCreated(businessTime.getTime());
     }
 
     /**

@@ -104,7 +104,7 @@
                                 <td class="sorter:'currency'" th:text="${T(geekshop.model.GSProduct).moneyToString(product.price)}">123 €</td>
                                 <td th:if="${max > 0} and !${session.ro}">
                                     <input type="hidden" name="pid" th:value="${product.identifier}"/>
-                                    <button th:unless="${session.ro}" id="tocart" name="tocart" type="submit" title="in den Warenkorb" class="cartButton">&nbsp;</button>
+                                    <button id="tocart" name="tocart" type="submit" title="in den Warenkorb" class="cartButton">&nbsp;</button>
                                 </td>
                                 <td th:unless="${max > 0}"><span class="cartButtonUnavailable" title="Artikel nicht verfügbar"></span></td>
                                 <td th:if="${session.ro}"><span class="cartButtonUnavailable" title="Reklamation muss vorher abgeschlossen werden"></span></td>
