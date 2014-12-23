@@ -100,6 +100,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         }
 
         setOrderStatus(OrderStatus.OPEN);
+        setDateCreated(businessTime.getTime());
 
         orderNumber = 0L;
     }
@@ -117,7 +118,6 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         if (getOrderStatus() != OrderStatus.OPEN)
             throw new IllegalStateException("Order may only be paid if the OrderStatus is OPEN!");
 
-        setDateCreated(businessTime.getTime());
         setOrderStatus(OrderStatus.PAID);
 
         if (type == OrderType.NORMAL) {
