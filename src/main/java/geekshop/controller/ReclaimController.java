@@ -240,38 +240,37 @@ class ReclaimController {
     }
 
 
-//    @RequestMapping(value = "/updatereclaimcartitem/", method = RequestMethod.POST)
-//    public String updateReclaimCartItem(@RequestParam String identifier, @RequestParam String quantity, @RequestParam ("orderNumber") String strNumber, @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
-//        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-//            return "redirect:/";
-//
-//        System.out.println("eingelesene Quantity "+quantity);
-//        int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
-//        int newquantity = Integer.parseInt(quantity);
-//        if (newquantity <= 0) {
-//            newquantity = 0;
-//        }
-//        int updatequantity = newquantity - oldquantity;
-//
-//        long num = Long.parseLong(strNumber);
-//        OrderLine line;
-//        int inOrder = 0;
-//        for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
-//             iterator.hasNext(); ) {
-//            line = iterator.next();                                                         //search Product of cartItem in order to compare quantity
-//            if (line.getProductName() == cart.getItem(identifier).get().getProductName()) {
-//                inOrder = line.getQuantity().getAmount().intValueExact();
-//                System.out.println("In Order: " + inOrder);
-//                break;
-//            }
-//        }
-//
-//        if (inOrder <= newquantity) {
-//            updatequantity = inOrder - oldquantity;
-//        }
-//        //  model.addAttribute("orderNumber", num);
-//        cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
-//        return "redirect:/cart";
-//    }
+    @RequestMapping(value = "/updatereclaimcartitem/", method = RequestMethod.POST)
+    public String updateReclaimCartItem(@RequestParam String identifier, @RequestParam String quantity, HttpSession session, /*@RequestParam ("orderNumber") String strNumber,*/ @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
+        int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
+        int newquantity = Integer.parseInt(quantity);
+        if (newquantity <= 0) {
+            newquantity = 0;
+        }
+        int updatequantity = newquantity - oldquantity;
+
+        long num= (long)session.getAttribute("oN");
+        OrderLine line;
+        int inOrder = 0;
+        for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
+             iterator.hasNext(); ) {
+            line = iterator.next();                                                         //search Product of cartItem in order to compare quantity
+            if (line.getProductName() == cart.getItem(identifier).get().getProductName()) {
+                inOrder = line.getQuantity().getAmount().intValueExact();
+                System.out.println("In Order: " + inOrder);
+                break;
+            }
+        }
+
+        if (inOrder <= newquantity) {
+            updatequantity = inOrder - oldquantity;
+        }
+        session.setAttribute("oN", num);
+        cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
+        return "redirect:/cart";
+    }
 
 }
