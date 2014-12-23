@@ -87,6 +87,10 @@
                     <button id="toreclaimcart" class="myButton marginButton">gesamte Bestellung zum Warenkorb</button>
                 </form>
 
+                <form th:if="${session.ro}or ${orderNumber} " th:method="post" th:action="@{/breakreclaim}">
+
+                    <button id="toreclaimcart" class="myButton marginButton">Abbrechen</button>
+                </form>
 
 
             </div>

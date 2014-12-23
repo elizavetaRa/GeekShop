@@ -107,16 +107,26 @@ class ReclaimController {
         model.addAttribute("reclaimorder", orderRepo.findByOrderNumber(num).get());
         session.setAttribute("ro", orderRepo.findByOrderNumber(num).get());
 
+        if (reclaimnumber <= 0) {
+            return "redirect:/reclaim";}
         for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
             if (line.getProductIdentifier().equals(productid)) {
                 System.out.println("richtige Orderline gefunden  " + line.toString());
+
                 if (reclaimnumber > line.getQuantity().getAmount().intValueExact()) {
                     reclaimnumber = line.getQuantity().getAmount().intValueExact();
                 }
-
-                if (reclaimnumber <= 0) {
-                    return "redirect:/reclaim";
+                for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
+                    CartItem cartItem = iterator.next();
+                    if (cartItem.getProduct().getIdentifier().equals(line.getProductIdentifier())){
+                        if ((cartItem.getQuantity().getAmount().intValueExact()+reclaimnumber)>line.getQuantity().getAmount().intValueExact()){
+                            reclaimnumber=0;
+                        }
+                    }
                 }
+
+
+
                 Quantity qnumber = new Quantity(reclaimnumber, line.getQuantity().getMetric(), line.getQuantity().getRoundingStrategy());
                 cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber);
                 model.addAttribute("orderNumber", num);
@@ -276,6 +286,14 @@ class ReclaimController {
         session.setAttribute("oN", num);
         cart.addOrUpdateItem(cart.getItem(identifier).get().getProduct(), new Quantity(updatequantity, cart.getItem(identifier).get().getQuantity().getMetric(), cart.getItem(identifier).get().getQuantity().getRoundingStrategy()));
         return "redirect:/cart";
+    }
+
+    @RequestMapping(value = "/breakreclaim", method = RequestMethod.POST)
+    public String breakReclaim(@LoggedIn Optional<UserAccount> userAccount, HttpSession session,@ModelAttribute Cart cart ){
+        session.removeAttribute("ro");
+        cart.clear();
+        return "redirect:/reclaim";
+
     }
 
 }
