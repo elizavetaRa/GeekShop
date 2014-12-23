@@ -32,6 +32,7 @@
                 <p th:if="${session.overview}==false">Rechnungsnummer ihrer Reklamationsanfrage: </p><div th:text="${T(geekshop.model.GSOrder).longToString(order.orderNumber)}"></div>
                 <p th:if="${session.overview}">Gekauft am:  </p>
                 <p th:if="${session.overview}==false">Datum:  </p><div th:text="${order.dateCreated.toString()}"></div>
+                <p th:if="${session.overview}==false">Reklamation bezogen auf Rechnungsnummer:  </p><div th:text="${T(geekshop.model.GSOrder).longToString(order.reclaimedOrder.orderNumber)}"></div>
                 <p th:if="${session.overview}">Zahlmethode:  <div th:if="${order.paymentMethod.toString()=='Cash'}">Barzahlung</div>
                 <div th:if="${order.paymentMethod.toString()=='Cheque'}">Lastschriftverfahren</div>
                 <div th:if="${order.paymentMethod.getClass().toString()=='class org.salespointframework.payment.CreditCard'}">Kreditkarte</div>
