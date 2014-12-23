@@ -8,6 +8,7 @@ import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.catalog.ProductIdentifier;
+import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.CartItem;
@@ -97,6 +98,7 @@ class ReclaimController {
 
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
     public String addProductToReclaimCart(@RequestParam("orderNumber") long num, @RequestParam("rpid") ProductIdentifier productid,
+                                          @RequestParam("olid") SalespointIdentifier olid,
                                           @RequestParam("rnumber") int reclaimnumber,
                                           @ModelAttribute Cart cart, HttpSession session, Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -107,11 +109,25 @@ class ReclaimController {
         model.addAttribute("reclaimorder", orderRepo.findByOrderNumber(num).get());
         session.setAttribute("ro", orderRepo.findByOrderNumber(num).get());
 
+
+        //Test1
+        Iterable<OrderLine> a = orderRepo.findByOrderNumber(num).get().getOrderLines();  //Test, soll alle OrderlineId's
+                                                                                         //inOrder ausgeben,
+        for (OrderLine line : a ) {                                               //aus irgendeinem Grund sind identisch
+            System.out.println(olid);
+        }
+
+        //Test2
+        for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {   //Test, ob OrderLines verschidene ProductId's haben
+            System.out.println(productid);                                                //aus irgendeinem Grund nicht
+        }
+
+
+      //  System.out.println("suche nach Orderline " + productid);
         if (reclaimnumber <= 0) {
             return "redirect:/reclaim";}
         for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
             if (line.getProductIdentifier().equals(productid)) {
-                System.out.println("richtige Orderline gefunden  " + line.toString());
 
                 if (reclaimnumber > line.getQuantity().getAmount().intValueExact()) {
                     reclaimnumber = line.getQuantity().getAmount().intValueExact();
@@ -120,7 +136,9 @@ class ReclaimController {
                     CartItem cartItem = iterator.next();
                     if (cartItem.getProduct().getIdentifier().equals(line.getProductIdentifier())){
                         if ((cartItem.getQuantity().getAmount().intValueExact()+reclaimnumber)>line.getQuantity().getAmount().intValueExact()){
-                            reclaimnumber=0;
+                           reclaimnumber=line.getQuantity().getAmount().intValueExact()-cartItem.getQuantity().getAmount().intValueExact();
+                            break;
+
                         }
                     }
                 }
@@ -134,6 +152,7 @@ class ReclaimController {
 
                 return "redirect:/reclaim";
             }
+            break;
         }
         return "redirect:/reclaim";
 
@@ -186,16 +205,15 @@ class ReclaimController {
 
             reclaimorder.pay();
             reclaimorder.setOrderType(OrderType.RECLAIM);
+
             orderRepo.save(reclaimorder);
-            if (reclaimorder.isOpen()){
-                System.out.println("reclaimoder is open");
-            }
+
 
             String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(/*reclaimorder*/orderRepo.findByOrderNumber(num).get().getOrderNumber()) + " zurückgegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, reclaimorder));
 
             cart.clear();
-            session.removeAttribute("ro");
+            session.removeAttribute("ro");                //makes possible starting of new reclaim
             model.addAttribute("order", reclaimorder);
             return "orderoverview";
         }).orElse("orderoverview");

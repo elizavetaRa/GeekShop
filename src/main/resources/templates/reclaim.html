@@ -58,22 +58,20 @@
                     </thead>
 
                     <tbody >
-                    <form method="post" th:action="@{/reclaimcart}">
+
                       <!--  <tr name="orderNumber" th:text="'OrderNumber: '+${reclaimorder.orderNumber}">666</tr>-->
                     <tr th:each="orderline : ${session.ro.orderLines}">
 
-
+                        <form method="post" th:action="@{/reclaimcart}">
                      <td th:text="${orderline.productName}">USB-Ventilator</td>
-
-
                      <td><input name="rnumber" id="rnumber" min="1" th:max="${orderline.quantity.amount}" th:value="${orderline.quantity.amount}"/></td>
                       <td th:text="${orderline.price}">15 EUR</td>
                         <td> <input type="hidden"  name="orderNumber" th:value="${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"/>
                             <input type="hidden" name="rpid" th:value="${orderline.productIdentifier}"/>
+                            <input type="hidden" name="olid" th:value="${orderline.identifier}"/>
                             <button id="toreclaim" name="toreclaimcart" type="submit" title="in den Warenkorb" class="cartButton">+</button></td>
-
-
-                    </tr></form>
+                        </form>
+                    </tr>
 
 
                     </tbody>
