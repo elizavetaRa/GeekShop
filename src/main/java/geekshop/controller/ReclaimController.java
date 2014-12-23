@@ -45,6 +45,7 @@ class ReclaimController {
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
+    private final MessageRepository messageRepo;
 
 
     /**
@@ -53,13 +54,14 @@ class ReclaimController {
      * @param orderManager must not be {@literal null}.
      */
     @Autowired
-    public ReclaimController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
+    public ReclaimController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo, MessageRepository messageRepo) {
 
         this.inventory = inventory;
         this.businessTime = businessTime;
         this.catalog = catalog;
         this.userRepo = userRepo;
         this.orderRepo = orderRepo;
+        this.messageRepo=messageRepo;
 
     }
 
@@ -169,7 +171,10 @@ class ReclaimController {
             reclaimorder.pay();
             reclaimorder.setOrderType(OrderType.RECLAIM);
             orderRepo.save(reclaimorder);
-            System.out.println("reclaimorder:  "+reclaimorder.toString());
+
+            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(reclaimorder.getOrderNumber()) + " zurückgegeben.";
+            messageRepo.save(new Message(MessageKind.RECLAIM, messageText, reclaimorder));
+
             cart.clear();
             model.addAttribute("order", reclaimorder);
             return "orderoverview";
