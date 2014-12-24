@@ -43,6 +43,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     @Transient
     private static MessageRepository messageRepo;
 
+    @Transient
+    private static long orderCounter = 0;
+
     private long orderNumber;
 
     @Enumerated(EnumType.STRING)
@@ -101,7 +104,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
         setOrderStatus(OrderStatus.OPEN);
 
-        orderNumber = 0L;
+        orderNumber = orderCounter++;
     }
 
 
@@ -118,6 +121,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
             throw new IllegalStateException("Order may only be paid if the OrderStatus is OPEN!");
 
         setOrderStatus(OrderStatus.PAID);
+        setDateCreated(businessTime.getTime());
 
         if (type == OrderType.NORMAL) {
 
@@ -216,17 +220,10 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
     public long getOrderNumber() {
-        if (orderNumber <= 0) {
-            long orderNr = 1;
-            while (orderRepo.findByOrderNumber(orderNr).isPresent())
-                orderNr++;
-            orderNumber = orderNr;
-            orderRepo.save(this);
-        }
         return orderNumber;
     }
 
-    public void setOrderType(OrderType type) {
+    protected void setOrderType(OrderType type) {
         this.type = type;
     }
 
@@ -281,8 +278,6 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     @Autowired
     public void setBusinessTime(BusinessTime businessTime) {
         GSOrder.businessTime = businessTime;
-
-        setDateCreated(businessTime.getTime());
     }
 
     /**
@@ -321,29 +316,6 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         sb.append(zeros);
         sb.append(nr);
         return sb.toString();
-
-//        String orderNumberString;
-//        int digits = 0;
-//        do {
-//            digits++;
-//        } while((orderNumber = orderNumber / 10) != 0);
-//        switch (digits){
-//            case 1: orderNumberString = "000000" + String.valueOf(orderNumber);
-//                    break;
-//            case 2: orderNumberString = "00000" + String.valueOf(orderNumber);
-//                    break;
-//            case 3: orderNumberString = "0000" + String.valueOf(orderNumber);
-//                    break;
-//            case 4: orderNumberString = "000" + String.valueOf(orderNumber);
-//                    break;
-//            case 5: orderNumberString = "00" + String.valueOf(orderNumber);
-//                    break;
-//            case 6: orderNumberString = "0" + String.valueOf(orderNumber);
-//                    break;
-//            default: orderNumberString = String.valueOf(orderNumber);
-//                    break;
-//        }
-//        return orderNumberString;
     }
 
     public int compareTo(GSOrder other) {
