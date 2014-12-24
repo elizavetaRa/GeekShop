@@ -550,12 +550,11 @@ class OwnerController {
 
         GSInventoryItem item = inventory.findByProductIdentifier(productId).get();
         Quantity setQuantity = Units.of(lgquantity).subtract(item.getQuantity());
-        if (setQuantity.isNegative()) {
-            item.decreaseQuantity(setQuantity);
-        } else {
-            item.increaseQuantity(setQuantity);
-        }
+        item.increaseQuantity(setQuantity);
         item.setMinimalQuantity(Units.of(minQuantity));
+        if (item.getMinimalQuantity().isGreaterThan(item.getQuantity())){
+            
+        }
         inventory.save(item);
 
         return "redirect:/range";
