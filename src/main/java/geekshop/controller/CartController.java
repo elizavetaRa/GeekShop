@@ -260,9 +260,12 @@ class CartController {
             model.addAttribute("order", order);
             if (!((boolean) session.getAttribute("isReclaim"))) {
                 session.setAttribute("isReclaim", true);
-                session.setAttribute("overview", true);
             }
-            return "redirect:/productsearch";
+            session.setAttribute("overview", true);
+
+            model.addAttribute("catalog", catalog);
+
+            return "orderoverview";
         }).orElse("redirect:/cart");
 
 

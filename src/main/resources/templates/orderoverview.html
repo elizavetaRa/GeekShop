@@ -16,54 +16,55 @@
     <div th:replace="header :: #header"></div>
 
     <!-- Navigation -->
-    <div th:replace="navigation :: nav ('orders')"></div>
+    <div th:replace="navigation :: nav ('cart')"></div>
 
     <div id="cols" class="box">
 
         <!-- Content -->
         <div id="content">
 
-            <h3 th:if="${session.overview}==true" id="content-title">Übersicht der Bestellung</h3>
-            <h3 th:if="${session.overview}==false" id="content-title">Übersicht der Reklamation</h3>
+            <h3 th:if="${session.overview}" id="content-title">Übersicht des Kaufvorgangs</h3>
+
+            <h3 th:if="${!session.overview}" id="content-title">Übersicht der Reklamation</h3>
 
             <div id="content-in">
 
-                <p th:if="${session.overview}">Rechnungsnummer ihrer Bestellung: </p>
-                <p th:if="${session.overview}==false">Rechnungsnummer ihrer Reklamationsanfrage: </p><div th:text="${T(geekshop.model.GSOrder).longToString(order.orderNumber)}"></div>
-                <p th:if="${session.overview}">Gekauft am:  </p>
-                <p th:if="${session.overview}==false">Datum:  </p><div th:text="${order.dateCreated.toString()}"></div>
-                <p th:if="${session.overview}==false">Reklamation bezogen auf Rechnungsnummer:  </p><div th:text="${T(geekshop.model.GSOrder).longToString(order.reclaimedOrder.orderNumber)}"></div>
-                <p th:if="${session.overview}">Zahlmethode:  <div th:if="${order.paymentMethod.toString()=='Cash'}">Barzahlung</div>
-                <div th:if="${order.paymentMethod.toString()=='Cheque'}">Lastschriftverfahren</div>
-                <div th:if="${order.paymentMethod.getClass().toString()=='class org.salespointframework.payment.CreditCard'}">Kreditkarte</div>
+                <p th:utext="'&lt;strong&gt;' + (${session.overview} ? 'Rechnungsnummer' : 'Rechnungsnummer Ihrer Reklamationsanfrage') + ': &lt;/strong&gt;' + ${T(geekshop.model.GSOrder).longToString(order.orderNumber)}"></p>
 
-                </p>
-                <table class="table-style01">
-                    <thead>
+                <p th:utext="'&lt;strong&gt;Datum: &lt;/strong&gt;' + ${#dates.format(order.creationDate, 'dd.MM.yyyy HH:mm')}"></p>
+
+                <p th:if="${!session.overview}"
+                   th:utext="'Reklamation bezieht sich auf &lt;strong&gt;Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.reclaimedOrder.orderNumber)} + '&lt;/strong&gt;'"></p>
+
+                <p th:if="${session.overview}"
+                   th:utext="'&lt;strong&gt;Zahlungsart: &lt;/strong&gt;' + ${order.paymentType.value}"></p>
+
+                <br/>
+
+                <table class="table-style01 alternatRows">
                     <tr>
 
-                        <th style="width:16em">Produkt</th>
+                        <th>Artikel</th>
                         <th style="width:8em">Anzahl</th>
-                        <th style="width:8em">Preis</th>
+                        <th style="width:8em">Stückpreis</th>
+                        <th style="width:8em">Gesamtpreis</th>
 
                     </tr>
-                    </thead>
-
-                    <tbody>
 
                     <tr th:each="orderline : ${order.orderLines}">
                         <td th:text="${orderline.productName}">USB-Ventilator</td>
                         <td th:text="${orderline.quantity.amount}">2</td>
+                        <td th:text="${T(geekshop.model.GSProduct).moneyToString(catalog.findOne(orderline.productIdentifier).get().price)}">
+                            15 EUR
+                        </td>
                         <td th:text="${T(geekshop.model.GSProduct).moneyToString(orderline.price)}">15 EUR</td>
                     </tr>
 
-                    </tbody>
-
                     <tfoot>
                     <tr>
-                        <td th:if="${session.overview}==true" colspan="2" class="t-right">Gesamtpreis:</td>
-                        <td th:if="${session.overview}==false" colspan="2" class="t-right">Wird zurück gezahlt:</td>
-                        <td th:text="${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">269,47 EUR</td>
+                        <td th:if="${session.overview}" colspan="3" class="t-right">Zu zahlende Summe:</td>
+                        <td th:if="${!session.overview}" colspan="3" class="t-right">Zurückzuzahlende Summe:</td>
+                        <td><strong th:text="${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">269,47 EUR</strong></td>
                     </tr>
                     </tfoot>
 

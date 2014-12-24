@@ -200,14 +200,15 @@ class ReclaimController {
 //            reclaimorder.setOrderType(OrderType.RECLAIM);
             orderRepo.save(reclaimorder);
 
-            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(reclaimorder.getOrderNumber()) + " zurückgegeben.";
+            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(reclaimorder.getReclaimedOrder().getOrderNumber()) + " zurückgegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, reclaimorder));
 
             cart.clear();
             model.addAttribute("order", reclaimorder);
+            model.addAttribute("catalog", catalog);
             session.removeAttribute("oN");
             session.removeAttribute("ro");
-            return "redirect:/productsearch";
+            return "orderoverview";
         }).orElse("orderoverview");
     }
 
@@ -225,25 +226,26 @@ class ReclaimController {
             session.setAttribute("isReclaim", true);
 
         long oNumber = Long.parseLong(searchOrderNumber);
+        String orderNumber = GSOrder.longToString(oNumber);
         System.out.println(oNumber + " orderNumber");
-        // int id = Integer.parseInt(searchOrdernumber);
+
         Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(oNumber);
         if (!optOrder.isPresent()) {
-            System.out.println("Keine Rechnung gefunden!");
-            String noOrder = "";
-            model.addAttribute("noorder", noOrder);
+            String error = "Rechnung " + orderNumber + " nicht gefunden!";
+            System.out.println(error);
+            model.addAttribute("error", error);
         } else if (optOrder.get().getOrderType() == OrderType.RECLAIM) {
-            System.out.println("Rechnung " + oNumber + " ist schon eine Reklamation!");
-            String alreadyReclaim = "";
-            model.addAttribute("alreadyreclaim", alreadyReclaim);
-        } else if (optOrder.get().isCompleted()) { // Es muss noch überprüft werden, ob es innerhalb der 14 Tage liegt!!! Wenn nicht, muss die Order completed werden.
-            System.out.println("Rechnung " + oNumber + " liegt nicht mehr innerhalb des 14-Tage-Fensters!");
-            String toolate = "";
-            model.addAttribute("toolate", toolate);
+            String error = "Rechnung " + orderNumber + " ist schon eine Reklamation!";
+            System.out.println(error);
+            model.addAttribute("error", error);
+        } else if (optOrder.get().isCompleted()) {
+            String error = "Rechnung " + orderNumber + " liegt nicht mehr innerhalb des 14-Tage-Fensters!";
+            System.out.println(error);
+            model.addAttribute("error", error);
         } else if (optOrder.get().isCanceled()) {
-            System.out.println("Rechnung " + oNumber + " wurde storniert!");
-            String canceled = "";
-            model.addAttribute("canceled", canceled);
+            String error = "Rechnung " + orderNumber + " wurde storniert!";
+            System.out.println(error);
+            model.addAttribute("error", error);
         } else {
             model.addAttribute("reclaimorder", optOrder.get());
             session.setAttribute("ro", optOrder.get());
@@ -298,8 +300,8 @@ class ReclaimController {
         return "redirect:/cart";
     }
 
-    @RequestMapping(value = "/breakreclaim", method = RequestMethod.POST)
-    public String breakReclaim(@LoggedIn Optional<UserAccount> userAccount, HttpSession session, @ModelAttribute Cart cart) {
+    @RequestMapping(value = "/cancelreclaim", method = RequestMethod.POST)
+    public String cancelReclaim(@LoggedIn Optional<UserAccount> userAccount, HttpSession session, @ModelAttribute Cart cart) {
         session.removeAttribute("ro");
         cart.clear();
         return "redirect:/reclaim";

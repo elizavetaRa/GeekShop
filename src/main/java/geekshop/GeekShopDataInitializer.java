@@ -323,7 +323,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
 
         for (GSOrder order : orderRepo.findByType(OrderType.RECLAIM)) {
-            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(order.getOrderNumber()) + " zurückgegeben.";
+            String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(order.getReclaimedOrder().getOrderNumber()) + " zurückgegeben.";
             messageRepo.save(new Message(MessageKind.RECLAIM, messageText, order));
         }
     }

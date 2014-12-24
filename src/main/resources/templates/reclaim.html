@@ -27,24 +27,25 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Reklamation</h3>
+            <h3 id="content-title">Reklamation <span th:if="${session.ro}" th:text="' von Rechnung ' + ${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"></span></h3>
 
             <div id="content-in">
 
-                <p th:if="${cart.empty}==false and ${!session.isReclaim}">Hinweis: Der Kaufvorgang muss abgeschlossen sein.<br/>
+                <p th:if="${!cart.empty} and ${!session.isReclaim}">Hinweis: Der Kaufvorgang muss abgeschlossen sein.<br/>
                 </p>
 
-                <form th:if="${session.isReclaim} and ${cart.empty} and ${session.ro}==null" method="get" action="/ordersearch">
+                <form th:if="${session.isReclaim} and ${cart.empty} and !${session.ro}" method="get" action="/ordersearch">
                     <input value="suchen" th:value="${suchen}" name="searchordernumber" id="searchordernumber" type="text"
                            size="25" maxlength="40" required="required" placeholder="Rechnungsnummer"/>
                     <button id="searchCatalog" type="submit">suchen</button>
                 </form>
 
+                <p th:if="${error}" th:text="${error}" style="margin-top:0.7em"></p>
 
-                <div th:if="${noorder}">keine Rechnung gefunden</div>
-                <div th:if="${alreadyreclaim}">Rechnung ist schon eine Reklamation</div>
-                <div th:if="${toolate}">Rechnung liegt nicht mehr innerhalb des 14-Tage-Fensters!</div>
-                <div th:if="${canceled}">Rechnung wurde storniert</div>
+                <!--<div th:if="${noorder}">keine Rechnung gefunden</div>-->
+                <!--<div th:if="${alreadyreclaim}">Rechnung ist schon eine Reklamation</div>-->
+                <!--<div th:if="${toolate}">Rechnung liegt nicht mehr innerhalb des 14-Tage-Fensters!</div>-->
+                <!--<div th:if="${canceled}">Rechnung wurde storniert</div>-->
 
                 <table th:if="${session.ro} " class="table-style01 alternatRows">
                     <tr>
@@ -81,7 +82,7 @@
                     <button id="toreclaimcart" class="myButton marginButton">Alle Artikel reklamieren</button>
                 </form>
 
-                <form th:if="${session.ro} or ${orderNumber} " th:method="post" th:action="@{/breakreclaim}">
+                <form th:if="${session.ro} or ${orderNumber} " th:method="post" th:action="@{/cancelreclaim}">
                     <button id="toreclaimcart" class="myButton marginButton">Abbrechen</button>
                 </form>
 

@@ -44,7 +44,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     private static MessageRepository messageRepo;
 
     @Transient
-    private static long orderCounter = 0;
+    private static long orderCounter = 0L;
 
     private long orderNumber;
 
@@ -58,7 +58,6 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     @Deprecated
     protected GSOrder() {
         this.reclaimedOrder = null;
-        initializeGSOrder(null);
     }
 
     public GSOrder(UserAccount ua) {
@@ -104,7 +103,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
         setOrderStatus(OrderStatus.OPEN);
 
-        orderNumber = orderCounter++;
+        orderNumber = ++orderCounter;
     }
 
 
@@ -121,7 +120,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
             throw new IllegalStateException("Order may only be paid if the OrderStatus is OPEN!");
 
         setOrderStatus(OrderStatus.PAID);
-        setDateCreated(businessTime.getTime());
+
+        if (getDateCreated() == null)
+            setDateCreated(businessTime.getTime());
 
         if (type == OrderType.NORMAL) {
 
@@ -228,9 +229,10 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
     public Date getCreationDate() {
+        if (getDateCreated() == null)
+            setDateCreated(businessTime.getTime());
+
         LocalDateTime ldt = getDateCreated();
-        if (ldt == null)
-            return null;
         ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
     }

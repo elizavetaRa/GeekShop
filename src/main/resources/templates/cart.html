@@ -27,7 +27,7 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Warenkorb</h3>
+            <h3 id="content-title">Warenkorb <span th:if="${session.ro}"> (Reklamation)</span></h3>
 
             <div id="content-in">
 
@@ -73,9 +73,9 @@
 
                         <tfoot>
                         <tr>
-                            <td th:unless="${session.isReclaim}" colspan="3" class="t-right">Summe Warenkorb:</td>
-                            <td th:if="${session.isReclaim}" colspan="3" class="t-right">Zurückzuzahlen:</td>
-                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</td>
+                            <td th:unless="${session.isReclaim}" colspan="3" class="t-right">Zu zahlende Summe:</td>
+                            <td th:if="${session.isReclaim}" colspan="3" class="t-right">Zurückzuzahlende Summe:</td>
+                            <td><strong th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</strong></td>
                         </tr>
                         </tfoot>
                     </table>

@@ -185,10 +185,12 @@ class OwnerController {
                     orderNr.setTextContent(String.valueOf(element.getOrderNumber()));
                     order.appendChild(orderNr);
 
-                    // payment method element
-                    Element paymentmethod = doc.createElement("paymenttype");
-                    paymentmethod.setTextContent(element.getPaymentType().toString().toLowerCase());
-                    order.appendChild(paymentmethod);
+                    if (element.getOrderLine().getType() == OrderType.NORMAL) {
+                        // payment method element
+                        Element paymentmethod = doc.createElement("paymenttype");
+                        paymentmethod.setTextContent(element.getPaymentType().toString().toLowerCase());
+                        order.appendChild(paymentmethod);
+                    }
 
                     // seller elements
                     Element seller = doc.createElement("seller");
@@ -245,7 +247,11 @@ class OwnerController {
                 order.setAttribute("ordernr", String.valueOf(o.getOrderNumber()));
                 order.setAttribute("type", o.getOrderType().toString().toLowerCase());
                 order.setAttribute("date", o.getCreationDate().toString());
-                order.setAttribute("paymenttype", o.getPaymentType().toString().toLowerCase());
+                if (o.getOrderType() == OrderType.RECLAIM) {
+                    order.setAttribute("reclaimedorder", String.valueOf(o.getReclaimedOrder().getOrderNumber()));
+                } else {
+                    order.setAttribute("paymenttype", o.getPaymentType().toString().toLowerCase());
+                }
                 order.setAttribute("seller", userRepo.findByUserAccount(o.getUserAccount()).toString());
                 order.setAttribute("totalprice", o.getTotalPrice().toString());
                 rootElement.appendChild(order);
