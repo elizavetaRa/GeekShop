@@ -552,10 +552,17 @@ class OwnerController {
         Quantity setQuantity = Units.of(lgquantity).subtract(item.getQuantity());
         item.increaseQuantity(setQuantity);
         item.setMinimalQuantity(Units.of(minQuantity));
-        if (item.getMinimalQuantity().isGreaterThan(item.getQuantity())){
-            
-        }
         inventory.save(item);
+
+        if (!item.hasSufficientQuantity()) {
+            messageRepo.save(new Message(MessageKind.NOTIFICATION,
+                    "Die verfügbare Menge des Artikels „" + item.getProduct().getName() + "“ " +
+                            "(Artikelnr. " + GSOrder.longToString(((GSProduct) item.getProduct()).getProductNumber()) +
+                            ") hat mit " + item.getQuantity().getAmount() + " Stück " +
+                            "die festgelegte Mindestanzahl von " + item.getMinimalQuantity().getAmount() +
+                            " Stück unterschritten."));
+        }
+
 
         return "redirect:/range";
 
