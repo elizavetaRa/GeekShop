@@ -187,7 +187,7 @@ class OwnerController {
 
                     // payment method element
                     Element paymentmethod = doc.createElement("paymenttype");
-                    paymentmethod.setTextContent(element.getPaymentType().getValue());
+                    paymentmethod.setTextContent(element.getPaymentType().toString().toLowerCase());
                     order.appendChild(paymentmethod);
 
                     // seller elements
@@ -245,7 +245,7 @@ class OwnerController {
                 order.setAttribute("ordernr", String.valueOf(o.getOrderNumber()));
                 order.setAttribute("type", o.getOrderType().toString().toLowerCase());
                 order.setAttribute("date", o.getCreationDate().toString());
-                order.setAttribute("paymenttype", o.getPaymentType().getValue());
+                order.setAttribute("paymenttype", o.getPaymentType().toString().toLowerCase());
                 order.setAttribute("seller", userRepo.findByUserAccount(o.getUserAccount()).toString());
                 order.setAttribute("totalprice", o.getTotalPrice().toString());
                 rootElement.appendChild(order);

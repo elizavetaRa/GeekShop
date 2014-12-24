@@ -33,42 +33,36 @@
 
                 <div th:unless="${cart.empty}">
                     <table class="table-style01 alternatRows">
-                        <thead>
                         <tr>
                             <!--  <th><input type="checkbox" id="selectAll"/></th>-->
-                            <th scope="col">Produkt</th>
-                            <th scope="col">Anzahl</th>
-                            <th scope="col">Preis</th>
-                            <th></th>
+                            <th>Artikel</th>
+                            <th style="width:10em">Anzahl</th>
+                            <th style="width:7em">Stückpreis</th>
+                            <th style="width:7em">Gesamtpreis</th>
+                            <th style="width:6em"></th>
                         </tr>
-                        </thead>
-                        <tbody th:remove="all-but-first">
                         <tr th:each="cartitem : ${cart}">
 
                             <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
 
                             <td>
-                                <form th:if="${!session.isReclaim}" th:action="@{/updatecartitem/}" th:object="${cartitem}" method="post">
-                                <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1" max=""/>
-                                <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
-                                <button class="myButton" type="submit">Aktualisieren</button>
-
-                                </form>
-
-                                <form th:if="${session.isReclaim}" th:action="@{/updatereclaimcartitem/}" th:object="${cartitem}" method="post">
-                                    <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1" max=""/>
-
+                                <form th:action="${!session.isReclaim} ? @{/updatecartitem/} : @{/updatereclaimcartitem/}" th:object="${cartitem}"
+                                      method="post">
+                                    <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}"
+                                           min="1" max="" style="width:8em; margin-right:5px"/>
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
-                                    <input  type="hidden" name="orderNumber" th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
-                                    <button class="myButton" type="submit">Aktualisieren</button>
+                                    <input th:if="${session.isReclaim}" type="hidden" name="orderNumber"
+                                           th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
+                                    <button class="refreshButton" type="submit" title="Menge aktualisieren"></button>
 
                                 </form>
                             </td>
 
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.product.price)}">209,19 EUR</td>
+
                             <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.price)}">209,19 EUR</td>
+
                             <td>
-
-
                                 <form th:action="@{/deletecartitem/}" th:object="${cartitem}" method="post">
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
                                     <button class="myButton" type="submit">Löschen</button>
@@ -77,13 +71,10 @@
                             </td>
                         </tr>
 
-
-                        </tbody>
-
                         <tfoot>
                         <tr>
                             <td th:unless="${session.isReclaim}" colspan="3" class="t-right">Summe Warenkorb:</td>
-                            <td th:if="${session.isReclaim}" colspan="3" class="t-right">Wird zurück gezahlt:</td>
+                            <td th:if="${session.isReclaim}" colspan="3" class="t-right">Zurückzuzahlen:</td>
                             <td th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</td>
                         </tr>
                         </tfoot>
@@ -101,7 +92,8 @@
 
                     <form th:if="${session.isReclaim}" th:method="post" th:action="@{/rcheckout}">
                         <!--<input type="hidden" name="orderNumber" th:value="${orderNumber} ? ${T(geekshop.model.GSOrder).longToString(orderNumber)}"/>-->
-                        <input type="hidden" name="orderNumber" th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
+                        <input type="hidden" name="orderNumber"
+                               th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
                         <button id="reclaimrequest" class="myButton marginButton" type="submit">Weiter
                         </button>
                     </form>

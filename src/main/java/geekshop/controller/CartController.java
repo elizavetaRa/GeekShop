@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.Optional;
 
 /**
@@ -178,7 +177,7 @@ class CartController {
     }
 
 
-    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
+//    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
     public PaymentMethod strToPaymentMethod(String strPayment)
 //                                            @RequestParam("accountname") String accountName,
 //                                            @RequestParam("accountnumber") String accountNumber,
@@ -249,8 +248,7 @@ class CartController {
             System.out.println(paymentM.toString());
             // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
 
-            for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
-                CartItem cartItem = iterator.next();
+            for (CartItem cartItem : cart) {
                 order.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
             }
 
@@ -260,10 +258,11 @@ class CartController {
 
             cart.clear();
             model.addAttribute("order", order);
-            if (!((boolean) session.getAttribute("isReclaim")))
+            if (!((boolean) session.getAttribute("isReclaim"))) {
                 session.setAttribute("isReclaim", true);
                 session.setAttribute("overview", true);
-            return "orderoverview";
+            }
+            return "redirect:/productsearch";
         }).orElse("redirect:/cart");
 
 

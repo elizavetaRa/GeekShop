@@ -39,7 +39,7 @@
                         <td class="t-left" colspan="3"
                             th:utext="'Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.orderNumber)}
                             + ' &lt;span class=\'t-normal\'&gt;(vom ' + ${#dates.format(order.creationDate, 'dd.MM.yyyy HH:mm')}
-                            + ', Zahlungsart: ' + ${order.paymentMethod} + ', Verkäufer: ' + ${userRepo.findByUserAccount(order.userAccount)} + ')&lt;/span&gt;'">
+                            + ', Zahlungsart: ' + ${order.paymentType.value} + ', Verkäufer: ' + ${userRepo.findByUserAccount(order.userAccount)} + ')&lt;/span&gt;'">
                             RECHNUNG
                         </td>
                         <td th:text="${order.orderType == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">

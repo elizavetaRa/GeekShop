@@ -36,7 +36,7 @@
                         <th style="width:6em">Artikelnr.</th>
                         <th style="width:6em">Bestand</th>
                         <th style="width:6em">Preis</th>
-                        <th style="width:15em"></th>
+                        <th style="width:16em"></th>
                     </tr>
                     </thead>
                     <tbody th:each="super : ${supercategories}">
@@ -44,11 +44,11 @@
                         <td class="t-left" colspan="6" th:text="${super.name}">Kleidung</td>
                         <td>
                             <form th:action="@{/range/editsuper/} + ${super.name}"><!-- style="display: inline-block">-->
-                                <button class="myButton marginButton">bearbeiten</button>
+                                <button class="myButton marginButton">Bearbeiten</button>
                             </form>
                             <form th:method="delete" th:action="@{/range/delsuper}"><!-- style="display: inline-block">-->
                                 <input name="superName" type="hidden" th:value="${super.name}"/>
-                                <button class="myButton">löschen</button>
+                                <button class="myButton">Löschen</button>
                             </form>
                         </td>
                     </tr>
@@ -59,11 +59,11 @@
                         <td bgcolor="#E5F4FA" class="t-left t-bold" colspan="5" th:text="${sub.name}">T-Shirts</td>
                         <td bgcolor="#E5F4FA">
                             <form th:action="@{/range/editsub/} + ${sub.name}"><!-- style="display: inline-block">-->
-                                <button class="myButton marginButton">bearbeiten</button>
+                                <button class="myButton marginButton">Bearbeiten</button>
                             </form>
                             <form th:method="delete" th:action="@{/range/delsub}"><!-- style="display: inline-block">-->
                                 <input name="subName" type="hidden" th:value="${sub.name}"/>
-                                <button class="myButton">löschen</button>
+                                <button class="myButton">Löschen</button>
                             </form>
                         </td>
                     <tr th:each="product : ${sub.products}">                        <!--Produkt-->
@@ -76,11 +76,11 @@
                         <td th:text="${product.moneyToString(product.getPrice())}">10€</td>
                         <td>
                             <form th:action="@{/range/editproduct/} + ${product.identifier}"><!-- style="display: inline-block">-->
-                                <button class="myButton marginButton">bearbeiten</button>
+                                <button class="myButton marginButton">Bearbeiten</button>
                             </form>
                             <form th:method="delete" th:action="@{/range/delproduct}"><!-- style="display: inline-block">-->
                                 <input name="productIdent" type="hidden" th:value="${product.getIdentifier()}"/>
-                                <button class="myButton">löschen</button>
+                                <button class="myButton">Löschen</button>
                             </form>
                         </td>
                     </tr>

@@ -50,9 +50,9 @@ class ReclaimController {
 
 
     /**
-     * Creates a new {@link CartController} with the given {@link OrderManager}.
+     * Creates a new {@link CartController} with the given {@link Inventory}.
      *
-     * @param orderManager must not be {@literal null}.
+     * @param inventory must not be {@literal null}.
      */
     @Autowired
     public ReclaimController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo, MessageRepository messageRepo) {
@@ -62,13 +62,14 @@ class ReclaimController {
         this.catalog = catalog;
         this.userRepo = userRepo;
         this.orderRepo = orderRepo;
-        this.messageRepo=messageRepo;
+        this.messageRepo = messageRepo;
 
     }
 
 
     @RequestMapping("/reclaim")
-    public String reclaim() {
+    public String reclaim(Model model) {
+        model.addAttribute("catalog", catalog);
         return "reclaim";
     }
 
@@ -88,14 +89,7 @@ class ReclaimController {
      * {@code pid} is {@link Product}. For all domain types extening {@link org.salespointframework.core.AbstractEntity} (directly or indirectly) a tiny
      * Salespoint extension will directly load the object instance from the database. If the identifier provided is
      * invalid (invalid format or no {@link Product} with the id found), {@literal null} will be handed into the method.
-     *
-     * @param product
-     * @param number
-     * @param model
-     * @return
      */
-
-
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
     public String addProductToReclaimCart(@RequestParam("orderNumber") long num, @RequestParam("rpid") ProductIdentifier productid,
                                           @RequestParam("olid") SalespointIdentifier olid,
@@ -112,8 +106,8 @@ class ReclaimController {
 
         //Test1
         Iterable<OrderLine> a = orderRepo.findByOrderNumber(num).get().getOrderLines();  //Test, soll alle OrderlineId's
-                                                                                         //inOrder ausgeben,
-        for (OrderLine line : a ) {                                               //aus irgendeinem Grund sind identisch
+        //inOrder ausgeben,
+        for (OrderLine line : a) {                                               //aus irgendeinem Grund sind identisch
             System.out.println(olid);
         }
 
@@ -123,9 +117,10 @@ class ReclaimController {
         }
 
 
-      //  System.out.println("suche nach Orderline " + productid);
+        //  System.out.println("suche nach Orderline " + productid);
         if (reclaimnumber <= 0) {
-            return "redirect:/reclaim";}
+            return "redirect:/reclaim";
+        }
         for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
             if (line.getProductIdentifier().equals(productid)) {
 
@@ -143,7 +138,6 @@ class ReclaimController {
                 }
 
 
-
                 Quantity qnumber = new Quantity(reclaimnumber, line.getQuantity().getMetric(), line.getQuantity().getRoundingStrategy());
                 cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber);
                 model.addAttribute("orderNumber", num);
@@ -159,7 +153,7 @@ class ReclaimController {
     }
 
     @RequestMapping(value = "/alltoreclaimcart", method = RequestMethod.POST)
-    public String allToReclaimCart(@RequestParam("orderNumber") long num, @ModelAttribute Cart cart, Model model, HttpSession session,@LoggedIn Optional<UserAccount> userAccount) {
+    public String allToReclaimCart(@RequestParam("orderNumber") long num, @ModelAttribute Cart cart, Model model, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
 
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
@@ -192,19 +186,18 @@ class ReclaimController {
             if (((boolean) session.getAttribute("overview")))
                 session.setAttribute("overview", false);
 
-            System.out.println("strNum:  "+strNum);
-            long num= Long.parseLong(strNum);
+            System.out.println("strNum:  " + strNum);
+            long num = Long.parseLong(strNum);
             GSOrder reclaimorder = new GSOrder(userAccount.get(), new Cash(), orderRepo.findByOrderNumber(num).get());
 
             // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
 
-            for (Iterator<CartItem> iterator = cart.iterator(); iterator.hasNext(); ) {
-                CartItem cartItem = iterator.next();
+            for (CartItem cartItem : cart) {
                 reclaimorder.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
             }
 
-            reclaimorder.pay();
-            reclaimorder.setOrderType(OrderType.RECLAIM);
+//            reclaimorder.pay();
+//            reclaimorder.setOrderType(OrderType.RECLAIM);
             orderRepo.save(reclaimorder);
 
             String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(reclaimorder.getOrderNumber()) + " zurückgegeben.";
@@ -212,7 +205,9 @@ class ReclaimController {
 
             cart.clear();
             model.addAttribute("order", reclaimorder);
-            return "orderoverview";
+            session.removeAttribute("oN");
+            session.removeAttribute("ro");
+            return "redirect:/productsearch";
         }).orElse("orderoverview");
     }
 
@@ -228,32 +223,33 @@ class ReclaimController {
 
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
-        
+
         long oNumber = Long.parseLong(searchOrderNumber);
         System.out.println(oNumber + " orderNumber");
         // int id = Integer.parseInt(searchOrdernumber);
         Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(oNumber);
         if (!optOrder.isPresent()) {
             System.out.println("Keine Rechnung gefunden!");
-            String noOrder= "";
+            String noOrder = "";
             model.addAttribute("noorder", noOrder);
         } else if (optOrder.get().getOrderType() == OrderType.RECLAIM) {
             System.out.println("Rechnung " + oNumber + " ist schon eine Reklamation!");
-            String alreadyReclaim= "";
+            String alreadyReclaim = "";
             model.addAttribute("alreadyreclaim", alreadyReclaim);
         } else if (optOrder.get().isCompleted()) { // Es muss noch überprüft werden, ob es innerhalb der 14 Tage liegt!!! Wenn nicht, muss die Order completed werden.
             System.out.println("Rechnung " + oNumber + " liegt nicht mehr innerhalb des 14-Tage-Fensters!");
-            String toolate= "";
+            String toolate = "";
             model.addAttribute("toolate", toolate);
         } else if (optOrder.get().isCanceled()) {
             System.out.println("Rechnung " + oNumber + " wurde storniert!");
-            String canceled= "";
+            String canceled = "";
             model.addAttribute("canceled", canceled);
         } else {
             model.addAttribute("reclaimorder", optOrder.get());
-            session.setAttribute("ro",optOrder.get());
+            session.setAttribute("ro", optOrder.get());
         }
 
+        model.addAttribute("catalog", catalog);
         return "reclaim";
     }
 
@@ -262,7 +258,7 @@ class ReclaimController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        long orderNumber= Long.parseLong(strNumber);
+        long orderNumber = Long.parseLong(strNumber);
         model.addAttribute("orderNumber", orderNumber);
 
         return "checkout";
@@ -281,7 +277,7 @@ class ReclaimController {
         }
         int updatequantity = newquantity - oldquantity;
 
-        long num= (long)session.getAttribute("oN");
+        long num = (long) session.getAttribute("oN");
         OrderLine line;
         int inOrder = 0;
         for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
@@ -303,7 +299,7 @@ class ReclaimController {
     }
 
     @RequestMapping(value = "/breakreclaim", method = RequestMethod.POST)
-    public String breakReclaim(@LoggedIn Optional<UserAccount> userAccount, HttpSession session,@ModelAttribute Cart cart ){
+    public String breakReclaim(@LoggedIn Optional<UserAccount> userAccount, HttpSession session, @ModelAttribute Cart cart) {
         session.removeAttribute("ro");
         cart.clear();
         return "redirect:/reclaim";
