@@ -46,10 +46,14 @@
                             <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
 
                             <td>
-                                <form th:action="${!session.isReclaim} ? @{/updatecartitem/} : @{/updatereclaimcartitem/}" th:object="${cartitem}"
+                                <form th:action="${!session.isReclaim} ? @{/updatecartitem/} : @{/updatereclaimcartitem/}"
+                                      th:object="${cartitem}"
                                       method="post">
-                                    <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}"
-                                           min="1" max="" style="width:8em; margin-right:5px"/>
+                                    <input type="number" name="quantity" maxlength="5" th:value="${cartitem.quantity.amount}" min="1"
+                                           th:max="${session.isReclaim} and ${session.mapAmounts} ?
+                                           ${session.mapAmounts.get(cartitem.product)} :
+                                           ${inventory.findByProductIdentifier(cartitem.product.identifier).get().quantity.amount}"
+                                           style="width:8em; margin-right:5px"/>
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
                                     <input th:if="${session.isReclaim}" type="hidden" name="orderNumber"
                                            th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
@@ -75,7 +79,8 @@
                         <tr>
                             <td th:unless="${session.isReclaim}" colspan="3" class="t-right">Zu zahlende Summe:</td>
                             <td th:if="${session.isReclaim}" colspan="3" class="t-right">Zurückzuzahlende Summe:</td>
-                            <td><strong th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</strong></td>
+                            <td><strong th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</strong>
+                            </td>
                         </tr>
                         </tfoot>
                     </table>

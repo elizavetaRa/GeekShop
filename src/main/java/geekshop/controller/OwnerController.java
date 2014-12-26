@@ -10,7 +10,6 @@ import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.UserAccount;
-import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -55,7 +54,6 @@ class OwnerController {
     private final Catalog<GSProduct> catalog;
     private final UserRepository userRepo;
     private final JokeRepository jokeRepo;
-    private final UserAccountManager userAccountManager;
     private final MessageRepository messageRepo;
     private final SubCategoryRepository subCategoryRepo;
     private final SuperCategoryRepository superCategoryRepo;
@@ -64,14 +62,13 @@ class OwnerController {
 
     @Autowired
     public OwnerController(GSOrderRepository orderRepo, Catalog<GSProduct> catalog,
-                           UserRepository userRepo, JokeRepository jokeRepo, UserAccountManager userAccountManager,
+                           UserRepository userRepo, JokeRepository jokeRepo,
                            MessageRepository messageRepo, SubCategoryRepository subCategoryRepo,
                            SuperCategoryRepository superCategoryRepo, Inventory<GSInventoryItem> inventory) {
         this.orderRepo = orderRepo;
         this.catalog = catalog;
         this.userRepo = userRepo;
         this.jokeRepo = jokeRepo;
-        this.userAccountManager = userAccountManager;
         this.messageRepo = messageRepo;
         this.subCategoryRepo = subCategoryRepo;
         this.superCategoryRepo = superCategoryRepo;

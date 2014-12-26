@@ -27,7 +27,9 @@
         <!-- Content -->
         <div id="content">
 
-            <h3 id="content-title">Reklamation <span th:if="${session.ro}" th:text="' von Rechnung ' + ${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"></span></h3>
+            <h3 id="content-title">Reklamation <span th:if="${session.ro}"
+                                                     th:text="' von Rechnung ' + ${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"></span>
+            </h3>
 
             <div id="content-in">
 
@@ -51,7 +53,7 @@
                     <tr>
 
                         <th>Artikel</th>
-                        <th style="width:9em">Anzahl</th>
+                        <th style="width:10em">Zu reklamierende Anzahl</th>
                         <th style="width:7em">Stückpreis</th>
                         <th style="width:7em">Gesamtpreis</th>
                         <th style="width:2em"></th>
@@ -60,18 +62,31 @@
                     <!--  <tr name="orderNumber" th:text="'OrderNumber: '+${reclaimorder.orderNumber}">666</tr>-->
                     <tr th:each="orderline : ${session.ro.orderLines}">
 
-                        <form method="post" th:action="@{/reclaimcart}">
+                        <form method="post" th:action="@{/reclaimcart}"
+                              th:with="amount = ${session.mapAmounts.get(catalog.findOne(orderline.productIdentifier).get())}">
                             <td class="t-bold" th:text="${orderline.productName}">USB-Ventilator</td>
-                            <td><input type="number" name="rnumber" id="rnumber" min="1" th:max="${orderline.quantity.amount}"
-                                       th:value="${orderline.quantity.amount}"/></td>
-                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(catalog.findOne(orderline.productIdentifier).get().price)}">15 EUR</td>
+                            <td>
+                                <input th:if="${amount &gt; 0}" type="number" name="rnumber" id="rnumber" min="1"
+                                       th:max="${amount}"
+                                       th:value="${amount}"/>
+
+                                <p th:unless="${amount &gt; 0}">&mdash;</p>
+                            </td>
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(catalog.findOne(orderline.productIdentifier).get().price)}">
+                                15 EUR
+                            </td>
                             <td th:text="${T(geekshop.model.GSProduct).moneyToString(orderline.price)}">15 EUR</td>
-                            <td><input type="hidden" name="orderNumber"
+                            <td th:if="${amount &gt; 0}">
+                                <input type="hidden" name="orderNumber"
                                        th:value="${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"/>
                                 <input type="hidden" name="rpid" th:value="${orderline.productIdentifier}"/>
                                 <input type="hidden" name="olid" th:value="${orderline.identifier}"/>
                                 <button id="toreclaim" name="toreclaimcart" type="submit" title="in den Warenkorb"
                                         class="cartButton">&nbsp;</button>
+                            </td>
+                            <td th:unless="${amount &gt; 0}">
+                                <span class="cartButtonUnavailable"
+                                      title="Dieser Rechnungsposten wurde bereits vollständig reklamiert."></span>
                             </td>
                         </form>
                     </tr>

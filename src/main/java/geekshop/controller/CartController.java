@@ -71,9 +71,11 @@ class CartController {
 
 
     @RequestMapping("/cart")
-    public String cart(@LoggedIn Optional<UserAccount> userAccount) {
+    public String cart(Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
+
+        model.addAttribute("inventory", inventory);
 
         return "cart";
     }
@@ -160,13 +162,13 @@ class CartController {
     }
 
 
-    @RequestMapping(value = "/cart", method = RequestMethod.GET)
-    public String basket(@LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
-
-        return "cart";
-    }
+//    @RequestMapping(value = "/cart", method = RequestMethod.GET)
+//    public String basket(@LoggedIn Optional<UserAccount> userAccount) {
+//        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+//            return "redirect:/";
+//
+//        return "cart";
+//    }
 
     @RequestMapping("/checkout")
     public String checkout(@LoggedIn Optional<UserAccount> userAccount) {
@@ -177,7 +179,7 @@ class CartController {
     }
 
 
-//    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
+    //    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
     public PaymentMethod strToPaymentMethod(String strPayment)
 //                                            @RequestParam("accountname") String accountName,
 //                                            @RequestParam("accountnumber") String accountNumber,

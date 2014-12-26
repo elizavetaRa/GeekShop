@@ -9,14 +9,11 @@ import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.core.SalespointIdentifier;
-import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.CartItem;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.payment.Cash;
-import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Quantity;
-import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
@@ -27,7 +24,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -40,27 +40,20 @@ import java.util.Optional;
 @PreAuthorize("isAuthenticated()")
 @SessionAttributes("cart")
 class ReclaimController {
-    private PaymentMethod paymentMethod;
-    private final Inventory<GSInventoryItem> inventory;
-    private final BusinessTime businessTime;
     private final Catalog<GSProduct> catalog;
-    private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
     private final MessageRepository messageRepo;
 
 
     /**
-     * Creates a new {@link CartController} with the given {@link Inventory}.
+     * Creates a new {@link CartController} with the given {@link Catalog}.
      *
-     * @param inventory must not be {@literal null}.
+     * @param catalog must not be {@literal null}.
      */
     @Autowired
-    public ReclaimController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo, MessageRepository messageRepo) {
+    public ReclaimController(Catalog<GSProduct> catalog, GSOrderRepository orderRepo, MessageRepository messageRepo) {
 
-        this.inventory = inventory;
-        this.businessTime = businessTime;
         this.catalog = catalog;
-        this.userRepo = userRepo;
         this.orderRepo = orderRepo;
         this.messageRepo = messageRepo;
 
@@ -100,20 +93,22 @@ class ReclaimController {
 
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
-        model.addAttribute("reclaimorder", orderRepo.findByOrderNumber(num).get());
-        session.setAttribute("ro", orderRepo.findByOrderNumber(num).get());
+
+        GSOrder reclaimedOrder = orderRepo.findByOrderNumber(num).get();
+
+        model.addAttribute("reclaimorder", reclaimedOrder);
+        session.setAttribute("ro", reclaimedOrder);
 
 
         //Test1
-        Iterable<OrderLine> a = orderRepo.findByOrderNumber(num).get().getOrderLines();  //Test, soll alle OrderlineId's
-        //inOrder ausgeben,
-        for (OrderLine line : a) {                                               //aus irgendeinem Grund sind identisch
-            System.out.println(olid);
+        Iterable<OrderLine> a = reclaimedOrder.getOrderLines(); //Test soll alle OrderlineId's inOrder ausgeben,
+        for (OrderLine line : a) {
+            System.out.println(line.getIdentifier());
         }
 
         //Test2
-        for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {   //Test, ob OrderLines verschidene ProductId's haben
-            System.out.println(productid);                                                //aus irgendeinem Grund nicht
+        for (OrderLine line : reclaimedOrder.getOrderLines()) { //Test, ob OrderLines verschidene ProductId's haben
+            System.out.println(line.getIdentifier());
         }
 
 
@@ -121,35 +116,36 @@ class ReclaimController {
         if (reclaimnumber <= 0) {
             return "redirect:/reclaim";
         }
-        for (OrderLine line : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
-            if (line.getProductIdentifier().equals(productid)) {
-
-                if (reclaimnumber > line.getQuantity().getAmount().intValueExact()) {
-                    reclaimnumber = line.getQuantity().getAmount().intValueExact();
-                }
-                for (CartItem cartItem : cart) {
-                    if (cartItem.getProduct().getIdentifier().equals(line.getProductIdentifier())) {
-                        if ((cartItem.getQuantity().getAmount().intValueExact() + reclaimnumber) > line.getQuantity().getAmount().intValueExact()) {
-                            reclaimnumber = line.getQuantity().getAmount().intValueExact() - cartItem.getQuantity().getAmount().intValueExact();
-                            break;
-
-                        }
-                    }
-                }
 
 
-                Quantity qnumber = new Quantity(reclaimnumber, line.getQuantity().getMetric(), line.getQuantity().getRoundingStrategy());
-                cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), qnumber);
-                model.addAttribute("orderNumber", num);
-                session.setAttribute("oN", num);        //picks up ordernumber for next steps
+        GSOrderLine reclaimedOL = (GSOrderLine) reclaimedOrder.findOrderLineByProduct(catalog.findOne(productid).get());
 
-                return "redirect:/reclaim";
+        if (reclaimedOL == null)
+            return "redirect:/reclaim";
 
+        BigDecimal maxAmount = ((Map<GSProduct, BigDecimal>) session.getAttribute("mapAmounts")).get(catalog.findOne(reclaimedOL.getProductIdentifier()).get());
+        if (reclaimnumber > maxAmount.intValue())
+            reclaimnumber = maxAmount.intValue();
+
+        CartItem cartItem = null;
+        for (CartItem ci : cart) {
+            if (ci.getProduct().getIdentifier().equals(reclaimedOL.getProductIdentifier())) {
+                cartItem = ci;
+                break;
             }
-
         }
-        return "redirect:/reclaim";
 
+        if (cartItem != null && cartItem.getQuantity().getAmount().intValue() + reclaimnumber > maxAmount.intValue()) {
+            reclaimnumber = maxAmount.intValue() - cartItem.getQuantity().getAmount().intValue();
+        }
+
+        Quantity qnumber = new Quantity(reclaimnumber, reclaimedOL.getQuantity().getMetric(), reclaimedOL.getQuantity().getRoundingStrategy());
+        cart.addOrUpdateItem(catalog.findOne(productid).get(), qnumber);
+
+        model.addAttribute("orderNumber", num);
+        session.setAttribute("oN", num);        //picks up ordernumber for next steps
+
+        return "redirect:/reclaim";
     }
 
     @RequestMapping(value = "/alltoreclaimcart", method = RequestMethod.POST)
@@ -158,15 +154,14 @@ class ReclaimController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        cart.clear(); //to avoid false quantity
-        OrderLine line;
+        cart.clear(); // to avoid false quantity
 
-        for (Iterator<OrderLine> iterator = orderRepo.findByOrderNumber(num).get().getOrderLines().iterator();
-             iterator.hasNext(); ) {
-            line = iterator.next();
-
-            cart.addOrUpdateItem(catalog.findOne(line.getProductIdentifier()).get(), line.getQuantity());
-
+        for (OrderLine orderLine : orderRepo.findByOrderNumber(num).get().getOrderLines()) {
+            BigDecimal maxAmount = ((Map<GSProduct, BigDecimal>) session.getAttribute("mapAmounts")).get(catalog.findOne(orderLine.getProductIdentifier()).get());
+            if (maxAmount.signum() > 0) {
+                cart.addOrUpdateItem(catalog.findOne(orderLine.getProductIdentifier()).get(),
+                        new Quantity(maxAmount, orderLine.getQuantity().getMetric(), orderLine.getQuantity().getRoundingStrategy()));
+            }
         }
 
         model.addAttribute("orderNumber", num);
@@ -248,10 +243,17 @@ class ReclaimController {
             model.addAttribute("error", error);
         } else {
             model.addAttribute("reclaimorder", optOrder.get());
+            model.addAttribute("catalog", catalog);
             session.setAttribute("ro", optOrder.get());
+
+            Map<GSProduct, BigDecimal> mapAmounts = new HashMap<>();
+            for (OrderLine ol : optOrder.get().getOrderLines()) {
+                GSProduct product = catalog.findOne(ol.getProductIdentifier()).get();
+                mapAmounts.put(product, determineNotReclaimedAmountOfProduct(optOrder.get(), product));
+            }
+            session.setAttribute("mapAmounts", mapAmounts);
         }
 
-        model.addAttribute("catalog", catalog);
         return "reclaim";
     }
 
@@ -308,4 +310,19 @@ class ReclaimController {
 
     }
 
+
+    private BigDecimal determineNotReclaimedAmountOfProduct(GSOrder orderToBeReclaimed, GSProduct product) {
+        if (orderToBeReclaimed.getOrderType() == OrderType.RECLAIM)
+            throw new IllegalArgumentException("The given order is a reclaim order! Relaim orders cannot be reclaimed.");
+
+        Iterable<GSOrder> reclaimOrders = orderRepo.findByReclaimedOrder(orderToBeReclaimed);
+        BigDecimal cnt = orderToBeReclaimed.findOrderLineByProduct(product).getQuantity().getAmount();
+        for (GSOrder order : reclaimOrders) {
+            OrderLine ol = order.findOrderLineByProduct(product);
+            if (ol != null) {
+                cnt = cnt.subtract(ol.getQuantity().getAmount());
+            }
+        }
+        return cnt;
+    }
 }

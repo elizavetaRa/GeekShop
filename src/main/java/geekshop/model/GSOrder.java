@@ -1,5 +1,6 @@
 package geekshop.model;
 
+import org.salespointframework.catalog.Product;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Order;
 import org.salespointframework.order.OrderLine;
@@ -256,6 +257,14 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
             return PaymentType.CREDITCARD;
         else
             return PaymentType.CASH;
+    }
+
+    public OrderLine findOrderLineByProduct(Product product) {
+        for (OrderLine orderLine : getOrderLines()) {
+            if (orderLine.getProductIdentifier().equals(product.getId()))
+                return orderLine;
+        }
+        return null;
     }
 
     /**
