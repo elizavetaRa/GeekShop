@@ -36,7 +36,7 @@
                         <tr>
                             <!--  <th><input type="checkbox" id="selectAll"/></th>-->
                             <th>Artikel</th>
-                            <th style="width:10em">Anzahl</th>
+                            <th style="width:130px">Anzahl</th>
                             <th style="width:7em">Stückpreis</th>
                             <th style="width:7em">Gesamtpreis</th>
                             <th style="width:6em"></th>
@@ -53,7 +53,7 @@
                                            th:max="${session.isReclaim} and ${session.mapAmounts} ?
                                            ${session.mapAmounts.get(cartitem.product)} :
                                            ${inventory.findByProductIdentifier(cartitem.product.identifier).get().quantity.amount}"
-                                           style="width:8em; margin-right:5px"/>
+                                           style="width:8em; margin-right:5px; display:block; float:left;"/>
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
                                     <input th:if="${session.isReclaim}" type="hidden" name="orderNumber"
                                            th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
@@ -85,23 +85,20 @@
                         </tfoot>
                     </table>
 
-                    <form th:method="delete" th:action="@{/deleteallitems}">
-                        <button id="delete" class="myButton marginButton">Warenkorb leeren</button>
-                    </form>
-
-
                     <form th:if="${!session.isReclaim}" th:action="@{/checkout}">
-                        <button id="checkout" class="myButton marginButton" type="submit">zur Kasse
-                        </button>
+                        <button id="checkout" class="myButton marginButton" type="submit">zur Kasse</button>
                     </form>
 
                     <form th:if="${session.isReclaim}" th:method="post" th:action="@{/rcheckout}">
-                        <!--<input type="hidden" name="orderNumber" th:value="${orderNumber} ? ${T(geekshop.model.GSOrder).longToString(orderNumber)}"/>-->
                         <input type="hidden" name="orderNumber"
                                th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
-                        <button id="reclaimrequest" class="myButton marginButton" type="submit">Weiter
-                        </button>
+                        <button id="reclaimrequest" class="myButton marginButton" type="submit">zur Kasse</button>
                     </form>
+
+                    <form th:method="delete" th:action="@{/deleteallitems}">
+                        <button id="delete" class="myButton f-right">Warenkorb leeren</button>
+                    </form>
+
                 </div>
                 <!--  th:unless="${cart.empty}"-->
 
@@ -119,10 +116,22 @@
         </div>
         <!-- /content -->
 
-
         <hr class="noscreen"/>
 
+
     </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
 
 </div>
 <!-- /main -->

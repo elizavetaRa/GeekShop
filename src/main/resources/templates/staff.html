@@ -62,20 +62,15 @@
                     </button>
                 </form>
 
-                <!--<form th:action="@{/deletemany}">-->
-                <!--<button id="dismiss" class="myButton marginButton" type="submit">Entlassen-->
-                <!--</button>-->
-                <!--</form>-->
-
-                <form th:action="@{/firestaff}" th:method="delete">
-                    <button id="dismissAll" class="myButton marginButton" type="submit">
-                        Alle Angestellten entlassen
-                    </button>
-                </form>
-
                 <form th:action="@{/setrules}">
                     <button id="changeRules" class="myButton" type="submit">
                         Passwortregeln ändern
+                    </button>
+                </form>
+
+                <form th:action="@{/firestaff}" th:method="delete">
+                    <button id="dismissAll" class="myButton f-right" type="submit">
+                        Alle Angestellten entlassen
                     </button>
                 </form>
 

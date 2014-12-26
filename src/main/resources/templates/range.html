@@ -43,10 +43,10 @@
                     <tr class="highlight">      <!--Kategorie-->
                         <td class="t-left" colspan="6" th:text="${super.name}">Kleidung</td>
                         <td>
-                            <form th:action="@{/range/editsuper/} + ${super.name}"><!-- style="display: inline-block">-->
+                            <form th:action="@{/range/editsuper/} + ${super.name}">
                                 <button class="myButton marginButton">Bearbeiten</button>
                             </form>
-                            <form th:method="delete" th:action="@{/range/delsuper}"><!-- style="display: inline-block">-->
+                            <form th:method="delete" th:action="@{/range/delsuper}">
                                 <input name="superName" type="hidden" th:value="${super.name}"/>
                                 <button class="myButton">Löschen</button>
                             </form>
@@ -58,10 +58,10 @@
                         <td style="width:3em"></td>
                         <td bgcolor="#E5F4FA" class="t-left t-bold" colspan="5" th:text="${sub.name}">T-Shirts</td>
                         <td bgcolor="#E5F4FA">
-                            <form th:action="@{/range/editsub/} + ${sub.name}"><!-- style="display: inline-block">-->
+                            <form th:action="@{/range/editsub/} + ${sub.name}">
                                 <button class="myButton marginButton">Bearbeiten</button>
                             </form>
-                            <form th:method="delete" th:action="@{/range/delsub}"><!-- style="display: inline-block">-->
+                            <form th:method="delete" th:action="@{/range/delsub}">
                                 <input name="subName" type="hidden" th:value="${sub.name}"/>
                                 <button class="myButton">Löschen</button>
                             </form>
@@ -75,10 +75,10 @@
                         </td>
                         <td th:text="${product.moneyToString(product.getPrice())}">10€</td>
                         <td>
-                            <form th:action="@{/range/editproduct/} + ${product.identifier}"><!-- style="display: inline-block">-->
+                            <form th:action="@{/range/editproduct/} + ${product.identifier}">
                                 <button class="myButton marginButton">Bearbeiten</button>
                             </form>
-                            <form th:method="delete" th:action="@{/range/delproduct}"><!-- style="display: inline-block">-->
+                            <form th:method="delete" th:action="@{/range/delproduct}">
                                 <input name="productIdent" type="hidden" th:value="${product.getIdentifier()}"/>
                                 <button class="myButton">Löschen</button>
                             </form>
@@ -92,13 +92,13 @@
 
                 </table>
 
-                <form th:method="get" th:action="@{/range/addsuper}" style="display: inline-block">
-                    <button id="addProd" class="myButton">Kategorie hinzufügen</button>
+                <form th:method="get" th:action="@{/range/addsuper}">
+                    <button id="addProd" class="myButton marginButton">Kategorie hinzufügen</button>
                 </form>
-                <form th:method="get" th:action="@{/range/addsub}" style="display: inline-block">
-                    <button id="addProd" class="myButton">Unterkategorie hinzufügen</button>
+                <form th:method="get" th:action="@{/range/addsub}">
+                    <button id="addProd" class="myButton marginButton">Unterkategorie hinzufügen</button>
                 </form>
-                <form th:method="get" th:action="@{/range/addproduct}" style="display: inline-block">
+                <form th:method="get" th:action="@{/range/addproduct}">
                     <button id="addProd" class="myButton">Artikel hinzufügen</button>
                 </form>
 

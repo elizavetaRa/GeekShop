@@ -33,7 +33,7 @@
                     <table class="table-style01 t-left noborder">
                         <tr>
                             <td th:with="superCategory = (${sub} ? ${sub.getSuperCategory()})">
-                                <select name="superCategory" id="superCategory" size="20" required="required">
+                                <select name="superCategory" id="superCategory" size="10" required="required">
                                     <option th:each="super : ${superCategories}"
                                             th:value="${super.name}" th:text="${super.name}"
                                             th:selected="${superCategory == super}"></option>
@@ -56,7 +56,7 @@
                     <input th:value="${sub} ? ${sub.name}" type="hidden" name="subCategory"/>
                     <button type="submit" name="save" id="save" class="myButton">Speichern
                     </button>
-                    <a th:href="@{/range}" class="myButton">Zurück</a>
+                    <a th:href="@{/range}" class="myButton f-right">Zurück</a>
                 </form>
 
             </div>

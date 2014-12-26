@@ -44,7 +44,7 @@
                                 </form>
                                 <form th:method="delete" th:if="${message.messageKind == T(geekshop.model.MessageKind).NOTIFICATION}"
                                       th:action="@{/messages/} + ${message.id}">
-                                    <button id="delMessage" class="myButton" style="margin-left: 1%">Löschen</button>
+                                    <button id="delMessage" class="myButton">Löschen</button>
                                 </form>
                             </td>
                         </tr>

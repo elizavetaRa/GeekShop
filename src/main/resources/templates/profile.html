@@ -164,7 +164,7 @@
                     <input name="uai" type="hidden" th:if="${user}" th:value="${user.userAccount.identifier}"/>
                     <button type="submit" name="save" id="save" class="myButton" th:if="${inEditingMode}">Speichern
                     </button>
-                    <a th:href="${path}" th:if="${inEditingMode}" class="myButton">Zurück</a>
+                    <a th:href="${path}" th:if="${inEditingMode}" class="myButton f-right">Zurück</a>
                 </form>
 
                 <form th:action="${path} + '/changedata'" method="post" class="f-left" th:if="${!inEditingMode}">

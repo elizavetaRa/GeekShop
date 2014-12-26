@@ -64,11 +64,10 @@
                         </tfoot>
                     </table>
 
-                    <form th:unless="${session.isReclaim}" method="post" id="buyit" th:action="@{/buy}"
-                          style="display: inline-block; float: left">
+                    <form th:unless="${session.isReclaim}" method="post" id="buyit" th:action="@{/buy}">
 
                         <div th:unless="${session.isReclaim}">
-                            <label for="payment">Zahlungsart:</label><br/>
+                            <label for="payment"><strong>Zahlungsart:</strong>&nbsp;</label>
 
                             <select name="payment" id="payment">
                                 <option th:each="p : ${T(geekshop.model.PaymentType).values()}"
@@ -77,20 +76,18 @@
                             </select></div>
 
                         <br/>
-                        <br/>
 
                         <input type="submit" class="myButton" value="Kaufen" id="checkout"/>
                     </form>
 
-
-                    <form th:if="${session.isReclaim}" method="post" id="reclaimit" th:action="@{/reclaimrequest}"
-                          style="display: inline-block; float: left">
+                    <form th:if="${session.isReclaim}" method="post" id="reclaimit" th:action="@{/reclaimrequest}">
 
                         <input type="hidden" name="orderNumber"
                                th:value="${orderNumber} ? ${T(geekshop.model.GSOrder).longToString(orderNumber)}"/>
                         <input type="submit" class="myButton" value="Reklamationsanfrage abschicken" id="reclaimrequest"/>
                     </form>
 
+                    <a href="/cart" class="myButton f-right">Zurück</a>
 
                 </div>
                 <p th:if="${cart.empty}">Nichts zu zeigen</p>
@@ -109,9 +106,16 @@
     </div>
     <!-- /cols -->
 
+    <div id="cols-bottom"></div>
 
     <hr class="noscreen"/>
 
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
 
 </div>
 <!-- /main -->
