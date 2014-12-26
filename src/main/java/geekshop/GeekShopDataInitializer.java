@@ -95,46 +95,66 @@ public class GeekShopDataInitializer implements DataInitializer {
         if (catalog.findAll().iterator().hasNext())
             return;
 
-        SuperCategory sup1 = new SuperCategory("SuperCategory1");
-        SuperCategory sup2 = new SuperCategory("SuperCategory2");
-        SuperCategory sup3 = new SuperCategory("SuperCategory3");
-        SubCategory sub1 = new SubCategory("SubCategory1", sup1);
-        SubCategory sub2 = new SubCategory("SubCategory2", sup1);
-        SubCategory sub3 = new SubCategory("SubCategory3", sup2);
-        SubCategory sub4 = new SubCategory("SubCategory4", sup2);
-        sup1.addSubCategory(sub1);
-        sup1.addSubCategory(sub2);
-        sup2.addSubCategory(sub3);
-        sup2.addSubCategory(sub4);
-        supCatRepo.save(sup1);
-        supCatRepo.save(sup2);
-        supCatRepo.save(sup3);
-        subCatRepo.save(sub1);
-        subCatRepo.save(sub2);
-        subCatRepo.save(sub3);
-        subCatRepo.save(sub4);
+        SuperCategory supClothing = new SuperCategory("Kleidung");
+        SuperCategory supUseful = new SuperCategory("Nützliches");
+        SuperCategory supDeco = new SuperCategory("Dekoration");
+        SubCategory subInfo = new SubCategory("Informatik", supClothing);
+        SubCategory subScience = new SubCategory("Wissenschaft", supClothing);
+        SubCategory subEatDrink = new SubCategory("Essen & Trinken", supUseful);
+        SubCategory subGadgets = new SubCategory("Gadgets", supUseful);
+        SubCategory subSticker = new SubCategory("Aufkleber", supDeco);
+        supClothing.addSubCategory(subInfo);
+        supClothing.addSubCategory(subScience);
+        supUseful.addSubCategory(subEatDrink);
+        supUseful.addSubCategory(subGadgets);
+        supDeco.addSubCategory(subSticker);
+        supCatRepo.save(supClothing);
+        supCatRepo.save(supUseful);
+        supCatRepo.save(supDeco);
+        subCatRepo.save(subInfo);
+        subCatRepo.save(subScience);
+        subCatRepo.save(subEatDrink);
+        subCatRepo.save(subGadgets);
+        subCatRepo.save(subSticker);
 
 
-        GSProduct prod1 = new GSProduct(5, "Product1", Money.of(EUR, 29.99), sub1);
-        GSProduct prod2 = new GSProduct(1, "Product2", Money.of(EUR, 19.99), sub2);
-        GSProduct prod3 = new GSProduct(4, "Product3", Money.of(EUR, 49.99), sub2);
-        GSProduct prod4 = new GSProduct(3, "Product4", Money.of(EUR, 9.99), sub1);
-        GSProduct prod5 = new GSProduct(2, "Product5", Money.of(EUR, 39.99), sub3);
+        GSProduct prod11 = new GSProduct(1, "Microcontroller Manschettenknöpfe", Money.of(EUR, 34.90), subInfo);
+        GSProduct prod12 = new GSProduct(2, "T-Shirt „There is no place like 127.0.0.1“", Money.of(EUR, 14.90), subInfo);
+        GSProduct prod21 = new GSProduct(3, "T-Shirt „Be rational. Get real.“", Money.of(EUR, 14.90), subScience);
+        GSProduct prod22 = new GSProduct(4, "T-Shirt „WANTED. Dead and Alive. Schrödinger's Cat“", Money.of(EUR, 14.90), subScience);
+        GSProduct prod31 = new GSProduct(5, "Selbstumrührender Becher", Money.of(EUR, 15.95), subEatDrink);
+        GSProduct prod32 = new GSProduct(6, "Star Wars Essstäbchen", Money.of(EUR, 12.95), subEatDrink);
+        GSProduct prod41 = new GSProduct(7, "Wäschefalter aus The Big Bang Theory", Money.of(EUR, 7.95), subGadgets);
+        GSProduct prod42 = new GSProduct(8, "USB-Staubsauger", Money.of(EUR, 11.95), subGadgets);
+        GSProduct prod51 = new GSProduct(9, "Aufkleber „This is NOT a touchscreen!“", Money.of(EUR, 1.50), subSticker);
+        GSProduct prod52 = new GSProduct(10, "Aufkleber „Enter any 11-digit prime number to continue.“", Money.of(EUR, 1.00), subSticker);
+        GSProduct prod53 = new GSProduct(11, "Aufkleber Binary Gas Pedal", Money.of(EUR, 2.90), subSticker);
 
-        catalog.save(prod1);
-        catalog.save(prod2);
-        catalog.save(prod3);
-        catalog.save(prod4);
-        catalog.save(prod5);
+        catalog.save(prod11);
+        catalog.save(prod12);
+        catalog.save(prod21);
+        catalog.save(prod22);
+        catalog.save(prod31);
+        catalog.save(prod32);
+        catalog.save(prod41);
+        catalog.save(prod42);
+        catalog.save(prod51);
+        catalog.save(prod52);
+        catalog.save(prod53);
 
         System.out.println(catalog.count());
 
-
-        sub1.addProduct(prod1);
-        sub2.addProduct(prod2);
-        sub2.addProduct(prod3);
-        sub1.addProduct(prod4);
-        sub3.addProduct(prod5);
+        subInfo.addProduct(prod11);
+        subInfo.addProduct(prod12);
+        subScience.addProduct(prod21);
+        subScience.addProduct(prod22);
+        subEatDrink.addProduct(prod31);
+        subEatDrink.addProduct(prod32);
+        subGadgets.addProduct(prod41);
+        subGadgets.addProduct(prod42);
+        subSticker.addProduct(prod51);
+        subSticker.addProduct(prod52);
+        subSticker.addProduct(prod53);
 
 
         for (GSProduct product : catalog.findAll()) {
@@ -281,8 +301,8 @@ public class GeekShopDataInitializer implements DataInitializer {
             return;
 
         UserAccount ua = userAccountManager.findByUsername("owner").get(); // suche UserAccount von owner
-        GSProduct prod1 = catalog.findByName("Product1").iterator().next(); // suche Product1 (siehe initializeCatalog)
-        GSProduct prod2 = catalog.findByName("Product2").iterator().next(); // suche Product1 (siehe initializeCatalog)
+        GSProduct prod1 = catalog.findByName("Aufkleber Binary Gas Pedal").iterator().next(); // suche Product1 (siehe initializeCatalog)
+        GSProduct prod2 = catalog.findByName("USB-Staubsauger").iterator().next(); // suche Product1 (siehe initializeCatalog)
         GSOrder order1 = new GSOrder(ua, Cash.CASH); // erzeuge GSOrder
         GSOrder order2 = new GSOrder(ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
         GSOrder order3 = new GSOrder(ua, Cash.CASH);
