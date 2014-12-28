@@ -85,6 +85,8 @@ tr.highlight th, tr.highlight td {font-weight:bold !important; background:#D5E7E
 /*tr.highlight:focus th, tr.highlight:hover th, tr.highlight:active th,
 tr.highlight:focus td, tr.highlight:hover td, tr.highlight:active td {background:#E5F3F9;}*/
 tr.indent td:first-child, td.indent {padding-left:2em !important;}
+table.noMargin {margin:0 !important;}
+
 
 ul.ul-style01 {margin:5px 0 15px 0px; padding:0; list-style:none;}
 ul.ul-style01 li {margin:0; padding:0; padding-left:15px; background:url("../images/ul-style01.gif") 0 0.5em no-repeat;}
@@ -177,3 +179,10 @@ dl#news dd span.date {padding-right:10px; background:url("../images/date.gif") 1
  */
 #cntMessages {position: absolute; font-weight: normal; display: block; top: 3px; right: 3px; background: #a00; color: white;
     border-radius: 50%; width: 15px; height: 15px; line-height: 15px; font-size: 80%;}
+
+/*
+ * Product search styles
+ */
+#categories {width:200px; position:absolute; top:10px; left:20px; bottom:5px; border:4px solid #02AAFC; border-radius:6px; padding-left:10px; overflow:auto;}
+#product-list {width:640px; position:absolute; top:10px; right:0; bottom:0;}
+#product-list > div {overflow:auto; position:absolute; top:40px; padding-right:15px; right:0; bottom:10px; left:0;}
