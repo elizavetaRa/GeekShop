@@ -15,7 +15,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.2.0.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
 
     <dependencies>
@@ -51,7 +51,12 @@
         <dependency>
             <groupId>de.tudresden.inf.st</groupId>
             <artifactId>salespoint-framework</artifactId>
-            <version>6.1.0.RELEASE</version>
+            <version>6.1.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>4.0.0.RC1</version>
         </dependency>
     </dependencies>
 
@@ -72,7 +77,7 @@
 
     <repositories>
         <repository>
-            <id>salespoint-framework</id> <!-- Name doesn't matter -->
+            <id>salespoint-framework</id>
             <url>http://www.st.inf.tu-dresden.de/SalesPoint/repository</url>
         </repository>
     </repositories>
