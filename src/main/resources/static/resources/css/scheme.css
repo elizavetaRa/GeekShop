@@ -80,7 +80,7 @@ dl#news dd span.date {color:#0288CA;}
     border-radius:3px;
     box-sizing: content-box;
     border:1px solid #0b0e07;
-    display:block;
+    display:inline-block;
     cursor:pointer;
     color:#ffffff;
     /*font-family:arial;*/
@@ -91,7 +91,6 @@ dl#news dd span.date {color:#0288CA;}
     text-decoration:none;
     text-shadow:0px 1px 0px #263666;
     float:left;
-    margin-right:15px;
 }
 
 .myButton:focus, .myButton:hover {
@@ -130,8 +129,8 @@ a.myButton {color:#FFF !important; display:inline-block;}
 /*
  * Refresh Button
  */
-.refreshButton {width:22px; height:22px; display:block; border:0; background: url("../images/refresh.png") no-repeat; cursor:pointer;}
-.refreshButton:active {position:relative; top:1px;}
+.refreshButton {width:22px; height:22px; display:inline-block; border:0; background: url("../images/refresh.png") no-repeat; cursor:pointer; position: relative; top: -4px; left: 2px;}
+.refreshButton:active {top:-3px;}
 
 
 /*

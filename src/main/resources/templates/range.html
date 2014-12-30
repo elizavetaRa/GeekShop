@@ -30,21 +30,20 @@
                 <table class="table-style01">
                     <thead>
                     <tr>
-                        <th colspan="2" style="width:3em">Kategorie</th>
-                        <!--<th style="width:8em">Unterkategorie</th>-->
+                        <th colspan="2" style="width:42px">Kategorie</th>
                         <th>Artikel</th>
-                        <th style="width:6em">Artikelnr.</th>
-                        <th style="width:6em">Bestand</th>
-                        <th style="width:6em">Preis</th>
-                        <th style="width:17em"></th>
+                        <th style="width:84px">Artikelnr.</th>
+                        <th style="width:84px">Bestand</th>
+                        <th style="width:84px">Preis</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody th:each="super : ${supercategories}">
                     <tr class="highlight">      <!--Kategorie-->
                         <td class="t-left" colspan="6" th:text="${super.name}">Kleidung</td>
-                        <td>
+                        <td class="fitToContent">
                             <form th:action="@{/range/editsuper/} + ${super.name}">
-                                <button class="myButton marginButton">Bearbeiten</button>
+                                <button class="myButton">Bearbeiten</button>
                             </form>
                             <form th:method="delete" th:action="@{/range/delsuper}">
                                 <input name="superName" type="hidden" th:value="${super.name}"/>
@@ -55,11 +54,11 @@
 
                     <tr th:each="sub : ${super.subCategories}">                     <!--Unterkategorie-->
 
-                        <td style="width:3em"></td>
+                        <td style="width:42px"></td>
                         <td bgcolor="#E5F4FA" class="t-left t-bold" colspan="5" th:text="${sub.name}">T-Shirts</td>
-                        <td bgcolor="#E5F4FA">
+                        <td bgcolor="#E5F4FA" class="fitToContent">
                             <form th:action="@{/range/editsub/} + ${sub.name}">
-                                <button class="myButton marginButton">Bearbeiten</button>
+                                <button class="myButton">Bearbeiten</button>
                             </form>
                             <form th:method="delete" th:action="@{/range/delsub}">
                                 <input name="subName" type="hidden" th:value="${sub.name}"/>
@@ -74,9 +73,9 @@
                             100
                         </td>
                         <td th:text="${product.moneyToString(product.getPrice())}">10€</td>
-                        <td>
+                        <td class="fitToContent">
                             <form th:action="@{/range/editproduct/} + ${product.identifier}">
-                                <button class="myButton marginButton">Bearbeiten</button>
+                                <button class="myButton">Bearbeiten</button>
                             </form>
                             <form th:method="delete" th:action="@{/range/delproduct}">
                                 <input name="productIdent" type="hidden" th:value="${product.getIdentifier()}"/>

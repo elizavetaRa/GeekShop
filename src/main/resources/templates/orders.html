@@ -30,9 +30,9 @@
                 <table class="table-style01" th:unless="${mapProductOrders}">
                     <tr>
                         <th>Artikelbezeichnung</th>
-                        <th style="width:8em">Artikelnummer</th>
-                        <th style="width:7em">Anzahl</th>
-                        <th style="width:8em">Gesamtpreis</th>
+                        <th style="width:112px">Artikelnummer</th>
+                        <th style="width:98px">Anzahl</th>
+                        <th style="width:112px">Gesamtpreis</th>
                     </tr>
                     <tbody th:remove="tag" th:each="order : ${setOrders}">
                     <tr class="highlight">
@@ -70,12 +70,12 @@
 
                 <table class="table-style01" th:if="${mapProductOrders}">
                     <tr>
-                        <th style="width:10em">Datum</th>
-                        <th style="width:7em">Rechnung</th>
-                        <th style="width:7em">Zahlungsart</th>
+                        <th style="width:140px">Datum</th>
+                        <th style="width:98px">Rechnung</th>
+                        <th style="width:98px">Zahlungsart</th>
                         <th>Verkäufer</th>
-                        <th style="width:4em">Anzahl</th>
-                        <th style="width:6em">Gesamtpreis</th>
+                        <th style="width:56px">Anzahl</th>
+                        <th style="width:84px">Gesamtpreis</th>
                     </tr>
                     <tbody th:remove="tag" th:each="gsProductOrders : ${mapProductOrders}">
                     <tr class="highlight" th:with="productOrders = ${gsProductOrders.value}">
@@ -104,10 +104,10 @@
                     </tbody>
                 </table>
 
-                <a th:href="${setOrders} ? '/orders?sort=products' : '/orders?sort=orders'" class="myButton"
+                <a th:href="${setOrders} ? '/orders?sort=products' : '/orders?sort=orders'" class="myButton marginButton"
                    th:text="${setOrders} ? 'Nach Artikeln sortieren' : 'Nach Rechnungen sortieren'"></a>
 
-                <a th:href="${setOrders} ? '/exportxml?sort=orders' : '/exportxml?sort=products'" class="myButton marginButton">
+                <a th:href="${setOrders} ? '/exportxml?sort=orders' : '/exportxml?sort=products'" class="myButton">
                     Als XML exportieren
                 </a>
 

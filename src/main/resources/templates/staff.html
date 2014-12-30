@@ -32,23 +32,21 @@
                 <table class="table-style01 alternatRows">
 
                     <tr>
-                        <!--<th><input type="checkbox" id="selectAll"/></th>-->
                         <th>Vorname</th>
                         <th>Nachname</th>
                         <th>Nutzername</th>
-                        <th style="width:22em"></th>
+                        <th></th>
                     </tr>
 
                     <tr th:each="employee : ${staff}">
-                        <!--<td align="center"><input type="checkbox" class="case" name="case" th:value="${employee.Id}"/></td>-->
                         <td th:utext="${employee.userAccount.firstname}">Steve</td>
                         <td th:utext="${employee.userAccount.lastname}">Jobs</td>
                         <td th:utext="${employee.userAccount.identifier}">Musterstrasse 1</td>
-                        <td>
-                            <a th:href="'staff/' + ${employee.userAccount.identifier}" class="myButton marginButton">Ansehen/Bearbeiten</a>
+                        <td class="fitToContent">
+                            <a th:href="'staff/' + ${employee.userAccount.identifier}" class="myButton">Ansehen/Bearbeiten</a>
 
                             <form th:method="delete" th:action="@{/staff/} + ${employee.userAccount.identifier}"
-                                  th:attr="data-entry-id=${employee.id}" class="f-left">
+                                  th:attr="data-entry-id=${employee.id}">
                                 <button class="myButton">Entlassen</button>
                             </form>
                         </td>

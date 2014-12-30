@@ -36,16 +36,16 @@
                         <tr>
                             <!--  <th><input type="checkbox" id="selectAll"/></th>-->
                             <th>Artikel</th>
-                            <th style="width:130px">Anzahl</th>
-                            <th style="width:7em">Stückpreis</th>
-                            <th style="width:7em">Gesamtpreis</th>
-                            <th style="width:6em"></th>
+                            <th>Anzahl</th>
+                            <th style="width:98px">Stückpreis</th>
+                            <th style="width:98px">Gesamtpreis</th>
+                            <th></th>
                         </tr>
                         <tr th:each="cartitem : ${cart}">
 
                             <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
 
-                            <td>
+                            <td class="fitToContent">
                                 <form th:action="${!session.isReclaim} ? @{/updatecartitem/} : @{/updatereclaimcartitem/}"
                                       th:object="${cartitem}"
                                       method="post">
@@ -53,7 +53,7 @@
                                            th:max="${session.isReclaim} and ${session.mapAmounts} ?
                                            ${session.mapAmounts.get(cartitem.product)} :
                                            ${inventory.findByProductIdentifier(cartitem.product.identifier).get().quantity.amount}"
-                                           style="width:8em; margin-right:5px; display:block; float:left;"/>
+                                           style="width:112px"/>
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
                                     <input th:if="${session.isReclaim}" type="hidden" name="orderNumber"
                                            th:value="${session.oN} ? ${T(geekshop.model.GSOrder).longToString(session.oN)}"/>
@@ -66,7 +66,7 @@
 
                             <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.price)}">209,19 EUR</td>
 
-                            <td>
+                            <td class="fitToContent">
                                 <form th:action="@{/deletecartitem/}" th:object="${cartitem}" method="post">
                                     <input type="hidden" name="identifier" th:value="${cartitem.identifier}"/>
                                     <button class="myButton" type="submit">Löschen</button>

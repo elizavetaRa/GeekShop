@@ -36,7 +36,7 @@
                         <tr>
                             <!--<th><input type="checkbox" id="selectAll"/></th>-->
                             <th class="t-center">Text</th>
-                            <th></th>
+                            <th style="width:1px"></th>
                         </tr>
                         <tr th:each="joke : ${jokes}">
                             <!--<td class="t-center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>-->
@@ -46,7 +46,7 @@
                                     neblig ...</p>
                             </td>
                             <td>
-                                <a th:href="@{/jokes/} + ${joke.id}" class="myButton">Ändern</a>
+                                <a th:href="@{/jokes/} + ${joke.id}" class="myButton" style="margin-bottom:3px">Ändern</a>
                                 <form th:action="@{/jokes/} + ${joke.id}" th:method="delete">
                                     <button type="submit" class="myButton">Löschen</button>
                                 </form>
