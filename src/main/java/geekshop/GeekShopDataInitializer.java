@@ -286,7 +286,7 @@ public class GeekShopDataInitializer implements DataInitializer {
                         "Die verblüfften Passagiere wollen wissen, wie der Pilot es geschafft habe, sich zu orientieren." + System.getProperty("line.separator") +
                         "„Ganz einfach“, sagt der Pilot. „Die Antwort auf meine Frage war kurz, korrekt und völlig nutzlos. " +
                         "Ich hatte also mit der Microsoft-Hotline gesprochen. " +
-                        "Das Microsoft Gebäude liegt 5 Meilen westlich vom Flughafen Seattle, Kurs 89 Grad.“"
+                        "Das Microsoft-Gebäude liegt 5 Meilen westlich vom Flughafen Seattle, Kurs 89 Grad.“"
         ));
         jokeRepo.save(new Joke(
                 "Am Straßenrand steht ein Auto mit einem platten Reifen. Woran erkennt man, dass der Fahrer Informatiker ist?" + System.getProperty("line.separator") +
