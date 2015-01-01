@@ -13,7 +13,7 @@ import javax.transaction.Transactional;
  *
  *
  *
- * @author Felix D&ouml;ring
+ * @author Felix Döring
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -6,9 +6,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
- * Class representing a joke displayed after user login. Jokes are stored in the {@link geekshop.model.JokeRepository}.
+ * Class representing a joke displayed after user login.
  *
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity
@@ -25,6 +25,9 @@ public class Joke {
     protected Joke() {
     }
 
+    /**
+     * Creates a new {@link Joke} with the given text.
+     */
     public Joke(String text) {
         this.text = text;
     }

@@ -22,10 +22,10 @@ import java.util.Arrays;
 import java.util.Date;
 
 /**
- * An extension of {@link Order} extended by {@link OrderType}.
+ * An extension of {@link Order} extended by order number, {@link OrderType} and, if this order is a reclaim, the initial order this order is referring to.
  *
+ * @author Sebastian Döring
  * @author Elizaveta Ragozina
- * @author Sebastian D&ouml;ring
  */
 
 @Entity
@@ -61,6 +61,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         this.reclaimedOrder = null;
     }
 
+    /**
+     * Creates a new {@link GSOrder}.
+     */
     public GSOrder(UserAccount ua) {
         super(ua);
 
@@ -68,6 +71,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         initializeGSOrder(reclaimedOrder);
     }
 
+    /**
+     * Creates a new reclaim {@link GSOrder} with the given initial order.
+     */
     public GSOrder(UserAccount ua, GSOrder reclaimedOrder) {
         super(ua);
 
@@ -75,6 +81,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         initializeGSOrder(reclaimedOrder);
     }
 
+    /**
+     * Creates a new {@link GSOrder} with the given {@link PaymentMethod}.
+     */
     public GSOrder(UserAccount ua, PaymentMethod paymentMethod) {
         super(ua, paymentMethod);
 
@@ -82,6 +91,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         initializeGSOrder(reclaimedOrder);
     }
 
+    /**
+     * Creates a new reclaim {@link GSOrder} with the given initial order and {@link PaymentMethod}.
+     */
     public GSOrder(UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
         super(ua, paymentMethod);
 
@@ -89,6 +101,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         initializeGSOrder(reclaimedOrder);
     }
 
+    /**
+     * Helper function for constructors setting {@link OrderType} and order number.
+     */
     private void initializeGSOrder(GSOrder reclaimedOrder) {
 
         ////////////////////////////////////// Validierung! ////////////////////////////////////////
@@ -108,6 +123,11 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
 
+    /**
+     * Adds an {@link OrderLine} to the {@link GSOrder}, the {@link OrderStatus} must be {@code OPEN}.
+     * If this order is a reclaim and the given {@link OrderLine} is a {@link GSOrderLine},
+     * the order line's type is also set to reclaim.
+     */
     @Override
     public void add(OrderLine orderLine) {
         if (type == OrderType.RECLAIM && orderLine instanceof GSOrderLine) {
@@ -116,6 +136,14 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         super.add(orderLine);
     }
 
+    /**
+     * Replaces {@code payOrder} of {@link org.salespointframework.order.OrderManager}.
+     * Sets the {@link OrderStatus} to {@code PAID} and date created to current {@link BusinessTime}
+     * if date created is not already set.
+     * If this is a reclaim, the reclaimed products are restored in {@link Inventory}.
+     * Else, the bought products are taken from {@link Inventory} and,
+     * if the current amount is falling below the specified minimal amount, a message will be sent to the owner.
+     */
     public void pay() {
         if (getOrderStatus() != OrderStatus.OPEN)
             throw new IllegalStateException("Order may only be paid if the OrderStatus is OPEN!");
@@ -152,6 +180,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         }
     }
 
+    /**
+     * Replaces {@code completeOrder} of {@link org.salespointframework.order.OrderManager} setting {@link OrderStatus} to {@code COMPLETED}.
+     */
     public void complete() {
         if (getOrderStatus() != OrderStatus.PAID)
             throw new IllegalStateException("Only paid orders may be completed!");
@@ -159,6 +190,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         setOrderStatus(OrderStatus.COMPLETED);
     }
 
+    /**
+     * Replaces {@code cancelOrder} of {@link org.salespointframework.order.OrderManager} setting {@link OrderStatus} to {@code CANCELLED}.
+     */
     public void cancel() {
         if (getOrderStatus() != OrderStatus.OPEN)
             throw new IllegalStateException("Order may only be cancelled if the OrderStatus is OPEN!");
@@ -167,16 +201,27 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
 
+    /**
+     * Convenience method for checking if an order has the status {@code OPEN}.
+     */
     @Override
     public boolean isOpen() {
         return getOrderStatus() == OrderStatus.OPEN;
     }
 
+    /**
+     * Convenience method for checking if an order has the status {@code PAID} or {@code COMPLETED}.
+     */
     @Override
     public boolean isPaid() {
         return getOrderStatus() == OrderStatus.PAID || isCompleted();
     }
 
+    /**
+     * Convenience method for checking if an order has the status {@code COMPLETED}.
+     * In addition, if this order is not a reclaim order and 14 days are already expired,
+     * the {@link OrderStatus} is set to {@code COMPLETED}.
+     */
     @Override
     public boolean isCompleted() {
         if (getOrderStatus() == OrderStatus.COMPLETED)
@@ -193,6 +238,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isCanceled() {
         return getOrderStatus() == OrderStatus.CANCELLED;
@@ -203,12 +251,15 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         setOrderField("orderStatus", status);
     }
 
+    /**
+     * Helper function to access and change private fields of super class {@link Order}.
+     */
     private void setOrderField(String fieldName, Object newValue) {
         Field field;
         try {
             field = getClass().getSuperclass().getDeclaredField(fieldName);
         } catch (NoSuchFieldException ex) {
-            System.out.println("!!!!!!!!!!!!!! " + fieldName + " of Order could not be found. !!!!!!!!!!!!!!");
+            System.out.println(fieldName + " of order could not be found!");
             ex.printStackTrace();
             return;
         }
@@ -216,7 +267,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
             field.setAccessible(true);
             field.set(this, newValue);
         } catch (IllegalAccessException ex) {
-            System.out.println("!!!!!!!!!!!!!! " + fieldName + " of Order could not be set. !!!!!!!!!!!!!!");
+            System.out.println(fieldName + " of order could not be set!");
             ex.printStackTrace();
         }
     }
@@ -229,6 +280,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         this.type = type;
     }
 
+    /**
+     * Returns date created as {@code java.util.Date}.
+     */
     public Date getCreationDate() {
         if (getDateCreated() == null)
             setDateCreated(businessTime.getTime());
@@ -250,6 +304,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         return reclaimedOrder;
     }
 
+    /**
+     * Converts {@code paymentMethod} to {@link PaymentType}.
+     */
     public PaymentType getPaymentType() {
         if (getPaymentMethod() instanceof Cheque)
             return PaymentType.CHEQUE;
@@ -259,6 +316,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
             return PaymentType.CASH;
     }
 
+    /**
+     * Returns the {@link OrderLine} containing the given {@link org.salespointframework.catalog.Product}.
+     */
     public OrderLine findOrderLineByProduct(Product product) {
         for (OrderLine orderLine : getOrderLines()) {
             if (orderLine.getProductIdentifier().equals(product.getId()))
@@ -269,7 +329,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * {@code @PostConstruct} fires {@code init()} once the Entity has been instantiated and by referencing businessTime, orderRepo, inventory and messageRepo in it,
-     * it forces – if not injected already – the injection on the static properties for the instance created.
+     * it forces &ndash; if not injected already &ndash; the injection on the static properties for the instance created.
      */
     @PostConstruct
     public void init() {
@@ -315,6 +375,9 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         GSOrder.messageRepo = messageRepo;
     }
 
+    /**
+     * Converts a long variable to string with leading zeros.
+     */
     public static String longToString(long number) {
         String nr = Long.toString(number);
         int length = 7;
@@ -329,6 +392,10 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
         return sb.toString();
     }
 
+    /**
+     * Compares two {@link GSOrder}s at first by date created and then by their order number.
+     */
+    @Override
     public int compareTo(GSOrder other) {
         if (this.getDateCreated() == null) {
             if (other.getDateCreated() == null) {

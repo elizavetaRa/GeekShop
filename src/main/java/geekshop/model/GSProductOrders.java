@@ -9,9 +9,10 @@ import java.math.BigDecimal;
 import java.util.TreeSet;
 
 /**
- * A helper class to encapsulate all {@link geekshop.model.GSOrder}s related to a specific {@link org.salespointframework.catalog.Product} as well as the total price and total quantity.
+ * A helper class for view to encapsulate all {@link geekshop.model.GSOrderLine}s
+ * related to a specific {@link org.salespointframework.catalog.Product} as well as the total price and total quantity.
  *
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 public class GSProductOrders {
@@ -21,17 +22,21 @@ public class GSProductOrders {
     private TreeSet<GSProductOrder> productOrders;
 
 
+    /**
+     * Creates new {@link GSProductOrders}.
+     */
     public GSProductOrders() {
         this.totalPrice = Money.zero(CurrencyUnit.EUR);
         this.totalQuantity = Units.ZERO;
         this.productOrders = new TreeSet<GSProductOrder>();
     }
 
+
     public Money getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Money totalPrice) {
+    private void setTotalPrice(Money totalPrice) {
         this.totalPrice = totalPrice;
     }
 
@@ -39,7 +44,7 @@ public class GSProductOrders {
         return totalQuantity;
     }
 
-    public void setTotalQuantity(Quantity totalQuantity) {
+    private void setTotalQuantity(Quantity totalQuantity) {
         this.totalQuantity = totalQuantity;
     }
 
@@ -47,6 +52,9 @@ public class GSProductOrders {
         return productOrders;
     }
 
+    /**
+     * Adds a {@link GSProductOrder} to the set and updates total price and total quantity correspondly.
+     */
     public void addProductOrder(GSProductOrder productOrder) {
         productOrders.add(productOrder);
         GSOrderLine ol = productOrder.getOrderLine();
@@ -61,7 +69,6 @@ public class GSProductOrders {
         Money price = ol.getPrice();
         if (ol.getType() == OrderType.RECLAIM)
             price = price.multipliedBy(-1);
-
 
         totalPrice = Money.total(totalPrice, price);
     }

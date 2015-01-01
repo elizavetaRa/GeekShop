@@ -1,9 +1,9 @@
 package geekshop.model;
 
 /**
- * Enumeration for the kind of message of the {@link geekshop.model.Message}s.
+ * Enumeration for the kind of {@link geekshop.model.Message}.
  *
- * @author Felix D&ouml;ring
+ * @author Felix Döring
  */
 
 public enum MessageKind {

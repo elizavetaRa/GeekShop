@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
  *
  *
  *
- * @author Felix D&ouml;ring
+ * @author Felix Döring
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)

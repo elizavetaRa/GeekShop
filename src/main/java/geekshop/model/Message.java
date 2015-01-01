@@ -5,9 +5,9 @@ import org.springframework.util.Assert;
 import javax.persistence.*;
 
 /**
- * Class representing a message to the owner displayed on Messages. Messages are stored in the {@link geekshop.model.MessageRepository}.
+ * Class representing a message to the owner displayed on {@code /messages}.
  *
- * @author Felix D&ouml;ring
+ * @author Felix Döring
  */
 
 @Entity

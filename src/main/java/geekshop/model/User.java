@@ -9,10 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This class represents the shop's users (shop owner and his employees).
+ * This class represents the shop's {@link User}s (shop owner and his employees).
  *
- * @author Felix D&ouml;ring
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
+ * @author Felix Döring
  */
 
 @Entity
@@ -49,6 +49,11 @@ public class User {
         this.recentJokes = new LinkedList<Joke>();
     }
 
+    /**
+     * Creates a new {@link User} with the given {@link UserAccount}, password, gender, birthday, {@link MaritalStatus},
+     * phone number, street, house number, postcode and place where he lives.
+     * {@link PasswordAttributes} are set by the given password.
+     */
     public User(UserAccount userAccount, String password, Gender gender, Date birthday,
                 MaritalStatus maritalStatus, String phone,
                 String street, String houseNr, String postcode, String place) {
@@ -154,6 +159,10 @@ public class User {
         this.recentJokes = recentJokes;
     }
 
+    /**
+     * Adds a new {@link Joke} to the list of recent jokes shown to this user.
+     * Only the last five jokes are stored.
+     */
     public void addJoke(Joke joke) {
         recentJokes.remove(joke);
         if (recentJokes.size() == 5) {
@@ -162,6 +171,9 @@ public class User {
         recentJokes.add(joke);
     }
 
+    /**
+     * Returns the last joke shown or {@literal null} if no jokes were shown currently.
+     */
     public Joke getLastJoke() {
         return recentJokes.size() > 0 ? recentJokes.get(recentJokes.size() - 1) : null;
     }
@@ -178,6 +190,9 @@ public class User {
         this.passwordAttributes = passwordAttributes;
     }
 
+    /**
+     * Returns the user's full name.
+     */
     @Override
     public String toString() {
         return userAccount.getFirstname() + (userAccount.getLastname().isEmpty() ? "" : " " + userAccount.getLastname());

@@ -11,8 +11,8 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 /**
  * The central application class to configure the Spring container and run the application.
  *
- * @author Felix D&ouml;ring
- * @author Sebastian D&ouml;ring
+ * @author Felix Döring
+ * @author Sebastian Döring
  */
 
 @EnableSalespoint
@@ -22,7 +22,9 @@ public class GeekShop {
         SpringApplication.run(GeekShop.class, args);
     }
 
-
+    /**
+     * Inner class for web configuration.
+     */
     @Configuration
     static class GeekShopWebConfiguration extends SalespointWebConfiguration {
 
@@ -36,6 +38,9 @@ public class GeekShop {
         }
     }
 
+    /**
+     * Inner class for security configuration.
+     */
     @Configuration
     static class WebSecurityConfiguration extends SalespointSecurityConfiguration {
 

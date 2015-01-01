@@ -24,8 +24,10 @@ import static org.joda.money.CurrencyUnit.EUR;
 /**
  * A {@link DataInitializer} implementation that will create dummy data for the application on application startup.
  *
- * @author Felix D&ouml;ring
- * @author Sebastian D&ouml;ring
+ * @author Felix Döring
+ * @author Sebastian Döring
+ * @author Marcus Kamerdiener
+ * @author Dominik Lauck
  */
 
 @Component
@@ -294,8 +296,10 @@ public class GeekShopDataInitializer implements DataInitializer {
         ));
     }
 
-
-    private void initializeTestOrders() { // nur zu Testzwecken
+    /**
+     * Initializes {@link GSOrder}s in {@link GSOrderRepository}, only for test purposes.
+     */
+    private void initializeTestOrders() {
 
         if (orderRepo.count() > 0)
             return;
@@ -328,7 +332,7 @@ public class GeekShopDataInitializer implements DataInitializer {
         for (GSOrder o : orderRepo.findAll()) { // iteriere über alle gespeicherten Orders
             System.out.println("+++++ Order " + GSOrder.longToString(o.getOrderNumber()) + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ", businessTime = " + o.getDateCreated() + ")");
             for (OrderLine ol : o.getOrderLines()) {
-//                System.out.println("+++++ --- " + ((GSOrderLine) ol).getReclaimedAmount());
+                System.out.println("+++++ --- OrderLine: " + ((GSOrderLine) ol).getId() + "   Type: " + ((GSOrderLine) ol).getType());
             }
         }
     }

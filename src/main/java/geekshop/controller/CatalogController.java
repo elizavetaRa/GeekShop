@@ -20,8 +20,8 @@ import java.util.*;
 /**
  * A Spring MVC controller to manage the {@link org.salespointframework.catalog.Catalog}.
  *
- * @author Sebastian D&ouml;ring
  * @author Marcus Kammerdiener
+ * @author Sebastian Döring
  */
 
 @Controller
@@ -60,7 +60,7 @@ class CatalogController {
     }
 
     /**
-     * shows the search Page with all {@Link Products} in the given {@Link SubCategory}
+     * Shows the search page with all {@link org.salespointframework.catalog.Product}s in the given {@link SubCategory}.
      */
 
     @RequestMapping("/productsearch/{Category}")
@@ -82,7 +82,7 @@ class CatalogController {
     }
 
     /**
-     * shows the search Page with all {@Link Products} which contain the searchTerm in their name
+     * Shows the search page with all {@link org.salespointframework.catalog.Product}s which contain the searchTerm in their name.
      */
 
     @RequestMapping("/productsearch")

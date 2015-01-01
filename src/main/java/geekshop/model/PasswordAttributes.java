@@ -7,7 +7,7 @@ import javax.persistence.Id;
 /**
  * Represents the attributes of an password to easily determine whether this password matches the password rules.
  *
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity
@@ -26,6 +26,9 @@ public class PasswordAttributes {
     protected PasswordAttributes() {
     }
 
+    /**
+     * Creates new {@link PasswordAttributes} with the given flags and length.
+     */
     public PasswordAttributes(boolean hasUpperAndLower, boolean hasDigits, boolean hasSpecialCharacters, int length) {
         this.hasUpperAndLower = hasUpperAndLower;
         this.hasDigits = hasDigits;

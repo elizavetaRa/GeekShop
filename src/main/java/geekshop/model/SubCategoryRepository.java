@@ -5,7 +5,7 @@ import org.salespointframework.core.SalespointRepository;
 /**
  * Repository to store {@link geekshop.model.SubCategory}s.
  *
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 public interface SubCategoryRepository extends SalespointRepository<SubCategory, Long> {

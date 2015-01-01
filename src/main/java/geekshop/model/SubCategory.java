@@ -8,7 +8,7 @@ import java.util.List;
  * Class representing a {@link SubCategory} which contains {@link org.salespointframework.catalog.Product}s.
  *
  * @author Marcus Kammerdiener
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity
@@ -27,6 +27,9 @@ public class SubCategory {
     protected SubCategory() {
     }
 
+    /**
+     * Creates a new {@link SubCategory} with the given name and the {@link SuperCategory} this subcategory is related to.
+     */
     public SubCategory(String name, SuperCategory supc) {
         this.name = name;
         this.superCategory = supc;

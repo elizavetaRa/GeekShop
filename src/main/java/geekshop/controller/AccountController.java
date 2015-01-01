@@ -17,10 +17,10 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
- * A Spring MVC controller to manage shop owner and employees.
+ * A Spring MVC controller to manage functionalities concerning shop owner's and employee's account.
  *
- * @author Felix D&ouml;ring
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
+ * @author Felix Döring
  */
 
 @Controller
@@ -33,16 +33,7 @@ class AccountController {
     private final AuthenticationManager authManager;
     private final MessageRepository messageRepo;
 
-    /**
-     * Creates a new {@link AccountController}.
-     *
-     * @param userRepo      must not be {@literal null}.
-     * @param jokeRepo      must not be {@literal null}.
-     * @param passRulesRepo must not be {@literal null}.
-     * @param uam           must not be {@literal null}.
-     * @param authManager   must not be {@literal null}.
-     * @param messageRepo   must not be {@literal null}.
-     */
+
     @Autowired
     public AccountController(UserRepository userRepo, JokeRepository jokeRepo, PasswordRulesRepository passRulesRepo,
                              UserAccountManager uam, AuthenticationManager authManager, MessageRepository messageRepo) {
@@ -144,7 +135,7 @@ class AccountController {
     }
 
     /**
-     * Redirects to start page if {@code /adjustpw} is directly requested.
+     * Redirects to start page if {@code /adjustpw} is mistakenly directly requested.
      */
     @RequestMapping("/adjustpw")
     public String adjustPW() {
@@ -199,9 +190,6 @@ class AccountController {
 
     /**
      * Shows the form for adding a new employee.
-     *
-     * @param model
-     * @return
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/addemployee")
@@ -270,18 +258,6 @@ class AccountController {
         return "redirect:/staff";
     }
 
-//    @RequestMapping(value = "/staff/firemany", method = RequestMethod.DELETE)
-//    public String fireMany(){
-//
-//        List<User> employees = getEmployees();
-//        List<Long> ids = new LinkedList<Long>();
-//        for (User user : employees) {
-//            if(employees.iterator().
-//        }
-//
-//        return "redirect:/staff";
-//    }
-
     /**
      * Depending on {@code page}, it shows the form either for data modification or for password change of an employee.
      */
@@ -321,7 +297,7 @@ class AccountController {
     }
 
     /**
-     * Saves the changed password rules and marks all users whose password does not match the new rules.
+     * Saves the changed password rules.
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/setrules", method = RequestMethod.POST)
@@ -428,7 +404,7 @@ class AccountController {
     }
 
     /**
-     * Saves the new password changed by the user himself. If the user changed his password, a message will be sent to the shop owner.
+     * Saves the new password. If the password has been changed by an employee, a message will be sent to the shop owner.
      */
     @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
     public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
@@ -457,7 +433,7 @@ class AccountController {
     }
 
     /**
-     * Saves the new password changed by the shop owner.
+     * Saves the new password of an employee changed by the shop owner.
      */
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
     public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
@@ -513,7 +489,8 @@ class AccountController {
     }
 
     /**
-     * Does the real dismissal work.
+     * Does the real dismissal work by removing the employee role, disabling the user account and change the password to a random one.
+     * However, the {@link User} cannot be removed from {@link UserRepository} because the user is still present in orders so far.
      */
     private void dismiss(User user) {
         UserAccount userAccount = user.getUserAccount();

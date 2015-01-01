@@ -11,7 +11,7 @@ import java.util.List;
  * Class representing a {@link SuperCategory} which contains {@link SubCategory}s.
  *
  * @author Marcus Kammerdiener
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity
@@ -28,6 +28,9 @@ public class SuperCategory {
     protected SuperCategory() {
     }
 
+    /**
+     * Creates a new {@link SuperCategory} with the given name.
+     */
     public SuperCategory(String name) {
         this.name = name;
         this.subCategories = new LinkedList<SubCategory>();

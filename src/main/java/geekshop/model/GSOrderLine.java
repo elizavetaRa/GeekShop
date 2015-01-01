@@ -9,17 +9,14 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 /**
- * An extension of {@link OrderLine} extended by {@link OrderLineState}.
+ * An extension of {@link OrderLine} extended by {@link OrderType}.
  *
  * @author Elizaveta Ragozina
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity
 public class GSOrderLine extends OrderLine {
-
-//    @Lob
-//    private BigDecimal reclaimedAmount;
 
     @Enumerated(EnumType.STRING)
     private OrderType type;
@@ -28,11 +25,14 @@ public class GSOrderLine extends OrderLine {
     protected GSOrderLine() {
     }
 
+    /**
+     * Creates a new {@link GSOrderLine} with the given {@link Product} and {@link Quantity}.
+     * The {@code orderType} is set to {@code NORMAL}.
+     */
     public GSOrderLine(Product product, Quantity quantity/*, Quantity reclaimedQuantity*/) {
         super(product, quantity);
 
         this.type = OrderType.NORMAL;
-//        this.reclaimedAmount = BigDecimal.ZERO;
     }
 
 
@@ -43,13 +43,4 @@ public class GSOrderLine extends OrderLine {
     public void setType(OrderType type) {
         this.type = type;
     }
-
-
-//    public BigDecimal getReclaimedAmount() {
-//        return reclaimedAmount;
-//    }
-
-//    public void increaseReclaimedAmount(BigDecimal amount) {
-//        reclaimedAmount = reclaimedAmount.add(amount);
-//    }
 }
