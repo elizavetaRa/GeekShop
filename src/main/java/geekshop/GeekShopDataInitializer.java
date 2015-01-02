@@ -26,7 +26,7 @@ import static org.joda.money.CurrencyUnit.EUR;
  *
  * @author Felix Döring
  * @author Sebastian Döring
- * @author Marcus Kamerdiener
+ * @author Marcus Kammerdiener
  * @author Dominik Lauck
  */
 

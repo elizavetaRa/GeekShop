@@ -1,32 +1,25 @@
 package geekshop.controller;
 
-import geekshop.GeekShop;
+import geekshop.AbstractWebIntegrationTests;
 import geekshop.model.GSProduct;
 import geekshop.model.GSProductOrders;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
-import javax.transaction.Transactional;
 import java.io.File;
 import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GeekShop.class)
-@Transactional
-public class OwnerControllerOrdersTest {
+public class OwnerControllerOrdersTest extends AbstractWebIntegrationTests {
 
     @Autowired
     OwnerController controller;
@@ -57,8 +50,8 @@ public class OwnerControllerOrdersTest {
 
         login("owner", "123");
 
-        controller.orders(model, "sort=products");
-        assertTrue(model.containsAttribute("orders"));
+        controller.orders(model, "orders");
+        assertTrue(model.containsAttribute("setOrders"));
 
     }
 

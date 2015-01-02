@@ -1,31 +1,20 @@
 package geekshop.model;
 
-import geekshop.GeekShop;
+import geekshop.AbstractIntegrationTests;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.transaction.Transactional;
 
 /**
  * Empty ReclaimLink Test for {@link geekshop.model.MessageRepository}.
  *
- *
- *
  * @author Felix Döring
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GeekShop.class)
-@Transactional
-public class MessageReclaimTest {
+public class MessageReclaimTest extends AbstractIntegrationTests {
+
     @Test(expected = IllegalArgumentException.class)
     public void emptyReclaimLink() {
         GSOrder identifier = null;
         new Message(MessageKind.RECLAIM, "Test", identifier);
-
     }
-
 
 }

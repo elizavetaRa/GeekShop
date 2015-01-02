@@ -329,7 +329,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * {@code @PostConstruct} fires {@code init()} once the Entity has been instantiated and by referencing businessTime, orderRepo, inventory and messageRepo in it,
-     * it forces &ndash; if not injected already &ndash; the injection on the static properties for the instance created.
+     * it forces – if not injected already – the injection on the static properties for the instance created.
      */
     @PostConstruct
     public void init() {

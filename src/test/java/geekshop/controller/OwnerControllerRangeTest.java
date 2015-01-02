@@ -1,28 +1,20 @@
 package geekshop.controller;
 
-import geekshop.GeekShop;
+import geekshop.AbstractWebIntegrationTests;
 import geekshop.model.*;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.transaction.Transactional;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GeekShop.class)
-@Transactional
-public class OwnerControllerRangeTest {
+public class OwnerControllerRangeTest extends AbstractWebIntegrationTests {
 
     @Autowired
     OwnerController controller;
