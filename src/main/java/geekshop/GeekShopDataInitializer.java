@@ -308,21 +308,21 @@ public class GeekShopDataInitializer implements DataInitializer {
         GSProduct prod1 = catalog.findByName("Aufkleber Binary Gas Pedal").iterator().next(); // suche Product1 (siehe initializeCatalog)
         GSProduct prod2 = catalog.findByName("USB-Staubsauger").iterator().next(); // suche Product1 (siehe initializeCatalog)
         GSOrder order1 = new GSOrder(ua, Cash.CASH); // erzeuge GSOrder
-        GSOrder order2 = new GSOrder(ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
-        GSOrder order3 = new GSOrder(ua, Cash.CASH);
-        GSOrder order4 = new GSOrder(ua, Cash.CASH, order1);
-        GSOrderLine orderLine11 = new GSOrderLine(prod1, Units.TEN);
-        GSOrderLine orderLine12 = new GSOrderLine(prod2, Units.TEN);
-        GSOrderLine orderLine21 = new GSOrderLine(prod2, Units.ONE);
-        GSOrderLine orderLine31 = new GSOrderLine(prod1, Units.of(6));
-        GSOrderLine orderLine41 = new GSOrderLine(prod1, Units.TEN);
+        GSOrder order2 = new GSOrder(ua, Cash.CASH);
+        GSOrderLine orderLine11 = new GSOrderLine(prod1, Units.of(5));
+        GSOrderLine orderLine12 = new GSOrderLine(prod2, Units.of(5));
+        GSOrderLine orderLine21 = new GSOrderLine(prod1, Units.of(3));
         order1.add(orderLine11); // füge GSOrderLine hinzu
         order1.add(orderLine12);
         order2.add(orderLine21);
+        order1.pay();
+        order2.pay();
+        GSOrder order3 = new GSOrder(ua, Cash.CASH, order1); // erzeuge Reclaim-GSOrder
+        GSOrder order4 = new GSOrder(ua, Cash.CASH, order1);
+        GSOrderLine orderLine31 = new GSOrderLine(prod2, Units.ONE);
+        GSOrderLine orderLine41 = new GSOrderLine(prod1, Units.of(2));
         order3.add(orderLine31);
         order4.add(orderLine41);
-        order1.pay();
-        order3.pay();
         orderRepo.save(order1);
         orderRepo.save(order2);
         orderRepo.save(order3);

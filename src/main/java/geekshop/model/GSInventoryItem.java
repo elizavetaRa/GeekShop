@@ -31,7 +31,8 @@ public class GSInventoryItem extends InventoryItem {
      */
     public GSInventoryItem(Product product, Quantity quantity, Quantity minimalQuantity) {
         super(product, quantity);
-        Assert.notNull(minimalQuantity, "Minimal Quantity must be not null.");
+        Assert.notNull(minimalQuantity, "Minimal quantity must be not null.");
+        Assert.isTrue(!minimalQuantity.isNegative(), "Minimal quantity must have positive amount.");
         this.minimalQuantity = minimalQuantity;
     }
 
@@ -40,6 +41,8 @@ public class GSInventoryItem extends InventoryItem {
     }
 
     public void setMinimalQuantity(Quantity minimalQuantity) {
+        Assert.notNull(minimalQuantity, "Minimal quantity must be not null.");
+        Assert.isTrue(!minimalQuantity.isNegative(), "Minimal quantity must have positive amount.");
         this.minimalQuantity = minimalQuantity;
     }
 

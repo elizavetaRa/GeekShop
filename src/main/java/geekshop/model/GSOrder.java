@@ -1,6 +1,7 @@
 package geekshop.model;
 
 import org.salespointframework.catalog.Product;
+import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.inventory.Inventory;
 import org.salespointframework.order.Order;
 import org.salespointframework.order.OrderLine;
@@ -65,54 +66,42 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
      * Creates a new {@link GSOrder}.
      */
     public GSOrder(UserAccount ua) {
-        super(ua);
-
-        this.reclaimedOrder = null;
-        initializeGSOrder(reclaimedOrder);
+        this(ua, null, null);
     }
 
     /**
      * Creates a new reclaim {@link GSOrder} with the given initial order.
      */
     public GSOrder(UserAccount ua, GSOrder reclaimedOrder) {
-        super(ua);
-
-        this.reclaimedOrder = reclaimedOrder;
-        initializeGSOrder(reclaimedOrder);
+        this(ua, null, reclaimedOrder);
     }
 
     /**
      * Creates a new {@link GSOrder} with the given {@link PaymentMethod}.
      */
     public GSOrder(UserAccount ua, PaymentMethod paymentMethod) {
-        super(ua, paymentMethod);
-
-        this.reclaimedOrder = null;
-        initializeGSOrder(reclaimedOrder);
+        this(ua, paymentMethod, null);
     }
 
     /**
      * Creates a new reclaim {@link GSOrder} with the given initial order and {@link PaymentMethod}.
      */
     public GSOrder(UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
-        super(ua, paymentMethod);
+        super(ua);
+
+        if (paymentMethod != null)
+            super.setPaymentMethod(paymentMethod);
 
         this.reclaimedOrder = reclaimedOrder;
-        initializeGSOrder(reclaimedOrder);
-    }
-
-    /**
-     * Helper function for constructors setting {@link OrderType} and order number.
-     */
-    private void initializeGSOrder(GSOrder reclaimedOrder) {
-
-        ////////////////////////////////////// Validierung! ////////////////////////////////////////
 
         if (reclaimedOrder == null) {
             this.type = OrderType.NORMAL;
         } else {
             if (reclaimedOrder.getOrderType() == OrderType.RECLAIM)
-                throw new IllegalArgumentException("Eine Reklamation darf sich nicht auf eine Reklamation beziehen!");
+                throw new IllegalArgumentException("A reclaim must not relate to a reclaim!");
+
+            if (reclaimedOrder.getOrderStatus() == OrderStatus.OPEN || reclaimedOrder.getOrderStatus() == OrderStatus.CANCELLED)
+                throw new IllegalArgumentException("A reclaim must not relate to a open or cancelled order!");
 
             this.type = OrderType.RECLAIM;
         }
@@ -130,8 +119,15 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
      */
     @Override
     public void add(OrderLine orderLine) {
-        if (type == OrderType.RECLAIM && orderLine instanceof GSOrderLine) {
-            ((GSOrderLine) orderLine).setType(OrderType.RECLAIM);
+        if (type == OrderType.RECLAIM) {
+            if (reclaimedOrder.findOrderLineByProductIdentifier(orderLine.getProductIdentifier()) == null)
+                throw new IllegalArgumentException("The reclaimed product must also be in the reclaimed order!");
+
+            if (reclaimedOrder.findOrderLineByProductIdentifier(orderLine.getProductIdentifier()).getQuantity().subtract(orderLine.getQuantity()).isNegative())
+                throw new IllegalArgumentException("It cannot be relaimed more units of a product than there are bought in the reclaimed order!");
+
+            if (orderLine instanceof GSOrderLine)
+                ((GSOrderLine) orderLine).setType(OrderType.RECLAIM);
         }
         super.add(orderLine);
     }
@@ -147,6 +143,12 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     public void pay() {
         if (getOrderStatus() != OrderStatus.OPEN)
             throw new IllegalStateException("Order may only be paid if the OrderStatus is OPEN!");
+
+        if (getPaymentMethod() == null)
+            throw new IllegalStateException("Order may only be paid if payment method is set!");
+
+        if (!this.getOrderLines().iterator().hasNext())
+            throw new IllegalStateException("Order may only be paid if it has at least one order line!");
 
         setOrderStatus(OrderStatus.PAID);
 
@@ -239,7 +241,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
     /**
-     * {@inheritDoc}
+     * Convenience method for checking if an order has the status {@code CANCELLED}.
      */
     @Override
     public boolean isCanceled() {
@@ -322,6 +324,17 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     public OrderLine findOrderLineByProduct(Product product) {
         for (OrderLine orderLine : getOrderLines()) {
             if (orderLine.getProductIdentifier().equals(product.getId()))
+                return orderLine;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the {@link OrderLine} containing the {@link org.salespointframework.catalog.Product} with the given {@link org.salespointframework.catalog.ProductIdentifier}.
+     */
+    public OrderLine findOrderLineByProductIdentifier(ProductIdentifier productId) {
+        for (OrderLine orderLine : getOrderLines()) {
+            if (orderLine.getProductIdentifier().equals(productId))
                 return orderLine;
         }
         return null;
