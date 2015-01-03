@@ -62,7 +62,10 @@ class ReclaimController {
 
 
     @RequestMapping("/reclaim")
-    public String reclaim(Model model) {
+    public String reclaim(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         model.addAttribute("catalog", catalog);
         return "reclaim";
     }
@@ -74,7 +77,10 @@ class ReclaimController {
 
 
     @RequestMapping("/reclaimcart")
-    public String reclaimcart() {
+    public String reclaimcart(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         return "cart";
     }
 
@@ -208,10 +214,13 @@ class ReclaimController {
         }).orElse("orderoverview");
     }
 
-    @RequestMapping(value = "/reclaimcart", method = RequestMethod.GET)
-    public String reclaimbasket() {
-        return "cart";
-    }
+//    @RequestMapping(value = "/reclaimcart", method = RequestMethod.GET)
+//    public String reclaimbasket(@LoggedIn Optional<UserAccount> userAccount) {
+//        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+//            return "redirect:/";
+//
+//        return "cart";
+//    }
 
     @RequestMapping("/ordersearch")
     public String searchOrderByNumber(Model model, @RequestParam(value = "searchordernumber", required = true) String searchOrderNumber, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
@@ -305,10 +314,12 @@ class ReclaimController {
 
     @RequestMapping(value = "/cancelreclaim", method = RequestMethod.POST)
     public String cancelReclaim(@LoggedIn Optional<UserAccount> userAccount, HttpSession session, @ModelAttribute Cart cart) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
         session.removeAttribute("ro");
         cart.clear();
         return "redirect:/reclaim";
-
     }
 
 
