@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Sebastian Döring
  */
 
-public class GSInventoryItemTest extends AbstractIntegrationTests {
+public class GSInventoryItemTests extends AbstractIntegrationTests {
 
     @Autowired
     private Inventory<GSInventoryItem> inventory;

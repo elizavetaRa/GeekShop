@@ -14,7 +14,7 @@ import org.springframework.security.web.FilterChainProxy;
 
 import static org.junit.Assert.assertTrue;
 
-public class OwnerControllerRangeTest extends AbstractWebIntegrationTests {
+public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
 
     @Autowired
     OwnerController controller;

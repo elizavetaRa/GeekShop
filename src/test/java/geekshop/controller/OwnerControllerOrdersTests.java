@@ -19,7 +19,7 @@ import java.util.Map;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class OwnerControllerOrdersTest extends AbstractWebIntegrationTests {
+public class OwnerControllerOrdersTests extends AbstractWebIntegrationTests {
 
     @Autowired
     OwnerController controller;

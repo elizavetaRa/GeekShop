@@ -32,7 +32,7 @@ import static org.junit.Assert.fail;
  * @author Sebastian Döring
  */
 
-public class GSOrderTest extends AbstractIntegrationTests {
+public class GSOrderTests extends AbstractIntegrationTests {
 
     @Autowired
     private GSOrderRepository orderRepo;
