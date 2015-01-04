@@ -14,9 +14,11 @@ import org.salespointframework.order.OrderStatus;
 import org.salespointframework.payment.Cash;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
+import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,15 +41,16 @@ public class GSOrderTest extends AbstractIntegrationTests {
     @Autowired
     private Inventory<GSInventoryItem> inventory;
     @Autowired
+    private SubCategoryRepository subCatRepo;
+    @Autowired
     private MessageRepository messageRepo;
     @Autowired
-    private SubCategoryRepository subCatRepo;
+    private BusinessTime businessTime;
 
     private UserAccount ua;
     private GSOrder openNormalOrder;
     private GSOrder paidNormalOrder;
     private GSOrder openReclaimOrder;
-    //    private GSOrder paidReclaimOrder;
     private GSInventoryItem item1;
     private GSInventoryItem item2;
     private GSInventoryItem item3;
@@ -59,7 +62,6 @@ public class GSOrderTest extends AbstractIntegrationTests {
     public void setUp() {
         ua = userRepo.findAll().iterator().next().getUserAccount();
 
-        openNormalOrder = new GSOrder(ua, Cash.CASH);
         SubCategory subCategory = subCatRepo.findAll().iterator().next();
         GSProduct prod1 = new GSProduct(100, "test1", Money.of(CurrencyUnit.EUR, 1D), subCategory);
         GSProduct prod2 = new GSProduct(101, "test2", Money.of(CurrencyUnit.EUR, 2D), subCategory);
@@ -79,6 +81,8 @@ public class GSOrderTest extends AbstractIntegrationTests {
         inventory.save(item4);
         inventory.save(item5);
         inventory.save(item6);
+
+        openNormalOrder = new GSOrder(ua, Cash.CASH);
         openNormalOrder.add(new GSOrderLine(prod1, Units.ONE));
         openNormalOrder.add(new GSOrderLine(prod2, Units.of(5L)));
         openNormalOrder.add(new GSOrderLine(prod3, Units.of(6L)));
@@ -125,6 +129,11 @@ public class GSOrderTest extends AbstractIntegrationTests {
     @Test
     public void testOrderNumbers() {
         Set<Long> orderNumbers = new HashSet<>();
+        for (GSOrder order : orderRepo.findAll()) {
+            if (!orderNumbers.add(order.getOrderNumber())) {
+                fail("The allocated order numbers are not unique!");
+            }
+        }
 
         for (int i = 0; i < 100; i++) {
             if (!orderNumbers.add(new GSOrder(ua).getOrderNumber())) {
@@ -269,5 +278,92 @@ public class GSOrderTest extends AbstractIntegrationTests {
     }
     //endregion
 
+    //region testIs[Status]
+    @Test
+    public void testIsOpen() {
+        Assert.assertTrue("isOpen() should return true for open order!", openNormalOrder.isOpen());
 
+        openNormalOrder.cancel();
+        Assert.assertFalse("isOpen() should return false for cancelled order!", openNormalOrder.isOpen());
+        Assert.assertFalse("isOpen() should return false for paid order!", paidNormalOrder.isOpen());
+        paidNormalOrder.complete();
+        Assert.assertFalse("isOpen() should return false for completed order!", paidNormalOrder.isOpen());
+    }
+
+    @Test
+    public void testIsPaid() {
+        Assert.assertTrue("isPaid() should return true for paid order!", paidNormalOrder.isPaid());
+        paidNormalOrder.complete();
+        Assert.assertTrue("isPaid() should return true for completed order!", paidNormalOrder.isPaid());
+
+        Assert.assertFalse("isPaid() should return false for open order!", openNormalOrder.isPaid());
+        openNormalOrder.cancel();
+        Assert.assertFalse("isPaid() should return false for cancelled order!", openNormalOrder.isPaid());
+    }
+
+    @Test
+    public void testIsCompleted() {
+        paidNormalOrder.complete();
+        Assert.assertTrue("isCompleted() should return true for completed order!", paidNormalOrder.isCompleted());
+
+        Assert.assertFalse("isCompleted() should return false for open order!", openNormalOrder.isCompleted());
+        openNormalOrder.cancel();
+        Assert.assertFalse("isCompleted() should return false for cancelled order!", openNormalOrder.isCompleted());
+    }
+
+    @Test
+    public void testIsCompleted14Days() {
+        Assert.assertFalse("isCompleted() should return false for paid order after less than 14 days!", paidNormalOrder.isCompleted());
+        businessTime.forward(Duration.ofDays(14L));
+        Assert.assertFalse("isCompleted() should return false for paid order after exactly 14 days!", paidNormalOrder.isCompleted());
+        businessTime.forward(Duration.ofDays(1L));
+        Assert.assertTrue("isCompleted() should return true for paid order after more than 14 days!", paidNormalOrder.isCompleted());
+    }
+
+    @Test
+    public void testIsCanceled() {
+        Assert.assertFalse("isCanceled() should return false for open order!", openNormalOrder.isCanceled());
+
+        openNormalOrder.cancel();
+        Assert.assertTrue("isCanceled() should return true for canceled order!", openNormalOrder.isCanceled());
+
+        Assert.assertFalse("isCanceled() should return false for paid order!", paidNormalOrder.isCanceled());
+        paidNormalOrder.complete();
+        Assert.assertFalse("isCanceled() should return false for completed order!", paidNormalOrder.isCanceled());
+    }
+    //endregion
+
+    //region testFindOrderLineByProduct
+    @Test
+    public void testFindOrderLineByProduct() {
+        for (OrderLine ol : openNormalOrder.getOrderLines()) {
+            Assert.assertEquals("findOrderLineByProduct returns wrong order line!", ol,
+                    openNormalOrder.findOrderLineByProduct(inventory.findByProductIdentifier(ol.getProductIdentifier()).get().getProduct()));
+            Assert.assertEquals("findOrderLineByProductIdentifier returns wrong order line!", ol,
+                    openNormalOrder.findOrderLineByProductIdentifier(ol.getProductIdentifier()));
+        }
+
+        Assert.assertNull("findOrderLineByProduct should return null if there is no order line belonging to the given product!",
+                openNormalOrder.findOrderLineByProduct(item4.getProduct()));
+        Assert.assertNull("findOrderLineByProductIdentifier should return null if there is no order line belonging to the given product!",
+                openNormalOrder.findOrderLineByProductIdentifier(item4.getProduct().getId()));
+    }
+    //endregion
+
+    //region testLongToString
+    @Test
+    public void testLongToString() {
+        Assert.assertEquals("longToString does not return string representing the original order number properly!",
+                openNormalOrder.getOrderNumber(), Long.parseLong(GSOrder.longToString(openNormalOrder.getOrderNumber())));
+    }
+    //endregion
+
+    //region testCompareTo
+    @Test
+    public void testCompareTo() {
+        Assert.assertEquals("openNormalOrder.compareTo(openReclaimOrder) should return -1!", -1, openNormalOrder.compareTo(openReclaimOrder));
+        Assert.assertEquals("openNormalOrder.compareTo(openNormalOrder) should return 0!", 0, openNormalOrder.compareTo(openNormalOrder));
+        Assert.assertEquals("openReclaimOrder.compareTo(openNormalOrder) should return 1!", 1, openReclaimOrder.compareTo(openNormalOrder));
+    }
+    //endregion
 }

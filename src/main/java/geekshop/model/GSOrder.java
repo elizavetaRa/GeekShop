@@ -108,7 +108,11 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
         setOrderStatus(OrderStatus.OPEN);
 
+        if (orderRepo.count() > 0L && orderCounter == 0L)
+            orderCounter = orderRepo.count();
         orderNumber = ++orderCounter;
+
+        setDateCreated(businessTime.getTime());
     }
 
 
@@ -249,53 +253,12 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
 
-    private void setOrderStatus(OrderStatus status) {
-        setOrderField("orderStatus", status);
-    }
-
-    /**
-     * Helper function to access and change private fields of super class {@link Order}.
-     */
-    private void setOrderField(String fieldName, Object newValue) {
-        Field field;
-        try {
-            field = getClass().getSuperclass().getDeclaredField(fieldName);
-        } catch (NoSuchFieldException ex) {
-            System.out.println(fieldName + " of order could not be found!");
-            ex.printStackTrace();
-            return;
-        }
-        try {
-            field.setAccessible(true);
-            field.set(this, newValue);
-        } catch (IllegalAccessException ex) {
-            System.out.println(fieldName + " of order could not be set!");
-            ex.printStackTrace();
-        }
-    }
-
     public long getOrderNumber() {
         return orderNumber;
     }
 
     protected void setOrderType(OrderType type) {
         this.type = type;
-    }
-
-    /**
-     * Returns date created as {@code java.util.Date}.
-     */
-    public Date getCreationDate() {
-        if (getDateCreated() == null)
-            setDateCreated(businessTime.getTime());
-
-        LocalDateTime ldt = getDateCreated();
-        ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
-        return Date.from(zdt.toInstant());
-    }
-
-    private void setDateCreated(LocalDateTime date) {
-        setOrderField("dateCreated", date);
     }
 
     public OrderType getOrderType() {
@@ -319,6 +282,18 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
     /**
+     * Returns date created as {@code java.util.Date}.
+     */
+    public Date getCreationDate() {
+        if (getDateCreated() == null)
+            setDateCreated(businessTime.getTime());
+
+        LocalDateTime ldt = getDateCreated();
+        ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
+        return Date.from(zdt.toInstant());
+    }
+
+    /**
      * Returns the {@link OrderLine} containing the given {@link org.salespointframework.catalog.Product}.
      */
     public OrderLine findOrderLineByProduct(Product product) {
@@ -338,6 +313,72 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
                 return orderLine;
         }
         return null;
+    }
+
+    /**
+     * Converts a long variable to string with leading zeros.
+     */
+    public static String longToString(long number) {
+        String nr = Long.toString(number);
+        int length = 7;
+        if (nr.length() >= length)
+            return nr;
+
+        StringBuilder sb = new StringBuilder(length);
+        char[] zeros = new char[length - nr.length()];
+        Arrays.fill(zeros, '0');
+        sb.append(zeros);
+        sb.append(nr);
+        return sb.toString();
+    }
+
+    /**
+     * Helper function to access and change private fields of super class {@link Order}.
+     */
+    private void setOrderField(String fieldName, Object newValue) {
+        Field field;
+        try {
+            field = getClass().getSuperclass().getDeclaredField(fieldName);
+        } catch (NoSuchFieldException ex) {
+            System.out.println(fieldName + " of order could not be found!");
+            ex.printStackTrace();
+            return;
+        }
+        try {
+            field.setAccessible(true);
+            field.set(this, newValue);
+        } catch (IllegalAccessException ex) {
+            System.out.println(fieldName + " of order could not be set!");
+            ex.printStackTrace();
+        }
+    }
+
+    private void setOrderStatus(OrderStatus status) {
+        setOrderField("orderStatus", status);
+    }
+
+    private void setDateCreated(LocalDateTime date) {
+        setOrderField("dateCreated", date);
+    }
+
+    /**
+     * Compares two {@link GSOrder}s at first by date created and then by their order number.
+     */
+    @Override
+    public int compareTo(GSOrder other) {
+        if (this.getDateCreated() == null) {
+            if (other.getDateCreated() == null) {
+                return ((Long) this.orderNumber).compareTo(other.orderNumber);
+            } else {
+                return 1;
+            }
+        } else {
+            if (other.getDateCreated() == null) {
+                return -1;
+            } else {
+                return (this.getDateCreated()).compareTo(other.getDateCreated());
+            }
+        }
     }
 
     /**
@@ -386,42 +427,5 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     @Autowired
     public void setMessageRepo(MessageRepository messageRepo) {
         GSOrder.messageRepo = messageRepo;
-    }
-
-    /**
-     * Converts a long variable to string with leading zeros.
-     */
-    public static String longToString(long number) {
-        String nr = Long.toString(number);
-        int length = 7;
-        if (nr.length() >= length)
-            return nr;
-
-        StringBuilder sb = new StringBuilder(length);
-        char[] zeros = new char[length - nr.length()];
-        Arrays.fill(zeros, '0');
-        sb.append(zeros);
-        sb.append(nr);
-        return sb.toString();
-    }
-
-    /**
-     * Compares two {@link GSOrder}s at first by date created and then by their order number.
-     */
-    @Override
-    public int compareTo(GSOrder other) {
-        if (this.getDateCreated() == null) {
-            if (other.getDateCreated() == null) {
-                return ((Long) this.orderNumber).compareTo(other.orderNumber);
-            } else {
-                return 1;
-            }
-        } else {
-            if (other.getDateCreated() == null) {
-                return -1;
-            } else {
-                return (this.getDateCreated()).compareTo(other.getDateCreated());
-            }
-        }
     }
 }
