@@ -7,7 +7,7 @@ import javax.persistence.*;
 /**
  * Class representing a message to the owner displayed on {@code /messages}.
  *
- * @author Felix Döring
+ * @author Felix D&ouml;ring
  */
 
 @Entity

@@ -24,8 +24,8 @@ import static org.joda.money.CurrencyUnit.EUR;
 /**
  * A {@link DataInitializer} implementation that will create dummy data for the application on application startup.
  *
- * @author Felix Döring
- * @author Sebastian Döring
+ * @author Felix D&ouml;ring
+ * @author Sebastian D&ouml;ring
  * @author Marcus Kammerdiener
  * @author Dominik Lauck
  */

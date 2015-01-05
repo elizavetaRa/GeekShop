@@ -8,7 +8,8 @@ import javax.persistence.Id;
 /**
  * Class representing a joke displayed after user login.
  *
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
+ * @author Felix D&ouml;ring
  */
 
 @Entity

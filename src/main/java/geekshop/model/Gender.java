@@ -3,7 +3,7 @@ package geekshop.model;
 /**
  * Enumeration representing the {@link User}'s gender.
  *
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
  */
 
 public enum Gender {

@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Repository to store {@link GSOrder}s.
  *
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
  */
 
 public interface GSOrderRepository extends SalespointRepository<GSOrder, OrderIdentifier> {

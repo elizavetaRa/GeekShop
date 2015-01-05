@@ -25,7 +25,7 @@ import java.util.Date;
 /**
  * An extension of {@link Order} extended by order number, {@link OrderType} and, if this order is a reclaim, the initial order this order is referring to.
  *
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
  * @author Elizaveta Ragozina
  */
 

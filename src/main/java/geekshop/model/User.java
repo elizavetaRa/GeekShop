@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * This class represents the shop's {@link User}s (shop owner and his employees).
  *
- * @author Sebastian Döring
- * @author Felix Döring
+ * @author Sebastian D&ouml;ring
+ * @author Felix D&ouml;ring
  */
 
 @Entity

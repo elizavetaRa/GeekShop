@@ -3,7 +3,8 @@ package geekshop.model;
 /**
  * Enumeration representing the {@link User}'s marital status.
  *
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
+ * @author Felix D&ouml;ring
  */
 
 public enum MaritalStatus {

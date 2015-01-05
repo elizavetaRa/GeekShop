@@ -12,7 +12,7 @@ import javax.persistence.Lob;
 /**
  * An extension of {@link InventoryItem} extended by a minimal {@link Quantity} in stock which must not be undercut.
  *
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
  */
 
 @Entity

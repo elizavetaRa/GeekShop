@@ -11,8 +11,8 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 /**
  * The central application class to configure the Spring container and run the application.
  *
- * @author Felix Döring
- * @author Sebastian Döring
+ * @author Felix D&ouml;ring
+ * @author Sebastian D&ouml;ring
  */
 
 @EnableSalespoint

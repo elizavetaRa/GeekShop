@@ -42,8 +42,8 @@ import static org.joda.money.CurrencyUnit.EUR;
 /**
  * A Spring MVC controller to manage the shop owner's functions.
  *
- * @author Felix Döring
- * @author Sebastian Döring
+ * @author Felix D&ouml;ring
+ * @author Sebastian D&ouml;ring
  * @author Dominik Lauck
  */
 
@@ -297,6 +297,9 @@ class OwnerController {
         }
     }
 
+    /**
+     * Shows a open reclaim
+     */
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.POST)
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId) {
 
@@ -315,6 +318,11 @@ class OwnerController {
         return "showreclaim";
     }
 
+    /**
+     * Accepts or declines the open reclaim and close it.
+     *
+     * Deletes the message.
+     */
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
@@ -322,14 +330,6 @@ class OwnerController {
         if (accept) {
             order.pay();
             orderRepo.save(order);
-
-//            for (OrderLine line : order.getOrderLines()){
-//                Quantity quantity = line.getQuantity();
-//                GSInventoryItem item = inventory.findByProductIdentifier(line.getProductIdentifier()).get();
-//                item.increaseQuantity(quantity);
-//                inventory.save(item);
-//            }
-
         } else {
 
             order.cancel();
@@ -340,12 +340,18 @@ class OwnerController {
     }
 
 
+    /**
+     * @return a new {@link Joke} instance.
+     */
     @RequestMapping("/jokes")
     public String jokes(Model model) {
         model.addAttribute("jokes", jokeRepo.findAll());
         return "jokes";
     }
 
+    /**
+     * Creates a new {@link Joke}
+     */
     @RequestMapping("/newjoke")
     public String newJoke() {
         return "editjoke";

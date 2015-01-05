@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * This class encapsulates the rules with which {@link geekshop.model.User}'s {@link org.salespointframework.useraccount.Password}s are validated.
  *
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
  */
 
 @Entity

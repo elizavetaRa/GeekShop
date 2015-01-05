@@ -12,7 +12,7 @@ import javax.persistence.Enumerated;
  * An extension of {@link OrderLine} extended by {@link OrderType}.
  *
  * @author Elizaveta Ragozina
- * @author Sebastian Döring
+ * @author Sebastian D&ouml;ring
  */
 
 @Entity
