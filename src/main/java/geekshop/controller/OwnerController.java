@@ -320,7 +320,7 @@ class OwnerController {
 
     /**
      * Accepts or declines the open reclaim and close it.
-     *
+     * <p/>
      * Deletes the message.
      */
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)
@@ -341,7 +341,10 @@ class OwnerController {
 
 
     /**
-     * @return a new {@link Joke} instance.
+     * Show all existing Jokes.
+     *
+     * @param model contains {@link geekshop.model.Joke}
+     * @return
      */
     @RequestMapping("/jokes")
     public String jokes(Model model) {
@@ -416,6 +419,13 @@ class OwnerController {
         return "redirect:/messages";
     }
 
+    /**
+     * Converts the Birthday {@link java.lang.String} to {@link java.util.Date}
+     *
+     * @param strDate must not be null
+     * @return {@link java.util.Date}
+     */
+
     public static Date strToDate(String strDate) {
         strDate = strDate.replace(".", " ");
         strDate = strDate.replace("-", " ");
@@ -439,12 +449,16 @@ class OwnerController {
 
     }
 
+
+    /**
+     * Deletes a {@link geekshop.model.SubCategory}
+     *
+     * @param superName must not be null
+     */
     @RequestMapping(value = "/range/delsuper", method = RequestMethod.DELETE)
     public String delSuper(@RequestParam("superName") String superName) {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superName);
-
-//        List<SubCategory> sub = superCategory.getSubCategories();
 
 
         while (!superCategory.getSubCategories().isEmpty()) {
@@ -459,12 +473,17 @@ class OwnerController {
         return "redirect:/range";
     }
 
+    /**
+     * Deletes a {@link geekshop.model.SubCategory} when requested.
+     *
+     * @param subName must not be null
+     */
     @RequestMapping(value = "/range/delsub", method = RequestMethod.DELETE)
     public String delSubRequest(@RequestParam("subName") String subName) {
 
         SubCategory subCategory = subCategoryRepo.findByName(subName);
 
-        SuperCategory superCategory = subCategory.getSuperCategory();
+//        SuperCategory superCategory = subCategory.getSuperCategory();
 
 //        superCategory.getSubCategories().remove(subCategory);
 
@@ -475,6 +494,11 @@ class OwnerController {
         return "redirect:/range";
     }
 
+    /**
+     * Deletes a {@link geekshop.model.GSProduct} when requested.
+     *
+     * @param productIdentifier must not be null
+     */
     @RequestMapping(value = "/range/delproduct", method = RequestMethod.DELETE)
     public String delProductRequest(@RequestParam("productIdent") ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
@@ -485,6 +509,11 @@ class OwnerController {
         return "redirect:/range";
     }
 
+    /**
+     * Deletes a {@link geekshop.model.SubCategory}.
+     *
+     * @param subCategory must not be null
+     */
     private void delSub(SubCategory subCategory) {
         while (!subCategory.getProducts().isEmpty()) {
             GSProduct product = subCategory.getProducts().get(0);
@@ -501,6 +530,11 @@ class OwnerController {
 
     }
 
+    /**
+     * Deletes a {@link geekshop.model.GSProduct}
+     *
+     * @param productIdentifier must not be null
+     */
     private void delProduct(ProductIdentifier productIdentifier) {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.setInRange(false);
@@ -513,6 +547,12 @@ class OwnerController {
         inventory.save(item);
     }
 
+
+    /**
+     * Shows editpage for the {@link geekshop.model.GSProduct}
+     *
+     * @param productId must not be null
+     */
     @RequestMapping(value = "/range/editproduct/{prodId}")
     public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId) {
 
@@ -527,6 +567,16 @@ class OwnerController {
 
     }
 
+    /**
+     * Save the changes on {@link geekshop.model.GSProduct}
+     *
+     * @param productName   must not be null
+     * @param strPrice      must not be null
+     * @param subCategoryId must not be null
+     * @param minQuantity   must not be null
+     * @param lgquantity    must not be null
+     * @param productId     must not be null
+     */
     @RequestMapping(value = "/range/editproduct", method = RequestMethod.POST)
     public String editProduct(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
                               @RequestParam("subCategory") long subCategoryId, @RequestParam("minQuantity") long minQuantity,
@@ -571,6 +621,9 @@ class OwnerController {
 
     }
 
+    /**
+     * Shows Page to create new {@link geekshop.model.GSProduct}
+     */
     @RequestMapping(value = "/range/addproduct")
     public String addProduct(Model model) {
 
@@ -580,6 +633,16 @@ class OwnerController {
         return "/editproduct";
     }
 
+    /**
+     * Ceate a new instance of {@link geekshop.model.GSProduct}
+     *
+     * @param productName   must not be null
+     * @param strPrice      must not be null
+     * @param subCategoryId must not be null
+     * @param productNumber must not be null
+     * @param lgquantity    must not be null
+     * @param lgminQuantity must not be null
+     */
     @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
     public String addProductToCatalog(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
                                       @RequestParam("subCategory") long subCategoryId,
@@ -626,6 +689,9 @@ class OwnerController {
 
     }
 
+    /**
+     * Shows Page to create new {@link geekshop.model.SuperCategory}
+     */
     @RequestMapping(value = "/range/addsuper")
     public String addSuper(Model model) {
 
@@ -678,6 +744,10 @@ class OwnerController {
 
     }
 
+
+    /**
+     * Shows Page to create new {@link geekshop.model.SubCategory}
+     */
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
     public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat) {
 
