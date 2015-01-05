@@ -7,7 +7,7 @@ import javax.persistence.Id;
 /**
  * Represents the attributes of an password to easily determine whether this password matches the password rules.
  *
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Dring
  */
 
 @Entity

@@ -35,7 +35,7 @@ import java.util.Optional;
  * A Spring MVC controller to manage the {@link org.salespointframework.order.Cart}.
  *
  * @author Elizaveta Ragozina
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Controller

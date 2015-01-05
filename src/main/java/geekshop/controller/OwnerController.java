@@ -42,8 +42,8 @@ import static org.joda.money.CurrencyUnit.EUR;
 /**
  * A Spring MVC controller to manage the shop owner's functions.
  *
- * @author Felix D&ouml;ring
- * @author Sebastian D&ouml;ring
+ * @author Felix Döring
+ * @author Sebastian Döring
  * @author Dominik Lauck
  */
 

@@ -11,7 +11,7 @@ import java.util.List;
  * Class representing a {@link SuperCategory} which contains {@link SubCategory}s.
  *
  * @author Marcus Kammerdiener
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity

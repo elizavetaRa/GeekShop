@@ -15,7 +15,7 @@ import javax.persistence.ManyToOne;
  * the {@link geekshop.model.SubCategory} the product is related to and a flag marking whether this product is in range.
  *
  * @author Marcus Kammerdiener
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity

@@ -21,7 +21,7 @@ import java.util.*;
  * A Spring MVC controller to manage the {@link org.salespointframework.catalog.Catalog}.
  *
  * @author Marcus Kammerdiener
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Controller

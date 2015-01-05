@@ -19,8 +19,8 @@ import java.util.*;
 /**
  * A Spring MVC controller to manage functionalities concerning shop owner's and employee's account.
  *
- * @author Sebastian D&ouml;ring
- * @author Felix D&ouml;ring
+ * @author Sebastian Döring
+ * @author Felix Döring
  */
 
 @Controller

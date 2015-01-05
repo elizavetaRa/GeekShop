@@ -12,7 +12,7 @@ import java.util.TreeSet;
  * A helper class for view to encapsulate all {@link geekshop.model.GSOrderLine}s
  * related to a specific {@link org.salespointframework.catalog.Product} as well as the total price and total quantity.
  *
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 public class GSProductOrders {

@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * A helper class for view to encapsulate a {@link GSOrderLine} related to a specific {@link org.salespointframework.catalog.Product} as well as the date sold and the seller.
  *
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 public class GSProductOrder implements Comparable<GSProductOrder> {

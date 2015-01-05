@@ -8,7 +8,7 @@ import java.util.List;
  * Class representing a {@link SubCategory} which contains {@link org.salespointframework.catalog.Product}s.
  *
  * @author Marcus Kammerdiener
- * @author Sebastian D&ouml;ring
+ * @author Sebastian Döring
  */
 
 @Entity

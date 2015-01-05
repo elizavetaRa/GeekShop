@@ -3,7 +3,7 @@ package geekshop.model;
 /**
  * Enumeration for the kind of {@link geekshop.model.Message}.
  *
- * @author Felix D&ouml;ring
+ * @author Felix Döring
  */
 
 public enum MessageKind {

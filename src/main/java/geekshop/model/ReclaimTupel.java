@@ -3,6 +3,12 @@ package geekshop.model;
 import org.salespointframework.order.OrderLine;
 import org.springframework.util.Assert;
 
+/**
+ * Tupel that assists to bring {@link geekshop.model.GSProduct} and {@link org.salespointframework.order.OrderLine} in one Model
+ *
+ * @author Felix Döring
+ */
+
 public class ReclaimTupel {
 
     private GSProduct product;

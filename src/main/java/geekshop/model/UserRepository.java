@@ -6,8 +6,8 @@ import org.salespointframework.useraccount.UserAccount;
 /**
  * Repository to store {@link User}s.
  *
- * @author Felix D&ouml;ring
- * @author Sebastian D&ouml;ring
+ * @author Felix Döring
+ * @author Sebastian Döring
  */
 
 public interface UserRepository extends SalespointRepository<User, Long> {
