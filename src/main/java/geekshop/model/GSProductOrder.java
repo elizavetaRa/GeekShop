@@ -29,6 +29,11 @@ public class GSProductOrder implements Comparable<GSProductOrder> {
     /**
      * Creates a new {@link GSProductOrder} with the given {@link GSOrderLine},
      * {@link Date}, order number, {@link PaymentMethod} and {@link User}.
+     *
+     * @param orderLine     must not be {@literal null}.
+     * @param date          must not be {@literal null}.
+     * @param paymentMethod must not be {@literal null}.
+     * @param seller        must not be {@literal null}.
      */
     public GSProductOrder(GSOrderLine orderLine, Date date, long orderNumber, PaymentMethod paymentMethod, User seller) {
         Assert.notNull(orderLine, "OrderLine must not be null!");

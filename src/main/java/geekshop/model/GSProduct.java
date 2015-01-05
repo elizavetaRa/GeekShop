@@ -34,6 +34,8 @@ public class GSProduct extends Product{
 
     /**
      * Creates a new {@link GSProduct} with the given product number, name, price and the {@link SubCategory} this product is related to. The flag {@code inRange} is set to {@code true}.
+     *
+     * @param subCategory must not be {@literal null}.
      */
     public GSProduct(long productNumber, String name, Money price, SubCategory subCategory) {
         super (name, price, Units.METRIC);

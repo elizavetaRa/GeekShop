@@ -53,6 +53,8 @@ public class User {
      * Creates a new {@link User} with the given {@link UserAccount}, password, gender, birthday, {@link MaritalStatus},
      * phone number, street, house number, postcode and place where he lives.
      * {@link PasswordAttributes} are set by the given password.
+     *
+     * @param userAccount must not be {@literal null}.
      */
     public User(UserAccount userAccount, String password, Gender gender, Date birthday,
                 MaritalStatus maritalStatus, String phone,
@@ -161,11 +163,12 @@ public class User {
 
     /**
      * Adds a new {@link Joke} to the list of recent jokes shown to this user.
-     * Only the last five jokes are stored.
+     * <p>
+     * Only the last five jokes are stored. If the given joke is already existing in list, the existing one will be removed.
      */
     public void addJoke(Joke joke) {
-        recentJokes.remove(joke);
-        if (recentJokes.size() == 5) {
+        recentJokes.remove(joke); // ensuring that each joke is only once in list
+        while (recentJokes.size() >= 5) {
             recentJokes.remove(0);
         }
         recentJokes.add(joke);

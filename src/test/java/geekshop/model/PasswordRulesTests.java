@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Test class for {@link GSOrder}.
+ * Test class for {@link PasswordRules}.
  *
  * @author Sebastian Döring
  */
