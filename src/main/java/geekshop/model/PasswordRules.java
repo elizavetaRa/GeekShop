@@ -37,6 +37,9 @@ public class PasswordRules {
 
     /**
      * Creates new {@link PasswordRules} with the given flags and minimal length.
+     *
+     * @param minLength must be at least 4.
+     * @throws IllegalArgumentException if {@literal minLength} is less than 4.
      */
     public PasswordRules(boolean upperAndLowerNecessary, boolean digitsNecessary, boolean specialCharactersNecessary, int minLength) {
         if (minLength < 4)
@@ -165,6 +168,10 @@ public class PasswordRules {
         return minLength;
     }
 
+    /**
+     * @param minLength must be at least 4.
+     * @throws IllegalArgumentException if {@literal minLength} is less than 4.
+     */
     public void setMinLength(int minLength) {
         if (minLength < 4)
             throw new IllegalArgumentException("Minimal password length has to be at least 4 characters!");

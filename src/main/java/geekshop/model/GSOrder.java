@@ -71,6 +71,11 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * Creates a new reclaim {@link GSOrder} with the given initial order.
+     *
+     * @param reclaimedOrder may be {@literal null}. If it is, this order's type is set to {@literal NORMAL}.
+     *                       Else, the reclaimed order must not be a reclaim, but a paid order being not older than 14 days.
+     *
+     * @throws IllegalArgumentException if the given reclaimed order is a reclaim, is open, cancelled or completed.
      */
     public GSOrder(UserAccount ua, GSOrder reclaimedOrder) {
         this(ua, null, reclaimedOrder);
@@ -84,7 +89,12 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
     }
 
     /**
-     * Creates a new reclaim {@link GSOrder} with the given initial order and {@link PaymentMethod}.
+     * Creates a new reclaim {@link GSOrder} with the given {@link PaymentMethod} and the initial order.
+     *
+     * @param reclaimedOrder may be {@literal null}. If it is, this order's type is set to {@literal NORMAL}.
+     *                       Else, the reclaimed order must not be a reclaim, but a paid order being not older than 14 days.
+     *
+     * @throws IllegalArgumentException if the given reclaimed order is a reclaim, is open, cancelled or completed.
      */
     public GSOrder(UserAccount ua, PaymentMethod paymentMethod, GSOrder reclaimedOrder) {
         super(ua);
@@ -100,8 +110,11 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
             if (reclaimedOrder.getOrderType() == OrderType.RECLAIM)
                 throw new IllegalArgumentException("A reclaim must not relate to a reclaim!");
 
-            if (reclaimedOrder.getOrderStatus() == OrderStatus.OPEN || reclaimedOrder.getOrderStatus() == OrderStatus.CANCELLED)
-                throw new IllegalArgumentException("A reclaim must not relate to a open or cancelled order!");
+            if (reclaimedOrder.isOpen() || reclaimedOrder.isCanceled())
+                throw new IllegalArgumentException("A reclaim must not relate to an open or cancelled order!");
+
+            if (reclaimedOrder.isCompleted())
+                throw new IllegalArgumentException("An order which is older than 14 days cannot be reclaimed!");
 
             this.type = OrderType.RECLAIM;
         }
@@ -118,8 +131,12 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * Adds an {@link OrderLine} to the {@link GSOrder}, the {@link OrderStatus} must be {@code OPEN}.
+     * <p>
      * If this order is a reclaim and the given {@link OrderLine} is a {@link GSOrderLine},
      * the order line's type is also set to reclaim.
+     *
+     * @throws IllegalArgumentException if the given reclaim order line contains a product which does not exist in the reclaimed order
+     *                                  or if the quantity of the given reclaim order line exceeds the quantity in reclaimed order.
      */
     @Override
     public void add(OrderLine orderLine) {
@@ -138,11 +155,13 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * Replaces {@code payOrder} of {@link org.salespointframework.order.OrderManager}.
-     * Sets the {@link OrderStatus} to {@code PAID} and date created to current {@link BusinessTime}
-     * if date created is not already set.
+     * <p>
+     * Sets the {@link OrderStatus} to {@code PAID}.
      * If this is a reclaim, the reclaimed products are restored in {@link Inventory}.
      * Else, the bought products are taken from {@link Inventory} and,
      * if the current amount is falling below the specified minimal amount, a message will be sent to the owner.
+     *
+     * @throws IllegalStateException if order is not open, payment method is not set or order has no order lines.
      */
     public void pay() {
         if (getOrderStatus() != OrderStatus.OPEN)
@@ -188,6 +207,8 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * Replaces {@code completeOrder} of {@link org.salespointframework.order.OrderManager} setting {@link OrderStatus} to {@code COMPLETED}.
+     *
+     * @throws IllegalStateException if order status is not {@literal PAID}.
      */
     public void complete() {
         if (getOrderStatus() != OrderStatus.PAID)
@@ -198,6 +219,8 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * Replaces {@code cancelOrder} of {@link org.salespointframework.order.OrderManager} setting {@link OrderStatus} to {@code CANCELLED}.
+     *
+     * @throws IllegalStateException if order status is not {@literal OPEN}.
      */
     public void cancel() {
         if (getOrderStatus() != OrderStatus.OPEN)
@@ -225,6 +248,7 @@ public class GSOrder extends Order implements Comparable<GSOrder> {
 
     /**
      * Convenience method for checking if an order has the status {@code COMPLETED}.
+     * <p>
      * In addition, if this order is not a reclaim order and 14 days are already expired,
      * the {@link OrderStatus} is set to {@code COMPLETED}.
      */

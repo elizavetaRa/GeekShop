@@ -320,7 +320,7 @@ class OwnerController {
 
     /**
      * Accepts or declines the open reclaim and close it.
-     * <p/>
+     * <p>
      * Deletes the message.
      */
     @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)

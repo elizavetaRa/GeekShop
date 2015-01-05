@@ -28,6 +28,8 @@ public class GSInventoryItem extends InventoryItem {
 
     /**
      * Creates a new {@link GSInventoryItem} for the given product and quantity. Furthermore a minimal {@link Quantity} is required which must not be undercut in stock.
+     *
+     * @param minimalQuantity must not be {@literal null} or negative.
      */
     public GSInventoryItem(Product product, Quantity quantity, Quantity minimalQuantity) {
         super(product, quantity);
@@ -40,6 +42,9 @@ public class GSInventoryItem extends InventoryItem {
         return minimalQuantity;
     }
 
+    /**
+     * @param minimalQuantity must not be {@literal null} or negative.
+     */
     public void setMinimalQuantity(Quantity minimalQuantity) {
         Assert.notNull(minimalQuantity, "Minimal quantity must be not null.");
         Assert.isTrue(!minimalQuantity.isNegative(), "Minimal quantity must have positive amount.");
