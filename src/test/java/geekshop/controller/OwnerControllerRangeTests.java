@@ -2,6 +2,7 @@ package geekshop.controller;
 
 import geekshop.AbstractWebIntegrationTests;
 import geekshop.model.*;
+import org.junit.Before;
 import org.junit.Test;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
@@ -31,14 +32,14 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
     Catalog<GSProduct> catalog;
 
 
-    protected void login(String username, String password) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+    @Before
+    public void login() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken("owner", "123");
         SecurityContextHolder.getContext().setAuthentication(authenticationManager.authenticate(authentication));
     }
 
     @Test
     public void addSuperCat() throws Exception {
-        login("owner", "123");
         controller.addSuperCategory("Test");
 
 
@@ -49,7 +50,6 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
     @Test
     public void editSuper() throws Exception {
 
-        login("owner", "123");
         SuperCategory superCategory = superCategoryRepo.findAll().iterator().next();
         String superCat = superCategory.getName();
         Long id = superCategory.getId();
@@ -71,7 +71,6 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
 
     @Test
     public void addSubCat() throws Exception {
-        login("owner", "123");
         String superCategory = superCategoryRepo.findAll().iterator().next().getName();
         controller.addSubCategory("Test", superCategory);
 
@@ -83,7 +82,6 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
     @Test
     public void editSub() throws Exception {
 
-        login("owner", "123");
         SubCategory subCategory = subCategoryRepo.findAll().iterator().next();
         String superCat = subCategory.getSuperCategory().getName();
         String subCat = subCategory.getName();
@@ -106,7 +104,6 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
 
     @Test
     public void addProduct() throws Exception {
-        login("owner", "123");
         controller.addProductToCatalog("Test", "23.45", 1l, 12, 1, 1);
 
 
@@ -117,7 +114,6 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
     @Test
     public void editProduct() throws Exception {
 
-        login("owner", "123");
         GSProduct product = catalog.findAll().iterator().next();
         ProductIdentifier id = product.getIdentifier();
         String strPrice = "12.34";
