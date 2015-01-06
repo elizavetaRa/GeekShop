@@ -15,6 +15,11 @@ public class ReclaimTupel {
     private OrderLine orderLine;
     private ReclaimTupel(){}
 
+    /**
+     * Creates a new {@link geekshop.model.ReclaimTupel}.
+     * @param product must not be null
+     * @param orderLine must not be null
+     */
     public ReclaimTupel (GSProduct product, OrderLine orderLine){
         Assert.notNull(product, "Product must not be null");
         Assert.notNull(orderLine, "OrderLine must not be null");

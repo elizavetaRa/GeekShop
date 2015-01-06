@@ -28,6 +28,11 @@ public class Message {
 
     }
 
+    /**
+     * Creates a new {@link geekshop.model.Message} from {@link geekshop.model.MessageKind} NOTIFICATION or PASSWORD.
+     * @param messageKind the kind of the Message
+     * @param messageText the text of the Message
+     */
     public Message(MessageKind messageKind, String messageText) {
         Assert.hasText(messageText, "messageText must not be null.");
         Assert.notNull(messageKind, "messageKind must not be null.");
@@ -36,6 +41,12 @@ public class Message {
 
     }
 
+    /**
+     * Creates a new {@link geekshop.model.Message} from {@link geekshop.model.MessageKind} RECLAIM.
+     * @param messageKind the kind of the Message
+     * @param messageText Messagekind RECLAIM
+     * @param reclaimId the Id of the {@link geekshop.model.GSOrder} with {@link geekshop.model.OrderType} RECLAIM
+     */
     public Message(MessageKind messageKind, String messageText, GSOrder reclaimId) {
         Assert.hasText(messageText, "messageText must not be null.");
         Assert.notNull(messageKind, "messageKind must not be null.");
