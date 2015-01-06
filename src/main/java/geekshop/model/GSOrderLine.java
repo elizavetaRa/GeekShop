@@ -29,7 +29,7 @@ public class GSOrderLine extends OrderLine {
      * Creates a new {@link GSOrderLine} with the given {@link Product} and {@link Quantity}.
      * The {@code orderType} is set to {@code NORMAL}.
      */
-    public GSOrderLine(Product product, Quantity quantity/*, Quantity reclaimedQuantity*/) {
+    public GSOrderLine(Product product, Quantity quantity) {
         super(product, quantity);
 
         this.type = OrderType.NORMAL;

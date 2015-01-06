@@ -124,6 +124,12 @@ public class GSOrderTests extends AbstractIntegrationTests {
             fail("There should be thrown an IllegalArgumentException if a reclaim relates to an open order!");
         } catch (IllegalArgumentException ignored) {
         }
+        paidNormalOrder.complete();
+        try {
+            new GSOrder(ua, paidNormalOrder);
+            fail("There should be thrown an IllegalArgumentException if a reclaim relates to a completed order!");
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
     @Test

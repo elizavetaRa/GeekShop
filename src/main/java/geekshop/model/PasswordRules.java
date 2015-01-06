@@ -19,9 +19,9 @@ public class PasswordRules {
     @Id
     private final String id = "passwordRules";
 
-    private boolean specialCharactersNecessary;
     private boolean upperAndLowerNecessary;
     private boolean digitsNecessary;
+    private boolean specialCharactersNecessary;
     private int minLength;
 
     /**
@@ -29,19 +29,25 @@ public class PasswordRules {
      * Minimal length is set to 8.
      */
     public PasswordRules() {
-        specialCharactersNecessary = true;
         upperAndLowerNecessary = true;
         digitsNecessary = true;
+        specialCharactersNecessary = true;
         minLength = 8;
     }
 
     /**
      * Creates new {@link PasswordRules} with the given flags and minimal length.
+     *
+     * @param minLength must be at least 4.
+     * @throws IllegalArgumentException if {@literal minLength} is less than 4.
      */
-    public PasswordRules(boolean specialCharactersNecessary, boolean upperAndLowerNecessary, boolean digitsNecessary, int minLength) {
-        this.specialCharactersNecessary = specialCharactersNecessary;
+    public PasswordRules(boolean upperAndLowerNecessary, boolean digitsNecessary, boolean specialCharactersNecessary, int minLength) {
+        if (minLength < 4)
+            throw new IllegalArgumentException("Minimal password length has to be at least 4 characters!");
+
         this.upperAndLowerNecessary = upperAndLowerNecessary;
         this.digitsNecessary = digitsNecessary;
+        this.specialCharactersNecessary = specialCharactersNecessary;
         this.minLength = minLength;
     }
 
@@ -52,12 +58,12 @@ public class PasswordRules {
     public String generateRandomPassword() {
         Random random = new SecureRandom();
         StringBuilder sb = new StringBuilder("abcdefghijklmnopqrstuvwxyz");
-        if (this.specialCharactersNecessary)
-            sb.append("!\"§$%&/=?`´\\()[]{}³²^°+#*'~,.-;:_<>|@€");
         if (this.upperAndLowerNecessary)
             sb.append("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         if (this.digitsNecessary)
             sb.append("0123456789");
+        if (this.specialCharactersNecessary)
+            sb.append("!\"§$%&/=?`´\\()[]{}³²^°+#*'~,.-;:_<>|@€");
         char[] charSet = sb.toString().toCharArray();
 
         char[] result;
@@ -76,38 +82,33 @@ public class PasswordRules {
 
     /**
      * Validates the given password according to the rules.
+     *
      * @return {@code True} if and only if the set conditions are fulfilled, the password is long enough, does not contain any white space characters and contains at least one alphanumeric character.
      */
     public boolean isValidPassword(String password) {
         return isLongEnough(password) && !password.matches(".*\\s.*") && password.matches(".*\\w.*") &&
-                (!this.specialCharactersNecessary || containsSpecialCharacters(password)) &&
                 (!this.upperAndLowerNecessary || containsUpperAndLower(password)) &&
-                (!this.digitsNecessary || containsDigits(password));
+                (!this.digitsNecessary || containsDigits(password)) &&
+                (!this.specialCharactersNecessary || containsSpecialCharacters(password));
     }
 
     /**
      * Validates the given password in the form of {@link PasswordAttributes} according to the rules.
+     *
      * @return {@code True} if and only if the set conditions are fulfilled, the password is long enough, does not contain any white space characters and contains at least one alphanumeric character.
      */
     public boolean isValidPassword(PasswordAttributes passwordAttributes) {
         return isLongEnough(passwordAttributes.getLength()) &&
-                (!this.specialCharactersNecessary || passwordAttributes.hasSpecialCharacters()) &&
                 (!this.upperAndLowerNecessary || passwordAttributes.hasUpperAndLower()) &&
-                (!this.digitsNecessary || passwordAttributes.hasDigits());
+                (!this.digitsNecessary || passwordAttributes.hasDigits()) &&
+                (!this.specialCharactersNecessary || passwordAttributes.hasSpecialCharacters());
     }
 
     /**
-     * Checks whether at least one special character, i. e. no Latin letter, digit or white space character, is contained in the given password.
-     */
-    public static boolean containsSpecialCharacters(String password) {
-        return password.matches(".*[^A-Za-z0-9\\s].*");
-    }
-
-    /**
-     * Checks whether at least one upper- and one lower-case characters are contained in the given password.
+     * Checks whether at least one upper- and one lower-case character are contained in the given password.
      */
     public static boolean containsUpperAndLower(String password) {
-        return password.matches(".*[A-Za-z].*");
+        return password.matches(".*[a-z].*") && password.matches(".*[A-Z].*");
     }
 
     /**
@@ -115,6 +116,13 @@ public class PasswordRules {
      */
     public static boolean containsDigits(String password) {
         return password.matches(".*[0-9].*");
+    }
+
+    /**
+     * Checks whether at least one special character, i. e. no Latin letter, digit or white space character, is contained in the given password.
+     */
+    public static boolean containsSpecialCharacters(String password) {
+        return password.matches(".*[^A-Za-z0-9\\s].*");
     }
 
     /**
@@ -132,14 +140,6 @@ public class PasswordRules {
     }
 
 
-    public boolean areSpecialCharactersNecessary() {
-        return specialCharactersNecessary;
-    }
-
-    public void setSpecialCharactersNecessary(boolean specialCharactersNecessary) {
-        this.specialCharactersNecessary = specialCharactersNecessary;
-    }
-
     public boolean areUpperAndLowerNecessary() {
         return upperAndLowerNecessary;
     }
@@ -156,11 +156,26 @@ public class PasswordRules {
         this.digitsNecessary = digitsNecessary;
     }
 
+    public boolean areSpecialCharactersNecessary() {
+        return specialCharactersNecessary;
+    }
+
+    public void setSpecialCharactersNecessary(boolean specialCharactersNecessary) {
+        this.specialCharactersNecessary = specialCharactersNecessary;
+    }
+
     public int getMinLength() {
         return minLength;
     }
 
+    /**
+     * @param minLength must be at least 4.
+     * @throws IllegalArgumentException if {@literal minLength} is less than 4.
+     */
     public void setMinLength(int minLength) {
+        if (minLength < 4)
+            throw new IllegalArgumentException("Minimal password length has to be at least 4 characters!");
+
         this.minLength = minLength;
     }
 }
