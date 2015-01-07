@@ -6,8 +6,6 @@ import geekshop.model.GSProductOrders;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.web.FilterChainProxy;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
@@ -21,10 +19,6 @@ public class OwnerControllerOrdersTests extends AbstractWebIntegrationTests {
 
     @Autowired
     OwnerController controller;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    FilterChainProxy securityFilterChain;
 
     @Before
     public void setUp() {
