@@ -93,19 +93,18 @@ class AccountController {
         }
 
         // arrange new welcome joke
-        String sessionId = user.getCurrentSessionId();
         List<Joke> recentJokes = user.getRecentJokes();
 
-        if (session.getId().equals(sessionId)) {
+        if (session.getAttribute("jokeDisplayed") != null && (boolean)session.getAttribute("jokeDisplayed")) {
             model.addAttribute("joke", user.getLastJoke());
         } else {
             Joke joke = getRandomJoke(recentJokes);
 
             if (joke != null)
                 user.addJoke(joke);
-
-            user.setCurrentSessionId(session.getId());
             userRepo.save(user);
+
+            session.setAttribute("jokeDisplayed", true);
 
             model.addAttribute("joke", joke);
         }
@@ -115,7 +114,7 @@ class AccountController {
     /**
      * Determines a random {@link Joke} out of the {@link JokeRepository} which is not contained in the list of recent jokes.
      */
-    private Joke getRandomJoke(List<Joke> recentJokes) {
+    public Joke getRandomJoke(List<Joke> recentJokes) {
         List<Joke> allJokes = new LinkedList<Joke>();
         for (Joke j : jokeRepo.findAll()) {
             allJokes.add(j);
