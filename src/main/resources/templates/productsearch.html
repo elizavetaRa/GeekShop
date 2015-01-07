@@ -23,7 +23,13 @@
                 e.stopPropagation();
             });
 
-            $('#sort').change(function () {
+            $("#formSearch").submit(function () {
+                if (formSearch.q.value != "") {
+                    formSearch.cat.value = "";
+                }
+            });
+
+            $("#sort").change(function () {
                 $("#formSearch").submit();
             });
         }); //$(document).ready
@@ -65,7 +71,8 @@
                             </a>
                             <ul th:each="subCategory: ${superCategory.subCategories}">
                                 <li>
-                                    <a th:href="'/productsearch?q=&amp;sort=' + (${param.sort} ? ${param.sort[0]} : '') + '&amp;cat=' + ${T(java.net.URLEncoder).encode(subCategory.name)}" th:text="${subCategory.name}">T-Shirts</a>
+                                    <a th:href="'/productsearch?q=&amp;sort=' + (${param.sort} ? ${param.sort[0]} : '') + '&amp;cat=' + ${T(java.net.URLEncoder).encode(subCategory.name)}"
+                                       th:text="${subCategory.name}">T-Shirts</a>
                                 </li>
                             </ul>
                         </li>
@@ -76,7 +83,7 @@
 
                 <div id="product-list">
 
-                    <form method="get" action="/productsearch" id="formSearch">
+                    <form method="get" action="/productsearch" name="formSearch" id="formSearch">
                         <input value="suchen" th:value="${param.q} ? ${param.q[0]}" name="q" id="q"
                                type="text" size="25" maxlength="40" placeholder="Artikelsuche"/>
                         <select name="sort" id="sort" style="margin: 0 15px 0 5px" class="f-right">
@@ -92,7 +99,7 @@
                         </select>
                         <label class="f-right">sortieren nach</label>
                         <button id="searchAndSortProducts" type="submit">suchen</button>
-                        <input type="hidden" name="cat" th:value="${param.cat} ? ${param.cat[0]}"/>
+                        <input type="hidden" name="cat" id="cat" th:value="${param.cat} ? ${param.cat[0]}"/>
                     </form>
                     <p th:if="${session.ro}" style="margin-top:10px">Hinweis: Beenden Sie den Reklamationsvorgang.</p>
 
