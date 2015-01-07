@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -83,8 +85,8 @@ class CartController {
 
 
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
-
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount, Model model) {
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @RequestParam("query") String query,
+                                   @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -109,8 +111,27 @@ class CartController {
             cart.addOrUpdateItem(product, inventory.findByProduct(product).get().getQuantity());
         }
 
+        for (Map.Entry<String, String> entry : getQueryMap(query).entrySet()) {
+            model.addAttribute(entry.getKey(), entry.getValue());
+        }
+
         return "redirect:/productsearch";
 
+    }
+
+    /**
+     * Creates a map of the given url query string.
+     */
+    private static Map<String, String> getQueryMap(String query) {
+        String[] params = query.split("&");
+        Map<String, String> map = new HashMap<String, String>();
+        for (String param : params) {
+            String[] split = param.split("=");
+            String name = split[0];
+            String value = split.length > 1 ? split[1] : "";
+            map.put(name, value);
+        }
+        return map;
     }
 
 
@@ -162,14 +183,6 @@ class CartController {
         return "redirect:/cart";
     }
 
-
-//    @RequestMapping(value = "/cart", method = RequestMethod.GET)
-//    public String basket(@LoggedIn Optional<UserAccount> userAccount) {
-//        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-//            return "redirect:/";
-//
-//        return "cart";
-//    }
 
     @RequestMapping("/checkout")
     public String checkout(@LoggedIn Optional<UserAccount> userAccount) {
