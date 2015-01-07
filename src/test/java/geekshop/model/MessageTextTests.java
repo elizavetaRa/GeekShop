@@ -9,7 +9,7 @@ import org.junit.Test;
  * @author Felix Döring
  */
 
-public class MessageTextTest extends AbstractIntegrationTests {
+public class MessageTextTests extends AbstractIntegrationTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyMessage() {
