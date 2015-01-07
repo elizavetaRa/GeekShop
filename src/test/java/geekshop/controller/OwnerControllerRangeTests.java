@@ -7,10 +7,6 @@ import org.junit.Test;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterChainProxy;
 
 import static org.junit.Assert.assertTrue;
@@ -19,8 +15,6 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
 
     @Autowired
     OwnerController controller;
-    @Autowired
-    AuthenticationManager authenticationManager;
     @Autowired
     FilterChainProxy securityFilterChain;
 
@@ -33,9 +27,8 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
 
 
     @Before
-    public void login() {
-        Authentication authentication = new UsernamePasswordAuthenticationToken("owner", "123");
-        SecurityContextHolder.getContext().setAuthentication(authenticationManager.authenticate(authentication));
+    public void setUp() {
+        login("owner", "123");
     }
 
     @Test
