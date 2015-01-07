@@ -95,7 +95,7 @@ class AccountController {
         // arrange new welcome joke
         List<Joke> recentJokes = user.getRecentJokes();
 
-        if (session.getAttribute("jokeDisplayed") != null && (boolean)session.getAttribute("jokeDisplayed")) {
+        if (session.getAttribute("jokeDisplayed") != null && (boolean) session.getAttribute("jokeDisplayed")) {
             model.addAttribute("joke", user.getLastJoke());
         } else {
             Joke joke = getRandomJoke(recentJokes);
@@ -149,9 +149,9 @@ class AccountController {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
-        changePassword(model, user, newPW, retypePW);
-
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+        if (changePassword(model, user, newPW, retypePW)) {
+            messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+        }
 
         return "redirect:/";
     }

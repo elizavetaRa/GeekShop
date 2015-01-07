@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.emptyIterable;
 import static org.junit.Assert.*;
 
 public class AccountControllerAuthenticationTests extends AbstractWebIntegrationTests {
@@ -31,12 +32,15 @@ public class AccountControllerAuthenticationTests extends AbstractWebIntegration
     @Autowired
     private HttpSession session;
 
+    private Model model;
     private User user;
 
 
     @Before
     public void setUp() {
         super.setUp();
+
+        model = new ExtendedModelMap();
 
         login("owner", "123");
         user = userRepo.findByUserAccount(authManager.getCurrentUser().get());
@@ -45,8 +49,6 @@ public class AccountControllerAuthenticationTests extends AbstractWebIntegration
 
     @Test
     public void testIndexOwner() {
-        Model model = new ExtendedModelMap();
-
         String view = controller.index(model, Optional.of(user.getUserAccount()), session);
 
         assertEquals(user, session.getAttribute("user"));
@@ -73,8 +75,6 @@ public class AccountControllerAuthenticationTests extends AbstractWebIntegration
         login("hans", "123");
 
         // Hans has an insecure password.
-        Model model = new ExtendedModelMap();
-
         User hans = userRepo.findByUserAccount(authManager.getCurrentUser().get());
 
         String view = controller.index(model, Optional.of(hans.getUserAccount()), session);
@@ -124,5 +124,20 @@ public class AccountControllerAuthenticationTests extends AbstractWebIntegration
 
         recent = Arrays.asList(j2, j1, j3, j4, j5, j6);
         assertEquals(j2, controller.getRandomJoke(recent));
+    }
+
+    @Test
+    public void adjustPW() {
+        login("hans", "123");
+        User hans = userRepo.findByUserAccount(authManager.getCurrentUser().get());
+        messageRepo.deleteAll();
+        controller.adjustPW(model, " ", " ", Optional.of(hans.getUserAccount()));
+        assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
+        controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f5", Optional.of(hans.getUserAccount()));
+        assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
+        controller.adjustPW(model, "123", "123", Optional.of(hans.getUserAccount()));
+        assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
+        controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f", Optional.of(hans.getUserAccount()));
+        assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), not(is(emptyIterable())));
     }
 }
