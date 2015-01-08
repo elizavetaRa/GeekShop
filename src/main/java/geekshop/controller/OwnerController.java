@@ -525,7 +525,7 @@ class OwnerController {
     }
 
     /**
-     * Deletes a {@link geekshop.model.SubCategory} when quested.
+     * Deletes a {@link geekshop.model.SubCategory} when requested.
      *
      * @param subName the name of the SubCategory
      * @return
