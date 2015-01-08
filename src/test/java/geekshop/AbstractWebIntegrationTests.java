@@ -4,6 +4,10 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -28,6 +32,8 @@ public abstract class AbstractWebIntegrationTests {
     WebApplicationContext context;
     @Autowired
     FilterChainProxy securityFilterChain;
+    @Autowired
+    AuthenticationManager authenticationManager;
 
     protected MockMvc mvc;
 
@@ -39,5 +45,10 @@ public abstract class AbstractWebIntegrationTests {
         mvc = MockMvcBuilders.webAppContextSetup(context).
                 addFilters(securityFilterChain).
                 build();
+    }
+
+    protected void login(String username, String password) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        SecurityContextHolder.getContext().setAuthentication(authenticationManager.authenticate(authentication));
     }
 }

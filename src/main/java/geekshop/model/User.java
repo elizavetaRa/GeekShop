@@ -24,8 +24,6 @@ public class User {
     @OneToOne
     private UserAccount userAccount;
 
-    private String currentSessionId;
-
     private Date birthday;
     private String phone;
     private String street;
@@ -79,14 +77,6 @@ public class User {
 
     public UserAccount getUserAccount() {
         return userAccount;
-    }
-
-    public String getCurrentSessionId() {
-        return currentSessionId;
-    }
-
-    public void setCurrentSessionId(String currentSessionId) {
-        this.currentSessionId = currentSessionId;
     }
 
     public Date getBirthday() {

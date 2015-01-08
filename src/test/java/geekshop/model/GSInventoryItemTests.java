@@ -1,14 +1,14 @@
 package geekshop.model;
 
 import geekshop.AbstractIntegrationTests;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.salespointframework.catalog.Product;
-import org.salespointframework.inventory.Inventory;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test class for {@link GSInventoryItem}.
@@ -18,17 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class GSInventoryItemTests extends AbstractIntegrationTests {
 
-    @Autowired
-    private Inventory<GSInventoryItem> inventory;
-    private GSInventoryItem item;
     private Product product;
     private Quantity quantity;
 
     @Before
     public void setUp() {
-        item = inventory.findAll().iterator().next();
-        product = item.getProduct();
-        quantity = item.getQuantity();
+        SuperCategory superCategory = new SuperCategory("superCat");
+        SubCategory subCategory = new SubCategory("subCat", superCategory);
+        product = new GSProduct(100, "test1", Money.of(CurrencyUnit.EUR, 1D), subCategory);
+        quantity = Units.of(5L);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -43,12 +41,12 @@ public class GSInventoryItemTests extends AbstractIntegrationTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetMinimalQuantityWithNullArgument() {
-        item.setMinimalQuantity(null);
+        new GSInventoryItem(product, quantity, quantity).setMinimalQuantity(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetMinimalQuantityWithNegativeArgument() {
-        item.setMinimalQuantity(Units.of(-1));
+        new GSInventoryItem(product, quantity, quantity).setMinimalQuantity(Units.of(-1));
     }
 
     @Test

@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -59,48 +58,54 @@ class CatalogController {
         this.inventory = inventory;
     }
 
-    /**
-     * Shows the search page with all {@link org.salespointframework.catalog.Product}s in the given {@link SubCategory}.
-     */
-
-    @RequestMapping("/productsearch/{Category}")
-    public String catgory(Model model, @PathVariable("Category") String category, @LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
-        String[] temp;
-        temp = category.split("_");
-        category = temp[1];
-        if (temp[0].contains("sub")) {
-            model.addAttribute("catalog", subRepo.findByName(category).getProducts());
-        } else {
-            model.addAttribute("catalog", getAllProductsInSuperCategory(supRepo.findByName(category)));
-        }
-        model.addAttribute("superCategories", supRepo.findAll());
-        model.addAttribute("subCategories", subRepo.findAll());
-        model.addAttribute("inventory", inventory);
-        return "productsearch";
-    }
 
     /**
-     * Shows the search page with all {@link org.salespointframework.catalog.Product}s which contain the searchTerm in their name.
+     * Shows the search page with all {@link org.salespointframework.catalog.Product}s which contain the search term ({@code q}) in their name,
+     * or if search term is not set, shows all {@link org.salespointframework.catalog.Product}s belonging to the chosen category ({@code cat}).
+     * The list of results is sorted by the given sorting method ({@code sort}).
      */
 
     @RequestMapping("/productsearch")
-    public String searchEntryByName(Model model, @RequestParam(value = "searchTerm", required = false) String searchTerm, @RequestParam(value = "sorting", required = false) String sorting, @LoggedIn Optional<UserAccount> userAccount) {
+    public String searchEntryByName(Model model, @LoggedIn Optional<UserAccount> userAccount,
+                                    @RequestParam(value = "q", required = false) String searchTerm,
+                                    @RequestParam(value = "sort", required = false) String sorting,
+                                    @RequestParam(value = "cat", required = false) String category) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        if (searchTerm == null) {
-            if ((sorting == null) || (sorting.equals("name"))) {
-                model.addAttribute("catalog", sortProductByName(findAllProducts()));
-            } else if (sorting.equals("prodnum")) {
-                model.addAttribute("catalog", sortProductByProductNumber(findAllProducts()));
-            } else if (sorting.equals("pricedesc")) {
-                model.addAttribute("catalog", sortProductByPrice(findAllProducts(), "desc"));
-            } else if (sorting.equals("priceasc")) {
-                model.addAttribute("catalog", sortProductByPrice(findAllProducts(), "asc"));
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            if (category == null || category.isEmpty()) {
+                if (sorting == null || sorting.isEmpty() || sorting.equals("name")) {
+                    model.addAttribute("catalog", sortProductByName(findAllProducts()));
+                } else if (sorting.equals("prodnum")) {
+                    model.addAttribute("catalog", sortProductByProductNumber(findAllProducts()));
+                } else if (sorting.equals("pricedesc")) {
+                    model.addAttribute("catalog", sortProductByPrice(findAllProducts(), "desc"));
+                } else if (sorting.equals("priceasc")) {
+                    model.addAttribute("catalog", sortProductByPrice(findAllProducts(), "asc"));
+                }
+            } else {
+                Iterable<GSProduct> catalog;
+                if (supRepo.findByName(category) == null) {
+                    if (subRepo.findByName(category) == null) {
+                        catalog = findAllProducts();
+                    } else {
+                        catalog = subRepo.findByName(category).getProducts();
+                    }
+                } else {
+                    catalog = getAllProductsInSuperCategory(supRepo.findByName(category));
+                }
+                if (sorting == null || sorting.isEmpty() || sorting.equals("name")) {
+                    model.addAttribute("catalog", sortProductByName(catalog));
+                } else if (sorting.equals("prodnum")) {
+                    model.addAttribute("catalog", sortProductByProductNumber(catalog));
+                } else if (sorting.equals("pricedesc")) {
+                    model.addAttribute("catalog", sortProductByPrice(catalog, "desc"));
+                } else if (sorting.equals("priceasc")) {
+                    model.addAttribute("catalog", sortProductByPrice(catalog, "asc"));
+                }
             }
-        } else if ((sorting == null) || (sorting.equals("name"))) {
+        } else if (sorting == null || sorting.isEmpty() || sorting.equals("name")) {
             model.addAttribute("catalog", sortProductByName(search(searchTerm)));
         } else if (sorting.equals("prodnum")) {
             model.addAttribute("catalog", sortProductByProductNumber(search(searchTerm)));
