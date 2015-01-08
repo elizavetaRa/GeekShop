@@ -303,7 +303,7 @@ class OwnerController {
      * @param msgId the Id of the Message
      * @return
      */
-    @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.POST)
+    @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.POST)
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId) {
 
         Set<ReclaimTupel> products = new HashSet<>();
@@ -329,7 +329,7 @@ class OwnerController {
      * @param accept boolean value if the reclaim is accepted
      * @return
      */
-    @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.DELETE)
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
         GSOrder order = orderRepo.findOne(reclaimId).get();
@@ -525,7 +525,7 @@ class OwnerController {
     }
 
     /**
-     * Deletes a {@link geekshop.model.SubCategory} when requested.
+     * Deletes a {@link geekshop.model.SubCategory} when quested.
      *
      * @param subName the name of the SubCategory
      * @return
