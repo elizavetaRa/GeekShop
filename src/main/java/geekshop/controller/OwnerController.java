@@ -592,7 +592,7 @@ class OwnerController {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.setInRange(false);
         product.setSubCategory(null);
-        Quantity quantity = Units.of(0L);
+        Quantity quantity = Units.ZERO;
         GSInventoryItem item = inventory.findByProductIdentifier(productIdentifier).get();
         item.setMinimalQuantity(quantity);
         item.decreaseQuantity(item.getQuantity());
@@ -703,17 +703,17 @@ class OwnerController {
     @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
     public String addProductToCatalog(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
                                       @RequestParam("subCategory") long subCategoryId,
-                                      @RequestParam("productNumber") int productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity) {
+                                      @RequestParam("productNumber") long productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity) {
 
 
         Quantity quantity = Units.of(lgquantity);
         Quantity minQuantity = Units.of(lgminQuantity);
         boolean productNumberExists = false;
-//        for ( GSInventoryItem products : inventory.findAll()){
-//            if (products.getProduct().getProductNumber() == productNumber){
-//                productNumberExists = true;
-//            }
-//        }
+        for (GSProduct products : catalog.findAll()){
+            if (products.getProductNumber() == productNumber){
+                productNumberExists = true;
+            }
+        }
 
         if (productNumberExists == false) {
             SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
