@@ -396,7 +396,8 @@ class AccountController {
         userRepo.save(user);
 
         if (userAccount.get().equals(ua)) {
-            messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat seine persönlichen Daten geändert."));
+            if (!userAccount.get().hasRole(new Role("ROLE_OWNER")))
+                messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat seine persönlichen Daten geändert."));
             return "redirect:/profile";
         } else
             return "redirect:/staff/" + uai;
@@ -419,12 +420,12 @@ class AccountController {
             System.out.println("Altes Passwort ist falsch!");
             model.addAttribute("error", "Altes Passwort ist falsch!");
         } else {
-            changePassword(model, user, newPW, retypePW);
-
-            if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
-                messageRepo.delete(messageRepo.findByMessageKind(MessageKind.PASSWORD));
-            } else {
-                messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+            if (changePassword(model, user, newPW, retypePW)) {
+                if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
+                    messageRepo.delete(messageRepo.findByMessageKind(MessageKind.PASSWORD));
+                } else {
+                    messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+                }
             }
         }
 
@@ -434,17 +435,15 @@ class AccountController {
     /**
      * Saves the new password of an employee changed by the shop owner.
      */
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
-    public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
+    public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai) {
 
         UserAccount ua = uam.get(uai).get();
         User user = userRepo.findByUserAccount(ua);
 
-        changePassword(model, user, newPW, retypePW);
-
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Neues Passwort von Nutzer " + user + ": " + newPW));
+        if (changePassword(model, user, newPW, retypePW))
+            messageRepo.save(new Message(MessageKind.NOTIFICATION, "Neues Passwort von Nutzer " + user + ": " + newPW));
 
         return "redirect:/staff/" + uai.toString();
     }

@@ -5,6 +5,7 @@ import geekshop.model.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.salespointframework.useraccount.AuthenticationManager;
+import org.salespointframework.useraccount.Password;
 import org.salespointframework.useraccount.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ExtendedModelMap;
@@ -134,10 +135,13 @@ public class AccountControllerAuthenticationTests extends AbstractWebIntegration
         controller.adjustPW(model, " ", " ", Optional.of(hans.getUserAccount()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
         controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f5", Optional.of(hans.getUserAccount()));
+        assertFalse(authManager.matches(new Password("!A2s3d4f"), hans.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
-        controller.adjustPW(model, "123", "123", Optional.of(hans.getUserAccount()));
+        controller.adjustPW(model, "123", "1234", Optional.of(hans.getUserAccount()));
+        assertFalse(authManager.matches(new Password("1234"), hans.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
         controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f", Optional.of(hans.getUserAccount()));
+        assertTrue(authManager.matches(new Password("!A2s3d4f"), hans.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), not(is(emptyIterable())));
     }
 }
