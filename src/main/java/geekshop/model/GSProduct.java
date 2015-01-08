@@ -1,6 +1,7 @@
 package geekshop.model;
 
 import org.joda.money.Money;
+import org.joda.money.format.MoneyAmountStyle;
 import org.joda.money.format.MoneyFormatter;
 import org.joda.money.format.MoneyFormatterBuilder;
 import org.salespointframework.catalog.Product;
@@ -70,7 +71,7 @@ public class GSProduct extends Product{
      * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12,34 €}" is delivered.
      */
     public static String moneyToString(Money money) {
-        MoneyFormatter moneyFormatter = new MoneyFormatterBuilder().appendAmountLocalized().appendLiteral(" ").appendCurrencySymbolLocalized().toFormatter();
+        MoneyFormatter moneyFormatter = new MoneyFormatterBuilder().appendAmount(MoneyAmountStyle.ASCII_DECIMAL_COMMA_GROUP3_DOT).appendLiteral(" €").toFormatter();
         return moneyFormatter.print(money);
     }
 }
