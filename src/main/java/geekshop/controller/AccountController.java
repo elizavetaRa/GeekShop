@@ -232,8 +232,7 @@ class AccountController {
     @RequestMapping(value = "/staff/{uai}", method = RequestMethod.DELETE)
     public String fire(@PathVariable("uai") UserAccountIdentifier uai) {
         UserAccount userAccount = uam.get(uai).get();
-        Role role = new Role("ROLE_OWNER");
-        if (userAccount.hasRole(role)) {
+        if (userAccount.hasRole(new Role("ROLE_OWNER"))) {
             return "redirect:/staff";
         } else {
             dismiss(userRepo.findByUserAccount(userAccount));
@@ -262,7 +261,7 @@ class AccountController {
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/staff/{uai}/{page}")
-    public String profileChange(Model model, @PathVariable("uai") UserAccountIdentifier uai, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
+    public String profileChange(Model model, @PathVariable("uai") UserAccountIdentifier uai, @PathVariable("page") String page) {
         UserAccount ua = uam.get(uai).get();
         User user = userRepo.findByUserAccount(ua);
         model.addAttribute("user", user);
@@ -488,16 +487,14 @@ class AccountController {
     }
 
     /**
-     * Does the real dismissal work by removing the employee role, disabling the user account and change the password to a random one.
-     * However, the {@link User} cannot be removed from {@link UserRepository} because the user is still present in orders so far.
+     * Does the real dismissal work by removing the employee role and disabling the user account.
+     * However, the {@link User} cannot be removed from {@link UserRepository} because the user could be still present in current orders.
      */
     private void dismiss(User user) {
         UserAccount userAccount = user.getUserAccount();
-//        userRepo.delete(user);
         userAccount.remove(new Role("ROLE_EMPLOYEE"));
-        uam.save(userAccount);
         uam.disable(userAccount.getIdentifier());
-        uam.changePassword(userAccount, passRulesRepo.findOne("passwordRules").get().generateRandomPassword());
+        uam.save(userAccount);
     }
 
     /**
