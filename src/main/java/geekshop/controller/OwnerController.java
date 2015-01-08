@@ -648,6 +648,7 @@ class OwnerController {
         subCategoryRepo.save(subCategory_new);
 
         strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+        strPrice = strPrice.replaceAll(",", ".");
         float price = Float.parseFloat(strPrice);
 
         product.setSubCategory(subCategory_new);
