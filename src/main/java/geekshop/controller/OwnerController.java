@@ -592,7 +592,7 @@ class OwnerController {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.setInRange(false);
         product.setSubCategory(null);
-        Quantity quantity = Units.of(-1L);
+        Quantity quantity = Units.of(0L);
         GSInventoryItem item = inventory.findByProductIdentifier(productIdentifier).get();
         item.setMinimalQuantity(quantity);
         item.decreaseQuantity(item.getQuantity());
@@ -708,17 +708,24 @@ class OwnerController {
 
         Quantity quantity = Units.of(lgquantity);
         Quantity minQuantity = Units.of(lgminQuantity);
+        boolean productNumberExists = false;
+//        for ( GSInventoryItem products : inventory.findAll()){
+//            if (products.getProduct().getProductNumber() == productNumber){
+//                productNumberExists = true;
+//            }
+//        }
 
-        SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
-        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
-        float price = Float.parseFloat(strPrice);
-        GSProduct product = new GSProduct(productNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
-        catalog.save(product);
-        subCategory.addProduct(product);
-        subCategoryRepo.save(subCategory);
-        GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
-        inventory.save(item);
-
+        if (productNumberExists == false) {
+            SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
+            strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+            float price = Float.parseFloat(strPrice);
+            GSProduct product = new GSProduct(productNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
+            catalog.save(product);
+            subCategory.addProduct(product);
+            subCategoryRepo.save(subCategory);
+            GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
+            inventory.save(item);
+        }
         return "redirect:/range";
     }
 
@@ -751,10 +758,18 @@ class OwnerController {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superCat);
 
-        superCategory.setName(name);
+        boolean exist = false;
+        for (SuperCategory superCategorys : superCategoryRepo.findAll()){
+            if (superCategory.getName().equals(name)){
+                exist = true;
+            }
+        }
 
-        superCategoryRepo.save(superCategory);
+        if (exist == false) {
+            superCategory.setName(name);
 
+            superCategoryRepo.save(superCategory);
+        }
         return "redirect:/range";
 
     }
@@ -779,8 +794,17 @@ class OwnerController {
     @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
     public String addSuperCategory(@RequestParam("name") String name) {
 
-        SuperCategory superCategory = new SuperCategory(name);
-        superCategoryRepo.save(superCategory);
+        boolean exist = false;
+        for (SuperCategory superCategory : superCategoryRepo.findAll()){
+            if (superCategory.getName().equals(name)){
+                exist = true;
+            }
+        }
+
+        if (exist == false) {
+            SuperCategory superCategory = new SuperCategory(name);
+            superCategoryRepo.save(superCategory);
+        }
 
         return "redirect:/range";
     }
@@ -817,17 +841,26 @@ class OwnerController {
         SuperCategory superCategory_new = superCategoryRepo.findByName(strSuperCat);
         SuperCategory superCategory_old = subCategory.getSuperCategory();
 
-        subCategory.setName(name);
-        subCategory.setSuperCategory(superCategory_new);
+        boolean exist = false;
+        for (SubCategory subCategorys : superCategory_new.getSubCategories()){
+            if (subCategorys.getName().equals(name)){
+                exist = true;
+            }
+        }
 
-        superCategory_new.addSubCategory(subCategory);
-        superCategory_old.getSubCategories().remove(subCategory);
+        if (exist == false) {
+            subCategory.setName(name);
+            subCategory.setSuperCategory(superCategory_new);
 
-        superCategoryRepo.save(superCategory_old);
-        superCategoryRepo.save(superCategory_new);
+            superCategory_new.addSubCategory(subCategory);
+            superCategory_old.getSubCategories().remove(subCategory);
+
+            superCategoryRepo.save(superCategory_old);
+            superCategoryRepo.save(superCategory_new);
 
 
-        subCategoryRepo.save(subCategory);
+            subCategoryRepo.save(subCategory);
+        }
 
         return "redirect:/range";
 
@@ -843,12 +876,21 @@ class OwnerController {
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
     public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat) {
 
-
         SuperCategory superCategory = superCategoryRepo.findByName(strSuperCat);
-        SubCategory subCategory = new SubCategory(name, superCategory);
-        superCategory.addSubCategory(subCategory);
-        subCategoryRepo.save(subCategory);
-        superCategoryRepo.save(superCategory);
+
+        boolean exist = false;
+        for (SubCategory subCategory : superCategory.getSubCategories()){
+            if (subCategory.getName().equals(name)){
+                exist = true;
+            }
+        }
+
+        if (exist == false) {
+            SubCategory subCategory = new SubCategory(name, superCategory);
+            superCategory.addSubCategory(subCategory);
+            subCategoryRepo.save(subCategory);
+            superCategoryRepo.save(superCategory);
+        }
 
 
         return "redirect:/range";
