@@ -10,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
@@ -30,11 +29,7 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
     @Autowired
     private MessageRepository messageRepo;
     @Autowired
-    private JokeRepository jokeRepo;
-    @Autowired
     private AuthenticationManager authManager;
-    @Autowired
-    private HttpSession session;
 
     private Model model;
     private User owner;
@@ -65,7 +60,13 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
     @SuppressWarnings("unchecked")
     public void testStaff() {
         assertEquals("staff", controller.staff(model));
-        assertThat((List<User>) model.asMap().get("staff"), not(hasItem(owner)));
+        List<User> employees = new LinkedList<User>();
+        for (User user : userRepo.findAll()) {
+            if (!user.getUserAccount().hasRole(new Role("ROLE_OWNER")) && user.getUserAccount().isEnabled()) {
+                employees.add(user);
+            }
+        }
+        assertThat((List<User>) model.asMap().get("staff"), containsInAnyOrder(employees.toArray(new User[employees.size()])));
     }
 
     @Test

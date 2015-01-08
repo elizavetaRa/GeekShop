@@ -206,7 +206,8 @@ class AccountController {
 
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         String password = passwordRules.generateRandomPassword();
-        password = password.substring(0, passwordRules.getMinLength() - 1); // create insecure password to force the new employee to change this initial password
+        // create insecure password to force the new employee to change this initial password
+        password = password.substring(0, passwordRules.getMinLength() - 1);
         UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
         ua.setFirstname(formData.get("firstname"));
         ua.setLastname(formData.get("lastname"));
@@ -302,12 +303,12 @@ class AccountController {
     public String setPWRules(@RequestParam Map<String, String> map) {
 
         int minLength = Integer.parseInt(map.get("minLength"));
+        if (minLength < 6)
+            minLength = 6;
+
         boolean upperLower = map.get("upperLower") != null && Boolean.parseBoolean(map.get("upperLower"));
         boolean digits = map.get("digits") != null && Boolean.parseBoolean(map.get("digits"));
         boolean specialChars = map.get("specialChars") != null && Boolean.parseBoolean(map.get("specialChars"));
-
-        if (minLength < 6)
-            minLength = 6;
 
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         passwordRules.setUpperAndLowerNecessary(upperLower);
