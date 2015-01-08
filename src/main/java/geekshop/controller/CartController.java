@@ -17,7 +17,6 @@ import org.salespointframework.payment.CreditCard;
 import org.salespointframework.payment.PaymentMethod;
 import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
-import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccount;
 import org.salespointframework.useraccount.web.LoggedIn;
@@ -45,18 +44,14 @@ import java.util.Optional;
 @SessionAttributes("cart")
 class CartController {
     private final Inventory<GSInventoryItem> inventory;
-    private final BusinessTime businessTime;
     private final Catalog<GSProduct> catalog;
-    private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
 
     @Autowired
-    public CartController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
+    public CartController(Inventory<GSInventoryItem> inventory, Catalog<GSProduct> catalog, GSOrderRepository orderRepo) {
 
         this.inventory = inventory;
-        this.businessTime = businessTime;
         this.catalog = catalog;
-        this.userRepo = userRepo;
         this.orderRepo = orderRepo;
 
     }
@@ -74,9 +69,18 @@ class CartController {
 
 
     @RequestMapping("/cart")
-    public String cart(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+    public String cart(Model model, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
+
+        if (!(boolean) session.getAttribute("isReclaim")) {
+            Iterable<CartItem> items = cart;
+            for (CartItem ci : items) {
+                if (!catalog.findOne(ci.getProduct().getId()).get().isInRange()) {
+                    cart.removeItem(ci.getIdentifier());
+                }
+            }
+        }
 
         model.addAttribute("inventory", inventory);
 
@@ -105,8 +109,7 @@ class CartController {
         CartItem item = cart.addOrUpdateItem(product, Units.of(number));
         System.out.println("zu Cart hinzugefügt:  " + number);
 
-        if (item.getQuantity().getAmount().intValueExact() >= inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()
-                ) {
+        if (item.getQuantity().getAmount().intValueExact() >= inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             cart.removeItem(item.getIdentifier());
             cart.addOrUpdateItem(product, inventory.findByProduct(product).get().getQuantity());
         }
@@ -128,8 +131,10 @@ class CartController {
         for (String param : params) {
             String[] split = param.split("=");
             String name = split[0];
-            String value = split.length > 1 ? split[1] : "";
-            map.put(name, value);
+            if (!name.isEmpty()) {
+                String value = split.length > 1 ? split[1] : "";
+                map.put(name, value);
+            }
         }
         return map;
     }
