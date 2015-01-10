@@ -3,11 +3,13 @@ package geekshop.controller;
 import geekshop.AbstractWebIntegrationTests;
 import geekshop.model.PasswordRules;
 import geekshop.model.PasswordRulesRepository;
+import geekshop.model.validation.SetRulesForm;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +23,8 @@ public class AccountControllerPasswordRulesTests extends AbstractWebIntegrationT
     private AccountController controller;
     @Autowired
     private PasswordRulesRepository passRulesRepo;
+    @Autowired
+    private BindingResult result;
 
     private Model model;
     private PasswordRules passwordRules;
@@ -52,7 +56,7 @@ public class AccountControllerPasswordRulesTests extends AbstractWebIntegrationT
         formData.put("digits", null);
         formData.put("specialChars", "true");
 
-        assertEquals("redirect:/staff", controller.setPWRules(formData));
+        assertEquals("redirect:/staff", controller.setPWRules(model, formData, new SetRulesForm(), result));
 
         assertFalse(passwordRules.areUpperAndLowerNecessary());
         assertFalse(passwordRules.areDigitsNecessary());

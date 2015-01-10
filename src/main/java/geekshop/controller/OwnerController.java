@@ -30,8 +30,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -461,28 +459,6 @@ class OwnerController {
     public String deleteMessage(@PathVariable("id") Long id) {
         messageRepo.delete(id);
         return "redirect:/messages";
-    }
-
-    /**
-     * Converts the Birthday {@link java.lang.String} to {@link java.util.Date}.
-     *
-     * @param strDate the String which contains a Date
-     * @return {@link java.util.Date}
-     */
-
-    public static Date strToDate(String strDate) {
-        strDate = strDate.replace(".", " ");
-        strDate = strDate.replace("-", " ");
-        strDate = strDate.replace("/", " ");
-        Date date = null;
-        try {
-            date = new SimpleDateFormat("dd MM yyyy").parse(strDate);
-        } catch (ParseException e) {
-
-        }
-
-        return date;
-
     }
 
 

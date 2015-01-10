@@ -137,6 +137,10 @@ a.myButton {color:#FFF !important; display:inline-block;}
  * Messages
  */
 
-.error {padding-top:10px; color:#AA0000;}
+.loginError {padding-top:10px; color:#AA0000;}
 
-.info {padding-top:10px; color:#0288CA;}
+.loginInfo {padding-top:10px; color:#0288CA;}
+
+.errorMsg {color:#AA0000;}
+.fieldError {border:1px solid #CC0000}
+
