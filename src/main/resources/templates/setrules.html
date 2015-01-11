@@ -28,7 +28,7 @@
 
             <div id="content-in">
 
-                <form method="post" action="/setrules">
+                <form method="post" action="/setrules" th:object="${setRulesForm}">
                     <p>
                         <input type="checkbox" name="upperLower" id="upperLower" value="true" th:checked="${passwordRules.areUpperAndLowerNecessary()}"/>
                         <label for="upperLower">Groß- und Kleinbuchstaben erforderlich</label>
@@ -46,7 +46,8 @@
                     <br/>
                     <p>
                         <label for="minLength">Minimale Länge des Passworts: </label>
-                        <input type="number" name="minLength" id="minLength" min="6" max="128" th:value="${passwordRules.minLength}"/>
+                        <input type="number" name="minLength" id="minLength" min="6" max="128" th:value="${passwordRules.minLength}" th:errorclass="fieldError"/>
+                        <p th:if="${#fields.hasErrors('minLength')}" class="errorMsg" th:errors="*{minLength}">Fehler</p>
                     </p>
                     <br/>
                     <p>

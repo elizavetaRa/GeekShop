@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -94,9 +96,18 @@ class CartController {
      * Returns current state of {@link Cart}.
      */
     @RequestMapping("/cart")
-    public String cart(Model model, @LoggedIn Optional<UserAccount> userAccount) {
+    public String cart(Model model, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
+
+        if (!(boolean) session.getAttribute("isReclaim")) {
+            Iterable<CartItem> items = cart;
+            for (CartItem ci : items) {
+                if (!catalog.findOne(ci.getProduct().getId()).get().isInRange()) {
+                    cart.removeItem(ci.getIdentifier());
+                }
+            }
+        }
 
         model.addAttribute("inventory", inventory);
 
@@ -114,7 +125,8 @@ class CartController {
      * @param model
      */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
-    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount, Model model) {
+    public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @RequestParam("query") String query,
+                                   @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -129,16 +141,40 @@ class CartController {
             number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
         }
 
+        System.out.println("Anzahl Produkte vor dem hinzufügen zu Cart  " + inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact());
         CartItem item = cart.addOrUpdateItem(product, Units.of(number));
-        if (item.getQuantity().getAmount().intValueExact() >= inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()
-                ) {
+        System.out.println("zu Cart hinzugefügt:  " + number);
+
+        if (item.getQuantity().getAmount().intValueExact() >= inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             cart.removeItem(item.getIdentifier());
             cart.addOrUpdateItem(product, inventory.findByProduct(product).get().getQuantity());
+        }
+
+        for (Map.Entry<String, String> entry : getQueryMap(query).entrySet()) {
+            model.addAttribute(entry.getKey(), entry.getValue());
         }
 
         return "redirect:/productsearch";
 
     }
+
+    /**
+     * Creates a map of the given url query string.
+     */
+    private static Map<String, String> getQueryMap(String query) {
+        String[] params = query.split("&");
+        Map<String, String> map = new HashMap<String, String>();
+        for (String param : params) {
+            String[] split = param.split("=");
+            String name = split[0];
+            if (!name.isEmpty()) {
+                String value = split.length > 1 ? split[1] : "";
+                map.put(name, value);
+            }
+        }
+        return map;
+    }
+
 
     /**
      * Deletes every {@link CartItem} from {@link Cart} .
@@ -359,7 +395,5 @@ class CartController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-        return "cart";
-    }
 
 }

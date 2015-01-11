@@ -84,7 +84,7 @@
                             <td th:with="price = (${product} ? ${product.moneyToString(product.getPrice())})">
                                 <input name="price" id="price" type="text" size="30" maxlength="30"
                                        value="10" th:value="${price}"
-                                       th:disabled="${user}"/>
+                                       th:disabled="${user}" pattern="\d+[.,]?\d*\s?€"/>
                             </td>
                         </tr>
 
@@ -100,12 +100,12 @@
                         </tr>
 
                         <tr >
-                            <td th:with="quantity = (${product} ? ${inventory.findByProduct(product).get().getQuantity().getAmount()} : '1')">
+                            <td>
                                 <label for="quantity" class="highlight">Stückzahl:</label>
                             </td>
-                            <td>
+                            <td th:with="quantity = (${product} ? ${inventory.findByProduct(product).get().getQuantity().getAmount()} : '1')">
                                 <input name="quantity" id="quantity" type="number" size="1" maxlength="40"
-                                       value="1" min="0" th:value="${quantity}"
+                                        value="1" min="0" th:value="${quantity}"
                                        required="required"/>
                             </td>
                         </tr>

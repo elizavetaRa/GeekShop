@@ -9,7 +9,7 @@ import org.junit.Test;
  * @author Felix Döring
  */
 
-public class MessageReclaimTest extends AbstractIntegrationTests {
+public class MessageReclaimTests extends AbstractIntegrationTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyReclaimLink() {

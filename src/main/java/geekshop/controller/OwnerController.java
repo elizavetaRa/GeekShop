@@ -30,8 +30,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -303,7 +301,7 @@ class OwnerController {
      * @param msgId the Id of the Message
      * @return
      */
-    @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.POST)
+    @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.POST)
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId) {
 
         Set<ReclaimTupel> products = new HashSet<>();
@@ -329,7 +327,7 @@ class OwnerController {
      * @param accept boolean value if the reclaim is accepted
      * @return
      */
-    @RequestMapping(value = "/showreclaim/reclaim={rid}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.DELETE)
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
         messageRepo.delete(msgId);
         GSOrder order = orderRepo.findOne(reclaimId).get();
@@ -384,7 +382,7 @@ class OwnerController {
      */
     @RequestMapping("/jokes/{id}")
     public String showJoke(Model model, @PathVariable("id") Long id) {
-        Joke joke = jokeRepo.findJokeById(id);
+        Joke joke = jokeRepo.findById(id);
         model.addAttribute("joke", joke);
         return "editjoke";
     }
@@ -398,7 +396,7 @@ class OwnerController {
      */
     @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
     public String editJoke(@PathVariable("id") Long id, @RequestParam("jokeText") String jokeText) {
-        Joke joke = jokeRepo.findJokeById(id);
+        Joke joke = jokeRepo.findById(id);
         joke.setText(jokeText);
         jokeRepo.save(joke);
         return "redirect:/jokes";
@@ -412,7 +410,7 @@ class OwnerController {
      */
     @RequestMapping(value = "/jokes/{id}", method = RequestMethod.DELETE)
     public String deleteJoke(@PathVariable("id") Long id) {
-        Joke joke = jokeRepo.findJokeById(id);
+        Joke joke = jokeRepo.findById(id);
         Iterable<User> allUsers = userRepo.findAll();
         for (User user : allUsers) {
             List<Joke> recentJokes = user.getRecentJokes();
@@ -461,28 +459,6 @@ class OwnerController {
     public String deleteMessage(@PathVariable("id") Long id) {
         messageRepo.delete(id);
         return "redirect:/messages";
-    }
-
-    /**
-     * Converts the Birthday {@link java.lang.String} to {@link java.util.Date}.
-     *
-     * @param strDate the String which contains a Date
-     * @return {@link java.util.Date}
-     */
-
-    public static Date strToDate(String strDate) {
-        strDate = strDate.replace(".", " ");
-        strDate = strDate.replace("-", " ");
-        strDate = strDate.replace("/", " ");
-        Date date = null;
-        try {
-            date = new SimpleDateFormat("dd MM yyyy").parse(strDate);
-        } catch (ParseException e) {
-
-        }
-
-        return date;
-
     }
 
 
@@ -592,7 +568,7 @@ class OwnerController {
         GSProduct product = catalog.findOne(productIdentifier).get();
         product.setInRange(false);
         product.setSubCategory(null);
-        Quantity quantity = Units.of(-1L);
+        Quantity quantity = Units.ZERO;
         GSInventoryItem item = inventory.findByProductIdentifier(productIdentifier).get();
         item.setMinimalQuantity(quantity);
         item.decreaseQuantity(item.getQuantity());
@@ -648,6 +624,7 @@ class OwnerController {
         subCategoryRepo.save(subCategory_new);
 
         strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+        strPrice = strPrice.replaceAll(",", ".");
         float price = Float.parseFloat(strPrice);
 
         product.setSubCategory(subCategory_new);
@@ -702,22 +679,29 @@ class OwnerController {
     @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
     public String addProductToCatalog(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
                                       @RequestParam("subCategory") long subCategoryId,
-                                      @RequestParam("productNumber") int productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity) {
+                                      @RequestParam("productNumber") long productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity) {
 
 
         Quantity quantity = Units.of(lgquantity);
         Quantity minQuantity = Units.of(lgminQuantity);
+        boolean productNumberExists = false;
+        for (GSProduct products : catalog.findAll()){
+            if (products.getProductNumber() == productNumber){
+                productNumberExists = true;
+            }
+        }
 
-        SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
-        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
-        float price = Float.parseFloat(strPrice);
-        GSProduct product = new GSProduct(productNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
-        catalog.save(product);
-        subCategory.addProduct(product);
-        subCategoryRepo.save(subCategory);
-        GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
-        inventory.save(item);
-
+        if (productNumberExists == false) {
+            SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
+            strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
+            float price = Float.parseFloat(strPrice);
+            GSProduct product = new GSProduct(productNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
+            catalog.save(product);
+            subCategory.addProduct(product);
+            subCategoryRepo.save(subCategory);
+            GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
+            inventory.save(item);
+        }
         return "redirect:/range";
     }
 
@@ -750,10 +734,18 @@ class OwnerController {
 
         SuperCategory superCategory = superCategoryRepo.findByName(superCat);
 
-        superCategory.setName(name);
+        boolean exist = false;
+        for (SuperCategory superCategorys : superCategoryRepo.findAll()){
+            if (superCategory.getName().equals(name)){
+                exist = true;
+            }
+        }
 
-        superCategoryRepo.save(superCategory);
+        if (exist == false) {
+            superCategory.setName(name);
 
+            superCategoryRepo.save(superCategory);
+        }
         return "redirect:/range";
 
     }
@@ -778,8 +770,17 @@ class OwnerController {
     @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
     public String addSuperCategory(@RequestParam("name") String name) {
 
-        SuperCategory superCategory = new SuperCategory(name);
-        superCategoryRepo.save(superCategory);
+        boolean exist = false;
+        for (SuperCategory superCategory : superCategoryRepo.findAll()){
+            if (superCategory.getName().equals(name)){
+                exist = true;
+            }
+        }
+
+        if (exist == false) {
+            SuperCategory superCategory = new SuperCategory(name);
+            superCategoryRepo.save(superCategory);
+        }
 
         return "redirect:/range";
     }
@@ -816,17 +817,26 @@ class OwnerController {
         SuperCategory superCategory_new = superCategoryRepo.findByName(strSuperCat);
         SuperCategory superCategory_old = subCategory.getSuperCategory();
 
-        subCategory.setName(name);
-        subCategory.setSuperCategory(superCategory_new);
+        boolean exist = false;
+        for (SubCategory subCategorys : superCategory_new.getSubCategories()){
+            if (subCategorys.getName().equals(name)){
+                exist = true;
+            }
+        }
 
-        superCategory_new.addSubCategory(subCategory);
-        superCategory_old.getSubCategories().remove(subCategory);
+        if (exist == false) {
+            subCategory.setName(name);
+            subCategory.setSuperCategory(superCategory_new);
 
-        superCategoryRepo.save(superCategory_old);
-        superCategoryRepo.save(superCategory_new);
+            superCategory_new.addSubCategory(subCategory);
+            superCategory_old.getSubCategories().remove(subCategory);
+
+            superCategoryRepo.save(superCategory_old);
+            superCategoryRepo.save(superCategory_new);
 
 
-        subCategoryRepo.save(subCategory);
+            subCategoryRepo.save(subCategory);
+        }
 
         return "redirect:/range";
 
@@ -842,12 +852,21 @@ class OwnerController {
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
     public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat) {
 
-
         SuperCategory superCategory = superCategoryRepo.findByName(strSuperCat);
-        SubCategory subCategory = new SubCategory(name, superCategory);
-        superCategory.addSubCategory(subCategory);
-        subCategoryRepo.save(subCategory);
-        superCategoryRepo.save(superCategory);
+
+        boolean exist = false;
+        for (SubCategory subCategory : superCategory.getSubCategories()){
+            if (subCategory.getName().equals(name)){
+                exist = true;
+            }
+        }
+
+        if (exist == false) {
+            SubCategory subCategory = new SubCategory(name, superCategory);
+            superCategory.addSubCategory(subCategory);
+            subCategoryRepo.save(subCategory);
+            superCategoryRepo.save(superCategory);
+        }
 
 
         return "redirect:/range";

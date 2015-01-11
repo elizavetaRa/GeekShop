@@ -38,7 +38,7 @@
                             <td th:utext="${message.messageText}">Hans hat seine Daten geändert.</td>
                             <td style="width: 100px;">
                                 <form th:method="post" th:if="${message.messageKind == T(geekshop.model.MessageKind).RECLAIM}"
-                                      th:action="'/showreclaim/reclaim=' + ${message.reclaimId}">
+                                      th:action="'/showreclaim/' + ${message.reclaimId}">
                                     <input name="msgId" type="hidden" th:value="${message.id}"/>
                                     <button id="shwoReclaim" class="myButton">Ansehen</button>
                                 </form>

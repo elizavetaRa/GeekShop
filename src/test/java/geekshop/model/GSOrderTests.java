@@ -16,6 +16,7 @@ import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
 import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
@@ -37,11 +38,13 @@ public class GSOrderTests extends AbstractIntegrationTests {
     @Autowired
     private GSOrderRepository orderRepo;
     @Autowired
-    private UserRepository userRepo;
+    private UserAccountManager uam;
     @Autowired
     private Inventory<GSInventoryItem> inventory;
     @Autowired
     private SubCategoryRepository subCatRepo;
+    @Autowired
+    private SuperCategoryRepository superCatRepo;
     @Autowired
     private MessageRepository messageRepo;
     @Autowired
@@ -60,9 +63,13 @@ public class GSOrderTests extends AbstractIntegrationTests {
 
     @Before
     public void setUp() {
-        ua = userRepo.findAll().iterator().next().getUserAccount();
+        ua = uam.create("test", "test");
+        uam.save(ua);
 
-        SubCategory subCategory = subCatRepo.findAll().iterator().next();
+        SuperCategory superCategory = new SuperCategory("superCat");
+        superCatRepo.save(superCategory);
+        SubCategory subCategory = new SubCategory("subCat", superCategory);
+        subCatRepo.save(subCategory);
         GSProduct prod1 = new GSProduct(100, "test1", Money.of(CurrencyUnit.EUR, 1D), subCategory);
         GSProduct prod2 = new GSProduct(101, "test2", Money.of(CurrencyUnit.EUR, 2D), subCategory);
         GSProduct prod3 = new GSProduct(102, "test3", Money.of(CurrencyUnit.EUR, 3D), subCategory);

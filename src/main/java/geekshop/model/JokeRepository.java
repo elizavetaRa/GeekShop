@@ -11,6 +11,5 @@ import org.salespointframework.core.SalespointRepository;
 
 public interface JokeRepository extends SalespointRepository<Joke, Long> {
 
-    Joke findJokeById(Long id);
-
+    Joke findById(Long id);
 }

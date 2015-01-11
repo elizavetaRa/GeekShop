@@ -4,6 +4,9 @@ import org.salespointframework.useraccount.UserAccount;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,9 +27,7 @@ public class User {
     @OneToOne
     private UserAccount userAccount;
 
-    private String currentSessionId;
-
-    private Date birthday;
+    private Date dateOfBirth;
     private String phone;
     private String street;
     private String houseNr;
@@ -50,19 +51,19 @@ public class User {
     }
 
     /**
-     * Creates a new {@link User} with the given {@link UserAccount}, password, gender, birthday, {@link MaritalStatus},
+     * Creates a new {@link User} with the given {@link UserAccount}, password, gender, date of birth, {@link MaritalStatus},
      * phone number, street, house number, postcode and place where he lives.
      * {@link PasswordAttributes} are set by the given password.
      *
      * @param userAccount must not be {@literal null}.
      */
-    public User(UserAccount userAccount, String password, Gender gender, Date birthday,
+    public User(UserAccount userAccount, String password, Gender gender, Date dateOfBirth,
                 MaritalStatus maritalStatus, String phone,
                 String street, String houseNr, String postcode, String place) {
         Assert.notNull(userAccount, "UserAccount must not be null.");
         this.userAccount = userAccount;
         this.gender = gender;
-        this.birthday = birthday;
+        this.dateOfBirth = dateOfBirth;
         this.maritalStatus = maritalStatus;
         this.phone = phone;
         this.street = street;
@@ -81,20 +82,44 @@ public class User {
         return userAccount;
     }
 
-    public String getCurrentSessionId() {
-        return currentSessionId;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setCurrentSessionId(String currentSessionId) {
-        this.currentSessionId = currentSessionId;
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
-    public Date getBirthday() {
-        return birthday;
+    public String dateOfBirthToString() {
+        return new SimpleDateFormat("dd.MM.yyyy").format(dateOfBirth);
     }
 
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
+    /**
+     * Converts a proper {@link java.lang.String} to {@link java.util.Date}.
+     *
+     * @param strDate the String which contains a Date
+     * @return {@link java.util.Date}
+     */
+    public static Date strToDate(String strDate) {
+        strDate = strDate.replace(".", " ");
+        strDate = strDate.replace("-", " ");
+        strDate = strDate.replace("/", " ");
+        if (strDate.matches("\\d{1,2} \\d{1,2} \\d{2}")) { // if date of format "x(x) x(x) xx", complete year to format xxxx
+            String dayMonth = strDate.substring(0, strDate.lastIndexOf(' '));
+            String year = strDate.substring(dayMonth.length() + 1);
+            int yearPrefix = Calendar.getInstance().get(Calendar.YEAR) / 100; // e.g. 19 for 19xx, 20 for 20xx
+            if (Integer.parseInt(yearPrefix + year) >= Calendar.getInstance().get(Calendar.YEAR)) // let current year be 2015: 01..14 -> 2014, 15..99 -> 1915
+                yearPrefix--;
+            strDate = dayMonth + " " + yearPrefix + year;
+        }
+
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("dd MM yyyy").parse(strDate);
+        } catch (ParseException ignored) {
+        }
+
+        return date;
     }
 
     public String getPhone() {
@@ -163,7 +188,7 @@ public class User {
 
     /**
      * Adds a new {@link Joke} to the list of recent jokes shown to this user.
-     * <p>
+     * <p/>
      * Only the last five jokes are stored. If the given joke is already existing in list, the existing one will be removed.
      */
     public void addJoke(Joke joke) {
