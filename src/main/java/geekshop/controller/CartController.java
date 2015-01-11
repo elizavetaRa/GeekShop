@@ -52,17 +52,14 @@ class CartController {
     private final GSOrderRepository orderRepo;
 
 
-
-
-     /**
+    /**
      * Creates a new {@link CartController} with the given {@link Inventory, @link BusinessTime, @link Catalog, @link UserRepository, @link GSOrderRepository}.
      *
-     * @param inventory must not be {@literal null}.
-      * @param businessTime must not be {@literal null}.
-      * @param catalog must not be {@literal null}.
-      * @param userRepo must not be {@literal null}.
-      * @param orderRepo must not be {@literal null}.
-      *
+     * @param inventory    must not be {@literal null}.
+     * @param businessTime must not be {@literal null}.
+     * @param catalog      must not be {@literal null}.
+     * @param userRepo     must not be {@literal null}.
+     * @param orderRepo    must not be {@literal null}.
      */
     @Autowired
     public CartController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
@@ -179,7 +176,7 @@ class CartController {
     /**
      * Deletes every {@link CartItem} from {@link Cart} .
      *
-     * @param session must not be {@literal null}.
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      */
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
@@ -208,12 +205,11 @@ class CartController {
     }
 
 
-
     /**
      * Deletes {@link CartItem} from {@link Cart} .
      *
-     * @param identifier must not be {@literal null}.
-     * @param session must not be {@literal null}.
+     * @param identifier  must not be {@literal null}.
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      */
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
@@ -242,13 +238,12 @@ class CartController {
     }
 
 
-
     /**
      * Updates {@link CartItem} of {@link Cart} .
      *
-     * @param identifier must not be {@literal null}.
-     * @param quantity must not be {@literal null}.
-     * @param session must not be {@literal null}.
+     * @param identifier  must not be {@literal null}.
+     * @param quantity    must not be {@literal null}.
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      */
     @RequestMapping(value = "/updatecartitem/", method = RequestMethod.POST)
@@ -284,7 +279,6 @@ class CartController {
     }
 
 
-
     /**
      * Returns the overview of {@link Cart}.
      *
@@ -299,14 +293,10 @@ class CartController {
     }
 
 
-
-
-
     /**
      * Generates {@link PaymentMethod} from given {@link PaymentType}.
      */
-    public PaymentMethod strToPaymentMethod(String strPayment)
-    {
+    public PaymentMethod strToPaymentMethod(String strPayment) {
         //because of a bug in PaymentMethod class the way of generating is scheduled with set data
         PaymentMethod paymentMethod;
         LocalDateTime dateWritten = LocalDateTime.now();
@@ -350,9 +340,9 @@ class CartController {
      * Checks out the current state of the {@link Cart} and creates new GSOrder from {@link CartItem} Using a method parameter of type {@code Optional<UserAccount>}
      * annotated with {@link LoggedIn} you can access the {@link UserAccount} of the currently logged in user.
      *
-     * @param session must not be {@literal null}.
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
-     * @param model must not be {@literal null}.
+     * @param model       must not be {@literal null}.
      * @return
      */
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
@@ -387,6 +377,7 @@ class CartController {
         }).orElse("redirect:/cart");
 
     }
+
     /**
      * Returns a view of after buying.
      */
@@ -396,4 +387,5 @@ class CartController {
             return "redirect:/";
 
 
+    }
 }
