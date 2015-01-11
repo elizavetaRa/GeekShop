@@ -297,8 +297,9 @@ class OwnerController {
 
     /**
      * Shows an open {@link geekshop.model.GSOrder} with {@link geekshop.model.OrderType} RECLAIM.
+     *
      * @param reclaimId the OrderIdentifier from the Order
-     * @param msgId the Id of the Message
+     * @param msgId     the Id of the Message
      * @return
      */
     @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.POST)
@@ -322,9 +323,10 @@ class OwnerController {
     /**
      * Accepts or declines the open {@link geekshop.model.GSOrder} with {@link geekshop.model.OrderType} RECLAIM and close it.
      * Deletes the message.
+     *
      * @param reclaimId the OrderIdentifier from the Order
-     * @param msgId the Id of the Message
-     * @param accept boolean value if the reclaim is accepted
+     * @param msgId     the Id of the Message
+     * @param accept    boolean value if the reclaim is accepted
      * @return
      */
     @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.DELETE)
@@ -346,6 +348,7 @@ class OwnerController {
 
     /**
      * Shows all existing {@link geekshop.model.Joke}s.
+     *
      * @return
      */
     @RequestMapping("/jokes")
@@ -356,6 +359,7 @@ class OwnerController {
 
     /**
      * Shows editpage for new {@link geekshop.model.Joke}s.
+     *
      * @return
      */
     @RequestMapping("/newjoke")
@@ -365,18 +369,21 @@ class OwnerController {
 
     /**
      * Creates a new instance of {@link geekshop.model.Joke} and save it to the {@link geekshop.model.JokeRepository}.
+     *
      * @param text the text of the Joke
      * @return
      */
     @RequestMapping(value = "/newjoke", method = RequestMethod.POST)
     public String newJoke(@RequestParam("jokeText") String text) {
-        jokeRepo.save(new Joke(text));
+        if (!text.trim().isEmpty())
+            jokeRepo.save(new Joke(text));
         return "redirect:/jokes";
     }
 
 
     /**
      * Shows editpage for an existing {@link geekshop.model.Joke}.
+     *
      * @param id the Id of the Joke
      * @return
      */
@@ -390,21 +397,25 @@ class OwnerController {
 
     /**
      * Edits an existing {@link geekshop.model.Joke} and save it to the {@link geekshop.model.JokeRepository}.
-     * @param id the Id of the Joke
+     *
+     * @param id       the Id of the Joke
      * @param jokeText the text of the Joke
      * @return
      */
     @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
     public String editJoke(@PathVariable("id") Long id, @RequestParam("jokeText") String jokeText) {
-        Joke joke = jokeRepo.findById(id);
-        joke.setText(jokeText);
-        jokeRepo.save(joke);
+        if (!jokeText.trim().isEmpty()) {
+            Joke joke = jokeRepo.findById(id);
+            joke.setText(jokeText);
+            jokeRepo.save(joke);
+        }
         return "redirect:/jokes";
     }
 
 
     /**
      * Deletes an existing {@link geekshop.model.Joke} from the {@link geekshop.model.JokeRepository}.
+     *
      * @param id the Id of the Joke
      * @return
      */
@@ -425,6 +436,7 @@ class OwnerController {
 
     /**
      * Deletes all existing {@link geekshop.model.Joke}s.
+     *
      * @return
      */
     @RequestMapping(value = "/deljokes", method = RequestMethod.DELETE)
@@ -442,6 +454,7 @@ class OwnerController {
 
     /**
      * Shows all existing {@link geekshop.model.Message}s.
+     *
      * @return
      */
     @RequestMapping("/messages")
@@ -452,6 +465,7 @@ class OwnerController {
 
     /**
      * Deletes an existing {@link geekshop.model.Message} from the {@link geekshop.model.MessageRepository}.
+     *
      * @param id the Id of the Message
      * @return
      */
@@ -464,6 +478,7 @@ class OwnerController {
 
     /**
      * Shows all existing {@link geekshop.model.SuperCategory}s, {@link geekshop.model.SubCategory}s an {@link geekshop.model.GSProduct}s.
+     *
      * @param model
      * @return
      */
@@ -655,6 +670,7 @@ class OwnerController {
 
     /**
      * Shows Editpage to create new {@link geekshop.model.GSProduct}.
+     *
      * @return
      */
     @RequestMapping(value = "/range/addproduct")
@@ -685,8 +701,8 @@ class OwnerController {
         Quantity quantity = Units.of(lgquantity);
         Quantity minQuantity = Units.of(lgminQuantity);
         boolean productNumberExists = false;
-        for (GSProduct products : catalog.findAll()){
-            if (products.getProductNumber() == productNumber){
+        for (GSProduct products : catalog.findAll()) {
+            if (products.getProductNumber() == productNumber) {
                 productNumberExists = true;
             }
         }
@@ -708,6 +724,7 @@ class OwnerController {
 
     /**
      * Shows the Editpage for {@link geekshop.model.SuperCategory}s.
+     *
      * @param superCatName the name of the SuperCategory
      * @return
      */
@@ -725,7 +742,8 @@ class OwnerController {
 
     /**
      * Saves changes from a {@link geekshop.model.SuperCategory} to {@link geekshop.model.SuperCategoryRepository}.
-     * @param name the new name of the Supercategory
+     *
+     * @param name     the new name of the Supercategory
      * @param superCat the old name of the Supercategory
      * @return
      */
@@ -735,8 +753,8 @@ class OwnerController {
         SuperCategory superCategory = superCategoryRepo.findByName(superCat);
 
         boolean exist = false;
-        for (SuperCategory superCategorys : superCategoryRepo.findAll()){
-            if (superCategory.getName().equals(name)){
+        for (SuperCategory superCategorys : superCategoryRepo.findAll()) {
+            if (superCategory.getName().equals(name)) {
                 exist = true;
             }
         }
@@ -752,6 +770,7 @@ class OwnerController {
 
     /**
      * Shows Editpage to create new {@link geekshop.model.SuperCategory}.
+     *
      * @return
      */
     @RequestMapping(value = "/range/addsuper")
@@ -764,6 +783,7 @@ class OwnerController {
 
     /**
      * Creates a new instance of {@link geekshop.model.SuperCategory} an saves it to {@link geekshop.model.SuperCategoryRepository}.
+     *
      * @param name the name of the Supercategory
      * @return
      */
@@ -771,8 +791,8 @@ class OwnerController {
     public String addSuperCategory(@RequestParam("name") String name) {
 
         boolean exist = false;
-        for (SuperCategory superCategory : superCategoryRepo.findAll()){
-            if (superCategory.getName().equals(name)){
+        for (SuperCategory superCategory : superCategoryRepo.findAll()) {
+            if (superCategory.getName().equals(name)) {
                 exist = true;
             }
         }
@@ -788,6 +808,7 @@ class OwnerController {
 
     /**
      * Shows the Editpage for {@link geekshop.model.SubCategory}s.
+     *
      * @param subCatName the name of the Subcategory
      * @return
      */
@@ -805,8 +826,9 @@ class OwnerController {
 
     /**
      * Saves changes from a {@link geekshop.model.SubCategory} to {@link geekshop.model.SubCategoryRepository}.
-     * @param name the new name of the SubCategory
-     * @param subCat the old name of the SubCategory
+     *
+     * @param name        the new name of the SubCategory
+     * @param subCat      the old name of the SubCategory
      * @param strSuperCat the name of the (new) SuperCategory
      * @return
      */
@@ -818,8 +840,8 @@ class OwnerController {
         SuperCategory superCategory_old = subCategory.getSuperCategory();
 
         boolean exist = false;
-        for (SubCategory subCategorys : superCategory_new.getSubCategories()){
-            if (subCategorys.getName().equals(name)){
+        for (SubCategory subCategorys : superCategory_new.getSubCategories()) {
+            if (subCategorys.getName().equals(name)) {
                 exist = true;
             }
         }
@@ -845,7 +867,8 @@ class OwnerController {
 
     /**
      * Shows Editpage to create new {@link geekshop.model.SubCategory}.
-     * @param name the name of the SubCategory
+     *
+     * @param name        the name of the SubCategory
      * @param strSuperCat the name of the SuperCategory
      * @return
      */
@@ -855,8 +878,8 @@ class OwnerController {
         SuperCategory superCategory = superCategoryRepo.findByName(strSuperCat);
 
         boolean exist = false;
-        for (SubCategory subCategory : superCategory.getSubCategories()){
-            if (subCategory.getName().equals(name)){
+        for (SubCategory subCategory : superCategory.getSubCategories()) {
+            if (subCategory.getName().equals(name)) {
                 exist = true;
             }
         }
@@ -875,6 +898,7 @@ class OwnerController {
 
     /**
      * Creates a new instance of {@link geekshop.model.SubCategory} and saves it to {@link geekshop.model.SubCategoryRepository}.
+     *
      * @return
      */
     @RequestMapping(value = "/range/addsub")
