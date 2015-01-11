@@ -25,7 +25,7 @@
         <div id="content">
 
             <h3 id="content-title"
-                th:text="(${user} ? 'Profil von ' + ${user} : 'Angestellten hinzufügen')">Profil</h3>
+                th:text="(${personalDataForm.firstname} ? 'Profil von ' + ${personalDataForm.firstname} + ' ' + ${personalDataForm.lastname} : 'Angestellten hinzufügen')">Profil</h3>
 
             <div id="content-in">
 
@@ -59,8 +59,8 @@
                             <td>
                                 <p th:if="${!inEditingMode}" th:text="*{username}"></p>
                                 <input type="text" th:field="*{username}" th:if="${inEditingMode}" th:errorclass="fieldError"
-                                       size="30" required="required" th:disabled="${user}" th:title="!${user} ? 'Benuzername muss muss mind. drei Zeichen lang sein'"/>
-                                <input type="hidden" th:field="*{username}" th:if="${inEditingMode} and ${user}"/>
+                                       size="30" required="required" th:disabled="*{firstname}" th:title="!*{firstname} ? 'Benuzername muss muss mind. drei Zeichen lang sein'"/>
+                                <input type="hidden" th:field="*{username}" th:if="${inEditingMode} and *{firstname}"/>
                                 <p th:if="${#fields.hasErrors('username')}" class="errorMsg" th:errors="*{username}">Fehler</p>
                             </td>
 
@@ -166,7 +166,7 @@
 
                         </tr>
                     </table>
-                    <input name="uai" type="hidden" th:if="${user}" th:value="${user.userAccount.identifier}"/>
+                    <!--<input name="uai" type="hidden" th:if="${user}" th:value="${user.userAccount.identifier}"/>-->
                     <button type="submit" name="save" id="save" class="myButton" th:if="${inEditingMode}">Speichern</button>
                     <a th:href="${#strings.contains(#httpServletRequest.requestURI, '/changedata')} ? ${#strings.substringBefore(#httpServletRequest.requestURI, '/changedata')} : '/staff'" th:if="${inEditingMode}" class="myButton f-right">Zurück</a>
                 </form>

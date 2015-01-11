@@ -61,14 +61,20 @@
                 <form method="post" action="/adjustpw">
                     <table class="table-style01 t-left noborder">
                         <tr>
-                            <td style="width:30%"><label for="newPW">Neues Passwort:</label></td>
+                            <td style="width:30%;" th:styleappend="${newPWError} ? 'vertical-align:top'"><label for="newPW">Neues Passwort:</label></td>
                             <td>
-                                <input name="newPW" id="newPW" type="password" placeholder="Neues Passwort" required="required"/></td>
+                                <input name="newPW" id="newPW" type="password" th:value="${newPW} ? ${newPW}"
+                                       placeholder="Neues Passwort" required="required" th:classappend="${newPWError} ? 'fieldError'"/>
+                                <p th:if="${newPWError}" class="errorMsg" th:text="${newPWError}">Fehler</p>
+                            </td>
                         </tr>
                         <tr>
-                            <td><label for="retypePW">Neues Passwort wiederholen:</label></td>
-                            <td><input name="retypePW" id="retypePW" type="password"
-                                       placeholder="Neues Passwort wiederholen" required="required"/></td>
+                            <td th:styleappend="${retypePWError} ? 'vertical-align:top'"><label for="retypePW">Neues Passwort wiederholen:</label></td>
+                            <td>
+                                <input name="retypePW" id="retypePW" type="password" th:value="${retypePW} ? ${retypePW}"
+                                       placeholder="Neues Passwort wiederholen" required="required" th:classappend="${retypePWError} ? 'fieldError'"/>
+                                <p th:if="${retypePWError}" class="errorMsg" th:text="${retypePWError}">Fehler</p>
+                            </td>
                         </tr>
                     </table>
 

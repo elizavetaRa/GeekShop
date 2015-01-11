@@ -25,7 +25,7 @@
         <div id="content">
 
             <h3 id="content-title"
-                th:text="'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname}">Profil</h3>
+                th:text="'Profil von ' + ${fullname}">Profil</h3>
 
             <div id="content-in">
 
@@ -48,32 +48,42 @@
                     </li>
                 </ul>
 
-                <form method="post" th:action="${isOwnProfile ? '/changedownpw' : '/changedpw'}">
+                <form method="post" th:action="${#httpServletRequest.requestURI}">
                     <table class="table-style01 t-left noborder">
                         <tr th:if="${isOwnProfile}">
-                            <td><label for="oldPW">Altes Passwort:</label></td>
-                            <td><input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort" required="required"/></td>
-                        </tr>
-                        <tr>
-                            <td style="width:30%"><label for="newPW">Neues Passwort:</label></td>
+                            <td th:styleappend="${oldPWError} ? 'vertical-align:top'"><label for="oldPW">Altes Passwort:</label></td>
                             <td>
-                                <input name="newPW" id="newPW" type="password" placeholder="Neues Passwort" required="required"/></td>
+                                <input name="oldPW" id="oldPW" type="password" placeholder="Altes Passwort" th:value="${oldPW} ? ${oldPW}"
+                                       required="required" th:classappend="${oldPWError} ? 'fieldError'"/>
+
+                                <p th:if="${oldPWError}" class="errorMsg" th:text="${oldPWError}">Fehler</p>
+                            </td>
                         </tr>
                         <tr>
-                            <td><label for="retypePW">Neues Passwort wiederholen:</label></td>
-                            <td><input name="retypePW" id="retypePW" type="password"
-                                       placeholder="Neues Passwort wiederholen" required="required"/></td>
+                            <td style="width:30%;" th:styleappend="${newPWError} ? 'vertical-align:top'"><label for="newPW">Neues Passwort:</label></td>
+                            <td>
+                                <input name="newPW" id="newPW" type="password" placeholder="Neues Passwort" th:value="${newPW} ? ${newPW}"
+                                       required="required" th:classappend="${newPWError} ? 'fieldError'"/>
+
+                                <p th:if="${newPWError}" class="errorMsg" th:text="${newPWError}">Fehler</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td th:styleappend="${retypePWError} ? 'vertical-align:top'"><label for="retypePW">Neues Passwort wiederholen:</label></td>
+                            <td>
+                                <input name="retypePW" id="retypePW" type="password" placeholder="Neues Passwort wiederholen"
+                                       th:value="${retypePW} ? ${retypePW}" required="required" th:classappend="${retypePWError} ? 'fieldError'"/>
+
+                                <p th:if="${retypePWError}" class="errorMsg" th:text="${retypePWError}">Fehler</p>
+                            </td>
                         </tr>
                     </table>
-
-                    <input name="uai" id="uai" type="hidden" th:if="${!isOwnProfile}"
-                           th:value="${user.userAccount.identifier}"/>
 
                     <p>
                         <button type="submit" name="submit" class="myButton" th:value="#{profil.changePW.submit}"
                                 value="Passwort speichern">Passwort speichern
                         </button>
-                        <a th:href="(${isOwnProfile} ? '/profile' : '/staff/' + ${user.userAccount.identifier})"
+                        <a th:href="${#strings.substringBefore(#httpServletRequest.requestURI, '/changepw')}"
                            class="myButton f-right">Zurück</a>
                     </p>
                 </form>

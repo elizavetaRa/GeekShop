@@ -226,15 +226,15 @@ public class AccountControllerProfileTests extends AbstractWebIntegrationTests {
     @Test
     public void testChangedPW() {
         messageRepo.deleteAll();
-        controller.changedPW(model, " ", " ", employee.getUserAccount().getId());
+        controller.changedPW(model, employee.getUserAccount().getId(), " ", " ");
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
-        controller.changedPW(model, "!A2s3d4f", "!A2s3d4f5", employee.getUserAccount().getId());
+        controller.changedPW(model, employee.getUserAccount().getId(), "!A2s3d4f", "!A2s3d4f5");
         assertFalse(authManager.matches(new Password("!A2s3d4f"), employee.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
-        controller.changedPW(model, "1234", "1234", employee.getUserAccount().getId());
+        controller.changedPW(model, employee.getUserAccount().getId(), "1234", "1234");
         assertFalse(authManager.matches(new Password("1234"), employee.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
-        controller.changedPW(model, "!A2s3d4f", "!A2s3d4f", employee.getUserAccount().getId());
+        controller.changedPW(model, employee.getUserAccount().getId(), "!A2s3d4f", "!A2s3d4f");
         assertTrue(authManager.matches(new Password("!A2s3d4f"), employee.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), not(is(emptyIterable())));
     }
