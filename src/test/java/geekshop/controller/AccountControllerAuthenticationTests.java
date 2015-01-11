@@ -132,15 +132,18 @@ public class AccountControllerAuthenticationTests extends AbstractWebIntegration
         login("hans", "123");
         User hans = userRepo.findByUserAccount(authManager.getCurrentUser().get());
         messageRepo.deleteAll();
-        controller.adjustPW(model, " ", " ", Optional.of(hans.getUserAccount()));
+        assertEquals("adjustpw", controller.adjustPW(model, " ", " ", Optional.of(hans.getUserAccount())));
+        assertTrue(model.containsAttribute("newPWError"));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
-        controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f5", Optional.of(hans.getUserAccount()));
+        assertEquals("adjustpw", controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f5", Optional.of(hans.getUserAccount())));
+        assertTrue(model.containsAttribute("retypePWError"));
         assertFalse(authManager.matches(new Password("!A2s3d4f"), hans.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
-        controller.adjustPW(model, "123", "1234", Optional.of(hans.getUserAccount()));
+        assertEquals("adjustpw", controller.adjustPW(model, "1234", "1234", Optional.of(hans.getUserAccount())));
+        assertTrue(model.containsAttribute("newPWError"));
         assertFalse(authManager.matches(new Password("1234"), hans.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), is(emptyIterable()));
-        controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f", Optional.of(hans.getUserAccount()));
+        assertEquals("redirect:/", controller.adjustPW(model, "!A2s3d4f", "!A2s3d4f", Optional.of(hans.getUserAccount())));
         assertTrue(authManager.matches(new Password("!A2s3d4f"), hans.getUserAccount().getPassword()));
         assertThat(messageRepo.findByMessageKind(MessageKind.NOTIFICATION), not(is(emptyIterable())));
     }
