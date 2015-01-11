@@ -212,8 +212,8 @@ class AccountController {
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
-    public String hire(Model model, @RequestParam Map<String, String> formData,
-                       @ModelAttribute("personalDataForm") @Valid PersonalDataForm personalDataForm, BindingResult result) {
+    public String hire(Model model, @ModelAttribute("personalDataForm") @Valid PersonalDataForm personalDataForm,
+                       BindingResult result) {
 
         if (personalDataForm.getUsername() != null && !personalDataForm.getUsername().isEmpty() && uam.findByUsername(personalDataForm.getUsername()).isPresent()) {
             result.addError(new FieldError("personalDataForm", "username", "Benutzername existiert bereits!"));
@@ -227,14 +227,14 @@ class AccountController {
         String password = passwordRules.generateRandomPassword();
         // create insecure password to force the new employee to change this initial password
         password = password.substring(0, passwordRules.getMinLength() - 1);
-        UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
-        ua.setFirstname(formData.get("firstname"));
-        ua.setLastname(formData.get("lastname"));
-        ua.setEmail(formData.get("email"));
+        UserAccount ua = uam.create(personalDataForm.getUsername(), password, new Role("ROLE_EMPLOYEE"));
+        ua.setFirstname(personalDataForm.getFirstname().trim());
+        ua.setLastname(personalDataForm.getLastname().trim());
+        ua.setEmail(personalDataForm.getEmail().trim());
 
-        User user = new User(ua, password, Gender.valueOf(formData.get("gender")), User.strToDate(formData.get("dateOfBirth")),
-                MaritalStatus.valueOf(formData.get("maritalStatus")), formData.get("phone"), formData.get("street"),
-                formData.get("houseNr"), formData.get("postcode"), formData.get("place"));
+        User user = new User(ua, password, personalDataForm.getGender(), User.strToDate(personalDataForm.getDateOfBirth().trim()),
+                personalDataForm.getMaritalStatus(), personalDataForm.getPhone().trim(), personalDataForm.getStreet().trim(),
+                personalDataForm.getHouseNr().trim(), personalDataForm.getPostcode().trim(), personalDataForm.getPlace().trim());
 
         uam.save(ua);
         userRepo.save(user);
@@ -242,7 +242,7 @@ class AccountController {
         String messageText = "Startpasswort des neuen Angestellten " + user + ": " + password;
         messageRepo.save(new Message(MessageKind.NOTIFICATION, messageText));
 
-        return "redirect:/staff";
+        return "redirect:/staff/" + ua.getId();
     }
 
     /**
@@ -536,17 +536,17 @@ class AccountController {
      * Does the real work by changing the user's personal data with the given {@link PersonalDataForm}.
      */
     private void changeData(User user, PersonalDataForm pdf) {
-        user.getUserAccount().setFirstname(pdf.getFirstname());
-        user.getUserAccount().setLastname(pdf.getLastname());
-        user.getUserAccount().setEmail(pdf.getEmail());
+        user.getUserAccount().setFirstname(pdf.getFirstname().trim());
+        user.getUserAccount().setLastname(pdf.getLastname().trim());
+        user.getUserAccount().setEmail(pdf.getEmail().trim());
         user.setGender(pdf.getGender());
-        user.setDateOfBirth(User.strToDate(pdf.getDateOfBirth()));
+        user.setDateOfBirth(User.strToDate(pdf.getDateOfBirth().trim()));
         user.setMaritalStatus(pdf.getMaritalStatus());
-        user.setPhone(pdf.getPhone());
-        user.setStreet(pdf.getStreet());
-        user.setHouseNr(pdf.getHouseNr());
-        user.setPostcode(pdf.getPostcode());
-        user.setPlace(pdf.getPlace());
+        user.setPhone(pdf.getPhone().trim());
+        user.setStreet(pdf.getStreet().trim());
+        user.setHouseNr(pdf.getHouseNr().trim());
+        user.setPostcode(pdf.getPostcode().trim());
+        user.setPlace(pdf.getPlace().trim());
     }
 
     /**

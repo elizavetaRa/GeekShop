@@ -34,7 +34,7 @@ public class PersonalDataForm {
     @NotNull(message = "Geschlecht nicht angegeben.")
     private Gender gender;
 
-    @NotBlank(message = "Geburtsdatum nicht angegeben.")
+    @NotEmpty(message = "Geburtsdatum nicht angegeben.")
     @DateOfBirth(message = "Ungültiges Datum angegeben.")
     private String dateOfBirth;
 
@@ -42,18 +42,18 @@ public class PersonalDataForm {
     private MaritalStatus maritalStatus;
 
     @NotNull(message = "Keine Telefonnummer angegeben.")
-    @Pattern(regexp = "\\(?(\\+\\s?\\d{2,4}\\s?)?\\d{2,8}\\s?[-/)]?\\s?\\d{3,10}", message = "Ungültige Telefonnummer.")
+    @Pattern(regexp = "\\s*(\\+?(\\d\\s?){2,6}[\\s-])?(\\(0\\)\\s?(\\d\\s?){2,5}|\\(?(\\d\\s?){3,6}\\)?)\\s?[-/]?\\s?(\\d[\\s-]?){5,11}\\s*", message = "Ungültige Telefonnummer.")
     private String phone;
 
     @NotBlank(message = "Keine Straße angegeben.")
     private String street;
 
-//    @NotNull(message = "Keine Hausnummer angegeben.")
+    @NotNull(message = "Keine Hausnummer angegeben.")
     @Pattern(regexp = ".*\\d.*", message = "Ungültige Hausnummer angegeben.")
     private String houseNr;
 
     @NotNull(message = "Keine PLZ angegeben.")
-    @Pattern(regexp = "\\d{5}", message = "Ungültige PLZ angegeben.")
+    @Pattern(regexp = "\\s*\\d{5}\\s*", message = "Ungültige PLZ angegeben.")
     private String postcode;
 
     @NotBlank(message = "Kein Wohnort angegeben.")

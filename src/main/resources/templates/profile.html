@@ -25,7 +25,7 @@
         <div id="content">
 
             <h3 id="content-title"
-                th:text="(${user} ? 'Profil von ' + ${user.userAccount.firstname} + ' ' + ${user.userAccount.lastname} : 'Angestellten hinzufügen')">Profil</h3>
+                th:text="(${user} ? 'Profil von ' + ${user} : 'Angestellten hinzufügen')">Profil</h3>
 
             <div id="content-in">
 
@@ -59,7 +59,7 @@
                             <td>
                                 <p th:if="${!inEditingMode}" th:text="*{username}"></p>
                                 <input type="text" th:field="*{username}" th:if="${inEditingMode}" th:errorclass="fieldError"
-                                       size="30" required="required" th:disabled="${user}"/>
+                                       size="30" required="required" th:disabled="${user}" th:title="!${user} ? 'Benuzername muss muss mind. drei Zeichen lang sein'"/>
                                 <input type="hidden" th:field="*{username}" th:if="${inEditingMode} and ${user}"/>
                                 <p th:if="${#fields.hasErrors('username')}" class="errorMsg" th:errors="*{username}">Fehler</p>
                             </td>
@@ -93,7 +93,8 @@
                             </td>
                             <td>
                                 <p th:if="${!inEditingMode}" th:text="*{dateOfBirth}"></p>
-                                <input type="text" th:field="*{dateOfBirth}" th:if="${inEditingMode}" th:errorclass="fieldError" required="required"/>
+                                <input type="text" th:field="*{dateOfBirth}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       required="required" title="Geben Sie das Datum in der Form TT.MM.JJJJ an"/>
                                 <p th:if="${#fields.hasErrors('dateOfBirth')}" class="errorMsg" th:errors="*{dateOfBirth}">Fehler</p>
                             </td>
                         </tr>
