@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -48,9 +49,27 @@ class CartController {
     private final UserRepository userRepo;
     private final GSOrderRepository orderRepo;
 
+
+
+
+     /**
+     * Creates a new {@link CartController} with the given {@link Inventory, @link BusinessTime, @link Catalog, @link UserRepository, @link GSOrderRepository}.
+     *
+     * @param inventory must not be {@literal null}.
+      * @param businessTime must not be {@literal null}.
+      * @param catalog must not be {@literal null}.
+      * @param userRepo must not be {@literal null}.
+      * @param orderRepo must not be {@literal null}.
+      *
+     */
     @Autowired
     public CartController(Inventory<GSInventoryItem> inventory, BusinessTime businessTime, Catalog<GSProduct> catalog, UserRepository userRepo, GSOrderRepository orderRepo) {
 
+        Assert.notNull(inventory, "inventory must not be null!");
+        Assert.notNull(businessTime, "businessTime must not be null!");
+        Assert.notNull(catalog, "catalog must not be null!");
+        Assert.notNull(userRepo, "userRepo must not be null!");
+        Assert.notNull(orderRepo, "orderRepo must not be null!");
         this.inventory = inventory;
         this.businessTime = businessTime;
         this.catalog = catalog;
@@ -71,6 +90,9 @@ class CartController {
     }
 
 
+    /**
+     * Returns current state of {@link Cart}.
+     */
     @RequestMapping("/cart")
     public String cart(Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -82,27 +104,32 @@ class CartController {
     }
 
 
+    /**
+     * Adds a {@link Product} to the {@link Cart}. If the identifier provided is
+     * invalid (invalid format or no {@link Product} with the id found), {@literal null} will be handed into the method.
+     *
+     * @param product
+     * @param number
+     * @param session
+     * @param model
+     */
     @RequestMapping(value = "/cart", method = RequestMethod.POST)
-
     public String addProductToCart(@RequestParam("pid") Product product, @RequestParam("number") long number, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
         if ((boolean) session.getAttribute("isReclaim"))
             session.setAttribute("isReclaim", false);
-
+        //checks if number of products is given in correct way
         if (number <= 0) {
-           /* number = 1;*/
             return "redirect:/productsearch";
         }
+        //if number is bigger then number of products in inventoryItem, puts the number of products in inventory
         if (number > inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
         }
 
-        System.out.println("Anzahl Produkte vor dem hinzufügen zu Cart  " + inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact());
         CartItem item = cart.addOrUpdateItem(product, Units.of(number));
-        System.out.println("zu Cart hinzugefügt:  " + number);
-
         if (item.getQuantity().getAmount().intValueExact() >= inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()
                 ) {
             cart.removeItem(item.getIdentifier());
@@ -113,7 +140,12 @@ class CartController {
 
     }
 
-
+    /**
+     * Deletes every {@link CartItem} from {@link Cart} .
+     *
+     * @param session must not be {@literal null}.
+     * @param userAccount must not be {@literal null}.
+     */
     @RequestMapping(value = "/deleteallitems", method = RequestMethod.DELETE)
     public String deleteAll(@ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -127,6 +159,27 @@ class CartController {
         return "redirect:/cart";
     }
 
+
+    /**
+     * Returns a view of {@link Cart} after it´s emptiing.
+     */
+    @RequestMapping("/deleteallitems/")
+    public String deleteAll(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
+        return "cart";
+    }
+
+
+
+    /**
+     * Deletes {@link CartItem} from {@link Cart} .
+     *
+     * @param identifier must not be {@literal null}.
+     * @param session must not be {@literal null}.
+     * @param userAccount must not be {@literal null}.
+     */
     @RequestMapping(value = "/deletecartitem/", method = RequestMethod.POST)
     public String deleteCartItem(@RequestParam String identifier, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -141,6 +194,27 @@ class CartController {
         return "redirect:/cart";
     }
 
+    /**
+     * Returns a view of {@link Cart} after deleting of {@link CartItem}.
+     */
+    @RequestMapping("/deletecartitem/")
+    public String deleteCartItem(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
+        return "cart";
+    }
+
+
+
+    /**
+     * Updates {@link CartItem} of {@link Cart} .
+     *
+     * @param identifier must not be {@literal null}.
+     * @param quantity must not be {@literal null}.
+     * @param session must not be {@literal null}.
+     * @param userAccount must not be {@literal null}.
+     */
     @RequestMapping(value = "/updatecartitem/", method = RequestMethod.POST)
     public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -162,15 +236,24 @@ class CartController {
         return "redirect:/cart";
     }
 
+    /**
+     * Returns a view of {@link Cart} after updating of {@link CartItem}.
+     */
+    @RequestMapping("/updatecartitem/")
+    public String updateCartItem(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
-//    @RequestMapping(value = "/cart", method = RequestMethod.GET)
-//    public String basket(@LoggedIn Optional<UserAccount> userAccount) {
-//        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-//            return "redirect:/";
-//
-//        return "cart";
-//    }
+        return "cart";
+    }
 
+
+
+    /**
+     * Returns the overview of {@link Cart}.
+     *
+     * @param userAccount must not be {@literal null}.
+     */
     @RequestMapping("/checkout")
     public String checkout(@LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -180,24 +263,16 @@ class CartController {
     }
 
 
-    //    @RequestMapping(value = "/chosepaymentmethod", method = RequestMethod.POST)
-    public PaymentMethod strToPaymentMethod(String strPayment)
-//                                            @RequestParam("accountname") String accountName,
-//                                            @RequestParam("accountnumber") String accountNumber,
-//                                            @RequestParam("chequenumber") String chequeNumber,
-//                                            @RequestParam("payee") String payee,
-//                                            @RequestParam("bankname") String bankName,
-//                                            @RequestParam("bankaddress") String bankAddress,
-//                                            @RequestParam("bankid") String bankIdentificationNumber,
-//                                            @RequestParam("cardname") String cardName,
-//                                            @RequestParam("cardassociationname") String cardAssociationName,
-//                                            @RequestParam("cardnumber") String cardNumber,
-//                                            @RequestParam("nameoncard") String nameOnCard,
-//                                            @RequestParam("billingadress") String billingAddress,
-//                                            @RequestParam("cardverificationcode") String cardVerificationCode) {
-    {
-        PaymentMethod paymentMethod;
 
+
+
+    /**
+     * Generates {@link PaymentMethod} from given {@link PaymentType}.
+     */
+    public PaymentMethod strToPaymentMethod(String strPayment)
+    {
+        //because of a bug in PaymentMethod class the way of generating is scheduled with set data
+        PaymentMethod paymentMethod;
         LocalDateTime dateWritten = LocalDateTime.now();
         LocalDateTime validFrom = LocalDateTime.parse("2013-12-18T14:30");
         LocalDateTime expiryDate = LocalDateTime.parse("2020-12-18T14:30");
@@ -205,7 +280,7 @@ class CartController {
         org.joda.money.Money creditLimit = org.joda.money.Money.of(CurrencyUnit.EUR, 1000);
         String p = " ";
         System.out.println(strPayment);
-
+        //compares given String with existing methods and generates an required paymentMethod
         if (strPayment.equals("CASH")) {
             paymentMethod = new Cash();
             return paymentMethod;
@@ -222,13 +297,10 @@ class CartController {
 
 
     /**
-     * Checks out the current state of the {@link Cart}. Using a method parameter of type {@code Optional<UserAccount>}
-     * annotated with {@link LoggedIn} you can access the {@link UserAccount} of the currently logged in user.
+     * Returns an overview of current order.
      *
      * @param userAccount must not be {@literal null}.
-     * @return
      */
-
     @RequestMapping("/orderoverview")
     public String orderoverview(@LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -238,8 +310,17 @@ class CartController {
     }
 
 
+    /**
+     * Checks out the current state of the {@link Cart} and creates new GSOrder from {@link CartItem} Using a method parameter of type {@code Optional<UserAccount>}
+     * annotated with {@link LoggedIn} you can access the {@link UserAccount} of the currently logged in user.
+     *
+     * @param session must not be {@literal null}.
+     * @param userAccount must not be {@literal null}.
+     * @param model must not be {@literal null}.
+     * @return
+     */
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
-    public String buy(@ModelAttribute Cart cart, HttpSession session, @RequestParam /*Map<String, String> map*/ String payment, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
+    public String buy(@ModelAttribute Cart cart, HttpSession session, @RequestParam String payment, @LoggedIn final Optional<UserAccount> userAccount, Model model) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -249,14 +330,12 @@ class CartController {
             GSOrder order = new GSOrder(userAccount.get(), paymentM);
 
             System.out.println(paymentM.toString());
-            // eigentlich cart.addItemsTo(order); Wir brauchen aber GSOrderLines!
 
             for (CartItem cartItem : cart) {
                 order.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
             }
 
             order.pay();
-            //  order.complete();
             orderRepo.save(order);
 
             cart.clear();
@@ -271,8 +350,16 @@ class CartController {
             return "orderoverview";
         }).orElse("redirect:/cart");
 
-
     }
+    /**
+     * Returns a view of after buying.
+     */
+    @RequestMapping("/buy")
+    public String buy(@LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
 
+        return "cart";
+    }
 
 }

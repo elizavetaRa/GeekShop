@@ -1,7 +1,9 @@
 package geekshop.model;
 
 /**
- * Created by Lisa on 19.12.2014.
+ * Enumeration representing the payment Method of {@link GSOrder}.
+ *
+ * @author Elizaveta Ragozina
  */
 public enum PaymentType {
     CASH("Barzahlung"), CREDITCARD("Kreditkarte"), CHEQUE("Lastschriftverfahren");
