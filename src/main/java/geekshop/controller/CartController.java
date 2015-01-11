@@ -386,6 +386,6 @@ class CartController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
-
+        return "redirect:/productsearch";
     }
 }
