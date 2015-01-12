@@ -37,8 +37,8 @@
                 <p class="submit">
                     <button type="submit" name="submit" th:value="#{index.form.login}" value="Login"><i class="icon-arrow-right icon-large"></i></button>
                 </p>
-                <p class="error" th:if="${param.error}">Benutzername oder Passwort falsch!</p>
-                <p class="info" th:if="${param.logout}">Sie haben sich erfolgreich abgemeldet!</p>
+                <p class="loginError" th:if="${param.error}">Benutzername oder Passwort falsch!</p>
+                <p class="loginInfo" th:if="${param.logout}">Sie haben sich erfolgreich abgemeldet!</p>
             </form>
         </section>
     </div>

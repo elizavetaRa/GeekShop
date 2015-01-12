@@ -25,7 +25,7 @@
         <hr class="noscreen" />
 
         <!-- Slogan -->
-        <div id="slogan" th:text="${session.user} ? ${session.user.userAccount.firstname} + ' ' + ${session.user.userAccount.lastname} : 'SWT-Praktikum Gruppe 30'">SWT-Praktikum Gruppe 30</div>
+        <div id="slogan" th:text="${session.user} ? ${session.user} : 'SWT-Praktikum Gruppe 30'">SWT-Praktikum Gruppe 30</div>
         <hr class="noscreen" />
 
         <!-- Hidden navigation -->

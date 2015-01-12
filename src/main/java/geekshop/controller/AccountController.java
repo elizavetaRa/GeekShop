@@ -1,6 +1,8 @@
 package geekshop.controller;
 
 import geekshop.model.*;
+import geekshop.model.validation.PersonalDataForm;
+import geekshop.model.validation.SetRulesForm;
 import org.salespointframework.useraccount.*;
 import org.salespointframework.useraccount.web.LoggedIn;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +10,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -149,11 +151,17 @@ class AccountController {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
-        if (changePassword(model, user, newPW, retypePW)) {
+        if (!validateNewPW(model, newPW, retypePW)) {
+            model.addAttribute("newPW", newPW);
+            model.addAttribute("retypePW", retypePW);
+            model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
+            return "adjustpw";
+        } else {
+            changePassword(user, newPW);
             messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
-        }
 
-        return "redirect:/";
+            return "redirect:/";
+        }
     }
     //endregion
 
@@ -180,7 +188,13 @@ class AccountController {
     public String showEmployee(Model model, @PathVariable("uai") UserAccountIdentifier uai) {
         UserAccount userAccount = uam.get(uai).get();
         User user = userRepo.findByUserAccount(userAccount);
-        model.addAttribute("user", user);
+        model.addAttribute("personalDataForm",
+                new PersonalDataForm(
+                        user.getUserAccount().getFirstname(), user.getUserAccount().getLastname(),
+                        user.getUserAccount().getUsername(), user.getUserAccount().getEmail(),
+                        user.getGender(), user.dateOfBirthToString(), user.getMaritalStatus(), user.getPhone(),
+                        user.getStreet(), user.getHouseNr(), user.getPostcode(), user.getPlace())
+        );
         model.addAttribute("isOwnProfile", false);
         model.addAttribute("inEditingMode", false);
 
@@ -194,6 +208,7 @@ class AccountController {
     @RequestMapping("/addemployee")
     public String hire(Model model) {
         model.addAttribute("inEditingMode", true);
+        model.addAttribute("personalDataForm", new PersonalDataForm());
         return "profile";
     }
 
@@ -202,19 +217,29 @@ class AccountController {
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/addemployee", method = RequestMethod.POST)
-    public String hire(@RequestParam Map<String, String> formData) {
+    public String hire(Model model, @ModelAttribute("personalDataForm") @Valid PersonalDataForm personalDataForm,
+                       BindingResult result) {
+
+        if (personalDataForm.getUsername() != null && !personalDataForm.getUsername().isEmpty() && uam.findByUsername(personalDataForm.getUsername()).isPresent()) {
+            result.addError(new FieldError("personalDataForm", "username", "Benutzername existiert bereits!"));
+        }
+        if (result.hasErrors()) {
+            model.addAttribute("inEditingMode", true);
+            return "profile";
+        }
 
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         String password = passwordRules.generateRandomPassword();
-        password = password.substring(0, passwordRules.getMinLength() - 1); // create insecure password to force the new employee to change this initial password
-        UserAccount ua = uam.create(formData.get("username"), password, new Role("ROLE_EMPLOYEE"));
-        ua.setFirstname(formData.get("firstname"));
-        ua.setLastname(formData.get("lastname"));
-        ua.setEmail(formData.get("email"));
+        // create insecure password to force the new employee to change this initial password
+        password = password.substring(0, passwordRules.getMinLength() - 1);
+        UserAccount ua = uam.create(personalDataForm.getUsername(), password, new Role("ROLE_EMPLOYEE"));
+        ua.setFirstname(personalDataForm.getFirstname().trim());
+        ua.setLastname(personalDataForm.getLastname().trim());
+        ua.setEmail(personalDataForm.getEmail().trim());
 
-        User user = new User(ua, password, Gender.valueOf(formData.get("gender")), OwnerController.strToDate(formData.get("birthday")),
-                MaritalStatus.valueOf(formData.get("maritalStatus")), formData.get("phone"), formData.get("street"),
-                formData.get("houseNr"), formData.get("postcode"), formData.get("place"));
+        User user = new User(ua, password, personalDataForm.getGender(), User.strToDate(personalDataForm.getDateOfBirth().trim()),
+                personalDataForm.getMaritalStatus(), personalDataForm.getPhone().trim(), personalDataForm.getStreet().trim(),
+                personalDataForm.getHouseNr().trim(), personalDataForm.getPostcode().trim(), personalDataForm.getPlace().trim());
 
         uam.save(ua);
         userRepo.save(user);
@@ -222,7 +247,7 @@ class AccountController {
         String messageText = "Startpasswort des neuen Angestellten " + user + ": " + password;
         messageRepo.save(new Message(MessageKind.NOTIFICATION, messageText));
 
-        return "redirect:/staff";
+        return "redirect:/staff/" + ua.getId();
     }
 
     /**
@@ -232,8 +257,7 @@ class AccountController {
     @RequestMapping(value = "/staff/{uai}", method = RequestMethod.DELETE)
     public String fire(@PathVariable("uai") UserAccountIdentifier uai) {
         UserAccount userAccount = uam.get(uai).get();
-        Role role = new Role("ROLE_OWNER");
-        if (userAccount.hasRole(role)) {
+        if (userAccount.hasRole(new Role("ROLE_OWNER"))) {
             return "redirect:/staff";
         } else {
             dismiss(userRepo.findByUserAccount(userAccount));
@@ -262,21 +286,85 @@ class AccountController {
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping("/staff/{uai}/{page}")
-    public String profileChange(Model model, @PathVariable("uai") UserAccountIdentifier uai, @PathVariable("page") String page, @LoggedIn Optional<UserAccount> userAccount) {
+    public String profileChange(Model model, @PathVariable("uai") UserAccountIdentifier uai, @PathVariable("page") String page) {
+
         UserAccount ua = uam.get(uai).get();
         User user = userRepo.findByUserAccount(ua);
-        model.addAttribute("user", user);
 
-        if (page.equals("changedata")) {
-            model.addAttribute("isOwnProfile", false);
+        switch (page) {
+            case "changedata":
+                model.addAttribute("personalDataForm",
+                        new PersonalDataForm(
+                                user.getUserAccount().getFirstname(), user.getUserAccount().getLastname(),
+                                user.getUserAccount().getUsername(), user.getUserAccount().getEmail(),
+                                user.getGender(), user.dateOfBirthToString(), user.getMaritalStatus(), user.getPhone(),
+                                user.getStreet(), user.getHouseNr(), user.getPostcode(), user.getPlace())
+                );
+                model.addAttribute("isOwnProfile", false);
+                model.addAttribute("inEditingMode", true);
+
+                return "profile";
+
+            case "changepw":
+                model.addAttribute("fullname", user.toString());
+                model.addAttribute("isOwnProfile", false);
+                model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
+
+                return "changepw";
+
+            default:
+                return "redirect:/staff/" + uai;
+        }
+    }
+
+    /**
+     * Saves the new user data changed by the shop owner.
+     */
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping(value = "/staff/{uai}/changedata", method = RequestMethod.POST)
+    public String changedData(Model model, @PathVariable("uai") UserAccountIdentifier uai,
+                              @ModelAttribute("personalDataForm") @Valid PersonalDataForm personalDataForm, BindingResult result) {
+
+        UserAccount ua = uam.get(uai).get();
+        User user = userRepo.findByUserAccount(ua);
+
+        if (result.hasErrors()) {
+            model.addAttribute("personalDataForm", personalDataForm);
+            model.addAttribute("isOwnProfile", true);
             model.addAttribute("inEditingMode", true);
 
             return "profile";
-        } else { // password change
+        }
+
+        changeData(user, personalDataForm);
+
+        uam.save(ua);
+        userRepo.save(user);
+
+        return "redirect:/staff/" + uai;
+    }
+
+    /**
+     * Saves the new password of an employee changed by the shop owner.
+     */
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    @RequestMapping(value = "staff/{uai}/changepw", method = RequestMethod.POST)
+    public String changedPW(Model model, @PathVariable("uai") UserAccountIdentifier uai, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW) {
+
+        UserAccount ua = uam.get(uai).get();
+        User user = userRepo.findByUserAccount(ua);
+
+        if (!validateNewPW(model, newPW, retypePW)) {
+            model.addAttribute("fullname", user.toString());
+            model.addAttribute("newPW", newPW);
+            model.addAttribute("retypePW", retypePW);
             model.addAttribute("isOwnProfile", false);
             model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
-
             return "changepw";
+        } else {
+            changePassword(user, newPW);
+            messageRepo.save(new Message(MessageKind.NOTIFICATION, "Neues Passwort von Nutzer " + user + ": " + newPW));
+            return "redirect:/staff/" + uai;
         }
     }
     //endregion
@@ -291,6 +379,7 @@ class AccountController {
     public String setPWRules(Model model) {
 
         model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
+        model.addAttribute("setRulesForm", new SetRulesForm());
 
         return "setrules";
     }
@@ -300,15 +389,21 @@ class AccountController {
      */
     @PreAuthorize("hasRole('ROLE_OWNER')")
     @RequestMapping(value = "/setrules", method = RequestMethod.POST)
-    public String setPWRules(@RequestParam Map<String, String> map) {
+    public String setPWRules(Model model, @RequestParam Map<String, String> map,
+                             @ModelAttribute("setRulesForm") @Valid SetRulesForm setRulesForm, BindingResult result) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
+            return "setrules";
+        }
 
         int minLength = Integer.parseInt(map.get("minLength"));
+        if (minLength < 6)
+            minLength = 6;
+
         boolean upperLower = map.get("upperLower") != null && Boolean.parseBoolean(map.get("upperLower"));
         boolean digits = map.get("digits") != null && Boolean.parseBoolean(map.get("digits"));
         boolean specialChars = map.get("specialChars") != null && Boolean.parseBoolean(map.get("specialChars"));
-
-        if (minLength < 6)
-            minLength = 6;
 
         PasswordRules passwordRules = passRulesRepo.findOne("passwordRules").get();
         passwordRules.setUpperAndLowerNecessary(upperLower);
@@ -333,7 +428,13 @@ class AccountController {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
-        model.addAttribute("user", user);
+        model.addAttribute("personalDataForm",
+                new PersonalDataForm(
+                        user.getUserAccount().getFirstname(), user.getUserAccount().getLastname(),
+                        user.getUserAccount().getUsername(), user.getUserAccount().getEmail(),
+                        user.getGender(), user.dateOfBirthToString(), user.getMaritalStatus(), user.getPhone(),
+                        user.getStreet(), user.getHouseNr(), user.getPostcode(), user.getPlace())
+        );
         model.addAttribute("isOwnProfile", true);
         model.addAttribute("inEditingMode", false);
 
@@ -350,18 +451,108 @@ class AccountController {
 
         User user = userRepo.findByUserAccount(userAccount.get());
 
-        if (page.equals("changedata")) {
-            model.addAttribute("user", user);
+        switch (page) {
+            case "changedata":
+                model.addAttribute("personalDataForm",
+                        new PersonalDataForm(
+                                user.getUserAccount().getFirstname(), user.getUserAccount().getLastname(),
+                                user.getUserAccount().getUsername(), user.getUserAccount().getEmail(),
+                                user.getGender(), user.dateOfBirthToString(), user.getMaritalStatus(), user.getPhone(),
+                                user.getStreet(), user.getHouseNr(), user.getPostcode(), user.getPlace())
+                );
+                model.addAttribute("isOwnProfile", true);
+                model.addAttribute("inEditingMode", true);
+
+                return "profile";
+
+            case "changepw":
+                model.addAttribute("fullname", user.toString());
+                model.addAttribute("isOwnProfile", true);
+                model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
+
+                return "changepw";
+
+            default:
+                return "redirect:/profile";
+        }
+    }
+
+    /**
+     * Saves the new user data changed by the user himself. If the user is an employee, a message will be sent to the shop owner.
+     */
+    @RequestMapping(value = "/profile/changedata", method = RequestMethod.POST)
+    public String changedOwnData(Model model, HttpSession session, @LoggedIn Optional<UserAccount> userAccount,
+                                 @ModelAttribute("personalDataForm") @Valid PersonalDataForm personalDataForm, BindingResult result) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
+        UserAccount ua = userAccount.get();
+        User user = userRepo.findByUserAccount(ua);
+
+        if (result.hasErrors()) {
+            model.addAttribute("personalDataForm", personalDataForm);
             model.addAttribute("isOwnProfile", true);
             model.addAttribute("inEditingMode", true);
 
             return "profile";
-        } else { // password change
-            model.addAttribute("user", user);
+        }
+
+        changeData(user, personalDataForm);
+
+        uam.save(ua);
+        userRepo.save(user);
+
+        if (!userAccount.get().hasRole(new Role("ROLE_OWNER")))
+            messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat seine persönlichen Daten geändert."));
+
+        session.setAttribute("user", user);
+
+        return "redirect:/profile";
+    }
+
+    /**
+     * Saves the new password. If the password has been changed by an employee, a message will be sent to the shop owner.
+     */
+    @RequestMapping(value = "/profile/changepw", method = RequestMethod.POST)
+    public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
+        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
+            return "redirect:/";
+
+        User user = userRepo.findByUserAccount(userAccount.get());
+
+        boolean hasErrors = false;
+
+        if (oldPW.trim().isEmpty()) {
+            System.out.println("Passwort ist leer!");
+            model.addAttribute("oldPWError", "Altes Passwort ist leer.");
+            hasErrors = true;
+        } else if (!authManager.matches(new Password(oldPW), userAccount.get().getPassword())) {
+            System.out.println("Altes Passwort ist falsch!");
+            model.addAttribute("oldPWError", "Altes Passwort ist falsch.");
+            hasErrors = true;
+        }
+
+        if (!validateNewPW(model, newPW, retypePW)) {
+            hasErrors = true;
+        }
+
+        if (hasErrors) {
+            model.addAttribute("fullname", user.toString());
+            model.addAttribute("oldPW", oldPW);
+            model.addAttribute("newPW", newPW);
+            model.addAttribute("retypePW", retypePW);
             model.addAttribute("isOwnProfile", true);
             model.addAttribute("passwordRules", passRulesRepo.findOne("passwordRules").get());
-
             return "changepw";
+        } else {
+            changePassword(user, newPW);
+            if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
+                messageRepo.delete(messageRepo.findByMessageKind(MessageKind.PASSWORD));
+            } else {
+                messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+            }
+            return "redirect:/profile";
+
         }
     }
     //endregion
@@ -369,111 +560,59 @@ class AccountController {
     //region General account methods
 
     /**
-     * Saves the new user data changed by the shop owner or by the user himself. If the user changed his data, a message will be sent to the shop owner.
+     * Does the real work by changing the user's personal data with the given {@link PersonalDataForm}.
      */
-    @RequestMapping(value = "/changeddata", method = RequestMethod.POST)
-    public String changedData(@RequestParam Map<String, String> formData, @LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
-
-        String uai = formData.get("uai");
-        UserAccount ua = uam.findByUsername(uai).get();
-        User user = userRepo.findByUserAccount(ua);
-
-        ua.setFirstname(formData.get("firstname"));
-        ua.setLastname(formData.get("lastname"));
-        ua.setEmail(formData.get("email"));
-        user.setGender(Gender.valueOf(formData.get("gender")));
-        user.setBirthday(OwnerController.strToDate(formData.get("birthday")));
-        user.setMaritalStatus(MaritalStatus.valueOf(formData.get("maritalStatus")));
-        user.setPhone(formData.get("phone"));
-        user.setStreet(formData.get("street"));
-        user.setHouseNr(formData.get("houseNr"));
-        user.setPostcode(formData.get("postcode"));
-        user.setPlace(formData.get("place"));
-
-        uam.save(ua);
-        userRepo.save(user);
-
-        if (userAccount.get().equals(ua)) {
-            messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat seine persönlichen Daten geändert."));
-            return "redirect:/profile";
-        } else
-            return "redirect:/staff/" + uai;
+    private void changeData(User user, PersonalDataForm pdf) {
+        user.getUserAccount().setFirstname(pdf.getFirstname().trim());
+        user.getUserAccount().setLastname(pdf.getLastname().trim());
+        user.getUserAccount().setEmail(pdf.getEmail().trim());
+        user.setGender(pdf.getGender());
+        user.setDateOfBirth(User.strToDate(pdf.getDateOfBirth().trim()));
+        user.setMaritalStatus(pdf.getMaritalStatus());
+        user.setPhone(pdf.getPhone().trim());
+        user.setStreet(pdf.getStreet().trim());
+        user.setHouseNr(pdf.getHouseNr().trim());
+        user.setPostcode(pdf.getPostcode().trim());
+        user.setPlace(pdf.getPlace().trim());
     }
 
     /**
-     * Saves the new password. If the password has been changed by an employee, a message will be sent to the shop owner.
+     * Validates whether the given new password is not empty, is valid according to the current password rules
+     * and matches the given retyped password.
+     * @return {@literal true} if the new password is valid
      */
-    @RequestMapping(value = "/changedownpw", method = RequestMethod.POST)
-    public String changedOwnPW(Model model, @RequestParam("oldPW") String oldPW, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
+    private boolean validateNewPW(Model model, String newPW, String retypePW) {
+        boolean hasErrors = false;
 
-        User user = userRepo.findByUserAccount(userAccount.get());
-
-        if (oldPW.trim().isEmpty()) {
+        if (newPW.trim().isEmpty()) {
             System.out.println("Passwort ist leer!");
-            model.addAttribute("error", "Passwort ist leer!");
-        } else if (!authManager.matches(new Password(oldPW), userAccount.get().getPassword())) {
-            System.out.println("Altes Passwort ist falsch!");
-            model.addAttribute("error", "Altes Passwort ist falsch!");
-        } else {
-            changePassword(model, user, newPW, retypePW);
+            model.addAttribute("newPWError", "Neues Passwort ist leer.");
+            hasErrors = true;
+        } else if (!passRulesRepo.findOne("passwordRules").get().isValidPassword(newPW)) {
+            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
+            model.addAttribute("newPWError", "Neues Passwort entspricht nicht den Sicherheitsregeln.");
+            hasErrors = true;
+        }
 
-            if (userAccount.get().hasRole(new Role("ROLE_OWNER"))) {
-                messageRepo.delete(messageRepo.findByMessageKind(MessageKind.PASSWORD));
-            } else {
-                messageRepo.save(new Message(MessageKind.NOTIFICATION, user + " hat sein Passwort geändert."));
+        if (!newPW.trim().isEmpty()) {
+            if (retypePW.trim().isEmpty()) {
+                System.out.println("Geben Sie das neue Passwort nochmals ein!");
+                model.addAttribute("retypePWError", "Geben Sie das neue Passwort nochmals ein.");
+                hasErrors = true;
+            } else if (!newPW.equals(retypePW)) {
+                System.out.println("Passwörter stimmen nicht überein!");
+                model.addAttribute("retypePWError", "Passwörter stimmen nicht überein.");
+                hasErrors = true;
             }
         }
 
-        return "redirect:/profile";
-    }
-
-    /**
-     * Saves the new password of an employee changed by the shop owner.
-     */
-    @RequestMapping(value = "/changedpw", method = RequestMethod.POST)
-    public String changedPW(Model model, @RequestParam("newPW") String newPW, @RequestParam("retypePW") String retypePW, @RequestParam("uai") UserAccountIdentifier uai, @LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
-
-        UserAccount ua = uam.get(uai).get();
-        User user = userRepo.findByUserAccount(ua);
-
-        changePassword(model, user, newPW, retypePW);
-
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Neues Passwort von Nutzer " + user + ": " + newPW));
-
-        return "redirect:/staff/" + uai.toString();
+        return !hasErrors;
     }
 
     /**
      * Does the real work by changing the user's password and updating his {@link PasswordAttributes}.
      */
-    private boolean changePassword(Model model, User user, String newPW, String retypePW) {
-
-        if (newPW.trim().isEmpty()) {
-            System.out.println("Passwort ist leer!");
-            model.addAttribute("error", "Passwort ist leer!");
-
-            return false;
-        }
-
-        if (!newPW.equals(retypePW)) {
-            System.out.println("Passwörter stimmen nicht überein!");
-            model.addAttribute("error", "Passwörter stimmen nicht überein!");
-
-            return false;
-        }
-
-        if (!passRulesRepo.findOne("passwordRules").get().isValidPassword(newPW)) {
-            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
-            model.addAttribute("error", "Neues Passwort entspricht nicht den Sicherheitsregeln!");
-
-            return false;
-        }
+    private void changePassword(User user, String newPW) {
 
         uam.changePassword(user.getUserAccount(), newPW);
 
@@ -483,21 +622,17 @@ class AccountController {
         pwAttributes.setHasSpecialCharacters(PasswordRules.containsSpecialCharacters(newPW));
         pwAttributes.setLength(newPW.length());
         userRepo.save(user);
-
-        return true;
     }
 
     /**
-     * Does the real dismissal work by removing the employee role, disabling the user account and change the password to a random one.
-     * However, the {@link User} cannot be removed from {@link UserRepository} because the user is still present in orders so far.
+     * Does the real dismissal work by removing the employee role and disabling the user account.
+     * However, the {@link User} cannot be removed from {@link UserRepository} because the user could be still present in current orders.
      */
     private void dismiss(User user) {
         UserAccount userAccount = user.getUserAccount();
-//        userRepo.delete(user);
         userAccount.remove(new Role("ROLE_EMPLOYEE"));
-        uam.save(userAccount);
         uam.disable(userAccount.getIdentifier());
-        uam.changePassword(userAccount, passRulesRepo.findOne("passwordRules").get().generateRandomPassword());
+        uam.save(userAccount);
     }
 
     /**
