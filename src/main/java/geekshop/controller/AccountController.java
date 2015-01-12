@@ -221,7 +221,7 @@ class AccountController {
                        BindingResult result) {
 
         if (personalDataForm.getUsername() != null && !personalDataForm.getUsername().isEmpty() && uam.findByUsername(personalDataForm.getUsername()).isPresent()) {
-            result.addError(new FieldError("personalDataForm", "username", "Benutzername existiert bereits!"));
+            result.addError(new FieldError("personalDataForm", "username", "Benutzername existiert bereits."));
         }
         if (result.hasErrors()) {
             model.addAttribute("inEditingMode", true);
