@@ -71,7 +71,7 @@ public class AccountControllerProfileTests extends AbstractWebIntegrationTests {
 
         passwordRules = passRulesRepo.findOne("passwordRules").get();
 
-        request = new MockHttpServletRequest("POST", "/addemployee");
+        request = new MockHttpServletRequest("POST", "/profile/changedata");
         pdf = new PersonalDataForm();
         binder = new WebDataBinder(pdf);
         binder.setValidator(validator); // use the validator from the context

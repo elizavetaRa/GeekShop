@@ -2,7 +2,6 @@ package geekshop.model;
 
 import org.joda.money.Money;
 import org.joda.money.format.MoneyAmountStyle;
-import org.joda.money.format.MoneyFormatter;
 import org.joda.money.format.MoneyFormatterBuilder;
 import org.salespointframework.catalog.Product;
 import org.salespointframework.quantity.Units;
@@ -20,7 +19,7 @@ import javax.persistence.ManyToOne;
  */
 
 @Entity
-public class GSProduct extends Product{
+public class GSProduct extends Product {
 
     private long productNumber;
     @ManyToOne
@@ -39,7 +38,7 @@ public class GSProduct extends Product{
      * @param subCategory must not be {@literal null}.
      */
     public GSProduct(long productNumber, String name, Money price, SubCategory subCategory) {
-        super (name, price, Units.METRIC);
+        super(name, price, Units.METRIC);
         Assert.notNull(subCategory, "SubCategory must be not null.");
         this.productNumber = productNumber;
         this.subCategory = subCategory;
@@ -51,7 +50,7 @@ public class GSProduct extends Product{
         return subCategory;
     }
 
-    public void setSubCategory(SubCategory subCategory){
+    public void setSubCategory(SubCategory subCategory) {
         this.subCategory = subCategory;
     }
 
@@ -68,10 +67,21 @@ public class GSProduct extends Product{
     }
 
     /**
-     * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12,34 €}" is delivered.
+     * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12, 34 €}" is delivered.
      */
     public static String moneyToString(Money money) {
-        MoneyFormatter moneyFormatter = new MoneyFormatterBuilder().appendAmount(MoneyAmountStyle.ASCII_DECIMAL_COMMA_GROUP3_DOT).appendLiteral(" €").toFormatter();
-        return moneyFormatter.print(money);
+        return moneyToString(money, false);
+    }
+
+    /**
+     * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12, 34 €}" is delivered.
+     *
+     * @param withoutEuroSign indicates if set to {@literal true} that the euro sign has not to be appended.
+     */
+    public static String moneyToString(Money money, boolean withoutEuroSign) {
+        MoneyFormatterBuilder mfb = new MoneyFormatterBuilder().appendAmount(MoneyAmountStyle.ASCII_DECIMAL_COMMA_GROUP3_DOT);
+        if (!withoutEuroSign)
+            mfb.appendLiteral(" €");
+        return mfb.toFormatter().print(money);
     }
 }

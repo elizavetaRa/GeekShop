@@ -25,94 +25,85 @@
         <div id="content">
 
             <h3 id="content-title"
-                th:text="(${product} ? 'Artikel ' + ${product.name} + ' bearbeiten' : 'Artikel hinzufügen')">Artikel</h3>
+                th:text="(${productName} ? 'Artikel »' + ${productName} + '« bearbeiten' : 'Artikel hinzufügen')">Artikel</h3>
 
             <div id="content-in">
 
-                <form th:action="(${product} ? '/range/editproduct' : '/range/addproduct')" method="post">
+                <form th:action="${#httpServletRequest.requestURI}" method="post" th:object="${productForm}">
                     <table class="table-style01 t-left noborder">
                         <tr>
-                            <td>
-                                <label for="productName" class="highlight">Artikelbezeichnung:</label>
+                            <td style="width:50px;" th:styleappend="${#fields.hasErrors('name')} ? 'vertical-align:top'">
+                                <label th:for="'name'" class="highlight">Artikelbezeichnung:</label>
                             </td>
-                            <td th:with="productName = (${product} ? ${product.name})">
-                                <input name="productName" id="productName" type="text" size="30" maxlength="30"
-                                       value="Artikel" th:value="${productName}"
-                                       required="required"/>
+                            <td>
+                                <input type="text" th:field="*{name}" size="30" required="required" th:errorclass="fieldError"/>
+
+                                <p th:if="${#fields.hasErrors('name')}" class="errorMsg" th:errors="*{name}">Fehler</p>
                             </td>
 
-                            <td class="indent" th:rowspan="${isNew} ? '5' : '4'">
-                                <label for="subCategory" class="highlight">Kategorie:</label>
+                            <td class="indent" style="width:50px;" rowspan="5">
+                                <label th:for="'subCategory'" class="highlight">Kategorie:</label>
                             </td>
-                            <td th:with="subCategory = (${product} ? ${product.subCategory})" th:rowspan="${isNew} ? '5' : '4'">
-                                <select name="subCategory" id="subCategory" size="10" required="required">
+                            <td rowspan="5">
+                                <select name="subCategory" id="subCategory" size="10" required="required" th:errorclass="fieldError">
                                     <optgroup th:each="super : ${superCategories}" th:label="${super.name}">
                                         <option th:each="sub : ${super.subCategories}"
-                                                th:value="${sub.id}" th:text="${sub.name}"
-                                                th:selected="${sub == subCategory}"></option>
+                                                th:value="${sub.name}" th:text="${sub.name}"
+                                                th:selected="*{subCategory} == ${sub.name}"></option>
                                     </optgroup>
                                 </select>
-                            </td>
 
-                            <!--<td class="indent">-->
-                            <!--<label for="subCategory" class="highlight">Unterkategorie:</label>-->
-                            <!--</td>-->
-                            <!--<td th:with="subCategory = (${product} ? ${product.subCategory.name})">-->
-                            <!--<input name="subCategory" id="subCategory" type="text" size="30" maxlength="40"-->
-                            <!--value="Unterkategorie" th:value="${subCategory}"-->
-                            <!--required="required"/>-->
-                            <!--</td>-->
-                        </tr>
-
-                        <tr>
-                            <td>
-                                <label for="productNumber" class="highlight">Artikelnummer:</label>
-                            </td>
-                            <td th:with="productNumber = (${product} ? ${product.productNumber})">
-                                <input th:if="${isNew}" name="productNumber" id="productNumber" type="number" size="1"
-                                       maxlength="40"
-                                       value="1" min="0"
-                                       required="required" pattern="\d+"/>
-                                <p th:unless="${isNew}" th:text="${T(geekshop.model.GSOrder).longToString(productNumber)}">0</p>
+                                <p th:if="${#fields.hasErrors('subCategory')}" class="errorMsg" th:errors="*{subCategory}">Fehler</p>
                             </td>
                         </tr>
 
                         <tr>
-                            <td>
-                                <label for="price" class="highlight">Preis in Euro:</label>
+                            <td th:styleappend="${#fields.hasErrors('productNumber')} ? 'vertical-align:top'">
+                                <label th:for="'productNumber'" class="highlight">Artikelnummer:</label>
                             </td>
-                            <td th:with="price = (${product} ? ${product.moneyToString(product.getPrice())})">
-                                <input name="price" id="price" type="text" size="30" maxlength="30"
-                                       value="10" th:value="${price}"
-                                       th:disabled="${user}" pattern="^[0-9]+([.]?[0-9]{3})*[,]?[0-9]*\s?€"/>
+                            <td>
+                                <p th:unless="${isNew}" th:text="*{T(geekshop.model.GSOrder).longToString(productNumber)}">0</p>
+                                <input th:type="${isNew} ? 'number' : 'hidden'" th:field="*{productNumber}" size="2" value="1" min="1"
+                                       required="required" th:errorclass="fieldError"/>
+
+                                <p th:if="${#fields.hasErrors('productNumber')}" class="errorMsg" th:errors="*{productNumber}">Fehler</p>
                             </td>
                         </tr>
 
                         <tr>
-                            <td>
-                                <label for="minQuantity" class="highlight">Minimale Stückzahl im Lager:</label>
+                            <td th:styleappend="${#fields.hasErrors('price')} ? 'vertical-align:top'">
+                                <label th:for="'price'" class="highlight">Preis in Euro:</label>
                             </td>
-                            <td th:with="minQuantity = (${product} ? ${inventory.findByProduct(product).get().minimalQuantity.amount} : '1')">
-                                <input name="minQuantity" id="minQuantity" type="number" size="1" maxlength="40"
-                                       value="1" min="1" th:value="${minQuantity}"
-                                       required="required" pattern="\d+"/>
+                            <td>
+                                <input type="text" th:field="*{price}" size="30" required="required" th:errorclass="fieldError"/>
+                                <p th:if="${#fields.hasErrors('price')}" class="errorMsg" th:errors="*{price}">Fehler</p>
                             </td>
                         </tr>
 
-                        <tr >
-                            <td>
-                                <label for="quantity" class="highlight">Stückzahl:</label>
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('minQuantity')} ? 'vertical-align:top'">
+                                <label th:for="'minQuantity'" class="highlight">Minimale Stückzahl:</label>
                             </td>
-                            <td th:with="quantity = (${product} ? ${inventory.findByProduct(product).get().getQuantity().getAmount()} : '1')">
-                                <input name="quantity" id="quantity" type="number" size="1" maxlength="40"
-                                        value="1" min="0" th:value="${quantity}"
-                                       required="required" pattern="\d+"/>
+                            <td>
+                                <input type="number" th:field="*{minQuantity}" size="2"
+                                       required="required" th:errorclass="fieldError"/>
+                                <p th:if="${#fields.hasErrors('minQuantity')}" class="errorMsg" th:errors="*{minQuantity}">Fehler</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('quantity')} ? 'vertical-align:top'">
+                                <label th:for="'quantity'" class="highlight">Stückzahl:</label>
+                            </td>
+                            <td>
+                                <input type="number" th:field="*{quantity}" size="2"
+                                       required="required" th:errorclass="fieldError"/>
+                                <p th:if="${#fields.hasErrors('quantity')}" class="errorMsg" th:errors="*{quantity}">Fehler</p>
                             </td>
                         </tr>
                     </table>
-                    <input th:value="${product} ? ${product.identifier}" type="hidden" name="productId"/>
-                    <button type="submit" name="save" id="save" class="myButton">Speichern
-                    </button>
+                    <!--<input th:value="${product} ? ${product.identifier}" type="hidden" name="productId"/>-->
+                    <button type="submit" name="save" id="save" class="myButton">Speichern</button>
                     <a th:href="@{/range}" class="myButton f-right">Zurück</a>
                 </form>
 

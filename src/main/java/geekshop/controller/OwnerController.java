@@ -1,6 +1,8 @@
 package geekshop.controller;
 
 import geekshop.model.*;
+import geekshop.model.validation.ProductForm;
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
@@ -14,13 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.validation.Valid;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,8 +36,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-
-import static org.joda.money.CurrencyUnit.EUR;
 
 /**
  * A Spring MVC controller to manage the shop owner's functions.
@@ -598,61 +598,75 @@ class OwnerController {
      * @param productId the ProductIdentifier of the GSProduct to be edited
      * @return
      */
-    @RequestMapping(value = "/range/editproduct/{prodId}")
+    @RequestMapping("/range/editproduct/{prodId}")
     public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId) {
 
         GSProduct product = catalog.findOne(productId).get();
+        GSInventoryItem item = inventory.findByProduct(product).get();
 
+        model.addAttribute("productForm", new ProductForm(
+                product.getName(), String.valueOf(product.getProductNumber()), GSProduct.moneyToString(product.getPrice(), true),
+                String.valueOf(item.getMinimalQuantity().getAmount().longValue()), String.valueOf(item.getQuantity().getAmount().longValue()), product.getSubCategory().getName()
+        ));
+        model.addAttribute("productName", product.getName());
         model.addAttribute("superCategories", superCategoryRepo.findAll());
-        model.addAttribute("product", product);
-        model.addAttribute("inventory", inventory);
         model.addAttribute("isNew", false);
 
-        return "/editproduct";
+        return "editproduct";
 
     }
 
     /**
      * Save the changes on {@link geekshop.model.GSProduct} to {@link org.salespointframework.inventory.Inventory}.
      *
-     * @param productName   the name of the GSProduct
-     * @param strPrice      the String of the Price
-     * @param subCategoryId the Id of the Subcategory
-     * @param minQuantity   the minimum Quantity
-     * @param lgquantity    the existing Quantity
-     * @param productId     the ProductIdentifier of the GSProduct
+     * @param productId   the ProductIdentifier of the GSProduct
+     * @param productForm contains the form data
+     * @param result      the result of validation
      * @return
      */
-    @RequestMapping(value = "/range/editproduct", method = RequestMethod.POST)
-    public String editProduct(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
-                              @RequestParam("subCategory") long subCategoryId, @RequestParam("minQuantity") long minQuantity,
-                              @RequestParam("quantity") long lgquantity,
-                              @RequestParam("productId") ProductIdentifier productId) {
+    @RequestMapping(value = "/range/editproduct/{prodId}", method = RequestMethod.POST)
+    public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId,
+                              @ModelAttribute("productForm") @Valid ProductForm productForm, BindingResult result) {
 
         GSProduct product = catalog.findOne(productId).get();
 
-        SubCategory subCategory_new = subCategoryRepo.findById(subCategoryId);
+        for (GSProduct p : catalog.findAll()) {
+            if (!p.equals(product) && p.getProductNumber() == Long.parseLong(productForm.getProductNumber())) {
+                result.addError(new FieldError("productForm", "productNumber", "Diese Artikelnummer ist bereits vergeben."));
+                break;
+            }
+        }
+        if (result.hasErrors()) {
+            model.addAttribute("productForm", productForm);
+            model.addAttribute("productName", product.getName());
+            model.addAttribute("superCategories", superCategoryRepo.findAll());
+            model.addAttribute("isNew", false);
+            return "editproduct";
+        }
+
+        product.setName(productForm.getName());
+
+        SubCategory subCategory_new = subCategoryRepo.findByName(productForm.getSubCategory());
         SubCategory subCategory_old = product.getSubCategory();
         subCategory_old.getProducts().remove(product);
         subCategoryRepo.save(subCategory_old);
         subCategory_new.getProducts().add(product);
         subCategoryRepo.save(subCategory_new);
-
-        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
-        strPrice = strPrice.replaceAll("[.]", "");
-        strPrice = strPrice.replaceAll(",", ".");
-        float price = Float.parseFloat(strPrice);
-
         product.setSubCategory(subCategory_new);
-        product.setName(productName);
-        product.setPrice(Money.of(EUR, Math.round(price * 100) / 100.0));
+
+        String strPrice = productForm.getPrice();
+        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.lastIndexOf(" ") : strPrice.length());
+        strPrice = strPrice.replaceAll("\\.", "");
+        strPrice = strPrice.replaceAll(",", ".");
+        Money price = Money.of(CurrencyUnit.EUR, Double.parseDouble(strPrice));
+        product.setPrice(price);
 
         catalog.save(product);
 
         GSInventoryItem item = inventory.findByProductIdentifier(productId).get();
-        Quantity setQuantity = Units.of(lgquantity).subtract(item.getQuantity());
+        Quantity setQuantity = Units.of(Long.parseLong(productForm.getQuantity())).subtract(item.getQuantity());
         item.increaseQuantity(setQuantity);
-        item.setMinimalQuantity(Units.of(minQuantity));
+        item.setMinimalQuantity(Units.of(Long.parseLong(productForm.getMinQuantity())));
         inventory.save(item);
 
         if (!item.hasSufficientQuantity()) {
@@ -677,48 +691,55 @@ class OwnerController {
     @RequestMapping(value = "/range/addproduct")
     public String addProduct(Model model) {
 
+        model.addAttribute("productForm", new ProductForm());
         model.addAttribute("superCategories", superCategoryRepo.findAll());
         model.addAttribute("isNew", true);
 
-        return "/editproduct";
+        return "editproduct";
     }
 
     /**
      * Creates a new instance of {@link geekshop.model.GSProduct} and save it to {@link org.salespointframework.inventory.Inventory}.
      *
-     * @param productName   the name of the GSProduct
-     * @param strPrice      the String of the Price
-     * @param subCategoryId the Id of the Subcategory
-     * @param lgminQuantity the minimum Quantity
-     * @param lgquantity    the existing Quantity
+     * @param productForm contains the form data
+     * @param result      the result of validation
      * @return
      */
     @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
-    public String addProductToCatalog(@RequestParam("productName") String productName, @RequestParam("price") String strPrice,
-                                      @RequestParam("subCategory") long subCategoryId,
-                                      @RequestParam("productNumber") long productNumber, @RequestParam("quantity") long lgquantity, @RequestParam("minQuantity") long lgminQuantity) {
+    public String addProductToCatalog(Model model, @ModelAttribute("productForm") @Valid ProductForm productForm, BindingResult result) {
 
-
-        Quantity quantity = Units.of(lgquantity);
-        Quantity minQuantity = Units.of(lgminQuantity);
-        boolean productNumberExists = false;
-        for (GSProduct products : catalog.findAll()) {
-            if (products.getProductNumber() == productNumber) {
-                productNumberExists = true;
+        for (GSProduct p : catalog.findAll()) {
+            if (productForm.getProductNumber() != null && !productForm.getProductNumber().isEmpty() && p.getProductNumber() == Long.parseLong(productForm.getProductNumber())) {
+                result.addError(new FieldError("productForm", "productNumber", "Diese Artikelnummer ist bereits vergeben."));
+                break;
             }
         }
-
-        if (productNumberExists == false) {
-            SubCategory subCategory = subCategoryRepo.findById(subCategoryId);
-            strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.indexOf(" ") : strPrice.length());
-            float price = Float.parseFloat(strPrice);
-            GSProduct product = new GSProduct(productNumber, productName, Money.of(EUR, Math.round(price * 100) / 100.0), subCategory);
-            catalog.save(product);
-            subCategory.addProduct(product);
-            subCategoryRepo.save(subCategory);
-            GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
-            inventory.save(item);
+        if (result.hasErrors()) {
+            model.addAttribute("productForm", productForm);
+            model.addAttribute("superCategories", superCategoryRepo.findAll());
+            model.addAttribute("isNew", true);
+            return "editproduct";
         }
+
+
+        Quantity quantity = Units.of(Long.parseLong(productForm.getQuantity()));
+        Quantity minQuantity = Units.of(Long.parseLong(productForm.getMinQuantity()));
+
+        SubCategory subCategory = subCategoryRepo.findByName(productForm.getSubCategory());
+        String strPrice = productForm.getPrice();
+        strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.lastIndexOf(" ") : strPrice.length());
+        strPrice = strPrice.replaceAll("\\.", "");
+        strPrice = strPrice.replaceAll(",", ".");
+        Money price = Money.of(CurrencyUnit.EUR, Double.parseDouble(strPrice));
+        GSProduct product = new GSProduct(Long.parseLong(productForm.getProductNumber()), productForm.getName(), price, subCategory);
+        catalog.save(product);
+
+        subCategory.addProduct(product);
+        subCategoryRepo.save(subCategory);
+
+        GSInventoryItem item = new GSInventoryItem(product, quantity, minQuantity);
+        inventory.save(item);
+
         return "redirect:/range";
     }
 

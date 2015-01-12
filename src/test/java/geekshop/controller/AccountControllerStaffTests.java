@@ -47,7 +47,6 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
     private User employee;
     private PasswordRules passwordRules;
 
-    private MockHttpServletRequest request;
     private PersonalDataForm pdf;
     private WebDataBinder binder;
 
@@ -68,7 +67,6 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
 
         passwordRules = passRulesRepo.findOne("passwordRules").get();
 
-        request = new MockHttpServletRequest("POST", "/addemployee");
         pdf = new PersonalDataForm();
         binder = new WebDataBinder(pdf);
         binder.setValidator(validator); // use the validator from the context
@@ -124,6 +122,7 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
 
         messageRepo.delete(messageRepo.findByMessageKind(MessageKind.NOTIFICATION));
 
+        MockHttpServletRequest  request = new MockHttpServletRequest("POST", "/addemployee");
         request.addParameters(formData); // populate the request
         binder.bind(new MutablePropertyValues(request.getParameterMap())); // triggering validation
         binder.getValidator().validate(binder.getTarget(), binder.getBindingResult());
@@ -152,6 +151,7 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
 
         messageRepo.delete(messageRepo.findByMessageKind(MessageKind.NOTIFICATION));
 
+        MockHttpServletRequest  request = new MockHttpServletRequest("POST", "/addemployee");
         request.addParameters(formData); // populate the request
         binder.bind(new MutablePropertyValues(request.getParameterMap())); // triggering validation
         binder.getValidator().validate(binder.getTarget(), binder.getBindingResult());
@@ -237,6 +237,7 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
 
         messageRepo.delete(messageRepo.findByMessageKind(MessageKind.NOTIFICATION));
 
+        MockHttpServletRequest  request = new MockHttpServletRequest("POST", "/staff/" + uai + "/changedata");
         request.addParameters(formData); // populate the request
         binder.bind(new MutablePropertyValues(request.getParameterMap())); // triggering validation
         binder.getValidator().validate(binder.getTarget(), binder.getBindingResult());
