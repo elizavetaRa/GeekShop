@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
 
 import static org.junit.Assert.assertTrue;
 
@@ -22,15 +24,19 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
     @Autowired
     Catalog<GSProduct> catalog;
 
+    private Model model;
+
 
     @Before
     public void setUp() {
         login("owner", "123");
+
+        model = new ExtendedModelMap();
     }
 
     @Test
     public void addSuperCat() throws Exception {
-        controller.addSuperCategory("Test");
+        controller.addSuperCategory(model, "Test");
 
 
         assertTrue(testSuper("Test"));
@@ -44,9 +50,9 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
         String superCat = superCategory.getName();
         Long id = superCategory.getId();
 
-        controller.editSuper("newName", superCat);
+        controller.editSuper(model, superCat, "newName");
 
-        assertTrue(superCategoryRepo.findOne(id).get().getName() == "newName");
+        assertTrue(superCategoryRepo.findOne(id).get().getName().equals("newName"));
     }
 
 
@@ -62,7 +68,7 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
     @Test
     public void addSubCat() throws Exception {
         String superCategory = superCategoryRepo.findAll().iterator().next().getName();
-        controller.addSubCategory("Test", superCategory);
+        controller.addSubCategory(model, "Test", superCategory);
 
 
         assertTrue(testSub("Test"));
@@ -77,7 +83,7 @@ public class OwnerControllerRangeTests extends AbstractWebIntegrationTests {
         String subCat = subCategory.getName();
         Long id = subCategory.getId();
 
-        controller.editSub("newName", subCat, superCat);
+        controller.editSub(model, subCat, "newName", superCat);
 
         assertTrue(subCategoryRepo.findOne(id).get().getName() == "newName");
 

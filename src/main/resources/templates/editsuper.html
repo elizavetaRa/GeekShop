@@ -25,29 +25,27 @@
         <div id="content">
 
             <h3 id="content-title"
-                th:text="(${super} ? 'Kategorie ' + ${super.name} + ' bearbeiten' : 'Kategorie hinzufügen')">Kategorie</h3>
+                th:text="(${super} ? 'Kategorie „' + ${super.name} + '“ bearbeiten' : 'Kategorie hinzufügen')">Kategorie</h3>
 
             <div id="content-in">
 
-                <form th:action="(${super} ? '/range/editsuper' : '/range/addsuper')" method="post">
+                <form th:action="${#httpServletRequest.requestURI}" method="post">
                     <table class="table-style01 t-left noborder">
                         <tr>
-                            <td>
+                            <td style="width:40px;">
                                 <label for="name" class="highlight">Name:</label>
                             </td>
-                            <td th:with="name = (${super} ? ${super.name})">
-                                <p th:if="${!isNew}" th:text="${name}"></p>
+                            <td>
                                 <input name="name" id="name" type="text" size="30" maxlength="30"
-                                       value="Kategorie" th:value="${name}"
-                                       required="required"/>
+                                       th:value="${name}" required="required" th:classappend="${nameError} ? 'fieldError'"/>
+
+                                <p th:if="${nameError}" class="errorMsg" th:text="${nameError}">Fehler</p>
                             </td>
 
                         </tr>
 
                     </table>
-                    <input th:value="${super} ? ${super.name}" type="hidden" name="superCategory"/>
-                    <button type="submit" name="save" id="save" class="myButton">Speichern
-                    </button>
+                    <button type="submit" name="save" id="save" class="myButton">Speichern</button>
                     <a th:href="@{/range}" class="myButton f-right">Zurück</a>
                 </form>
 

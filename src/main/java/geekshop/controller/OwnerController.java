@@ -732,11 +732,14 @@ class OwnerController {
     @RequestMapping(value = "/range/editsuper/{super}")
     public String editSuperCategory(Model model, @PathVariable("super") String superCatName) {
 
+        if (superCategoryRepo.findByName(superCatName) == null)
+            return "redirect:/range";
+
         SuperCategory superCategory = superCategoryRepo.findByName(superCatName);
         model.addAttribute("super", superCategory);
-        model.addAttribute("isNew", false);
+        model.addAttribute("name", superCatName);
 
-        return "/editsuper";
+        return "editsuper";
 
     }
 
@@ -744,27 +747,35 @@ class OwnerController {
     /**
      * Saves changes from a {@link geekshop.model.SuperCategory} to {@link geekshop.model.SuperCategoryRepository}.
      *
-     * @param name     the new name of the Supercategory
-     * @param superCat the old name of the Supercategory
+     * @param superCatName the old name of the Supercategory
+     * @param name         the new name of the Supercategory
      * @return
      */
-    @RequestMapping(value = "/range/editsuper", method = RequestMethod.POST)
-    public String editSuper(@RequestParam("name") String name, @RequestParam("superCategory") String superCat) {
+    @RequestMapping(value = "/range/editsuper/{super}", method = RequestMethod.POST)
+    public String editSuper(Model model, @PathVariable("super") String superCatName, @RequestParam("name") String name) {
 
-        SuperCategory superCategory = superCategoryRepo.findByName(superCat);
+        if (superCategoryRepo.findByName(superCatName) == null)
+            return "redirect:/range";
 
-        boolean exist = false;
-        for (SuperCategory superCategorys : superCategoryRepo.findAll()) {
-            if (superCategory.getName().equals(name)) {
-                exist = true;
-            }
+        SuperCategory superCategory = superCategoryRepo.findByName(superCatName);
+
+        if (name == null || name.trim().isEmpty()) {
+            model.addAttribute("super", superCategory);
+            model.addAttribute("name", name);
+            model.addAttribute("nameError", "Der Name der Kategorie darf nicht leer sein.");
+            return "editsuper";
         }
 
-        if (exist == false) {
-            superCategory.setName(name);
-
-            superCategoryRepo.save(superCategory);
+        if (!superCatName.equals(name) && superCategoryRepo.findByName(name.trim()) != null) {
+            model.addAttribute("super", superCategory);
+            model.addAttribute("name", name);
+            model.addAttribute("nameError", "Dieser Name ist bereits vergeben.");
+            return "editsuper";
         }
+
+        superCategory.setName(name.trim());
+        superCategoryRepo.save(superCategory);
+
         return "redirect:/range";
 
     }
@@ -776,9 +787,7 @@ class OwnerController {
      */
     @RequestMapping(value = "/range/addsuper")
     public String addSuper(Model model) {
-
-        model.addAttribute("isNew", true);
-        return "/editsuper";
+        return "editsuper";
     }
 
 
@@ -789,19 +798,23 @@ class OwnerController {
      * @return
      */
     @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
-    public String addSuperCategory(@RequestParam("name") String name) {
+    public String addSuperCategory(Model model, @RequestParam("name") String name) {
 
-        boolean exist = false;
-        for (SuperCategory superCategory : superCategoryRepo.findAll()) {
-            if (superCategory.getName().equals(name)) {
-                exist = true;
-            }
+        if (name == null || name.trim().isEmpty()) {
+            model.addAttribute("name", name);
+            model.addAttribute("nameError", "Der Name der Kategorie darf nicht leer sein.");
+            return "editsuper";
         }
 
-        if (exist == false) {
-            SuperCategory superCategory = new SuperCategory(name);
-            superCategoryRepo.save(superCategory);
+        if (superCategoryRepo.findByName(name.trim()) != null) {
+            model.addAttribute("name", name);
+            model.addAttribute("nameError", "Diese Kategorie existiert bereits.");
+            return "editsuper";
         }
+
+        SuperCategory superCategory = new SuperCategory(name.trim());
+        superCategoryRepo.save(superCategory);
+
 
         return "redirect:/range";
     }
@@ -816,50 +829,72 @@ class OwnerController {
     @RequestMapping(value = "/range/editsub/{sub}")
     public String editSubCategory(Model model, @PathVariable("sub") String subCatName) {
 
+        if (subCategoryRepo.findByName(subCatName) == null)
+            return "redirect:/range";
+
         SubCategory subCategory = subCategoryRepo.findByName(subCatName);
         model.addAttribute("sub", subCategory);
+        model.addAttribute("superCategory", subCategory.getSuperCategory().getName());
+        model.addAttribute("name", subCatName);
         model.addAttribute("superCategories", superCategoryRepo.findAll());
-        model.addAttribute("isNew", false);
 
-        return "/editsub";
+        return "editsub";
 
     }
 
     /**
      * Saves changes from a {@link geekshop.model.SubCategory} to {@link geekshop.model.SubCategoryRepository}.
      *
+     * @param subCatName  the old name of the SubCategory
      * @param name        the new name of the SubCategory
-     * @param subCat      the old name of the SubCategory
      * @param strSuperCat the name of the (new) SuperCategory
      * @return
      */
-    @RequestMapping(value = "/range/editsub", method = RequestMethod.POST)
-    public String editSub(@RequestParam("name") String name, @RequestParam("subCategory") String subCat, @RequestParam("superCategory") String strSuperCat) {
+    @RequestMapping(value = "/range/editsub/{sub}", method = RequestMethod.POST)
+    public String editSub(Model model, @PathVariable("sub") String subCatName, @RequestParam("name") String name, @RequestParam(value = "superCategory", required = false) String strSuperCat) {
 
-        SubCategory subCategory = subCategoryRepo.findByName(subCat);
-        SuperCategory superCategory_new = superCategoryRepo.findByName(strSuperCat);
+        if (subCategoryRepo.findByName(subCatName) == null)
+            return "redirect:/range";
+
+        SubCategory subCategory = subCategoryRepo.findByName(subCatName);
+
+        boolean hasErrors = false;
+
+        if (strSuperCat == null || strSuperCat.trim().isEmpty()) {
+            model.addAttribute("superCatError", "Es wurde keine Oberkategorie ausgewählt.");
+            hasErrors = true;
+        }
+
+        if (name == null || name.trim().isEmpty()) {
+            model.addAttribute("nameError", "Der Name der Kategorie darf nicht leer sein.");
+            hasErrors = true;
+        } else if (!subCatName.equals(name.trim()) && subCategoryRepo.findByName(name.trim()) != null) {
+            model.addAttribute("nameError", "Dieser Name ist bereits vergeben.");
+            hasErrors = true;
+        }
+
+        if (hasErrors) {
+            model.addAttribute("sub", subCategory);
+            model.addAttribute("superCategory", strSuperCat);
+            model.addAttribute("name", name);
+            model.addAttribute("superCategories", superCategoryRepo.findAll());
+            return "editsub";
+        }
+
+        SuperCategory superCategory_new = superCategoryRepo.findByName(strSuperCat.trim());
         SuperCategory superCategory_old = subCategory.getSuperCategory();
 
-        boolean exist = false;
-        for (SubCategory subCategorys : superCategory_new.getSubCategories()) {
-            if (subCategorys.getName().equals(name)) {
-                exist = true;
-            }
-        }
+        subCategory.setName(name.trim());
+        subCategory.setSuperCategory(superCategory_new);
 
-        if (exist == false) {
-            subCategory.setName(name);
-            subCategory.setSuperCategory(superCategory_new);
+        superCategory_new.addSubCategory(subCategory);
+        superCategory_old.getSubCategories().remove(subCategory);
 
-            superCategory_new.addSubCategory(subCategory);
-            superCategory_old.getSubCategories().remove(subCategory);
-
-            superCategoryRepo.save(superCategory_old);
-            superCategoryRepo.save(superCategory_new);
+        superCategoryRepo.save(superCategory_old);
+        superCategoryRepo.save(superCategory_new);
 
 
-            subCategoryRepo.save(subCategory);
-        }
+        subCategoryRepo.save(subCategory);
 
         return "redirect:/range";
 
@@ -874,24 +909,36 @@ class OwnerController {
      * @return
      */
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
-    public String addSubCategory(@RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat) {
+    public String addSubCategory(Model model, @RequestParam("name") String name, @RequestParam(value = "superCategory", required = false) String strSuperCat) {
 
-        SuperCategory superCategory = superCategoryRepo.findByName(strSuperCat);
+        boolean hasErrors = false;
 
-        boolean exist = false;
-        for (SubCategory subCategory : superCategory.getSubCategories()) {
-            if (subCategory.getName().equals(name)) {
-                exist = true;
-            }
+        if (strSuperCat == null || strSuperCat.trim().isEmpty()) {
+            model.addAttribute("superCatError", "Es wurde keine Oberkategorie ausgewählt.");
+            hasErrors = true;
         }
 
-        if (exist == false) {
-            SubCategory subCategory = new SubCategory(name, superCategory);
-            superCategory.addSubCategory(subCategory);
-            subCategoryRepo.save(subCategory);
-            superCategoryRepo.save(superCategory);
+        if (name == null || name.trim().isEmpty()) {
+            model.addAttribute("nameError", "Der Name der Kategorie darf nicht leer sein.");
+            hasErrors = true;
+        } else if (subCategoryRepo.findByName(name.trim()) != null) {
+            model.addAttribute("nameError", "Diese Kategorie existiert bereits.");
+            hasErrors = true;
         }
 
+        if (hasErrors) {
+            model.addAttribute("superCategory", strSuperCat);
+            model.addAttribute("name", name);
+            model.addAttribute("superCategories", superCategoryRepo.findAll());
+            return "editsub";
+        }
+
+        SuperCategory superCategory = superCategoryRepo.findByName(strSuperCat.trim());
+
+        SubCategory subCategory = new SubCategory(name.trim(), superCategory);
+        superCategory.addSubCategory(subCategory);
+        subCategoryRepo.save(subCategory);
+        superCategoryRepo.save(superCategory);
 
         return "redirect:/range";
     }
@@ -906,8 +953,7 @@ class OwnerController {
     public String addSub(Model model) {
 
         model.addAttribute("superCategories", superCategoryRepo.findAll());
-        model.addAttribute("isNew", true);
-        return "/editsub";
+        return "editsub";
     }
 
 

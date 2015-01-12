@@ -25,37 +25,38 @@
         <div id="content">
 
             <h3 id="content-title"
-                th:text="(${sub} ? 'Unterkategorie ' + ${sub.name} + ' von ' + ${sub.getSuperCategory().name} + ' bearbeiten' : 'Unterkategorie hinzufügen')">Unterkategorie</h3>
+                th:text="(${sub} ? 'Unterkategorie „' + ${sub.name} + '“ von „' + ${sub.getSuperCategory().name} + '“ bearbeiten' : 'Unterkategorie hinzufügen')">
+                Unterkategorie</h3>
 
             <div id="content-in">
 
-                <form th:action="(${sub} ? '/range/editsub' : '/range/addsub')" method="post">
+                <form th:action="${#httpServletRequest.requestURI}" method="post">
                     <table class="table-style01 t-left noborder">
                         <tr>
-                            <td th:with="superCategory = (${sub} ? ${sub.getSuperCategory()})">
-                                <select name="superCategory" id="superCategory" size="10" required="required">
-                                    <option th:each="super : ${superCategories}"
-                                            th:value="${super.name}" th:text="${super.name}"
-                                            th:selected="${superCategory == super}"></option>
-                                </select>
-                            </td>
-                            <td>
+                            <td style="width:40px;">
                                 <label for="name" class="highlight">Name:</label>
                             </td>
-                            <td th:with="name = (${sub} ? ${sub.name})">
-                                <p th:if="${!isNew}" th:text="${name}"></p>
+                            <td>
                                 <input name="name" id="name" type="text" size="30" maxlength="30"
-                                       value="Kategorie" th:value="${name}"
-                                       required="required"/>
+                                       th:value="${name}" required="required" th:classappend="${nameError} ? 'fieldError'"/>
+
+                                <p th:if="${nameError}" class="errorMsg" th:text="${nameError}">Fehler</p>
                             </td>
-
-
+                            <td class="indent" style="width:40px;">
+                                <label for="superCategory" class="highlight">Oberkategorie:</label>
+                            </td>
+                            <td>
+                                <select name="superCategory" id="superCategory" size="10" required="required" th:classappend="${superCatError} ? 'fieldError'">
+                                    <option th:each="super : ${superCategories}"
+                                            th:value="${super.name}" th:text="${super.name}"
+                                            th:selected="${superCategory == super.name}"></option>
+                                </select>
+                                <p th:if="${superCatError}" class="errorMsg" th:text="${superCatError}">Fehler</p>
+                            </td>
                         </tr>
 
                     </table>
-                    <input th:value="${sub} ? ${sub.name}" type="hidden" name="subCategory"/>
-                    <button type="submit" name="save" id="save" class="myButton">Speichern
-                    </button>
+                    <button type="submit" name="save" id="save" class="myButton">Speichern</button>
                     <a th:href="@{/range}" class="myButton f-right">Zurück</a>
                 </form>
 

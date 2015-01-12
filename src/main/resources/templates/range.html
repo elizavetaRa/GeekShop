@@ -54,7 +54,7 @@
 
                     <tr th:each="sub : ${super.subCategories}">                     <!--Unterkategorie-->
 
-                        <td style="width:42px"></td>
+                        <td style="width:30px"></td>
                         <td bgcolor="#E5F4FA" class="t-left t-bold" colspan="5" th:text="${sub.name}">T-Shirts</td>
                         <td bgcolor="#E5F4FA" class="fitToContent">
                             <form th:action="@{/range/editsub/} + ${sub.name}">
