@@ -84,7 +84,7 @@
                             <td th:with="price = (${product} ? ${product.moneyToString(product.getPrice())})">
                                 <input name="price" id="price" type="text" size="30" maxlength="30"
                                        value="10" th:value="${price}"
-                                       th:disabled="${user}" pattern="\d+[.,]?\d*\s?€"/>
+                                       th:disabled="${user}" pattern="^[0-9]\d[.,]?\d*\s?€"/>
                             </td>
                         </tr>
 
