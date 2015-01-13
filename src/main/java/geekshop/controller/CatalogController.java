@@ -120,6 +120,12 @@ class CatalogController {
         return "productsearch";
     }
 
+    /**
+     * Searches the {@Link Catalog} for {@Link Product}s which contain the {@param searchTerm}, are in a {@Link SubCategory} which contains the
+     * {@param searchTerm} or are in a {@Link SuperCategory} which contains the {@param searchTerm}.
+     * Returns a Set with the {@Link Product}s matching the Criteria.
+     */
+
     private Set<GSProduct> search(String searchTerm) {
         Iterable<GSProduct> allProducts = findAllProducts();
         Set<GSProduct> foundProducts = new HashSet<GSProduct>();
@@ -137,6 +143,11 @@ class CatalogController {
         return foundProducts;
     }
 
+    /**
+     * Sorts a List of {@Link Product}s by Name.
+     * Returns a sorted Set of {@Link Product}s.
+     */
+
     private List<GSProduct> sortProductByName(Iterable<GSProduct> foundProducts) {
         List<GSProduct> sortedProducts = new LinkedList<>();
         for (GSProduct product : foundProducts) {
@@ -146,6 +157,10 @@ class CatalogController {
         return sortedProducts;
     }
 
+    /**
+     * Sorts a List of {@Link Product}s by ProductNumber.
+     * Returns a sorted Set of {@Link Product}s.
+     */
 
     private List<GSProduct> sortProductByProductNumber(Iterable<GSProduct> foundProducts) {
         List<GSProduct> sortedProducts = new LinkedList<>();
@@ -155,6 +170,11 @@ class CatalogController {
         Collections.sort(sortedProducts, (GSProduct a, GSProduct b) -> (Long.compare(a.getProductNumber(), b.getProductNumber())));
         return sortedProducts;
     }
+
+    /**
+     * Sorts a List of {@Link Product}s by Price.
+     * Returns a sorted Set of {@Link Product}s.
+     */
 
     private List<GSProduct> sortProductByPrice(Iterable<GSProduct> foundProducts, String direction) {
         List<GSProduct> sortedProducts = new LinkedList<>();
@@ -168,6 +188,9 @@ class CatalogController {
         return sortedProducts;
     }
 
+    /**
+     * Sorts the List of {@Link SubCategory} for a persistent display in the Frontend.
+     */
 
     private List<SubCategory> sortSubCategoryByName(Iterable<SubCategory> foundCategories) {
         List<SubCategory> sortedSubCategory = new LinkedList<>();
@@ -179,6 +202,10 @@ class CatalogController {
         return sortedSubCategory;
     }
 
+    /**
+     * Returns an Iterable with all {@Link Product}s in the {@Link Catalog} that are in Range.     *
+     */
+
     private Iterable<GSProduct> findAllProducts() {
         Collection<GSProduct> products = new HashSet<>();
         for (GSProduct p : catalog.findAll()) {
@@ -188,6 +215,9 @@ class CatalogController {
         return products;
     }
 
+    /**
+     * Returns a Set of all {@Link Product}s in the given {@param superCategory}
+     */
     private Set<GSProduct> getAllProductsInSuperCategory(SuperCategory superCategory) {
         List<SubCategory> temp = superCategory.getSubCategories();
         Set<GSProduct> products = new HashSet<GSProduct>();
