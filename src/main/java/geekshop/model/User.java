@@ -188,7 +188,7 @@ public class User {
 
     /**
      * Adds a new {@link Joke} to the list of recent jokes shown to this user.
-     * <p/>
+     * <p>
      * Only the last five jokes are stored. If the given joke is already existing in list, the existing one will be removed.
      */
     public void addJoke(Joke joke) {

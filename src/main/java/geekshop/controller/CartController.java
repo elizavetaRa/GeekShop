@@ -53,7 +53,7 @@ class CartController {
 
 
     /**
-     * Creates a new {@link CartController} with the given {@link Inventory, @link BusinessTime, @link Catalog, @link UserRepository, @link GSOrderRepository}.
+     * Creates a new {@link CartController} with the given {@link Inventory}, {@link BusinessTime}, {@link Catalog}, {@link UserRepository}, {@link GSOrderRepository}.
      *
      * @param inventory    must not be {@literal null}.
      * @param businessTime must not be {@literal null}.

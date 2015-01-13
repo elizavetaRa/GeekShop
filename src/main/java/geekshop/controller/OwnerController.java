@@ -129,7 +129,6 @@ class OwnerController {
      * Creates {@link geekshop.model.GSProductOrders} for
      * @param map the map with {@link geekshop.model.GSProduct} for which the {@link geekshop.model.GSProductOrders} should be created.
      * @param order the {@link geekshop.model.GSOrder} from which a {@link geekshop.model.GSOrderLine} should be added to {@link geekshop.model.GSProductOrders}.
-     * @return
      */
     private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
         LocalDateTime ldt = order.getDateCreated();    // date
@@ -151,7 +150,6 @@ class OwnerController {
     /**
      * Decides what the .xml should by sorted by.
      * @param sort the Object which the .xml should by sorted by.
-     * @return
      */
     @RequestMapping("/exportxml")
     public String exportXML(@RequestParam(value = "sort", required = false) String sort) {
@@ -168,7 +166,6 @@ class OwnerController {
 
     /**
      * Creates .xml sorted by {@link geekshop.model.GSProduct}.
-     * @return
      */
     public void createXMLSortedByProducts() {
         Map<GSProduct, GSProductOrders> map = putMap();
@@ -251,7 +248,6 @@ class OwnerController {
 
     /**
      * Creates .xml sorted by {@link geekshop.model.GSOrder}.
-     * @return
      */
     public void createXMLSortedByOrders() {
         TreeSet<GSOrder> orders = new TreeSet<>();

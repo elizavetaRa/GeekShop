@@ -57,7 +57,7 @@ public class SubCategory {
     }
 
     /**
-     * Adds a {@Link GSProduct} to the {@Link SubCategory}.
+     * Adds a {@link GSProduct} to the {@link SubCategory}.
      */
 
     public boolean addProduct(GSProduct product) {
