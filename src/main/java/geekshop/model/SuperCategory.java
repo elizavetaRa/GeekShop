@@ -48,6 +48,10 @@ public class SuperCategory {
         return subCategories;
     }
 
+    /**
+     * Adds a {@Link SubCategory} to the {@Link SuperCategory}.
+     */
+
     public boolean addSubCategory(SubCategory subCategory) {
         return subCategories.add(subCategory);
     }

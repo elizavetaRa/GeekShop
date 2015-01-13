@@ -56,6 +56,10 @@ public class SubCategory {
         return products;
     }
 
+    /**
+     * Adds a {@Link GSProduct} to the {@Link SubCategory}.
+     */
+
     public boolean addProduct(GSProduct product) {
         return products.add(product);
     }
