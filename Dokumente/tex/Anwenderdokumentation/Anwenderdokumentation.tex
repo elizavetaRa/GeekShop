@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{color}
 \usepackage{tabularx}
 \usepackage{graphicx}
 \usepackage{hyperref}
@@ -9,6 +10,12 @@
 \usepackage{booktabs,paralist}
 \usepackage{scrpage2,lastpage}
 \usepackage{menukeys}
+% Unserer Blau-Farbe definieren
+\definecolor{geekblue}{rgb}{0.01, 0.44, 0.99}
+% Farbe des Menus aendern
+\changemenucolor{gray}{bg}{named}{geekblue}
+\changemenucolor{gray}{br}{named}{geekblue}
+\changemenucolor{gray}{txt}{named}{white}
 %
 %
 %
@@ -40,7 +47,7 @@
 % Define \menusection
 %
 % Usage: \menusection{Number of Section}{Name of Section}
-\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}\menu{#2}\\[.5cm]}
+\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}{\Huge{\menu{\Large{#2}}}}\\[.5cm]}
 %
 %
 % Define \menusubdection
