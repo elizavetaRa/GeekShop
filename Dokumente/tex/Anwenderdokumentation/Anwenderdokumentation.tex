@@ -47,19 +47,19 @@
 % Define \menusection
 %
 % Usage: \menusection{Number of Section}{Name of Section}
-\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}{\Huge{\menu{\Large{#2}}}}\\[.5cm]}
+\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}{\Huge{\menu{#2}}}\\[.5cm]}
 %
 %
 % Define \menusubdection
 %
 % Usage: \menusubdection{Number of Subsection}{Name of Subection}
-\def\menusubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsection}{\protect\numberline{\getnumber.#1} #2}\setsubnumber{#1}\setsubsection{#2}\menu{\getsection > #2}\\[.5cm]}
+\def\menusubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsection}{\protect\numberline{\getnumber.#1} #2}\setsubnumber{#1}\setsubsection{#2}{\Large{\menu{\getsection > #2}}}\\[.5cm]}
 %
 %
 % Define \menusubsubsection
 %
 % Usage: \menusubsubsection{Number of Subsubsection}{Name of Subsubsection}
-\def\menusubsubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsubsection}{\protect\numberline{\getnumber.\getsubnumber.#1} #2}\menu{\getsection > \getsubsection > #2}\\[.5cm]}
+\def\menusubsubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsubsection}{\protect\numberline{\getnumber.\getsubnumber.#1} #2}{\Large{\menu{\getsection > \getsubsection > #2}}}\\[.5cm]}
 %
 % Ja, ich habe mich hingesetzt un all die Commands abgekuerzt... Hat mich auch nur 3 Stunden gekostet... Felix
 
