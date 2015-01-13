@@ -1,0 +1,116 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+\usepackage{menukeys}
+%
+%
+%
+%
+%
+%        TYPESETTING ENGINGE MUST BE XeLaTeX!
+%
+%
+%
+%
+%
+% Define new Variables for section
+\newcommand{\getsection}{undefined}
+\newcommand{\setsection}[1]{\renewcommand{\getsection}{#1}}
+\newcommand{\getnumber}{0}
+\newcommand{\setnumber}[1]{\renewcommand{\getnumber}{#1}}
+% Define new Variables for subsection
+\newcommand{\getsubsection}{undefined}
+\newcommand{\setsubsection}[1]{\renewcommand{\getsubsection}{#1}}
+\newcommand{\getsubnumber}{0}
+\newcommand{\setsubnumber}[1]{\renewcommand{\getsubnumber}{#1}}
+% Define new Variables for subsubsection
+\newcommand{\getsubsubsection}{undefined}
+\newcommand{\setsubsubsection}[1]{\renewcommand{\getssubsubection}{#1}}
+\newcommand{\getsubsubnumber}{0}
+\newcommand{\setsubsubnumber}[1]{\renewcommand{\getsubsubnumber}{#1}}
+%
+%
+% Define \menusection
+%
+% Usage: \menusection{Number of Section}{Name of Section}
+\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}\menu{#2}\\[.5cm]}
+%
+%
+% Define \menusubdection
+%
+% Usage: \menusubdection{Number of Subsection}{Name of Subection}
+\def\menusubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsection}{\protect\numberline{\getnumber.#1} #2}\setsubnumber{#1}\setsubsection{#2}\menu{\getsection > #2}\\[.5cm]}
+%
+%
+% Define \menusubsubsection
+%
+% Usage: \menusubsubsection{Number of Subsubsection}{Name of Subsubsection}
+\def\menusubsubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsubsection}{\protect\numberline{\getnumber.\getsubnumber.#1} #2}\menu{\getsection > \getsubsection > #2}\\[.5cm]}
+%
+% Ja, ich habe mich hingesetzt un all die Commands abgekuerzt... Hat mich auch nur 3 Stunden gekostet... Felix
+
+
+
+\begin{document}
+%
+% Titelblatt
+\input{./title.tex}
+%
+% Inhaltsverzeichnis
+\tableofcontents
+\newpage
+%
+%
+%    WICHTIG: GENAU FREIE ZEILEN VOR EINEM NEUEN \menu LASSEN!
+%
+%    SONST GIBT ES EINE FALSCHE FORMATIERUNG
+%
+%
+\menusection{1}{Authentifikation}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Artikelsuche
+\menusection{2}{Artikelsuche}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Suchen
+\menusubsection{1}{Suchen}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Sortieren
+\menusubsection{2}{Sortieren}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Reklamation
+\menusection{3}{Reklamation}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Artikel reklamieren
+\menusubsection{1}{Artikel reklamieren}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Warenkorb
+\menusection{4}{Warenkorb}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Artikel aendern/loeschen
+\menusubsection{1}{Artikel ändern/löschen}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Kasse
+\menusubsection{2}{Kasse}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+% Zahlungsart
+\menusubsubsection{1}{Zahlungsart}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+
+\end{document}
