@@ -25,11 +25,11 @@ public class ProductForm {
     private String price;
 
     @NotNull(message = "Minimale Stückzahl nicht angegeben.")
-    @Pattern(regexp = "\\d+", message = "Minimale Stückzahl darf nicht negativ sein.")
+    @Pattern(regexp = "\\d+", message = "Minimale Stückzahl muss eine positive Zahl sein.")
     private String minQuantity;
 
     @NotNull(message = "Stückzahl nicht angegeben.")
-    @Pattern(regexp = "\\d+", message = "Stückzahl darf nicht negativ sein.")
+    @Pattern(regexp = "\\d+", message = "Stückzahl muss eine positive Zahl sein.")
     private String quantity;
 
     @NotEmpty(message = "Keine Kategorie angegeben.")
