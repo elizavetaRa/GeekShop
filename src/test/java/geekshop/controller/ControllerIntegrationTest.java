@@ -11,26 +11,19 @@ import org.salespointframework.order.Cart;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.AuthenticationManager;
+import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
-import org.springframework.web.context.WebApplicationContext;
-
 
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.junit.Assert.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 /**
  * Created by Midokin on 12.01.2015.
@@ -56,6 +49,8 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     @Autowired
     private UserRepository userRepo;
     @Autowired
+    private UserAccountManager uam;
+    @Autowired
     private GSOrderRepository orderRepo;
     @Autowired
     private Catalog<GSProduct> catalog;
@@ -65,10 +60,13 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     private SubCategoryRepository subCatRepo;
     @Autowired
     private SuperCategoryRepository supCatRepo;
+    @Autowired
+    private PasswordRulesRepository passwordRulesRepo;
 
 
     private Model model;
-    private User user;
+    private User hans;
+    private User owner;
     private GSInventoryItem testItem;
     long quantity = 1;
 
@@ -76,14 +74,17 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     public void setup() {
         model = new ExtendedModelMap();
 
+        hans = userRepo.findByUserAccount(uam.findByUsername("hans").get());
+        owner = userRepo.findByUserAccount(uam.findByUsername("owner").get());
+
         login("owner", "123");
-        user = userRepo.findByUserAccount(authManager.getCurrentUser().get());
+//        owner = userRepo.findByUserAccount(authManager.getCurrentUser().get());
 
         super.setUp();
     }
 
     @Test
-    public void buySomething() throws Exception{
+    public void buySomething() throws Exception {
         Money price = Money.parse("EUR 5.00");
         Cart testCart = new Cart();
         String query = "TestProduct=1";
@@ -102,13 +103,13 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         assertNotNull(subCatRepo.findByName("TestSubCat"));
         assertNotNull(inventory.findByProduct(testProduct));
 
-        cartController.addProductToCart(testProduct, quantity, query, testCart, session, Optional.of(user.getUserAccount()), model);
-        cartController.buy(testCart, session, payment, Optional.of(user.getUserAccount()), model);
+        cartController.addProductToCart(testProduct, quantity, query, testCart, session, Optional.of(owner.getUserAccount()), model);
+        cartController.buy(testCart, session, payment, Optional.of(owner.getUserAccount()), model);
 
-        for (GSOrder order : orderRepo.findAll()){
-            if (!order.isOpen() && !order.isCanceled()){
-                for (OrderLine ol : order.getOrderLines()){
-                    if (ol.getProductName().equals(testProduct.getName())){
+        for (GSOrder order : orderRepo.findAll()) {
+            if (!order.isOpen() && !order.isCanceled()) {
+                for (OrderLine ol : order.getOrderLines()) {
+                    if (ol.getProductName().equals(testProduct.getName())) {
 
                         boughtProduct = catalog.findOne(ol.getProductIdentifier()).get();
 
@@ -123,7 +124,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void reclaimSomething() throws Exception{
+    public void reclaimSomething() throws Exception {
         Money price = Money.parse("EUR 5.00");
         Cart testCart = new Cart();
         long productNumber = 101;
@@ -137,10 +138,10 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
 
 
-        for (GSOrder order : orderRepo.findAll()){
-            if (!order.isOpen() && !order.isCanceled()){
-                for (OrderLine ol : order.getOrderLines()){
-                    if (ol.getProductName().equals(testProduct.getName())){
+        for (GSOrder order : orderRepo.findAll()) {
+            if (!order.isOpen() && !order.isCanceled()) {
+                for (OrderLine ol : order.getOrderLines()) {
+                    if (ol.getProductName().equals(testProduct.getName())) {
                         orderNumber = order.getOrderNumber();
                     }
                 }
@@ -148,8 +149,8 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         }
         iterableCount = orderRepo.count();
 
-        recController.allToReclaimCart(orderNumber, testCart, model, session, Optional.of(user.getUserAccount()));
-        recController.reclaimIt(testCart, String.valueOf(orderNumber), session, Optional.of(user.getUserAccount()), model);
+        recController.allToReclaimCart(orderNumber, testCart, model, session, Optional.of(owner.getUserAccount()));
+        recController.reclaimIt(testCart, String.valueOf(orderNumber), session, Optional.of(owner.getUserAccount()), model);
 
         assertEquals(orderRepo.count(), iterableCount + 1);
         assertEquals(currentQuantity + quantity, testItem.getQuantity().getAmount().intValueExact());
@@ -157,23 +158,31 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void accConIndexTest() throws Exception{
-        mvc.perform(get("/index"))
+    public void accConIndexTest() throws Exception {
+        mvc.perform(get("/index")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
                 .andExpect(model().attributeExists("joke"));
     }
 
     @Test
-    public void accConAdjustPW() throws Exception{
-        mvc.perform(post("/adjustpw"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists(""));
+    public void accConAdjustPW() throws Exception {
+        mvc.perform(get("/adjustpw")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(post("/adjustpw")
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("newPW", "!A2s3d4f")
+                .param("retypePW", "!A2s3d4f"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
-    public void accConStaff() throws Exception{
+    public void accConStaff() throws Exception {
         mvc.perform(get("/staff"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff"))
@@ -181,7 +190,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void accConShowEmployee() throws Exception{
+    public void accConShowEmployee() throws Exception {
         mvc.perform(get("/staff/{uai}"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
@@ -190,28 +199,28 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void accConHire() throws Exception{
+    public void accConHire() throws Exception {
         mvc.perform(post("/addemployee"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff"));
     }
 
     @Test
-    public void accConFire() throws Exception{
+    public void accConFire() throws Exception {
         mvc.perform(delete("/staff/{uai}"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff"));
     }
 
     @Test
-    public void accConFireAll() throws Exception{
+    public void accConFireAll() throws Exception {
         mvc.perform(delete("/firestaff"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff"));
     }
 
     @Test
-    public void accConProfileChange1() throws Exception{
+    public void accConProfileChange1() throws Exception {
         mvc.perform(get("/staff/{uai}/{page}"))
                 .andExpect(status().isOk());
 //                .andExpect(view().name("welcome"))
@@ -219,28 +228,28 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void accConChangedData() throws Exception{
+    public void accConChangedData() throws Exception {
         mvc.perform(post("/staff/{uai}/changedata"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff"));
     }
 
     @Test
-    public void accConChangedPW() throws Exception{
+    public void accConChangedPW() throws Exception {
         mvc.perform(post("/staff/{uai}/changepw"))
                 .andExpect(status().isOk())
                 .andExpect(view().name(""));
     }
 
     @Test
-    public void accConSetPWRules() throws Exception{
+    public void accConSetPWRules() throws Exception {
         mvc.perform(post("/setrules"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff"));
     }
 
     @Test
-    public void accConProfile() throws Exception{
+    public void accConProfile() throws Exception {
         mvc.perform(get("/profile"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
@@ -249,28 +258,28 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void accConProfileChange2() throws Exception{
+    public void accConProfileChange2() throws Exception {
         mvc.perform(get("/profile/{page}"))
                 .andExpect(status().isOk())
                 .andExpect(view().name(""));
     }
 
     @Test
-    public void accConChangedOwnData() throws Exception{
+    public void accConChangedOwnData() throws Exception {
         mvc.perform(post("/profile/changedata"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"));
     }
 
     @Test
-    public void accConChangedOwnPW() throws Exception{
+    public void accConChangedOwnPW() throws Exception {
         mvc.perform(post("/profile/changepw"))
                 .andExpect(status().isOk())
                 .andExpect(view().name(""));
     }
 
     @Test
-    public void cartConCart() throws Exception{
+    public void cartConCart() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -278,7 +287,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void cartConAddProductToCart() throws Exception{
+    public void cartConAddProductToCart() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -286,7 +295,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void cartConDeleteAll() throws Exception{
+    public void cartConDeleteAll() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -294,7 +303,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void cartConDeleteCartItem() throws Exception{
+    public void cartConDeleteCartItem() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -302,7 +311,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void cartConUpdateCartItem() throws Exception{
+    public void cartConUpdateCartItem() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -310,7 +319,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void cartConCheckOut() throws Exception{
+    public void cartConCheckOut() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -318,7 +327,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void cartConOrderOverview() throws Exception{
+    public void cartConOrderOverview() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -326,7 +335,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void cartConBuy() throws Exception{
+    public void cartConBuy() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -334,7 +343,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void catConSearchEntryByName() throws Exception{
+    public void catConSearchEntryByName() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -342,7 +351,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConOrders() throws Exception{
+    public void ownConOrders() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -350,7 +359,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConExportXML() throws Exception{
+    public void ownConExportXML() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -358,7 +367,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConShowReclaim() throws Exception{
+    public void ownConShowReclaim() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -366,7 +375,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConAcceptReclaim() throws Exception{
+    public void ownConAcceptReclaim() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -374,7 +383,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConJokes() throws Exception{
+    public void ownConJokes() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -382,7 +391,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConNewJoke() throws Exception{
+    public void ownConNewJoke() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -390,7 +399,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConShowJoke() throws Exception{
+    public void ownConShowJoke() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -398,7 +407,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConEditJoke() throws Exception{
+    public void ownConEditJoke() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -406,7 +415,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConDeleteJoke() throws Exception{
+    public void ownConDeleteJoke() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -414,7 +423,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConDeleteAllJokes() throws Exception{
+    public void ownConDeleteAllJokes() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -422,7 +431,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConMessages() throws Exception{
+    public void ownConMessages() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -430,7 +439,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConDeleteMessages() throws Exception{
+    public void ownConDeleteMessages() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -438,7 +447,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConRange() throws Exception{
+    public void ownConRange() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -446,7 +455,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConDelSuper() throws Exception{
+    public void ownConDelSuper() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -454,7 +463,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConDelSubRequest() throws Exception{
+    public void ownConDelSubRequest() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -462,7 +471,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConDelProductRequest() throws Exception{
+    public void ownConDelProductRequest() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -470,7 +479,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConEditProduct() throws Exception{
+    public void ownConEditProduct() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -478,7 +487,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConAddProduct() throws Exception{
+    public void ownConAddProduct() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -486,7 +495,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConAddProductToCatalog() throws Exception{
+    public void ownConAddProductToCatalog() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -494,7 +503,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConEditSuperCategory() throws Exception{
+    public void ownConEditSuperCategory() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -502,7 +511,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConEditSuper() throws Exception{
+    public void ownConEditSuper() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -510,7 +519,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConAddSuper() throws Exception{
+    public void ownConAddSuper() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -518,7 +527,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConAddSuperCategory() throws Exception{
+    public void ownConAddSuperCategory() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -526,7 +535,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConEditSubCategory() throws Exception{
+    public void ownConEditSubCategory() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -534,7 +543,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConEditSub() throws Exception{
+    public void ownConEditSub() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -542,7 +551,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConAddSubCategory() throws Exception{
+    public void ownConAddSubCategory() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -550,7 +559,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void ownConAddSub() throws Exception{
+    public void ownConAddSub() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -558,7 +567,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConReclaim() throws Exception{
+    public void recConReclaim() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -566,7 +575,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConReclaimCart() throws Exception{
+    public void recConReclaimCart() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -574,7 +583,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConAddProductToReclaimCart() throws Exception{
+    public void recConAddProductToReclaimCart() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -582,7 +591,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-     public void recConAllToReclaimCart() throws Exception{
+    public void recConAllToReclaimCart() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -590,7 +599,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConReclaimIt() throws Exception{
+    public void recConReclaimIt() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -598,7 +607,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConReclaimBasket() throws Exception{
+    public void recConReclaimBasket() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -606,7 +615,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConSearchOrderByNumber() throws Exception{
+    public void recConSearchOrderByNumber() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -614,7 +623,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConCheckOut() throws Exception{
+    public void recConCheckOut() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -622,7 +631,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConUpdateReclaimCartItem() throws Exception{
+    public void recConUpdateReclaimCartItem() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
@@ -630,13 +639,12 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     }
 
     @Test
-    public void recConCancelReclaim() throws Exception{
+    public void recConCancelReclaim() throws Exception {
         mvc.perform(get("/index"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("welcome"))
                 .andExpect(model().attributeExists("joke"));
     }
-
 
 
 }
