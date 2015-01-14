@@ -222,7 +222,7 @@ class AccountController {
     public String hire(Model model, @ModelAttribute("personalDataForm") @Valid PersonalDataForm personalDataForm,
                        BindingResult result) {
 
-        if (personalDataForm.getUsername() != null && !personalDataForm.getUsername().isEmpty() && uam.findByUsername(personalDataForm.getUsername()).isPresent()) {
+        if (personalDataForm.getUsername() != null && !personalDataForm.getUsername().trim().isEmpty() && uam.findByUsername(personalDataForm.getUsername()).isPresent()) {
             result.addError(new FieldError("personalDataForm", "username", "Benutzername existiert bereits."));
         }
         if (result.hasErrors()) {

@@ -85,7 +85,7 @@
 
                     <form method="get" action="/productsearch" name="formSearch" id="formSearch">
                         <input value="suchen" th:value="${param.q} ? ${param.q[0]}" name="q" id="q"
-                               type="text" size="25" maxlength="40" placeholder="Artikelsuche"/>
+                               type="text" size="25" maxlength="400" placeholder="Artikelsuche"/>
                         <select name="sort" id="sort" style="margin: 0 15px 0 5px" class="f-right">
                             <option value="name" th:selected="${param.sort} and (${param.sort[0]} == 'name')">Name</option>
                             <option value="priceasc" th:selected="${param.sort} and (${param.sort[0]} == 'priceasc')">Preis
