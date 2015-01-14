@@ -85,7 +85,7 @@
                                 <label th:for="'minQuantity'" class="highlight">Minimale Stückzahl:</label>
                             </td>
                             <td>
-                                <input type="number" th:field="*{minQuantity}" size="2"
+                                <input type="number" th:field="*{minQuantity}" size="2" min="0"
                                        required="required" th:errorclass="fieldError"/>
                                 <p th:if="${#fields.hasErrors('minQuantity')}" class="errorMsg" th:errors="*{minQuantity}">Fehler</p>
                             </td>
@@ -96,7 +96,7 @@
                                 <label th:for="'quantity'" class="highlight">Stückzahl:</label>
                             </td>
                             <td>
-                                <input type="number" th:field="*{quantity}" size="2"
+                                <input type="number" th:field="*{quantity}" size="2" min="0"
                                        required="required" th:errorclass="fieldError"/>
                                 <p th:if="${#fields.hasErrors('quantity')}" class="errorMsg" th:errors="*{quantity}">Fehler</p>
                             </td>
