@@ -13,8 +13,11 @@ import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.AuthenticationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.web.context.WebApplicationContext;
+
 
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
@@ -22,6 +25,12 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 /**
  * Created by Midokin on 12.01.2015.
@@ -57,18 +66,20 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     @Autowired
     private SuperCategoryRepository supCatRepo;
 
+
     private Model model;
     private User user;
     private GSInventoryItem testItem;
     long quantity = 1;
 
     @Before
-    public void setUp() {
+    public void setup() {
         model = new ExtendedModelMap();
 
         login("owner", "123");
         user = userRepo.findByUserAccount(authManager.getCurrentUser().get());
 
+        super.setUp();
     }
 
     @Test
@@ -145,6 +156,486 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
 
     }
 
+    @Test
+    public void accConIndexTest() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void accConAdjustPW() throws Exception{
+        mvc.perform(post("/adjustpw"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists(""));
+    }
+
+    @Test
+    public void accConStaff() throws Exception{
+        mvc.perform(get("/staff"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff"))
+                .andExpect(model().attributeExists("staff"));
+    }
+
+    @Test
+    public void accConShowEmployee() throws Exception{
+        mvc.perform(get("/staff/{uai}"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("inEditingMode"));
+    }
+
+    @Test
+    public void accConHire() throws Exception{
+        mvc.perform(post("/addemployee"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff"));
+    }
+
+    @Test
+    public void accConFire() throws Exception{
+        mvc.perform(delete("/staff/{uai}"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff"));
+    }
+
+    @Test
+    public void accConFireAll() throws Exception{
+        mvc.perform(delete("/firestaff"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff"));
+    }
+
+    @Test
+    public void accConProfileChange1() throws Exception{
+        mvc.perform(get("/staff/{uai}/{page}"))
+                .andExpect(status().isOk());
+//                .andExpect(view().name("welcome"))
+//                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void accConChangedData() throws Exception{
+        mvc.perform(post("/staff/{uai}/changedata"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff"));
+    }
+
+    @Test
+    public void accConChangedPW() throws Exception{
+        mvc.perform(post("/staff/{uai}/changepw"))
+                .andExpect(status().isOk())
+                .andExpect(view().name(""));
+    }
+
+    @Test
+    public void accConSetPWRules() throws Exception{
+        mvc.perform(post("/setrules"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("staff"));
+    }
+
+    @Test
+    public void accConProfile() throws Exception{
+        mvc.perform(get("/profile"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("inEditingMode"));
+    }
+
+    @Test
+    public void accConProfileChange2() throws Exception{
+        mvc.perform(get("/profile/{page}"))
+                .andExpect(status().isOk())
+                .andExpect(view().name(""));
+    }
+
+    @Test
+    public void accConChangedOwnData() throws Exception{
+        mvc.perform(post("/profile/changedata"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profile"));
+    }
+
+    @Test
+    public void accConChangedOwnPW() throws Exception{
+        mvc.perform(post("/profile/changepw"))
+                .andExpect(status().isOk())
+                .andExpect(view().name(""));
+    }
+
+    @Test
+    public void cartConCart() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void cartConAddProductToCart() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void cartConDeleteAll() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void cartConDeleteCartItem() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void cartConUpdateCartItem() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void cartConCheckOut() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void cartConOrderOverview() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void cartConBuy() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void catConSearchEntryByName() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConOrders() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConExportXML() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConShowReclaim() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConAcceptReclaim() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConJokes() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConNewJoke() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConShowJoke() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConEditJoke() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConDeleteJoke() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConDeleteAllJokes() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConMessages() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConDeleteMessages() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConRange() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConDelSuper() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConDelSubRequest() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConDelProductRequest() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConEditProduct() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConAddProduct() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConAddProductToCatalog() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConEditSuperCategory() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConEditSuper() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConAddSuper() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConAddSuperCategory() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConEditSubCategory() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConEditSub() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConAddSubCategory() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void ownConAddSub() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConReclaim() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConReclaimCart() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConAddProductToReclaimCart() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+     public void recConAllToReclaimCart() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConReclaimIt() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConReclaimBasket() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConSearchOrderByNumber() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConCheckOut() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConUpdateReclaimCartItem() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
+
+    @Test
+    public void recConCancelReclaim() throws Exception{
+        mvc.perform(get("/index"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attributeExists("joke"));
+    }
 
 
 
