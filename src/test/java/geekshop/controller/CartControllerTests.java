@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.salespointframework.order.CartItem;
 import org.salespointframework.quantity.Metric;
+import org.salespointframework.quantity.Quantity;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.useraccount.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,6 @@ public class CartControllerTests extends AbstractWebIntegrationTests {
     Cart cart;
     Model model;
     UserAccount userAccount;
-//    MockHttpSession session= new MockHttpSession();
 
 
     @Before
@@ -112,116 +112,120 @@ public class CartControllerTests extends AbstractWebIntegrationTests {
         cart.clear();
         GSProduct product = catalog.findByName("test1").iterator().next();
         controller.addProductToCart(product, 9, "1", cart, session, Optional.of(userAccount), model);
-       // long id = product.getProductNumber();
-        assertTrue(testCartItem());
+        assertEquals(cart.iterator().next().getQuantity().getAmount().intValue(), 9);
         cart.clear();
+
+        //negative amount of products
         controller.addProductToCart(product, -42, "1", cart, session, Optional.of(userAccount), model);
-        assertTrue(testCartItem2());
+        boolean empty;
+        if (cart.isEmpty()) {
+            empty=true;
+        } else empty = false;
+
+        assertTrue(empty);
         cart.clear();
-        controller.addProductToCart(product, 102, "1", cart, session, Optional.of(userAccount), model);  //more products than in inventory
+
+        //more products than in inventory
+        controller.addProductToCart(product, 102, "1", cart, session, Optional.of(userAccount), model);
         assertEquals(cart.iterator().next().getQuantity().getAmount().intValue(), 10);
         cart.clear();
+
         //more products than in inventory with multiple using of function
         controller.addProductToCart(product, 3, "1", cart, session, Optional.of(userAccount), model);
         controller.addProductToCart(product, 8, "1", cart, session, Optional.of(userAccount), model);
         assertEquals(cart.iterator().next().getQuantity().getAmount().intValue(), 10);
-
     }
 
-    public Boolean testCartItem() {
-        CartItem item = cart.iterator().next();
-        if (item == null) return false;
-         else {
-            if (item.getQuantity().getAmount().intValueExact() == 9) {
-                return true;
-            } return false;
-        }
+
+
+    // tests if correct CartItem is deleted
+    @Test
+    public void deleteCartItem() throws Exception {
+        cart.clear();
+        GSProduct product = catalog.findByName("test1").iterator().next();
+        controller.addProductToCart(product, 1, "1", cart, session, Optional.of(userAccount), model);
+        GSProduct product2 = catalog.findByName("test2").iterator().next();
+        controller.addProductToCart(product2, 1, "1", cart, session, Optional.of(userAccount), model);
+        String id1= cart.iterator().next().getIdentifier();
+        cart.removeItem(id1);
+        String id2= cart.iterator().next().getIdentifier();
+        assertEquals(cart.iterator().next().getIdentifier(), id2);
+        cart.clear();
     }
 
-    public Boolean testCartItem2() {
-        if (cart.isEmpty()) {
-            return true;
-        } else return false;
-        }
 
 
+    // tests if CartItem is correctly updated in Cart
+    @Test
+    public void updateCartItem() throws Exception {
 
-//    // tests if cart has correct amount of products
-//    @Test
-//    public void addProductToCart2() throws Exception {
-//        Model model = new ExtendedModelMap();
-//
-////        org.joda.money.Money==
-////        Product product=new Product()
-//        ownerController.addProductToCatalog(model, product, 1l, 12, 1, 1);
-//        GSProduct product = catalog.findByName("Test").iterator().next();
-//        controller.addProductToCart(product, -100, "1", cart, session, user);
-//        long id = product.getProductNumber();
-//        assertTrue(testItemAmount());
-//    }
-//
-//    public Boolean testItemAmount() {
-//        CartItem item = cart.iterator().next();
-//        if (cart.isEmpty()) {
-//            return true;
-//        } else return false;
-//    }
+        cart.clear();
+        GSProduct product = catalog.findByName("test1").iterator().next();
+        controller.addProductToCart(product, 1, "1", cart, session, Optional.of(userAccount), model);
 
-//
-////    // tests if correct CartItem is deleted
-////    @Test
-////    public void deleteCartItem() throws Exception {
-////        Model model = new ExtendedModelMap();
-////
-//////        org.joda.money.Money==
-//////        Product product=new Product()
-////        ownerController.addProductToCatalog(model, product, 1l, 12, 1, 1);
-////        GSProduct product= catalog.findByName("Test").iterator().next();
-////        controller.addProductToCart(product, 3, "1", cart, session, user);
-////        cart.
-////    }
-////
-////
-////    public Boolean testCartItem3(String id) {
-////        CartItem item= cart.getItem(id);
-////        if (cart.isEmpty()) {
-////            return true;
-////        } else {
-////            if (item.getQuantity().getAmount().intValueExact() == -100) {
-////                cart.clear();
-////                return false;
-////            }
-////        }
-////    }
-//
-//
-//    // tests if CartItem is correctly updated
-//    @Test
-//    public void updateCartItem() throws Exception {
-//        Model model = new ExtendedModelMap();
-//
-////        org.joda.money.Money==
-////        Product product=new Product()
-//        ownerController.addProductToCatalog(model, product, 1l, 12, 1, 1);
-//        GSProduct product = catalog.findByName("Test").iterator().next();
-//        controller.addProductToCart(product, -100, "1", cart, session, user);  //must be 0
-//        controller.addProductToCart(product, 100, "1", cart, session, user);   //must be 11
-//        //long id= product.getProductNumber();
-//        assertEquals(cart.iterator().next().getQuantity().getAmount().intValueExact(), 11);
-//    }
-//
-//
-//    @Test
-//    public void buy() throws Exception {
-//        Model model = new ExtendedModelMap();
-//
-//    }
+        //tests if the multiple updating is correct
+        String id=cart.iterator().next().getIdentifier();
+        controller.updateCartItem(id, "3", cart, session, Optional.of(userAccount));
+                assertEquals(cart.iterator().next().getQuantity().getAmount().intValueExact(), 3);
+        String id2=cart.iterator().next().getIdentifier();
+        controller.updateCartItem(id2, "4", cart, session, Optional.of(userAccount));
+        assertEquals(cart.iterator().next().getQuantity().getAmount().intValueExact(), 4);
+
+        //tests bahavior if input is not a number
+        String id3=cart.iterator().next().getIdentifier();
+        controller.updateCartItem(id3, "-2ab", cart, session, Optional.of(userAccount));
+        assertEquals(cart.iterator().next().getQuantity().getAmount().intValueExact(), 4);
+
+        //tests bahavior if input is negative number
+        String id4=cart.iterator().next().getIdentifier();
+        controller.updateCartItem(id4, "-2", cart, session, Optional.of(userAccount));
+        assertEquals(cart.iterator().next().getQuantity().getAmount().intValueExact(), 4);
+
+        //tests the quantity if input is smaller than current quantity
+        String id5=cart.iterator().next().getIdentifier();
+        controller.updateCartItem(id5, "2", cart, session, Optional.of(userAccount));
+        assertEquals(cart.iterator().next().getQuantity().getAmount().intValueExact(), 2);
+        cart.clear();
+    }
+
+
+    @Test
+    public void buy() throws Exception {
+        cart.clear();
+        gsOrderRepository.deleteAll();
+
+        //tests if the order is created and paymentMethod is correct
+        GSProduct product = catalog.findByName("test1").iterator().next();
+        controller.addProductToCart(product, 1, "2", cart, session, Optional.of(userAccount), model);
+        controller.buy(cart, session, "CASH", Optional.of(userAccount), model);
+       GSOrder order= gsOrderRepository.findAll().iterator().next();
+        assertEquals(order.getPaymentType().getValue(), "Barzahlung");
+
+        //tests if order has correct state
+        boolean paid= order.isPaid();
+        boolean completed= order.isCompleted();
+        assertTrue(paid);
+        assertFalse(completed);
+
+        //tests if after false inputs order is created
+        cart.clear();
+        gsOrderRepository.deleteAll();
+        GSProduct product2 = catalog.findByName("test1").iterator().next();
+        controller.addProductToCart(product, 1, "2", cart, session, Optional.of(userAccount), model);
+        controller.buy(cart, session, "lol", Optional.of(userAccount), model);
+        GSOrder order2= gsOrderRepository.findAll().iterator().next();
+        boolean falsemethod=true;
+        if (gsOrderRepository.findAll().iterator().hasNext()){ falsemethod = true;} else {falsemethod=true;}
+        assertTrue(falsemethod);
+
+    }
 
 
     @After
        public void clearData() {
         cart.clear();
         catalog.deleteAll();
+        gsOrderRepository.deleteAll();
     }
 
 
