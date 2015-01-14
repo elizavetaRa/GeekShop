@@ -1,8 +1,5 @@
 package geekshop.controller;
 
-/*
- * Created by Basti on 20.11.2014.
- */
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
@@ -265,6 +262,12 @@ class ReclaimController {
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
 
+        if (!containsOnlyNumbers(searchOrderNumber)){
+            String error = "Falsche Zeichen. Eingabe muss eine Zahl sein!";
+            model.addAttribute("error", error);
+            return "reclaim";
+        }
+
         long oNumber = Long.parseLong(searchOrderNumber);
         String orderNumber = GSOrder.longToString(oNumber);
         System.out.println(oNumber + " orderNumber");
@@ -407,5 +410,13 @@ class ReclaimController {
             }
         }
         return cnt;
+    }
+
+    public boolean containsOnlyNumbers(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i)))
+                return false;
+        }
+        return true;
     }
 }
