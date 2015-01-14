@@ -251,14 +251,16 @@ class CartController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
         int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
+        if (!containsOnlyNumbers(quantity)){return "redirect:/cart";}
         int newquantity = Integer.parseInt(quantity);
-        if (newquantity <= 0) {
-            newquantity = 0;
+//        int oldquality=cart.getItem(identifier).get().getQuantity().getAmount().intValueExact();
+//        int newquantity=
+        if (newquantity <= 1) {
+            newquantity = 1;
         }
         int updatequantity = newquantity - oldquantity;
 
         String onLager = (inventory.findByProductIdentifier(cart.getItem(identifier).get().getProduct().getIdentifier())).get().getQuantity().getAmount().toString();
-        System.out.println("Am Lager sind so viele Produkte: " + onLager);
         if (Integer.parseInt(onLager) <= newquantity) {
             updatequantity = Integer.parseInt(onLager) - oldquantity;
         }
@@ -387,5 +389,15 @@ class CartController {
             return "redirect:/";
 
         return "redirect:/productsearch";
+    }
+
+
+
+    public boolean containsOnlyNumbers(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i)))
+                return false;
+        }
+        return true;
     }
 }
