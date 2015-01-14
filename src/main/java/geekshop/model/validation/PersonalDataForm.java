@@ -23,6 +23,7 @@ public class PersonalDataForm {
     @NotBlank(message = "Kein Nachname angegeben.")
     private String lastname;
 
+    @NotNull(message = "Kein Benutzername angegeben.")
     @Size(min = 3, message = "Benutzername muss mind. 3 Zeichen lang sein.")
     @Pattern(regexp = "[^\\s]*", message = "Benutzername darf keine Leerzeichen enthalten.")
     private String username;

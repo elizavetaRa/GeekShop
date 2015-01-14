@@ -95,12 +95,16 @@ public class User {
     }
 
     /**
-     * Converts a proper {@link java.lang.String} to {@link java.util.Date}.
+     * Converts a proper {@link java.lang.String} representing a date arranged in the common order of the German-speaking area
+     * to {@link java.util.Date}.
      *
      * @param strDate the String which contains a Date
      * @return {@link java.util.Date}
      */
     public static Date strToDate(String strDate) {
+        if (!strDate.matches("\\d{1,2}[\\s.\\-/]\\d{1,2}[\\s.\\-/]\\d{2}(\\d{2})?"))
+            return null;
+
         strDate = strDate.replace(".", " ");
         strDate = strDate.replace("-", " ");
         strDate = strDate.replace("/", " ");
