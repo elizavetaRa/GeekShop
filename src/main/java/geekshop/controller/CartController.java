@@ -251,10 +251,10 @@ class CartController {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
         int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
-        if (!containsOnlyNumbers(quantity)){return "redirect:/cart";}
+        if (!containsOnlyNumbers(quantity)) {
+            return "redirect:/cart";
+        }
         int newquantity = Integer.parseInt(quantity);
-//        int oldquality=cart.getItem(identifier).get().getQuantity().getAmount().intValueExact();
-//        int newquantity=
         if (newquantity <= 1) {
             newquantity = 1;
         }
@@ -391,8 +391,9 @@ class CartController {
         return "redirect:/productsearch";
     }
 
-
-
+    /**
+     * Help function for validation
+     */
     public boolean containsOnlyNumbers(String str) {
         for (int i = 0; i < str.length(); i++) {
             if (!Character.isDigit(str.charAt(i)))
