@@ -49,7 +49,7 @@ public class SuperCategory {
     }
 
     /**
-     * Adds a {@Link SubCategory} to the {@Link SuperCategory}.
+     * Adds a {@link SubCategory} to the {@link SuperCategory}.
      */
 
     public boolean addSubCategory(SubCategory subCategory) {

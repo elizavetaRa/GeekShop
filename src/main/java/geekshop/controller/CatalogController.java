@@ -121,9 +121,9 @@ class CatalogController {
     }
 
     /**
-     * Searches the {@Link Catalog} for {@Link Product}s which contain the {@param searchTerm}, are in a {@Link SubCategory} which contains the
-     * {@param searchTerm} or are in a {@Link SuperCategory} which contains the {@param searchTerm}.
-     * Returns a Set with the {@Link Product}s matching the Criteria.
+     * Searches the {@link Catalog} for {@link GSProduct}s which contain the given {@literal searchTerm}, are in a {@link SubCategory} which contains the
+     * given {@literal searchTerm} or are in a {@link SuperCategory} which contains the given {@literal searchTerm}.
+     * Returns a Set with the {@link GSProduct}s matching the Criteria.
      */
 
     private Set<GSProduct> search(String searchTerm) {
@@ -144,8 +144,8 @@ class CatalogController {
     }
 
     /**
-     * Sorts a List of {@Link Product}s by Name.
-     * Returns a sorted Set of {@Link Product}s.
+     * Sorts a List of {@link GSProduct}s by Name.
+     * Returns a sorted Set of {@link GSProduct}s.
      */
 
     private List<GSProduct> sortProductByName(Iterable<GSProduct> foundProducts) {
@@ -158,8 +158,8 @@ class CatalogController {
     }
 
     /**
-     * Sorts a List of {@Link Product}s by ProductNumber.
-     * Returns a sorted Set of {@Link Product}s.
+     * Sorts a List of {@link GSProduct}s by ProductNumber.
+     * Returns a sorted Set of {@link GSProduct}s.
      */
 
     private List<GSProduct> sortProductByProductNumber(Iterable<GSProduct> foundProducts) {
@@ -172,8 +172,8 @@ class CatalogController {
     }
 
     /**
-     * Sorts a List of {@Link Product}s by Price.
-     * Returns a sorted Set of {@Link Product}s.
+     * Sorts a List of {@link GSProduct}s by Price.
+     * Returns a sorted Set of {@link GSProduct}s.
      */
 
     private List<GSProduct> sortProductByPrice(Iterable<GSProduct> foundProducts, String direction) {
@@ -189,7 +189,7 @@ class CatalogController {
     }
 
     /**
-     * Sorts the List of {@Link SubCategory} for a persistent display in the Frontend.
+     * Sorts the List of {@link SubCategory} for a persistent display in the front-end.
      */
 
     private List<SubCategory> sortSubCategoryByName(Iterable<SubCategory> foundCategories) {
@@ -203,7 +203,7 @@ class CatalogController {
     }
 
     /**
-     * Returns an Iterable with all {@Link Product}s in the {@Link Catalog} that are in Range.     *
+     * Returns an Iterable with all {@link GSProduct}s in the {@link Catalog} that are in Range.
      */
 
     private Iterable<GSProduct> findAllProducts() {
@@ -216,7 +216,7 @@ class CatalogController {
     }
 
     /**
-     * Returns a Set of all {@Link Product}s in the given {@param superCategory}
+     * Returns a Set of all {@link GSProduct}s in the given {@literal superCategory}.
      */
     private Set<GSProduct> getAllProductsInSuperCategory(SuperCategory superCategory) {
         List<SubCategory> temp = superCategory.getSubCategories();
