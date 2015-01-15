@@ -240,6 +240,8 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
     @Test
     public void accConHire() throws Exception {
+        String newUserName = "hans1";
+
         mvc.perform(get("/addemployee")
                 .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
@@ -248,9 +250,21 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("personalDataForm"));
 
         mvc.perform(post("/addemployee")
-                .with(user("owner").roles("OWNER")))
+                .with(user("owner").roles("OWNER"))
+                .param("firstname", "hans")
+                .param("lastname", "hansen")
+                .param("username", newUserName)
+                .param("email", "hans@hansen.de")
+                .param("gender", "MALE")
+                .param("dateOfBirth", "01.01.1990")
+                .param("maritalStatus", "UNMARRIED")
+                .param("phone", "01231234567")
+                .param("street", "hansstreet")
+                .param("houseNr", "1")
+                .param("postcode", "01234")
+                .param("place", "hansstadt"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/staff/"));
+                .andExpect(redirectedUrl("/staff/" + newUserName));
 
         mvc.perform(get("/addemployee")
                 .with(user("hans").roles("EMPLOYEE")))
@@ -322,7 +336,19 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
         UserAccountIdentifier uai = hans.getUserAccount().getIdentifier();
 
         mvc.perform(post("/staff/" + uai.toString() + "/changedata")
-                .with(user("owner").roles("OWNER")))
+                .with(user("owner").roles("OWNER"))
+                .param("firstname", "hans")
+                .param("lastname", "hansen")
+                .param("username", uai.toString())
+                .param("email", "hans@hansen.de")
+                .param("gender", "MALE")
+                .param("dateOfBirth", "01.01.1990")
+                .param("maritalStatus", "UNMARRIED")
+                .param("phone", "01231234567")
+                .param("street", "hansstreet")
+                .param("houseNr", "1")
+                .param("postcode", "01234")
+                .param("place", "hansstadt"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/staff/" + uai.toString()));
 
@@ -382,7 +408,10 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
         mvc.perform(post("/setrules")
                 .with(user("owner").roles("OWNER"))
-                .param("map", map.toString()))
+                .param("minLength", "8")
+                .param("upperLower", "1")
+                .param("digits", "1")
+                .param("specialChars", "1"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/staff"));
 
@@ -428,8 +457,11 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("isOwnProfile"))
                 .andExpect(model().attributeExists("passwordRules"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/profile")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -437,19 +469,34 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
     @Test
     public void accConChangedOwnData() throws Exception {
         mvc.perform(post("/profile/changedata")
-                .with(user("hans").roles("EMPLOYEE")))
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("firstname", "hans")
+                .param("lastname", "hansen")
+                .param("username", "hans")
+                .param("email", "hans@hansen.de")
+                .param("gender", "MALE")
+                .param("dateOfBirth", "01.01.1990")
+                .param("maritalStatus", "UNMARRIED")
+                .param("phone", "01231234567")
+                .param("street", "hansstreet")
+                .param("houseNr", "1")
+                .param("postcode", "01234")
+                .param("place", "hansstadt"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/profile"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/profile")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void accConChangedOwnPW() throws Exception {
-        String oldPW = "";
+        String oldPW = "123";
 
         mvc.perform(post("/profile/changepw")
                 .with(user("hans").roles("EMPLOYEE"))
@@ -473,8 +520,11 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("isOwnProfile"))
                 .andExpect(model().attributeExists("passwordRules"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(post("/profile")
-                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .with(user("hans").roles("EMPLOYEE"))
                 .param("oldPW", oldPW)
                 .param("newPW", "!A2s3d4f")
                 .param("retypePW", "!A2s3d4f"))
@@ -484,19 +534,36 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
     @Test
     public void cartConCart() throws Exception {
+        Money price = Money.parse("EUR 5.00");
+        String query = "q=aufkl&sort=name&cat=";
+        long productNumber = 101;
+        SuperCategory testSupCat = new SuperCategory("TestSupCat");
+        supCatRepo.save(testSupCat);
+        SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
+        subCatRepo.save(testSubCat);
+        GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
+
         mvc.perform(get("/cart")
-                .with(user("owner").roles("OWNER")))
+                .with(user("owner").roles("OWNER"))
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isOk())
                 .andExpect(view().name("cart"))
                 .andExpect(model().attributeExists("inventory"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/cart")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
 
         mvc.perform(post("/cart")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("pid", testProduct.getId().toString())
+                .param("number", "1")
+                .param("query", query)
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -504,7 +571,8 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
     @Test
     public void cartConDeleteAll() throws Exception {
         mvc.perform(delete("/deleteallitems")
-                .with(user("owner").roles("OWNER")))
+                .with(user("owner").roles("OWNER"))
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/cart"));
 
@@ -513,13 +581,16 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("cart"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(delete("/deleteallitems")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
 
-        mvc.perform(get("/deleteallitems")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+        mvc.perform(get("/deleteallitems/")
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -534,31 +605,41 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
         SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
         subCatRepo.save(testSubCat);
         GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
+        catalog.save(testProduct);
+        testItem = new GSInventoryItem(testProduct, Units.TEN, Units.of(5L));
+        inventory.save(testItem);
 
         mvc.perform(post("/cart")
                 .with(user("owner").roles("OWNER"))
-                .param("pid", testProduct.toString())
+                .param("pid", testProduct.getId().toString())
                 .param("number", "1")
-                .param("query", query));
+                .param("query", query)
+                .sessionAttr("isReclaim", false));
 
 
-        mvc.perform(get("/deletecartitem/"))
+        mvc.perform(get("/deletecartitem/")
+                .with(user("owner").roles("OWNER"))
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isOk())
                 .andExpect(view().name("cart"));
 
         mvc.perform(post("/deletecartitem/")
                 .with(user("owner").roles("OWNER"))
-                .param("identifier", testProduct.getIdentifier().toString()))
+                .param("identifier", testProduct.getIdentifier().toString())
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/cart"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/deleteallitems/")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
 
         mvc.perform(post("/deleteallitems/")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -573,12 +654,17 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
         SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
         subCatRepo.save(testSubCat);
         GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
+        catalog.save(testProduct);
+        testItem = new GSInventoryItem(testProduct, Units.TEN, Units.of(5L));
+        inventory.save(testItem);
 
-        mvc.perform(post("/cart")
+        Cart cart = (Cart) mvc.perform(post("/cart")
                 .with(user("owner").roles("OWNER"))
-                .param("pid", testProduct.toString())
+                .param("pid", testProduct.getId().toString())
                 .param("number", "1")
-                .param("query", query));
+                .param("query", query)
+                .sessionAttr("isReclaim", false))
+                .andReturn().getModelAndView().getModel().get("cart");
 
 
         mvc.perform(get("/updatecartitem/")
@@ -588,18 +674,22 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
         mvc.perform(post("/updatecartitem/")
                 .with(user("owner").roles("OWNER"))
-                .param("identifier", testProduct.getIdentifier().toString())
-                .param("quantity", "1"))
+                .param("identifier", testItem.getIdentifier().getIdentifier())
+                .param("quantity", "1")
+                .sessionAttr("cart", cart))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("cart"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/updatecartitem/")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
 
         mvc.perform(post("/updatecartitem/")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -611,20 +701,31 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("checkout"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/checkout")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConOrderOverview() throws Exception {
-        mvc.perform(get("/orderoverview"))
+        long orderNumber = orderRepo.findByType(OrderType.NORMAL).iterator().next().getOrderNumber();
+
+        mvc.perform(get("/orderoverview")
+                .with(user("owner").roles("OWNER"))
+                .sessionAttr("overview", false)
+                .sessionAttr("orderNumber", orderNumber))
                 .andExpect(status().isOk())
                 .andExpect(view().name("orderoverview"));
 
-        mvc.perform(post("/orderoverview")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
+        mvc.perform(get("/orderoverview")
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -636,13 +737,18 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/productsearch"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/buy")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
 
         mvc.perform(post("/buy")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("payment", "CASH")
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -658,8 +764,11 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("subCategories"))
                 .andExpect(model().attributeExists("inventory"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/productsearch")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -801,19 +910,17 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
     @Test
     public void ownConRangeDel() throws Exception {
-        String superName = supCatRepo.findAll().iterator().next().getName();
-        String subName = subCatRepo.findAll().iterator().next().getName();
         ProductIdentifier productID = catalog.findAll().iterator().next().getIdentifier();
 
         mvc.perform(delete("/range/delsuper")
                 .with(user("owner").roles("OWNER"))
-                .param("superName", superName))
+                .param("superName", "Kleidung"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
         mvc.perform(delete("/range/delsub")
                 .with(user("owner").roles("OWNER"))
-                .param("subName", subName))
+                .param("subName", "Informatik"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
@@ -838,7 +945,13 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("isNew"));
 
         mvc.perform(post("/range/editproduct/" + productID.toString())
-                .with(user("owner").roles("OWNER")))
+                .with(user("owner").roles("OWNER"))
+                .param("name", "Täst")
+                .param("productNumber", "1234567")
+                .param("price", "1.234.567,89 €")
+                .param("minQuantity", "5")
+                .param("quantity", "10")
+                .param("subCategory", "Informatik"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
     }
@@ -868,7 +981,6 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
     @Test
     public void ownConEditSuperCategory() throws Exception {
         String superName = supCatRepo.findAll().iterator().next().getName();
-        String name = subCatRepo.findAll().iterator().next().getName();
 
         mvc.perform(get("/range/editsuper/" + superName)
                 .with(user("owner").roles("OWNER")))
@@ -879,7 +991,7 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
         mvc.perform(post("/range/editsuper/" + superName)
                 .with(user("owner").roles("OWNER"))
-                .param("name", name))
+                .param("name", "newSuperName"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
@@ -894,7 +1006,7 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
         mvc.perform(post("/range/editsuper/" + superName)
                 .with(user("owner").roles("OWNER"))
-                .param("name", superName))
+                .param("name", "Kleidung"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("editsuper"))
                 .andExpect(model().attributeExists("super"))
@@ -928,10 +1040,9 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
     @Test
     public void ownConEditSubCategory() throws Exception {
-        String sub = subCatRepo.findAll().iterator().next().getName();
         String newSub = "newTestName";
 
-        mvc.perform(get("/range/editsub/" + sub)
+        mvc.perform(get("/range/editsub/Informatik")
                 .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("editsub"))
@@ -945,21 +1056,24 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
-        mvc.perform(post("/range/editsub/" + sub)
+        mvc.perform(post("/range/editsub/Informatik")
                 .with(user("owner").roles("OWNER"))
-                .param("name", newSub))
+                .param("name", newSub)
+                .param("superCategory", "Kleidung"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
         mvc.perform(post("/range/editsub/notExisting")
                 .with(user("owner").roles("OWNER"))
-                .param("name", newSub))
+                .param("name", newSub)
+                .param("superCategory", "Kleidung"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
-        mvc.perform(post("/range/editsub/" + sub)
+        mvc.perform(post("/range/editsub/Informatik")
                 .with(user("owner").roles("OWNER"))
-                .param("name", ""))
+                .param("name", "")
+                .param("superCategory", ""))
                 .andExpect(status().isOk())
                 .andExpect(view().name("editsub"))
                 .andExpect(model().attributeExists("sub"))
@@ -1005,61 +1119,94 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(view().name("reclaim"))
                 .andExpect(model().attributeExists("catalog"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(post("/reclaim")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void recConReclaimCart() throws Exception {
         GSOrder order = orderRepo.findByType(OrderType.NORMAL).iterator().next();
         long num = order.getOrderNumber();
         GSProduct product = catalog.findByName(order.getOrderLines().iterator().next().getProductName()).iterator().next();
         ProductIdentifier productID = product.getIdentifier();
-        SalespointIdentifier sID = order.findOrderLineByProduct(product).getIdentifier();
         int reclaimNum = (int) orderRepo.findByType(OrderType.RECLAIM).iterator().next().getOrderNumber();
+        long orderNumber = order.getOrderNumber();
 
         mvc.perform(get("/reclaimcart")
                 .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("cart"));
 
+        Map<GSProduct, BigDecimal> mapAmounts = (Map<GSProduct, BigDecimal>)
+                mvc.perform(get("/ordersearch")
+                        .with(user("owner").roles("OWNER"))
+                        .param("searchordernumber", String.valueOf(orderNumber))
+                        .sessionAttr("isReclaim", true))
+                        .andReturn().getRequest().getSession().getAttribute("mapAmounts");
+
         mvc.perform(post("/reclaimcart")
                 .with(user("owner").roles("OWNER"))
                 .param("orderNumber", String.valueOf(num))
                 .param("rpid", productID.toString())
-                .param("olid", sID.toString())
-                .param("rnumber", String.valueOf(reclaimNum)))
+                .param("rnumber", String.valueOf(reclaimNum))
+                .sessionAttr("isReclaim", true)
+                .sessionAttr("mapAmounts", mapAmounts))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/reclaim"))
+                .andExpect(redirectedUrl("/reclaim?orderNumber=" + String.valueOf(num)))
                 .andExpect(model().attributeExists("orderNumber"))
                 .andExpect(model().attributeExists("reclaimorder"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/reclaimcart")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
 
         mvc.perform(post("/relaimcart")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("orderNumber", String.valueOf(num))
+                .param("rpid", productID.toString())
+                .param("rnumber", String.valueOf(reclaimNum))
+                .sessionAttr("isReclaim", true)
+                .sessionAttr("mapAmounts", mapAmounts))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void recConAllToReclaimCart() throws Exception {
         long num = orderRepo.findByType(OrderType.NORMAL).iterator().next().getOrderNumber();
 
+        Map<GSProduct, BigDecimal> mapAmounts = (Map<GSProduct, BigDecimal>)
+                mvc.perform(get("/ordersearch")
+                        .with(user("owner").roles("OWNER"))
+                        .param("searchordernumber", String.valueOf(num))
+                        .sessionAttr("isReclaim", true))
+                        .andReturn().getRequest().getSession().getAttribute("mapAmounts");
+
         mvc.perform(post("/alltoreclaimcart")
                 .with(user("owner").roles("OWNER"))
-                .param("orderNumber", String.valueOf(num)))
+                .param("orderNumber", String.valueOf(num))
+                .sessionAttr("isReclaim", true)
+                .sessionAttr("mapAmounts", mapAmounts))
                 .andExpect(status().isOk())
                 .andExpect(view().name("cart"))
                 .andExpect(model().attributeExists("orderNumber"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(post("/alltoreclaimcart")
-                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .with(user("hans").roles("EMPLOYEE"))
                 .param("orderNumber", String.valueOf(num)))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
@@ -1071,14 +1218,19 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
         mvc.perform(post("/reclaimrequest")
                 .with(user("owner").roles("OWNER"))
-                .param("orderNumber", String.valueOf(num)))
+                .param("orderNumber", String.valueOf(num))
+                .sessionAttr("overview", false))
                 .andExpect(status().isOk())
                 .andExpect(view().name("orderoverview"))
                 .andExpect(model().attributeExists("order"))
                 .andExpect(model().attributeExists("catalog"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(post("/reclaimrequest")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("orderNumber", String.valueOf(num)))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -1089,21 +1241,27 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
         mvc.perform(get("/ordersearch")
                 .with(user("owner").roles("OWNER"))
-                .param("searchordernumber", searchOrderNumber))
+                .param("searchordernumber", searchOrderNumber)
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isOk())
                 .andExpect(view().name("reclaim"))
                 .andExpect(model().attributeExists("reclaimorder"))
                 .andExpect(model().attributeExists("catalog"));
 
-        mvc.perform(post("/ordersearch")
+        mvc.perform(get("/ordersearch")
                 .with(user("owner").roles("OWNER"))
-                .param("searchordernumber", "test"))
+                .param("searchordernumber", "test")
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isOk())
                 .andExpect(view().name("reclaim"))
                 .andExpect(model().attributeExists("error"));
 
-        mvc.perform(post("/ordersearch")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
+        mvc.perform(get("/ordersearch")
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("searchordernumber", searchOrderNumber))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -1118,28 +1276,78 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("checkout"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/rcheckout")
-                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .with(user("hans").roles("EMPLOYEE"))
                 .param("orderNumber", orderNum))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void recConUpdateReclaimCartItem() throws Exception {
         GSOrder reclaim = orderRepo.findByType(OrderType.RECLAIM).iterator().next();
         String identifier = reclaim.getIdentifier().toString();
         String quantity = "1";
 
+        GSOrder order = null;
+        GSProduct reclProduct = null;
+
+        for (GSOrder o : orderRepo.findByType(OrderType.NORMAL)) {
+            if (!o.isOpen() && !o.isCanceled()) {
+                order = o;
+                boolean exitLoop = false;
+                for (OrderLine ol : order.getOrderLines()) {
+                    if (inventory.findByProductIdentifier(ol.getProductIdentifier()).get().getQuantity().getAmount().intValue() > 1) {
+                        reclProduct = catalog.findOne(ol.getProductIdentifier()).get();
+                        exitLoop = true;
+                        break;
+                    }
+                }
+                if (exitLoop)
+                    break;
+            }
+        }
+
+        if (order == null || reclProduct == null)
+            return;
+
+        long orderNumber = order.getOrderNumber();
+
+        Map<GSProduct, BigDecimal> mapAmounts = (Map<GSProduct, BigDecimal>)
+                mvc.perform(get("/ordersearch")
+                        .with(user("owner").roles("OWNER"))
+                        .param("searchordernumber", String.valueOf(orderNumber))
+                        .sessionAttr("isReclaim", true))
+                        .andReturn().getRequest().getSession().getAttribute("mapAmounts");
+
+        Cart cart = (Cart) mvc.perform(post("/reclaimcart")
+                .with(user("owner").roles("OWNER"))
+                .param("orderNumber", String.valueOf(orderNumber))
+                .param("rpid", reclProduct.getId().toString())
+                .param("rnumber", "2")
+                .sessionAttr("isReclaim", true)
+                .sessionAttr("mapAmounts", mapAmounts))
+                .andReturn().getModelAndView().getModel().get("cart");
+
+
         mvc.perform(post("/updatereclaimcartitem/")
                 .with(user("owner").roles("OWNER"))
                 .param("identifier", identifier)
-                .param("quantity", quantity))
+                .param("quantity", quantity)
+                .sessionAttr("oN", orderNumber)
+                .sessionAttr("cart", cart))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("cart"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(post("/updatereclaimcartitem/")
-                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .with(user("hans").roles("EMPLOYEE"))
                 .param("identifier", identifier)
                 .param("quantity", quantity))
                 .andExpect(status().isFound())
@@ -1158,13 +1366,16 @@ public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/reclaim"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/cancelreclaim")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
 
         mvc.perform(post("/cancelreclaim")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
