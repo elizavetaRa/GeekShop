@@ -59,8 +59,9 @@
                             <td>
                                 <p th:if="${!inEditingMode}" th:text="*{username}"></p>
                                 <input type="text" th:field="*{username}" th:if="${inEditingMode}" th:errorclass="fieldError"
-                                       size="30" required="required" th:disabled="*{firstname}" th:title="!*{firstname} ? 'Benuzername muss muss mind. drei Zeichen lang sein'"/>
-                                <input type="hidden" th:field="*{username}" th:if="${inEditingMode} and *{firstname}"/>
+                                       size="30" required="required" th:disabled="!${#strings.contains(#httpServletRequest.requestURI, '/addemployee')}"
+                                       th:title="!*{#strings.contains(#httpServletRequest.requestURI, '/addemployee')} ? 'Benuzername muss muss mind. drei Zeichen lang sein'"/>
+                                <input type="hidden" th:field="*{username}" th:if="${inEditingMode} and !${#strings.contains(#httpServletRequest.requestURI, '/addemployee')}"/>
                                 <p th:if="${#fields.hasErrors('username')}" class="errorMsg" th:errors="*{username}">Fehler</p>
                             </td>
 

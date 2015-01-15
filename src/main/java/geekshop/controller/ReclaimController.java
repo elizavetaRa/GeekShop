@@ -1,8 +1,5 @@
 package geekshop.controller;
 
-/*
- * Created by Basti on 20.11.2014.
- */
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
@@ -50,8 +47,8 @@ class ReclaimController {
     /**
      * Creates a new {@link ReclaimController} with the given {@link Catalog}.
      *
-     * @param catalog must not be {@literal null}.
-     * @param orderRepo must not be {@literal null}.
+     * @param catalog     must not be {@literal null}.
+     * @param orderRepo   must not be {@literal null}.
      * @param messageRepo must not be {@literal null}.
      */
     @Autowired
@@ -91,7 +88,6 @@ class ReclaimController {
 
     /**
      * Returns the view of reclaimcart.
-     *
      */
     @RequestMapping("/reclaimcart")
     public String reclaimcart(@LoggedIn Optional<UserAccount> userAccount) {
@@ -105,12 +101,12 @@ class ReclaimController {
      * Adds a quantity to relcaim of {@link geekshop.model.GSProduct} from {@link GSOrderLine} of reclaiming
      * {@link GSOrder} to the {@link Cart}.
      *
-     * @param num must not be {@literal null}.
-     * @param productid must not be {@literal null}.
-     * @param olid must not be {@literal null}.
+     * @param num           must not be {@literal null}.
+     * @param productid     must not be {@literal null}.
+     * @param olid          must not be {@literal null}.
      * @param reclaimnumber must not be {@literal null}.
-     * @param session must not be {@literal null}.
-     * @param userAccount must not be {@literal null}.
+     * @param session       must not be {@literal null}.
+     * @param userAccount   must not be {@literal null}.
      * @param model
      */
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
@@ -168,8 +164,8 @@ class ReclaimController {
     /**
      * Adds a all products  of reclaiming {@link GSOrder} to the {@link Cart}.
      *
-     * @param num must not be {@literal null}.
-     * @param session must not be {@literal null}.
+     * @param num         must not be {@literal null}.
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      * @param model
      */
@@ -198,7 +194,7 @@ class ReclaimController {
      * Creates reclaimed Order out of the content of {@link Cart}.
      *
      * @param strNum
-     * @param session must not be {@literal null}.
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      * @param model
      */
@@ -253,8 +249,8 @@ class ReclaimController {
      * Searchs order by given orderNumber out of the content of {@link Cart}.
      *
      * @param searchOrderNumber must not be {@literal null}.
-     * @param session must not be {@literal null}.
-     * @param userAccount must not be {@literal null}.
+     * @param session           must not be {@literal null}.
+     * @param userAccount       must not be {@literal null}.
      * @param model
      */
     @RequestMapping("/ordersearch")
@@ -264,6 +260,12 @@ class ReclaimController {
 
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
+
+        if (!containsOnlyNumbers(searchOrderNumber)) {
+            String error = "Falsche Zeichen. Eingabe muss eine Zahl sein!";
+            model.addAttribute("error", error);
+            return "reclaim";
+        }
 
         long oNumber = Long.parseLong(searchOrderNumber);
         String orderNumber = GSOrder.longToString(oNumber);
@@ -321,7 +323,7 @@ class ReclaimController {
      *
      * @param identifier
      * @param quantity
-     * @param session must not be {@literal null}.
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      * @param model
      */
@@ -361,7 +363,8 @@ class ReclaimController {
 
     /**
      * Cancels current reclaim
-     * @param session must not be {@literal null}.
+     *
+     * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
      */
     @RequestMapping(value = "/cancelreclaim", method = RequestMethod.POST)
@@ -392,7 +395,6 @@ class ReclaimController {
      *
      * @param orderToBeReclaimed
      * @param product
-     *
      */
     private BigDecimal determineNotReclaimedAmountOfProduct(GSOrder orderToBeReclaimed, GSProduct product) {
         if (orderToBeReclaimed.getOrderType() == OrderType.RECLAIM)
@@ -407,5 +409,16 @@ class ReclaimController {
             }
         }
         return cnt;
+    }
+
+    /**
+     * Help function for validation
+     */
+    public boolean containsOnlyNumbers(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i)))
+                return false;
+        }
+        return true;
     }
 }

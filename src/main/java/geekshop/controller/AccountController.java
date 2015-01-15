@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -220,7 +222,7 @@ class AccountController {
     public String hire(Model model, @ModelAttribute("personalDataForm") @Valid PersonalDataForm personalDataForm,
                        BindingResult result) {
 
-        if (personalDataForm.getUsername() != null && !personalDataForm.getUsername().isEmpty() && uam.findByUsername(personalDataForm.getUsername()).isPresent()) {
+        if (personalDataForm.getUsername() != null && !personalDataForm.getUsername().trim().isEmpty() && uam.findByUsername(personalDataForm.getUsername()).isPresent()) {
             result.addError(new FieldError("personalDataForm", "username", "Benutzername existiert bereits."));
         }
         if (result.hasErrors()) {
@@ -247,7 +249,7 @@ class AccountController {
         String messageText = "Startpasswort des neuen Angestellten " + user + ": " + password;
         messageRepo.save(new Message(MessageKind.NOTIFICATION, messageText));
 
-        return "redirect:/staff/" + ua.getId();
+        return "redirect:/staff/" + urlEncode(ua.getId().toString());
     }
 
     /**
@@ -313,7 +315,7 @@ class AccountController {
                 return "changepw";
 
             default:
-                return "redirect:/staff/" + uai;
+                return "redirect:/staff/" + urlEncode(uai.toString());
         }
     }
 
@@ -341,7 +343,7 @@ class AccountController {
         uam.save(ua);
         userRepo.save(user);
 
-        return "redirect:/staff/" + uai;
+        return "redirect:/staff/" + urlEncode(uai.toString());
     }
 
     /**
@@ -364,7 +366,7 @@ class AccountController {
         } else {
             changePassword(user, newPW);
             messageRepo.save(new Message(MessageKind.NOTIFICATION, "Neues Passwort von Nutzer " + user + ": " + newPW));
-            return "redirect:/staff/" + uai;
+            return "redirect:/staff/" + urlEncode(uai.toString());
         }
     }
     //endregion
@@ -647,6 +649,20 @@ class AccountController {
             }
         }
         return employees;
+    }
+
+    /**
+     * Helper method to url-encode a string.
+     *
+     * @param str String to be encoded
+     */
+    private String urlEncode(String str) {
+        try {
+            str = URLEncoder.encode(str, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            str = "";
+        }
+        return str;
     }
     //endregion
 }
