@@ -138,9 +138,7 @@ class CartController {
             number = inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact();
         }
 
-        System.out.println("Anzahl Produkte vor dem hinzufügen zu Cart  " + inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact());
         CartItem item = cart.addOrUpdateItem(product, Units.of(number));
-        System.out.println("zu Cart hinzugefügt:  " + number);
 
         if (item.getQuantity().getAmount().intValueExact() >= inventory.findByProduct(product).get().getQuantity().getAmount().intValueExact()) {
             cart.removeItem(item.getIdentifier());
@@ -250,6 +248,7 @@ class CartController {
     public String updateCartItem(@RequestParam String identifier, @RequestParam String quantity, @ModelAttribute Cart cart, HttpSession session, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
+
         int oldquantity = Integer.parseInt(cart.getItem(identifier).get().getQuantity().getAmount().toString());
         if (!containsOnlyNumbers(quantity)) {
             return "redirect:/cart";
@@ -307,7 +306,7 @@ class CartController {
         org.joda.money.Money dailyWithdrawalLimit = org.joda.money.Money.of(CurrencyUnit.EUR, 1000);
         org.joda.money.Money creditLimit = org.joda.money.Money.of(CurrencyUnit.EUR, 1000);
         String p = " ";
-        System.out.println(strPayment);
+
         //compares given String with existing methods and generates an required paymentMethod
         if (strPayment.equals("CASH")) {
             paymentMethod = new Cash();
@@ -317,24 +316,9 @@ class CartController {
             return paymentMethod;
         } else if (strPayment.equals("CREDITCARD")) {
             paymentMethod = new CreditCard(p, p, p, p, p, validFrom, expiryDate, p, dailyWithdrawalLimit, creditLimit);
-            System.out.println(strPayment + " " + paymentMethod.toString() + "   allright");
             return paymentMethod;
         }
         return new Cash();
-    }
-
-
-    /**
-     * Returns an overview of current order.
-     *
-     * @param userAccount must not be {@literal null}.
-     */
-    @RequestMapping("/orderoverview")
-    public String orderoverview(@LoggedIn Optional<UserAccount> userAccount) {
-        if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
-            return "redirect:/";
-
-        return "orderoverview";
     }
 
 
@@ -356,8 +340,6 @@ class CartController {
 
             PaymentMethod paymentM = strToPaymentMethod(payment);
             GSOrder order = new GSOrder(userAccount.get(), paymentM);
-
-            System.out.println(paymentM.toString());
 
             for (CartItem cartItem : cart) {
                 order.add(new GSOrderLine(cartItem.getProduct(), cartItem.getQuantity()));
