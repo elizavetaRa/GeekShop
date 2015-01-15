@@ -4,7 +4,6 @@ package geekshop.controller;
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
-import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.CartItem;
 import org.salespointframework.order.OrderLine;
@@ -110,7 +109,6 @@ class ReclaimController {
      */
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
     public String addProductToReclaimCart(@RequestParam("orderNumber") long num, @RequestParam("rpid") ProductIdentifier productid,
-                                          @RequestParam("olid") SalespointIdentifier olid,
                                           @RequestParam("rnumber") int reclaimnumber,
                                           @ModelAttribute Cart cart, HttpSession session, Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
@@ -327,7 +325,7 @@ class ReclaimController {
      * @param model
      */
     @RequestMapping(value = "/updatereclaimcartitem/", method = RequestMethod.POST)
-    public String updateReclaimCartItem(@RequestParam String identifier, @RequestParam String quantity, HttpSession session, /*@RequestParam ("orderNumber") String strNumber,*/ @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+    public String updateReclaimCartItem(@RequestParam String identifier, @RequestParam String quantity, HttpSession session, @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
