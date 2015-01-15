@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.*;
 
 
 public class CatalogControllerTests extends AbstractWebIntegrationTests {
@@ -117,12 +117,18 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
-        for (GSProduct prod : catalog.findAll()) {
+        int cntProducts = 0;
 
-            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        for (GSProduct prod : catalog.findAll()) {
+            if (prod.isInRange()) {
+                assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+                cntProducts++;
+            } else {
+                assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), not(hasItem(prod)));
+            }
         }
-        System.out.println(actual.size());
-        assertTrue(actual.size() == 11);
+
+        assertEquals(actual.size(), cntProducts);
 
 
     }
@@ -138,7 +144,7 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
-        assertTrue(actual.size() == 3);
+        assertEquals(actual.size(), 3);
 
     }
 
@@ -153,7 +159,7 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
-        assertTrue(actual.size() == 4);
+        assertEquals(actual.size(), 4);
 
     }
 
@@ -175,7 +181,8 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             else
                 assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
         }
-        assertTrue(actual.size() == 11);
+
+        assertEquals(actual.size(), 11);
     }
 
     @Test
@@ -192,12 +199,12 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         for (int i = 0; i < actual.size(); i++) {
             if (i > 0)
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())) == -1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
             else
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())) == 1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
         }
 
-        assertTrue(actual.size() == 11);
+        assertEquals(actual.size(), 11);
 
 
     }
@@ -216,12 +223,12 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         for (int i = 0; i < actual.size(); i++) {
             if (i > 0)
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())) == 1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
             else
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())) == -1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
         }
 
-        assertTrue(actual.size() == 11);
+        assertEquals(actual.size(), 11);
     }
 
     @Test
@@ -243,7 +250,7 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
                 assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
         }
 
-        assertTrue(actual.size() == 3);
+        assertEquals(actual.size(), 3);
 
     }
 
@@ -261,12 +268,12 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         for (int i = 0; i < actual.size(); i++) {
             if (i > 0)
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())) == -1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
             else
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())) == 1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
         }
 
-        assertTrue(actual.size() == 3);
+        assertEquals(actual.size(), 3);
 
     }
 
@@ -284,12 +291,12 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         for (int i = 0; i < actual.size(); i++) {
             if (i > 0)
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())) == 1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
             else
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())) == -1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
         }
 
-        assertTrue(actual.size() == 3);
+        assertEquals(actual.size(), 3);
     }
 
     @Test
@@ -311,7 +318,7 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
                 assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
         }
 
-        assertTrue(actual.size() == 4);
+        assertEquals(actual.size(), 4);
     }
 
     @Test
@@ -328,12 +335,12 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         for (int i = 0; i < actual.size(); i++) {
             if (i > 0)
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())) == -1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
             else
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())) == 1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
         }
 
-        assertTrue(actual.size() == 4);
+        assertEquals(actual.size(), 4);
 
     }
 
@@ -351,12 +358,12 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         for (int i = 0; i < actual.size(); i++) {
             if (i > 0)
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())) == 1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
             else
-                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())) == -1);
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
         }
 
-        assertTrue(actual.size() == 4);
+        assertEquals(actual.size(), 4);
 
     }
 }
