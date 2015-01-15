@@ -15,13 +15,12 @@ import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.*;
 
 
 public class CatalogControllerTests extends AbstractWebIntegrationTests {
@@ -116,169 +115,255 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
     public void testParameterlessProductSearch() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, null, null);
 
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
+        int cntProducts = 0;
+
+        for (GSProduct prod : catalog.findAll()) {
+            if (prod.isInRange()) {
+                assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+                cntProducts++;
+            } else {
+                assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), not(hasItem(prod)));
+            }
+        }
+
+        assertEquals(actual.size(), cntProducts);
+
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testProductSearch() {
+        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), "Shirt", null, null);
+
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
+        for (GSProduct prod : catalog.findByName("Shirt")) {
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        assertEquals(actual.size(), 3);
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testCategoryView() {
+        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, null, "subCat1");
+
+        for (GSProduct prod : catalog.findByCategory("subCat1")) {
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
+        assertEquals(actual.size(), 4);
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testParameterlessSortByProductNumber() {
+        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "prodnum", null);
+
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
         for (GSProduct prod : catalog.findAll()) {
 
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
-
-    }
-
-    @Test
-    public void testProductSearch() {
-        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), "Shirt", null, null);
-
-        for (GSProduct prod: catalog.findByName("Shirt")) {
-            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertTrue(actual.get(i).getProductNumber() > actual.get(i - 1).getProductNumber());
+            else
+                assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
         }
 
+        assertEquals(actual.size(), 11);
     }
 
     @Test
-    public void testCategoryView() {
-        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, null, "subCat1");
-
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod1);
-        expected.add(prod5);
-        expected.add(prod6);
-        expected.add(prod7);
-
-        //assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod5));
-
-//        for (GSProduct prod: subCatRepo.findByName("subCat1").getProducts()) {
-//            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
-//        }
-
-
-    }
-
-    @Test
-    public void testParameterlessSortByProductNumber() {
-        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "prodnum", null);
-
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod1);
-        expected.add(prod3);
-        expected.add(prod2);
-        expected.add(prod4);
-        expected.add(prod6);
-        expected.add(prod7);
-        expected.add(prod5);
-        expected.add(prod8);
-        expected.add(prod9);
-        expected.add(prod10);
-        expected.add(prod11);
-
-    }
-
-    @Test
+    @SuppressWarnings("unchecked")
     public void testParameterlessSortByPriceAscending() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "priceasc", null);
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod8);
-        expected.add(prod1);
-        expected.add(prod2);
-        expected.add(prod3);
-        expected.add(prod6);
-        expected.add(prod9);
-        expected.add(prod7);
-        expected.add(prod11);
-        expected.add(prod5);
-        expected.add(prod4);
-        expected.add(prod10);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
+        for (GSProduct prod : catalog.findAll()) {
+
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
+            else
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
+        }
+
+        assertEquals(actual.size(), 11);
+
 
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testParameterlessSortByPriceDescending() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "pricedesc", null);
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod10);
-        expected.add(prod4);
-        expected.add(prod5);
-        expected.add(prod11);
-        expected.add(prod7);
-        expected.add(prod9);
-        expected.add(prod6);
-        expected.add(prod3);
-        expected.add(prod2);
-        expected.add(prod1);
-        expected.add(prod8);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
+        for (GSProduct prod : catalog.findAll()) {
+
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
+            else
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
+        }
+
+        assertEquals(actual.size(), 11);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testSearchedSortByProductNumber() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), "Aufkleber", "prodnum", null);
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod9);
-        expected.add(prod10);
-        expected.add(prod11);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
+        for (GSProduct prod : catalog.findByName("Aufkleber")) {
+
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertTrue(actual.get(i).getProductNumber() > actual.get(i - 1).getProductNumber());
+            else
+                assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
+        }
+
+        assertEquals(actual.size(), 3);
 
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testSearchedSortByPriceAscending() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), "Aufkleber", "priceasc", null);
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod9);
-        expected.add(prod11);
-        expected.add(prod10);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
+        for (GSProduct prod : catalog.findByName("Aufkleber")) {
+
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
+            else
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
+        }
+
+        assertEquals(actual.size(), 3);
 
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testSearchedSortByPriceDescending() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), "Aufkleber", "pricedesc", null);
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod10);
-        expected.add(prod11);
-        expected.add(prod9);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
+        for (GSProduct prod : catalog.findByName("Aufkleber")) {
+
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
+            else
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
+        }
+
+        assertEquals(actual.size(), 3);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCategorySortByProductNumber() {
-        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "prodnum", "subCate1");
+        controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "prodnum", "subCat1");
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod1);
-        expected.add(prod7);
-        expected.add(prod6);
-        expected.add(prod5);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
+        for (GSProduct prod : catalog.findByCategory("subCat1")) {
 
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
 
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertTrue(actual.get(i).getProductNumber() > actual.get(i - 1).getProductNumber());
+            else
+                assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
+        }
+
+        assertEquals(actual.size(), 4);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCategorySortByPriceAscending() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "priceasc", "subCat1");
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod1);
-        expected.add(prod6);
-        expected.add(prod7);
-        expected.add(prod5);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
+        for (GSProduct prod : catalog.findByCategory("subCat1")) {
+
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
+            else
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
+        }
+
+        assertEquals(actual.size(), 4);
 
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCategorySortByPriceDescending() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, "pricedesc", "subCat1");
 
-        Set<GSProduct> expected = new HashSet<>();
-        expected.add(prod5);
-        expected.add(prod7);
-        expected.add(prod6);
-        expected.add(prod1);
+        List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+
+        for (GSProduct prod : catalog.findByCategory("subCat1")) {
+
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+        }
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (i > 0)
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
+            else
+                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
+        }
+
+        assertEquals(actual.size(), 4);
 
     }
 }
