@@ -3,7 +3,6 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
-import org.salespointframework.catalog.Product;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.order.Cart;
@@ -261,8 +260,8 @@ class ReclaimController {
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
 
-        if (!containsOnlyNumbers(searchOrderNumber)) {
-            String error = "Falsche Zeichen. Eingabe muss eine Zahl sein!";
+        if (searchOrderNumber == null || searchOrderNumber.trim().isEmpty() || !containsOnlyNumbers(searchOrderNumber)) {
+            String error = "Eingabe muss eine Artikelnummer sein.";
             model.addAttribute("error", error);
             return "reclaim";
         }

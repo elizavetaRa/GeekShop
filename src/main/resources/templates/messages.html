@@ -31,7 +31,7 @@
 
                 <div th:each="message : ${ownermessage}">
                     <table class="table-style01 alternatRows">
-                        <tr th:if="${message.messageKind == T(geekshop.model.MessageKind).PASSWORD}" style="height: 1.3cm; background: #BE190C; border-color: #BE190C">
+                        <tr th:if="${message.messageKind == T(geekshop.model.MessageKind).PASSWORD}" style="height: 1.3cm; background: #e70; border-color: #BE190C">
                             <td th:utext="'Sicherheitswarnung: ' + ${message.messageText}">Passwort aendern!</td>
                         </tr>
                         <tr th:if="${message.messageKind != T(geekshop.model.MessageKind).PASSWORD}" style="height: 1.3cm; background: #EFEFEF; border-color: #EFEFEF;">

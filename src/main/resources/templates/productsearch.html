@@ -85,7 +85,7 @@
 
                     <form method="get" action="/productsearch" name="formSearch" id="formSearch">
                         <input value="suchen" th:value="${param.q} ? ${param.q[0]}" name="q" id="q"
-                               type="text" size="25" maxlength="400" placeholder="Artikelsuche"/>
+                               type="text" size="35" maxlength="400" placeholder="Suche nach Artikelnr., Artikelname, Kategorie"/>
                         <select name="sort" id="sort" style="margin: 0 15px 0 5px" class="f-right">
                             <option value="name" th:selected="${param.sort} and (${param.sort[0]} == 'name')">Name</option>
                             <option value="priceasc" th:selected="${param.sort} and (${param.sort[0]} == 'priceasc')">Preis
@@ -104,7 +104,10 @@
                     <p th:if="${session.ro}" style="margin-top:10px">Hinweis: Beenden Sie den Reklamationsvorgang.</p>
 
                     <div th:style="${session.ro} ? 'top:70px'">
-                        <table id="searchTable" class="table-style01 alternatRows noMargin">
+                        <p class="infoMsg" th:if="${catalog.isEmpty()} and ${#strings.isEmpty(param.cat[0])}">Keine entsprechenden Artikel gefunden.</p>
+                        <p class="infoMsg" th:if="${catalog.isEmpty()} and !${#strings.isEmpty(param.cat[0])}">Keine Artikel in dieser Kategorie enthalten.</p>
+
+                        <table id="searchTable" class="table-style01 alternatRows noMargin" th:unless="${catalog.isEmpty()}">
                             <tr>
                                 <th>Artikelbezeichnung</th>
                                 <th style="width:84px">Artikelnr.</th>
