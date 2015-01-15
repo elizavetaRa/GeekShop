@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -158,9 +158,9 @@ class CartController {
     /**
      * Creates a map of the given url query string.
      */
-    private static Map<String, String> getQueryMap(String query) {
+    private static LinkedHashMap<String, String> getQueryMap(String query) {
         String[] params = query.split("&");
-        Map<String, String> map = new HashMap<String, String>();
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
         for (String param : params) {
             String[] split = param.split("=");
             String name = split[0];

@@ -9,9 +9,10 @@ import org.salespointframework.catalog.Catalog;
 import org.salespointframework.catalog.ProductIdentifier;
 import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
+import org.salespointframework.order.Cart;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Units;
-import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.Role;
 import org.salespointframework.useraccount.UserAccountIdentifier;
 import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @WebAppConfiguration
-public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
+public class ControllerIntegrationTests extends AbstractWebIntegrationTests {
 
 
     @Autowired
@@ -83,85 +85,104 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
         subCatRepo.save(testSubCat);
         GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
+        catalog.save(testProduct);
         testItem = new GSInventoryItem(testProduct, Units.TEN, Units.of(5L));
         inventory.save(testItem);
-        GSProduct boughtProduct = new GSProduct(0, "WrongTestProduct", Money.parse("EUR 2.00"), testSubCat);
 
         assertNotNull(supCatRepo.findByName("TestSupCat"));
         assertNotNull(subCatRepo.findByName("TestSubCat"));
         assertNotNull(inventory.findByProduct(testProduct));
 
-        mvc.perform(post("/cart")
+        Cart cart = (Cart) mvc.perform(post("/cart")
                 .with(user("owner").roles("OWNER"))
-                .param("pid", testProduct.toString())
+                .param("pid", testProduct.getId().toString())
                 .param("number", "1")
-                .param("query", query))
+                .param("query", query)
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/productsearch"))
-                .andExpect(model().attributeExists("q"))
-                .andExpect(model().attributeExists("sort"))
-                .andExpect(model().attributeExists("cat"));
+                .andExpect(redirectedUrl("/productsearch?" + query))
+                .andReturn().getModelAndView().getModel().get("cart");
 
         mvc.perform((post("/buy")
                 .with(user("owner").roles("OWNER"))
-                .param("payment", payment)))
+                .param("payment", payment))
+                .sessionAttr("cart", cart)
+                .sessionAttr("isReclaim", false))
                 .andExpect(status().isOk())
                 .andExpect(view().name("orderoverview"))
                 .andExpect(model().attributeExists("order"))
-                .andExpect(model().attributeExists("orderoverview"));
+                .andExpect(model().attributeExists("catalog"));
 
-        for (GSOrder order : orderRepo.findAll()) {
+        boolean found = false;
+        for (GSOrder order : orderRepo.findByType(OrderType.NORMAL)) {
             if (!order.isOpen() && !order.isCanceled()) {
-                for (OrderLine ol : order.getOrderLines()) {
-                    if (ol.getProductName().equals(testProduct.getName())) {
-                        boughtProduct = catalog.findOne(ol.getProductIdentifier()).get();
-                    }
+                if (order.findOrderLineByProduct(testProduct) != null) {
+                    found = true;
                 }
             }
         }
 
-        assertEquals(boughtProduct, testProduct);
-        assertTrue(testItem.getQuantity().getAmount().intValueExact() == 9);
+        assertTrue(found);
+
+        assertTrue(testItem.getQuantity().getAmount().intValue() == 9);
 
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void reclaimSomething() throws Exception {
-        Money price = Money.parse("EUR 5.00");
-        long productNumber = 101;
-        long orderNumber = 0;
-        long iterableCount;
-        SuperCategory testSupCat = new SuperCategory("TestSupCat");
-        supCatRepo.save(testSupCat);
-        SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
-        subCatRepo.save(testSubCat);
-        GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
-        testItem = new GSInventoryItem(testProduct, Units.TEN, Units.of(5L));
-        inventory.save(testItem);
-        long currentQuantity = testItem.getQuantity().getAmount().longValue();
 
-        for (GSOrder order : orderRepo.findAll()) {
-            if (!order.isOpen() && !order.isCanceled()) {
+        GSOrder order = null;
+        GSProduct reclProduct = null;
+
+        for (GSOrder o : orderRepo.findByType(OrderType.NORMAL)) {
+            if (!o.isOpen() && !o.isCanceled()) {
+                order = o;
+                boolean exitLoop = false;
                 for (OrderLine ol : order.getOrderLines()) {
-                    if (ol.getProductName().equals(testProduct.getName())) {
-                        orderNumber = order.getOrderNumber();
+                    if (inventory.findByProductIdentifier(ol.getProductIdentifier()).get().getQuantity().getAmount().intValue() > 1) {
+                        reclProduct = catalog.findOne(ol.getProductIdentifier()).get();
+                        exitLoop = true;
+                        break;
                     }
                 }
+                if (exitLoop)
+                    break;
             }
         }
-        iterableCount = orderRepo.count();
 
-        mvc.perform(post("/alltoreclaimcart")
+        if (order == null || reclProduct == null)
+            return;
+
+        long orderNumber = order.getOrderNumber();
+        long iterableCount = orderRepo.count();
+        int productQuantity = inventory.findByProduct(reclProduct).get().getQuantity().getAmount().intValue();
+
+        Map<GSProduct, BigDecimal> mapAmounts = (Map<GSProduct, BigDecimal>)
+                mvc.perform(get("/ordersearch")
+                        .with(user("owner").roles("OWNER"))
+                        .param("searchordernumber", String.valueOf(orderNumber))
+                        .sessionAttr("isReclaim", true))
+                        .andReturn().getRequest().getSession().getAttribute("mapAmounts");
+
+        Cart cart = (Cart) mvc.perform(post("/reclaimcart")
                 .with(user("owner").roles("OWNER"))
-                .param("orderNumber", String.valueOf(orderNumber)));
+                .param("orderNumber", String.valueOf(orderNumber))
+                .param("rpid", reclProduct.getId().toString())
+                .param("rnumber", "2")
+                .sessionAttr("isReclaim", true)
+                .sessionAttr("mapAmounts", mapAmounts))
+                .andReturn().getModelAndView().getModel().get("cart");
 
         mvc.perform(post("/reclaimrequest")
                 .with(user("owner").roles("OWNER"))
-                .param("orderNumber", String.valueOf(orderNumber)));
+                .param("orderNumber", String.valueOf(orderNumber))
+                .sessionAttr("cart", cart)
+                .sessionAttr("overview", true)
+                .sessionAttr("oN", String.valueOf(orderNumber)));
 
         assertEquals(orderRepo.count(), iterableCount + 1);
-        assertEquals(currentQuantity + 1, testItem.getQuantity().getAmount().intValueExact());
-
+        assertEquals(productQuantity, inventory.findByProduct(reclProduct).get().getQuantity().getAmount().intValueExact());
     }
 
     @Test
@@ -342,7 +363,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
 
     @Test
     public void accConSetPWRules() throws Exception {
-        Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put("minLength", "8");
         map.put("upperLower", "1");
         map.put("digits", "1");
@@ -380,8 +401,11 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("isOwnProfile"))
                 .andExpect(model().attributeExists("inEditingMode"));
 
+        hans.getUserAccount().add(new Role("ROLE_INSECURE_PASSWORD"));
+        userRepo.save(hans);
+
         mvc.perform(get("/profile")
-                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/"));
     }
@@ -518,7 +542,6 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
                 .param("query", query));
 
 
-
         mvc.perform(get("/deletecartitem/"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("cart"));
@@ -556,7 +579,6 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
                 .param("pid", testProduct.toString())
                 .param("number", "1")
                 .param("query", query));
-
 
 
         mvc.perform(get("/updatecartitem/")
@@ -832,7 +854,13 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("isNew"));
 
         mvc.perform(post("/range/addproduct")
-                .with(user("owner").roles("OWNER")))
+                .with(user("owner").roles("OWNER"))
+                .param("name", "Täst")
+                .param("productNumber", "1234567")
+                .param("price", "1.234.567,89 €")
+                .param("minQuantity", "5")
+                .param("quantity", "10")
+                .param("subCategory", "Informatik"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
     }
@@ -913,7 +941,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
                 .andExpect(model().attributeExists("superCategories"));
 
         mvc.perform(get("/range/editsub/notExisting")
-                .with(user("owner"). roles("OWNER")))
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
@@ -952,13 +980,15 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
 
         mvc.perform(post("/range/addsub")
                 .with(user("owner").roles("OWNER"))
-                .param("name", name))
+                .param("name", name)
+                .param("superCategory", "Kleidung"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/range"));
 
         mvc.perform(post("/range/addsub")
                 .with(user("owner").roles("OWNER"))
-                .param("name", ""))
+                .param("name", "")
+                .param("superCategory", ""))
                 .andExpect(status().isOk())
                 .andExpect(view().name("editsub"))
                 .andExpect(model().attributeExists("superCategory"))
@@ -988,7 +1018,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         GSProduct product = catalog.findByName(order.getOrderLines().iterator().next().getProductName()).iterator().next();
         ProductIdentifier productID = product.getIdentifier();
         SalespointIdentifier sID = order.findOrderLineByProduct(product).getIdentifier();
-        int reclaimNum = (int)orderRepo.findByType(OrderType.RECLAIM).iterator().next().getOrderNumber();
+        int reclaimNum = (int) orderRepo.findByType(OrderType.RECLAIM).iterator().next().getOrderNumber();
 
         mvc.perform(get("/reclaimcart")
                 .with(user("owner").roles("OWNER")))
