@@ -225,6 +225,7 @@ public class AccountControllerStaffTests extends AbstractWebIntegrationTests {
         formData.put("uai", uai);
         formData.put("firstname", "Test");
         formData.put("lastname", "User");
+        formData.put("username", employee.getUserAccount().getUsername());
         formData.put("email", "user@test.test");
         formData.put("gender", "SOMETHING_ELSE");
         formData.put("dateOfBirth", "12.12.1912");
