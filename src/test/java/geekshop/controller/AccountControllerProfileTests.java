@@ -102,6 +102,7 @@ public class AccountControllerProfileTests extends AbstractWebIntegrationTests {
         formData.put("uai", owner.getUserAccount().getId().toString());
         formData.put("firstname", "Test");
         formData.put("lastname", "User");
+        formData.put("username", owner.getUserAccount().getUsername());
         formData.put("email", "user@test.test");
         formData.put("gender", "SOMETHING_ELSE");
         formData.put("dateOfBirth", "12.12.1912");
@@ -141,6 +142,7 @@ public class AccountControllerProfileTests extends AbstractWebIntegrationTests {
         formData.put("uai", employee.getUserAccount().getId().toString());
         formData.put("firstname", "Test");
         formData.put("lastname", "Employee");
+        formData.put("username", employee.getUserAccount().getUsername());
         formData.put("email", "user@test.test");
         formData.put("gender", "SOMETHING_ELSE");
         formData.put("dateOfBirth", "12.12.1912");
