@@ -6,19 +6,21 @@ import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.salespointframework.catalog.Catalog;
+import org.salespointframework.catalog.ProductIdentifier;
+import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.inventory.Inventory;
-import org.salespointframework.order.Cart;
 import org.salespointframework.order.OrderLine;
 import org.salespointframework.quantity.Units;
-import org.salespointframework.useraccount.AuthenticationManager;
+import org.salespointframework.useraccount.UserAccount;
+import org.salespointframework.useraccount.UserAccountIdentifier;
 import org.salespointframework.useraccount.UserAccountManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpSession;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -32,20 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
 
-    @Autowired
-    private AccountController accController;
-    @Autowired
-    private CartController cartController;
-    @Autowired
-    private CatalogController catController;
-    @Autowired
-    private OwnerController ownController;
-    @Autowired
-    private ReclaimController recController;
-    @Autowired
-    private AuthenticationManager authManager;
-    @Autowired
-    private HttpSession session;
+
     @Autowired
     private UserRepository userRepo;
     @Autowired
@@ -61,14 +50,15 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     @Autowired
     private SuperCategoryRepository supCatRepo;
     @Autowired
-    private PasswordRulesRepository passwordRulesRepo;
+    private MessageRepository messageRepo;
+    @Autowired
+    private JokeRepository jokeRepo;
 
 
     private Model model;
     private User hans;
     private User owner;
     private GSInventoryItem testItem;
-    long quantity = 1;
 
     @Before
     public void setup() {
@@ -78,7 +68,6 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         owner = userRepo.findByUserAccount(uam.findByUsername("owner").get());
 
         login("owner", "123");
-//        owner = userRepo.findByUserAccount(authManager.getCurrentUser().get());
 
         super.setUp();
     }
@@ -86,8 +75,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     @Test
     public void buySomething() throws Exception {
         Money price = Money.parse("EUR 5.00");
-        Cart testCart = new Cart();
-        String query = "TestProduct=1";
+        String query = "q=aufkl&sort=name&cat=";
         String payment = "CASH";
         long productNumber = 101;
         SuperCategory testSupCat = new SuperCategory("TestSupCat");
@@ -103,16 +91,30 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         assertNotNull(subCatRepo.findByName("TestSubCat"));
         assertNotNull(inventory.findByProduct(testProduct));
 
-        cartController.addProductToCart(testProduct, quantity, query, testCart, session, Optional.of(owner.getUserAccount()), model);
-        cartController.buy(testCart, session, payment, Optional.of(owner.getUserAccount()), model);
+        mvc.perform(post("/cart")
+                .with(user("owner").roles("OWNER"))
+                .param("pid", testProduct.toString())
+                .param("number", "1")
+                .param("query", query))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/productsearch"))
+                .andExpect(model().attributeExists("q"))
+                .andExpect(model().attributeExists("sort"))
+                .andExpect(model().attributeExists("cat"));
+
+        mvc.perform((post("/buy")
+                .with(user("owner").roles("OWNER"))
+                .param("payment", payment)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("orderoverview"))
+                .andExpect(model().attributeExists("order"))
+                .andExpect(model().attributeExists("orderoverview"));
 
         for (GSOrder order : orderRepo.findAll()) {
             if (!order.isOpen() && !order.isCanceled()) {
                 for (OrderLine ol : order.getOrderLines()) {
                     if (ol.getProductName().equals(testProduct.getName())) {
-
                         boughtProduct = catalog.findOne(ol.getProductIdentifier()).get();
-
                     }
                 }
             }
@@ -126,9 +128,7 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
     @Test
     public void reclaimSomething() throws Exception {
         Money price = Money.parse("EUR 5.00");
-        Cart testCart = new Cart();
         long productNumber = 101;
-        long currentQuantity = testItem.getQuantity().getAmount().intValueExact();
         long orderNumber = 0;
         long iterableCount;
         SuperCategory testSupCat = new SuperCategory("TestSupCat");
@@ -136,7 +136,9 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
         subCatRepo.save(testSubCat);
         GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
-
+        testItem = new GSInventoryItem(testProduct, Units.TEN, Units.of(5L));
+        inventory.save(testItem);
+        long currentQuantity = testItem.getQuantity().getAmount().longValue();
 
         for (GSOrder order : orderRepo.findAll()) {
             if (!order.isOpen() && !order.isCanceled()) {
@@ -149,11 +151,16 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
         }
         iterableCount = orderRepo.count();
 
-        recController.allToReclaimCart(orderNumber, testCart, model, session, Optional.of(owner.getUserAccount()));
-        recController.reclaimIt(testCart, String.valueOf(orderNumber), session, Optional.of(owner.getUserAccount()), model);
+        mvc.perform(post("/alltoreclaimcart")
+                .with(user("owner").roles("OWNER"))
+                .param("orderNumber", String.valueOf(orderNumber)));
+
+        mvc.perform(post("/reclaimrequest")
+                .with(user("owner").roles("OWNER"))
+                .param("orderNumber", String.valueOf(orderNumber)));
 
         assertEquals(orderRepo.count(), iterableCount + 1);
-        assertEquals(currentQuantity + quantity, testItem.getQuantity().getAmount().intValueExact());
+        assertEquals(currentQuantity + 1, testItem.getQuantity().getAmount().intValueExact());
 
     }
 
@@ -183,467 +190,953 @@ public class ControllerIntegrationTest extends AbstractWebIntegrationTests {
 
     @Test
     public void accConStaff() throws Exception {
-        mvc.perform(get("/staff"))
+        mvc.perform(get("/staff/")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("staff"))
                 .andExpect(model().attributeExists("staff"));
+
+        mvc.perform(get("/staff")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void accConShowEmployee() throws Exception {
-        mvc.perform(get("/staff/{uai}"))
+        UserAccountIdentifier uai = hans.getUserAccount().getIdentifier();
+
+        mvc.perform(get("/staff/" + uai.toString())
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
                 .andExpect(model().attributeExists("isOwnProfile"))
                 .andExpect(model().attributeExists("inEditingMode"));
+
+        mvc.perform(get("/staff/" + uai.toString())
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void accConHire() throws Exception {
-        mvc.perform(post("/addemployee"))
+        mvc.perform(get("/addemployee")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("staff"));
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeExists("inEditingMode"))
+                .andExpect(model().attributeExists("personalDataForm"));
+
+        mvc.perform(post("/addemployee")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/staff/"));
+
+        mvc.perform(get("/addemployee")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
+
+        mvc.perform(post("/addemployee")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
+
     }
 
     @Test
     public void accConFire() throws Exception {
-        mvc.perform(delete("/staff/{uai}"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("staff"));
+        UserAccountIdentifier uai = hans.getUserAccount().getIdentifier();
+
+        mvc.perform(delete("/staff/" + uai.toString())
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/staff"));
+
+        mvc.perform(delete("/staff/" + uai.toString())
+                .with(user("erna").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void accConFireAll() throws Exception {
-        mvc.perform(delete("/firestaff"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("staff"));
+        mvc.perform(delete("/firestaff")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/staff"));
+
+        mvc.perform(delete("/firestaff")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void accConProfileChange1() throws Exception {
-        mvc.perform(get("/staff/{uai}/{page}"))
-                .andExpect(status().isOk());
-//                .andExpect(view().name("welcome"))
-//                .andExpect(model().attributeExists("joke"));
+    public void accConProfileChangeOwner() throws Exception {
+        UserAccountIdentifier uai = hans.getUserAccount().getIdentifier();
+
+        mvc.perform(get("/staff/" + uai.toString() + "/changedata")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeExists("personalDataForm"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("inEditingMode"));
+
+        mvc.perform(get("/staff/" + uai.toString() + "/changepw")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("changepw"))
+                .andExpect(model().attributeExists("fullname"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("passwordRules"));
+
+        mvc.perform(get("/staff/" + uai.toString() + "/changedata")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
+
+        mvc.perform(get("/staff/" + uai.toString() + "/changepw")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void accConChangedData() throws Exception {
-        mvc.perform(post("/staff/{uai}/changedata"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("staff"));
+        UserAccountIdentifier uai = hans.getUserAccount().getIdentifier();
+
+        mvc.perform(post("/staff/" + uai.toString() + "/changedata")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/staff/" + uai.toString()));
+
+        mvc.perform(post("/staff/" + uai.toString() + "/changedata")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void accConChangedPW() throws Exception {
-        mvc.perform(post("/staff/{uai}/changepw"))
+        UserAccountIdentifier uai = hans.getUserAccount().getIdentifier();
+
+        mvc.perform(post("/staff/" + uai.toString() + "/changepw")
+                .with(user("owner").roles("OWNER"))
+                .param("newPW", "!A2s3d4f")
+                .param("retypePW", "!A2s3d4f"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/staff/" + uai.toString()));
+
+        mvc.perform(post("/staff/" + uai.toString() + "/changepw")
+                .with(user("owner").roles("OWNER"))
+                .param("newPW", "!A2s3d4f")
+                .param("retypePW", "!A2s3d"))
                 .andExpect(status().isOk())
-                .andExpect(view().name(""));
+                .andExpect(view().name("changepw"))
+                .andExpect(model().attributeExists("fullname"))
+                .andExpect(model().attributeExists("newPW"))
+                .andExpect(model().attributeExists("retypePW"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("passwordRules"));
+
+        mvc.perform(post("/staff/" + uai.toString() + "/changedata")
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("newPW", "!A2s3d4f")
+                .param("retypePW", "!A2s3d4f"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void accConSetPWRules() throws Exception {
-        mvc.perform(post("/setrules"))
+        Map<String,String> map = new HashMap<>();
+        map.put("minLength", "8");
+        map.put("upperLower", "1");
+        map.put("digits", "1");
+        map.put("specialChars", "1");
+
+        mvc.perform(get("/setrules")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("staff"));
+                .andExpect(view().name("setrules"))
+                .andExpect(model().attributeExists("passwordRules"))
+                .andExpect(model().attributeExists("setRulesForm"));
+
+        mvc.perform(get("/setrules")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isForbidden());
+
+        mvc.perform(post("/setrules")
+                .with(user("owner").roles("OWNER"))
+                .param("map", map.toString()))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/staff"));
+
+        mvc.perform(get("/setrules")
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("map", map.toString()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void accConProfile() throws Exception {
-        mvc.perform(get("/profile"))
+        mvc.perform(get("/profile")
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
                 .andExpect(model().attributeExists("isOwnProfile"))
                 .andExpect(model().attributeExists("inEditingMode"));
+
+        mvc.perform(get("/profile")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
-    public void accConProfileChange2() throws Exception {
-        mvc.perform(get("/profile/{page}"))
+    public void accConProfileChange() throws Exception {
+        mvc.perform(get("/profile/changedata")
+                .with(user("hans").roles("EMPLOYEE")))
                 .andExpect(status().isOk())
-                .andExpect(view().name(""));
+                .andExpect(view().name("profile"))
+                .andExpect(model().attributeExists("personalDataForm"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("inEditingMode"));
+
+        mvc.perform(get("/profile/changepw")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("changepw"))
+                .andExpect(model().attributeExists("fullname"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("passwordRules"));
+
+        mvc.perform(get("/profile")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void accConChangedOwnData() throws Exception {
-        mvc.perform(post("/profile/changedata"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("profile"));
+        mvc.perform(post("/profile/changedata")
+                .with(user("hans").roles("EMPLOYEE")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/profile"));
+
+        mvc.perform(get("/profile")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void accConChangedOwnPW() throws Exception {
-        mvc.perform(post("/profile/changepw"))
+        String oldPW = "";
+
+        mvc.perform(post("/profile/changepw")
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("oldPW", oldPW)
+                .param("newPW", "!A2s3d4f")
+                .param("retypePW", "!A2s3d4f"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/profile"));
+
+        mvc.perform(post("/profile/changepw")
+                .with(user("hans").roles("EMPLOYEE"))
+                .param("oldPW", oldPW)
+                .param("newPW", "!A2s3d4f")
+                .param("retypePW", "!A2s3d"))
                 .andExpect(status().isOk())
-                .andExpect(view().name(""));
+                .andExpect(view().name("changepw"))
+                .andExpect(model().attributeExists("fullname"))
+                .andExpect(model().attributeExists("oldPW"))
+                .andExpect(model().attributeExists("newPW"))
+                .andExpect(model().attributeExists("retypePW"))
+                .andExpect(model().attributeExists("isOwnProfile"))
+                .andExpect(model().attributeExists("passwordRules"));
+
+        mvc.perform(post("/profile")
+                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .param("oldPW", oldPW)
+                .param("newPW", "!A2s3d4f")
+                .param("retypePW", "!A2s3d4f"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConCart() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/cart")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+                .andExpect(view().name("cart"))
+                .andExpect(model().attributeExists("inventory"));
 
-    @Test
-    public void cartConAddProductToCart() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(get("/cart")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(post("/cart")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConDeleteAll() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(delete("/deleteallitems")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/cart"));
+
+        mvc.perform(get("/deleteallitems/")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("cart"));
+
+        mvc.perform(delete("/deleteallitems")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(get("/deleteallitems")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConDeleteCartItem() throws Exception {
-        mvc.perform(get("/index"))
+        Money price = Money.parse("EUR 5.00");
+        String query = "TestProduct=1";
+        long productNumber = 101;
+        SuperCategory testSupCat = new SuperCategory("TestSupCat");
+        supCatRepo.save(testSupCat);
+        SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
+        subCatRepo.save(testSubCat);
+        GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
+
+        mvc.perform(post("/cart")
+                .with(user("owner").roles("OWNER"))
+                .param("pid", testProduct.toString())
+                .param("number", "1")
+                .param("query", query));
+
+
+
+        mvc.perform(get("/deletecartitem/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("cart"));
+
+        mvc.perform(post("/deletecartitem/")
+                .with(user("owner").roles("OWNER"))
+                .param("identifier", testProduct.getIdentifier().toString()))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/cart"));
+
+        mvc.perform(get("/deleteallitems/")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(post("/deleteallitems/")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConUpdateCartItem() throws Exception {
-        mvc.perform(get("/index"))
+        Money price = Money.parse("EUR 5.00");
+        String query = "TestProduct=1";
+        long productNumber = 101;
+        SuperCategory testSupCat = new SuperCategory("TestSupCat");
+        supCatRepo.save(testSupCat);
+        SubCategory testSubCat = new SubCategory("TestSubCat", testSupCat);
+        subCatRepo.save(testSubCat);
+        GSProduct testProduct = new GSProduct(productNumber, "TestProduct", price, testSubCat);
+
+        mvc.perform(post("/cart")
+                .with(user("owner").roles("OWNER"))
+                .param("pid", testProduct.toString())
+                .param("number", "1")
+                .param("query", query));
+
+
+
+        mvc.perform(get("/updatecartitem/")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("cart"));
+
+        mvc.perform(post("/updatecartitem/")
+                .with(user("owner").roles("OWNER"))
+                .param("identifier", testProduct.getIdentifier().toString())
+                .param("quantity", "1"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("cart"));
+
+        mvc.perform(get("/updatecartitem/")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(post("/updatecartitem/")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConCheckOut() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/checkout")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("checkout"));
+
+        mvc.perform(get("/checkout")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConOrderOverview() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/orderoverview"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("orderoverview"));
+
+        mvc.perform(post("/orderoverview")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void cartConBuy() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(get("/buy")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/productsearch"));
+
+        mvc.perform(get("/buy")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(post("/buy")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void catConSearchEntryByName() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/productsearch")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("productsearch"))
+                .andExpect(model().attributeExists("catalog"))
+                .andExpect(model().attributeExists("superCategories"))
+                .andExpect(model().attributeExists("subCategories"))
+                .andExpect(model().attributeExists("inventory"));
+
+        mvc.perform(get("/productsearch")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void ownConOrders() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/orders")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("orders"))
+                .andExpect(model().attributeExists("setOrders"))
+                .andExpect(model().attributeExists("userRepo"))
+                .andExpect(model().attributeExists("catalog"));
     }
 
     @Test
     public void ownConExportXML() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(get("/exportxml")
+                .with(user("owner").roles("OWNER"))
+                .param("sort", "products"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/orders?sort=products"));
+
+        mvc.perform(get("/exportxml")
+                .with(user("owner").roles("OWNER"))
+                .param("sort", "orders"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/orders?sort=orders"));
     }
 
     @Test
     public void ownConShowReclaim() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        Message message = messageRepo.findByMessageKind(MessageKind.RECLAIM).iterator().next();
+        long messageID = message.getId();
+        String reclaimID = message.getReclaimId();
+        boolean accept = true;
 
-    @Test
-    public void ownConAcceptReclaim() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(post("/showreclaim/" + reclaimID)
+                .with(user("owner").roles("OWNER"))
+                .param("msgId", String.valueOf(messageID)))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("showreclaim"))
+                .andExpect(model().attributeExists("rid"))
+                .andExpect(model().attributeExists("message"))
+                .andExpect(model().attributeExists("products"))
+                .andExpect(model().attributeExists("order"));
+
+        mvc.perform(delete("/showreclaim/" + reclaimID)
+                .with(user("owner").roles("OWNER"))
+                .param("msgId", String.valueOf(messageID))
+                .param("accept", String.valueOf(accept)))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/messages"));
     }
 
     @Test
     public void ownConJokes() throws Exception {
-        mvc.perform(get("/index"))
+        long id = jokeRepo.findAll().iterator().next().getId();
+
+        mvc.perform(get("/jokes")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
+                .andExpect(view().name("jokes"))
+                .andExpect(model().attributeExists("jokes"));
+
+        mvc.perform(get("/jokes/" + String.valueOf(id))
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editjoke"))
                 .andExpect(model().attributeExists("joke"));
+
+        mvc.perform(delete("/jokes/" + String.valueOf(id))
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/jokes"));
     }
 
     @Test
     public void ownConNewJoke() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        String jokeText = "testjoke";
 
-    @Test
-    public void ownConShowJoke() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/newjoke")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("editjoke"));
+
+        mvc.perform(post("/newjoke")
+                .with(user("owner").roles("OWNER"))
+                .param("jokeText", jokeText))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/jokes"));
     }
 
     @Test
     public void ownConEditJoke() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        long id = jokeRepo.findAll().iterator().next().getId();
+        String jokeText = "testjoke";
 
-    @Test
-    public void ownConDeleteJoke() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(post("/editjoke/" + String.valueOf(id))
+                .with(user("owner").roles("OWNER"))
+                .param("jokeText", jokeText))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/jokes"));
     }
 
     @Test
     public void ownConDeleteAllJokes() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(delete("/deljokes")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/jokes"));
     }
 
     @Test
     public void ownConMessages() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        long id = messageRepo.findAll().iterator().next().getId();
 
-    @Test
-    public void ownConDeleteMessages() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/messages")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("messages"))
+                .andExpect(model().attributeExists("ownermessage"));
+
+        mvc.perform(delete("/messages/" + String.valueOf(id))
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/messages"));
     }
 
     @Test
     public void ownConRange() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/range")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("range"))
+                .andExpect(model().attributeExists("inventory"))
+                .andExpect(model().attributeExists("supercategories"));
     }
 
     @Test
-    public void ownConDelSuper() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+    public void ownConRangeDel() throws Exception {
+        String superName = supCatRepo.findAll().iterator().next().getName();
+        String subName = subCatRepo.findAll().iterator().next().getName();
+        ProductIdentifier productID = catalog.findAll().iterator().next().getIdentifier();
 
-    @Test
-    public void ownConDelSubRequest() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        mvc.perform(delete("/range/delsuper")
+                .with(user("owner").roles("OWNER"))
+                .param("superName", superName))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
 
-    @Test
-    public void ownConDelProductRequest() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(delete("/range/delsub")
+                .with(user("owner").roles("OWNER"))
+                .param("subName", subName))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
+
+        mvc.perform(delete("/range/delproduct")
+                .with(user("owner").roles("OWNER"))
+                .param("productIdent", productID.toString()))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
     }
 
     @Test
     public void ownConEditProduct() throws Exception {
-        mvc.perform(get("/index"))
+        ProductIdentifier productID = catalog.findAll().iterator().next().getIdentifier();
+
+        mvc.perform(get("/range/editproduct/" + productID.toString())
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("editproduct"))
+                .andExpect(model().attributeExists("productForm"))
+                .andExpect(model().attributeExists("productName"))
+                .andExpect(model().attributeExists("superCategories"))
+                .andExpect(model().attributeExists("isNew"));
+
+        mvc.perform(post("/range/editproduct/" + productID.toString())
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
     }
 
     @Test
     public void ownConAddProduct() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/range/addproduct")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+                .andExpect(view().name("editproduct"))
+                .andExpect(model().attributeExists("productForm"))
+                .andExpect(model().attributeExists("superCategories"))
+                .andExpect(model().attributeExists("isNew"));
 
-    @Test
-    public void ownConAddProductToCatalog() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(post("/range/addproduct")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
     }
 
     @Test
     public void ownConEditSuperCategory() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        String superName = supCatRepo.findAll().iterator().next().getName();
+        String name = subCatRepo.findAll().iterator().next().getName();
 
-    @Test
-    public void ownConEditSuper() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/range/editsuper/" + superName)
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("editsuper"))
+                .andExpect(model().attributeExists("super"))
+                .andExpect(model().attributeExists("name"));
+
+        mvc.perform(post("/range/editsuper/" + superName)
+                .with(user("owner").roles("OWNER"))
+                .param("name", name))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
+
+        mvc.perform(post("/range/editsuper/" + superName)
+                .with(user("owner").roles("OWNER"))
+                .param("name", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editsuper"))
+                .andExpect(model().attributeExists("super"))
+                .andExpect(model().attributeExists("name"))
+                .andExpect(model().attributeExists("nameError"));
+
+        mvc.perform(post("/range/editsuper/" + superName)
+                .with(user("owner").roles("OWNER"))
+                .param("name", superName))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editsuper"))
+                .andExpect(model().attributeExists("super"))
+                .andExpect(model().attributeExists("name"))
+                .andExpect(model().attributeExists("nameError"));
     }
 
     @Test
     public void ownConAddSuper() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        String name = "testName";
 
-    @Test
-    public void ownConAddSuperCategory() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/range/addsuper")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("editsuper"));
+
+        mvc.perform(post("/range/addsuper")
+                .with(user("owner").roles("OWNER"))
+                .param("name", name))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
+
+        mvc.perform(post("/range/addsuper")
+                .with(user("owner").roles("OWNER"))
+                .param("name", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editsuper"))
+                .andExpect(model().attributeExists("name"))
+                .andExpect(model().attributeExists("nameError"));
     }
 
     @Test
     public void ownConEditSubCategory() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        String sub = subCatRepo.findAll().iterator().next().getName();
+        String newSub = "newTestName";
 
-    @Test
-    public void ownConEditSub() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/range/editsub/" + sub)
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("editsub"))
+                .andExpect(model().attributeExists("sub"))
+                .andExpect(model().attributeExists("superCategory"))
+                .andExpect(model().attributeExists("name"))
+                .andExpect(model().attributeExists("superCategories"));
+
+        mvc.perform(get("/range/editsub/notExisting")
+                .with(user("owner"). roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
+
+        mvc.perform(post("/range/editsub/" + sub)
+                .with(user("owner").roles("OWNER"))
+                .param("name", newSub))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
+
+        mvc.perform(post("/range/editsub/notExisting")
+                .with(user("owner").roles("OWNER"))
+                .param("name", newSub))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
+
+        mvc.perform(post("/range/editsub/" + sub)
+                .with(user("owner").roles("OWNER"))
+                .param("name", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editsub"))
+                .andExpect(model().attributeExists("sub"))
+                .andExpect(model().attributeExists("superCategory"))
+                .andExpect(model().attributeExists("name"))
+                .andExpect(model().attributeExists("superCategories"));
     }
 
     @Test
     public void ownConAddSubCategory() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        String name = "newSub";
 
-    @Test
-    public void ownConAddSub() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/range/addsub")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("editsub"))
+                .andExpect(model().attributeExists("superCategories"));
+
+        mvc.perform(post("/range/addsub")
+                .with(user("owner").roles("OWNER"))
+                .param("name", name))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/range"));
+
+        mvc.perform(post("/range/addsub")
+                .with(user("owner").roles("OWNER"))
+                .param("name", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editsub"))
+                .andExpect(model().attributeExists("superCategory"))
+                .andExpect(model().attributeExists("name"))
+                .andExpect(model().attributeExists("superCategories"))
+                .andExpect(model().attributeExists("nameError"));
     }
 
     @Test
     public void recConReclaim() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/reclaim")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("reclaim"))
+                .andExpect(model().attributeExists("catalog"));
+
+        mvc.perform(post("/reclaim")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void recConReclaimCart() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        GSOrder order = orderRepo.findByType(OrderType.NORMAL).iterator().next();
+        long num = order.getOrderNumber();
+        GSProduct product = catalog.findByName(order.getOrderLines().iterator().next().getProductName()).iterator().next();
+        ProductIdentifier productID = product.getIdentifier();
+        SalespointIdentifier sID = order.findOrderLineByProduct(product).getIdentifier();
+        int reclaimNum = (int)orderRepo.findByType(OrderType.RECLAIM).iterator().next().getOrderNumber();
 
-    @Test
-    public void recConAddProductToReclaimCart() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(get("/reclaimcart")
+                .with(user("owner").roles("OWNER")))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("cart"));
+
+        mvc.perform(post("/reclaimcart")
+                .with(user("owner").roles("OWNER"))
+                .param("orderNumber", String.valueOf(num))
+                .param("rpid", productID.toString())
+                .param("olid", sID.toString())
+                .param("rnumber", String.valueOf(reclaimNum)))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/reclaim"))
+                .andExpect(model().attributeExists("orderNumber"))
+                .andExpect(model().attributeExists("reclaimorder"));
+
+        mvc.perform(get("/reclaimcart")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(post("/relaimcart")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void recConAllToReclaimCart() throws Exception {
-        mvc.perform(get("/index"))
+        long num = orderRepo.findByType(OrderType.NORMAL).iterator().next().getOrderNumber();
+
+        mvc.perform(post("/alltoreclaimcart")
+                .with(user("owner").roles("OWNER"))
+                .param("orderNumber", String.valueOf(num)))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("cart"))
+                .andExpect(model().attributeExists("orderNumber"));
+
+        mvc.perform(post("/alltoreclaimcart")
+                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .param("orderNumber", String.valueOf(num)))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void recConReclaimIt() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
-    }
+        long num = orderRepo.findByType(OrderType.NORMAL).iterator().next().getOrderNumber();
 
-    @Test
-    public void recConReclaimBasket() throws Exception {
-        mvc.perform(get("/index"))
+        mvc.perform(post("/reclaimrequest")
+                .with(user("owner").roles("OWNER"))
+                .param("orderNumber", String.valueOf(num)))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("orderoverview"))
+                .andExpect(model().attributeExists("order"))
+                .andExpect(model().attributeExists("catalog"));
+
+        mvc.perform(post("/reclaimrequest")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void recConSearchOrderByNumber() throws Exception {
-        mvc.perform(get("/index"))
+        String searchOrderNumber = String.valueOf(orderRepo.findByType(OrderType.NORMAL).iterator().next().getOrderNumber());
+
+        mvc.perform(get("/ordersearch")
+                .with(user("owner").roles("OWNER"))
+                .param("searchordernumber", searchOrderNumber))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("reclaim"))
+                .andExpect(model().attributeExists("reclaimorder"))
+                .andExpect(model().attributeExists("catalog"));
+
+        mvc.perform(post("/ordersearch")
+                .with(user("owner").roles("OWNER"))
+                .param("searchordernumber", "test"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reclaim"))
+                .andExpect(model().attributeExists("error"));
+
+        mvc.perform(post("/ordersearch")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void recConCheckOut() throws Exception {
-        mvc.perform(get("/index"))
+        String orderNum = String.valueOf(orderRepo.findByType(OrderType.NORMAL).iterator().next().getOrderNumber());
+
+        mvc.perform(get("/rcheckout")
+                .with(user("owner").roles("OWNER"))
+                .param("orderNumber", orderNum))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+                .andExpect(view().name("checkout"));
+
+        mvc.perform(get("/rcheckout")
+                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .param("orderNumber", orderNum))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void recConUpdateReclaimCartItem() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        GSOrder reclaim = orderRepo.findByType(OrderType.RECLAIM).iterator().next();
+        String identifier = reclaim.getIdentifier().toString();
+        String quantity = "1";
+
+        mvc.perform(post("/updatereclaimcartitem/")
+                .with(user("owner").roles("OWNER"))
+                .param("identifier", identifier)
+                .param("quantity", quantity))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("cart"));
+
+        mvc.perform(post("/updatereclaimcartitem/")
+                .with(user("hans").roles("INSECURE_PASSWORD"))
+                .param("identifier", identifier)
+                .param("quantity", quantity))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
     public void recConCancelReclaim() throws Exception {
-        mvc.perform(get("/index"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("welcome"))
-                .andExpect(model().attributeExists("joke"));
+        mvc.perform(get("/cancelreclaim")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/reclaim"));
+
+        mvc.perform(post("/cancelreclaim")
+                .with(user("owner").roles("OWNER")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/reclaim"));
+
+        mvc.perform(get("/cancelreclaim")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
+
+        mvc.perform(post("/cancelreclaim")
+                .with(user("hans").roles("INSECURE_PASSWORD")))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/"));
     }
 
 
