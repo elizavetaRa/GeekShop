@@ -3,6 +3,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{tabularx}
+\usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage[ngerman]{babel}
@@ -10,6 +11,7 @@
 \usepackage{scrpage2,lastpage}
 \usepackage{a4wide}
 \begin{document}
+\newcommand{\half}{0.5\textwidth}
 
 % Titelblatt
 \input{./title.tex}
@@ -29,35 +31,60 @@ Um das Geschäftsklima zu verbessern, hätten wir gern, dass jeder Angestellte m
 Einzelne Mitarbeiter sollen sich mit ihrem Namen und einem sicheren Passwort anmelden können. Unsichere Passwörter sollen bei uns gar nicht erst zugelassen werden. Ein Passwort wie „mama“ wäre also unerwünscht. Möglich wäre z. B. „MaM4.12\$“.\\
 Mitarbeiter sollen vor allem Einkäufe von Kunden abwickeln. Unser Sortiment ist in Kategorien wie z. B. „Nerd-Wear“ oder „Elektronische Gagdets“ gegliedert. Die Kategorien sind ihrerseits wieder in Unterkategorien wie z. B. „Admin-Shirts“ o. „Gamer-Shirts“ unterteilt. Mitarbeiter sollen sich zunächst durch das Sortiment „klicken“ können oder über eine Suchfunktion Waren direkt finden. Angezeigte Ergebnisse sollen nach allen Kriterien (auf/absteigend nach Preis, nach Name ...) sortiert werden können, wie man es von gängigen Online-Shops her kennt. Die Angestellten sollen die Möglichkeit haben, die Waren nacheinander in einen Warenkorb einzufügen. Im nächsten Schritt sollen die Angestellten eine Übersicht über den Einkauf erhalten und die Zahlungsweise eingeben können. Es ist für Kunden möglich per elektronischem Lastschriftverfahren, per Kreditkarte oder bar zu zahlen. Nach der Bezahlung soll eine druckfertige Rechnung angezeigt werden.\\
 Wir haben eine 14-tägige Geld-zurück-Garantie. Falls ein Kunde etwas reklamieren möchte, soll(en) der/die Artikel ebenfalls in einen Warenkorb gelegt werden. Im nächsten Schritt soll noch einmal die Übersicht über die Reklamation gezeigt werden. Es ist dann erforderlich, dass der Abschluss einer Reklamation vom Ladenbesitzer genehmigt werden muss. Am besten wäre es, wenn er dazu Name und Passwort eingeben müsste.\\
-Der Ladenbesitzer ist für die Verwaltung der Mitarbeiter zuständig. Er kann sie entlassen, einstellen oder ihre persönlichen Daten verändern. Nur der Ladenbesitzer kann das Sortiment bearbeiten. Das heißt er kann Kategorien und Unterkategorien erstellen, löschen und umbenennen. Ebenfalls kann nur er Artikel hinzufügen, löschen und bearbeiten.\\
+Der Ladenbesitzer ist für die Verwaltung der Mitarbeiter zuständig. Er kann sie entlassen, einstellen oder ihre persönlichen Daten verändern. Nur der Ladenbesitzer kann das Sortiment bearbeiten. Das hei\ss{}t er kann Kategorien und Unterkategorien erstellen, löschen und umbenennen. Ebenfalls kann nur er Artikel hinzufügen, löschen und bearbeiten.\\
 Ein Überblick über den aktuellen Lagerbestand ist ebenfalls erforderlich. Der Ladenbesitzer muss den Bestand natürlich auch verändern können, um neue Lieferungen einzutragen.\\
 Wenn der Bestand eines Artikels eine untere Grenze unterschreitet, möchte der Ladenbesitzer natürlich gewarnt werden.\\
 Der Ladenbesitzer kann auf „Rohdaten“ aller Verkäufe zugreifen. Also wann, welcher Artikel, in welcher Menge verkauft wurde. Wir planen bei einem Freelancer ein umfangreiches Statistik-Tool für uns in Auftrag zu geben. Damit dieser gleich diese Rohdaten benutzen kann, brauchen wir eine Exportfunktion, die die Daten in eine XML Datei schreibt.
 
-% Qualitätsziele
-\subsection{Qualitätsziele}
-
 % Stakeholder
 \subsection{Stakeholder}
-\begin{tabularx}{\textwidth}{| *5{>{\arraybackslash}X|}} \hline
-Rolle & Beschreibung & Ziel/Intention & Kontakt & Bemerkungen\\ \hline
-Owner & Ladenbesitzer & NA & NA & NA\\ \hline
+\begin{tabularx}{\textwidth}{| *4{>{\arraybackslash}X|}} \hline
+{\textbf{Rolle}} & {\textbf{Beschreibung}} & {\textbf{Ziel/Intention}} & {\textbf{Bemerkungen}}\\ \hline
+Owner & Ladenbesitzer & GELD & alle Rechte\\ \hline
+Employee & Mitarbeiter & Arbeiten $\rightarrow$ Geld & Sklave\\ \hline
 \end{tabularx}
 
 % Randbedingungen
 \section{Randbedingungen}
-
 % Technische Randbedingungen
 \subsection{Technische Randbedingungen}
+\begin{tabular}{|p{\half}|p{\half}|} \hline
+\multicolumn{2}{|p{\textwidth}|}{Hardware-Vorgaben}\\ \hline
+& RAM: 128 MB\\ \cline{2-2}
+& Datentr\"agerkapazit\"at: 150 MB\\ \cline{2-2}
+& mindestens 266MHz-Prozessor\\ \hline
+\multicolumn{2}{|p{\textwidth}|}{Software-Vorgaben}\\ \hline
+& Java 8\\ \cline{2-2}
+& Browser mit HTML5-Unterst\"utzung\\ \hline
+\multicolumn{2}{|p{\textwidth}|}{Programmiervorgaben}\\ \hline
+& Java 8\\ \cline{2-2}
+& Thymeleaf\\ \cline{2-2}
+& Maven 3.2.5\\ \cline{2-2}
+& Spring-Framework 4.1.4\\ \cline{2-2}
+& SalesPoint-Framework 6.1.1\\ \hline
+
+
+\end{tabular}
+
+
 
 % Konventionen
 \subsection{Konventionen}
+Zur optischen Unifizierung des Codes und zur Optimierung der {\textit{Imports}} wurde die Autoformatierung von IntelliJ IDEA 14 verwendet.\\
+Die Namenskonvention lautet wie folgt:\\
+\begin{itemize}
+\item Klassennamen beginnen mit einem Gro\ss{}buchstaben, bestehen sie aus mehreren W\"ortern, so werden sie zusammen geschrieben und jeweils der erste Buchstabe gro\ss{}
+\item Methodennamen beginnen mit einem Kleinbuchstaben, bestehen sie aus mehreren W\"ortern, so werden sie zusammen und ab dem zeiten Wort die Anfangsbuchstaben gro\ss{} geschrieben.
+\end{itemize}
 
 % Kontextabgrenzung
+\newpage
 \section{Kontextabgrenzung}
 
 % Fachlicher Kontext
 \subsection{Fachlicher Kontext}
+\includegraphics[width=\textwidth]{../Pflichtenheft/images/toplevelarchitektur}
+
 
 % Technischer oder Verteilungskontext
 \subsection{Technischer oder Verteilungskontext}
@@ -91,12 +118,6 @@ Owner & Ladenbesitzer & NA & NA & NA\\ \hline
 
 % Sicherheit
 \subsection{Sicherheit}
-
-% Kommunikation und Integration mit anderen IT-Systemen
-\subsection{Kommunikation und Integration mit anderen IT-Systemen}
-
-% Verteilung
-\subsection{Verteilung}
 
 % Plausibilisierung und Validierung
 \subsection{Plausibilisierung und Validierung}
