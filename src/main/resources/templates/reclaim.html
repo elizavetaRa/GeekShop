@@ -33,7 +33,7 @@
 
             <div id="content-in">
 
-                <p th:if="${!cart.empty} and ${!session.isReclaim}">Hinweis: Der Kaufvorgang muss abgeschlossen sein.<br/>
+                <p class="infoMsg msgMargin" th:if="${!cart.empty} and ${!session.isReclaim}">Beenden Sie zuerst den Kaufvorgang, um eine Reklamation durchführen zu können.<br/>
                 </p>
 
                 <form th:if="${session.isReclaim} and ${cart.empty} and !${session.ro}" method="get" action="/ordersearch">
