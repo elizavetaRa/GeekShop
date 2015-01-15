@@ -661,7 +661,7 @@ class OwnerController {
         GSProduct product = catalog.findOne(productId).get();
 
         for (GSProduct p : catalog.findAll()) {
-            if (!p.equals(product) && p.getProductNumber() == Long.parseLong(productForm.getProductNumber())) {
+            if (!p.equals(product) && p.getProductNumber() == Long.parseLong(productForm.getProductNumber().trim())) {
                 result.addError(new FieldError("productForm", "productNumber", "Diese Artikelnummer ist bereits vergeben."));
                 break;
             }
@@ -676,7 +676,7 @@ class OwnerController {
 
         product.setName(productForm.getName());
 
-        SubCategory subCategory_new = subCategoryRepo.findByName(productForm.getSubCategory());
+        SubCategory subCategory_new = subCategoryRepo.findByName(productForm.getSubCategory().trim());
         SubCategory subCategory_old = product.getSubCategory();
         subCategory_old.getProducts().remove(product);
         subCategoryRepo.save(subCategory_old);
@@ -684,7 +684,7 @@ class OwnerController {
         subCategoryRepo.save(subCategory_new);
         product.setSubCategory(subCategory_new);
 
-        String strPrice = productForm.getPrice();
+        String strPrice = productForm.getPrice().trim();
         strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.lastIndexOf(" ") : strPrice.length());
         strPrice = strPrice.replaceAll("\\.", "");
         strPrice = strPrice.replaceAll(",", ".");
@@ -694,9 +694,9 @@ class OwnerController {
         catalog.save(product);
 
         GSInventoryItem item = inventory.findByProductIdentifier(productId).get();
-        Quantity setQuantity = Units.of(Long.parseLong(productForm.getQuantity())).subtract(item.getQuantity());
+        Quantity setQuantity = Units.of(Long.parseLong(productForm.getQuantity().trim())).subtract(item.getQuantity());
         item.increaseQuantity(setQuantity);
-        item.setMinimalQuantity(Units.of(Long.parseLong(productForm.getMinQuantity())));
+        item.setMinimalQuantity(Units.of(Long.parseLong(productForm.getMinQuantity().trim())));
         inventory.save(item);
 
         if (!item.hasSufficientQuantity()) {
@@ -739,7 +739,7 @@ class OwnerController {
     public String addProductToCatalog(Model model, @ModelAttribute("productForm") @Valid ProductForm productForm, BindingResult result) {
 
         for (GSProduct p : catalog.findAll()) {
-            if (productForm.getProductNumber() != null && !productForm.getProductNumber().isEmpty() && p.getProductNumber() == Long.parseLong(productForm.getProductNumber())) {
+            if (productForm.getProductNumber() != null && !productForm.getProductNumber().trim().isEmpty() && p.getProductNumber() == Long.parseLong(productForm.getProductNumber())) {
                 result.addError(new FieldError("productForm", "productNumber", "Diese Artikelnummer ist bereits vergeben."));
                 break;
             }
@@ -752,16 +752,16 @@ class OwnerController {
         }
 
 
-        Quantity quantity = Units.of(Long.parseLong(productForm.getQuantity()));
-        Quantity minQuantity = Units.of(Long.parseLong(productForm.getMinQuantity()));
+        Quantity quantity = Units.of(Long.parseLong(productForm.getQuantity().trim()));
+        Quantity minQuantity = Units.of(Long.parseLong(productForm.getMinQuantity().trim()));
 
-        SubCategory subCategory = subCategoryRepo.findByName(productForm.getSubCategory());
-        String strPrice = productForm.getPrice();
+        SubCategory subCategory = subCategoryRepo.findByName(productForm.getSubCategory().trim());
+        String strPrice = productForm.getPrice().trim();
         strPrice = strPrice.substring(0, strPrice.contains(" ") ? strPrice.lastIndexOf(" ") : strPrice.length());
         strPrice = strPrice.replaceAll("\\.", "");
         strPrice = strPrice.replaceAll(",", ".");
         Money price = Money.of(CurrencyUnit.EUR, Double.parseDouble(strPrice));
-        GSProduct product = new GSProduct(Long.parseLong(productForm.getProductNumber()), productForm.getName(), price, subCategory);
+        GSProduct product = new GSProduct(Long.parseLong(productForm.getProductNumber().trim()), productForm.getName().trim(), price, subCategory);
         catalog.save(product);
 
         subCategory.addProduct(product);

@@ -1,21 +1,25 @@
 \documentclass[12pt,a4paper]{article}
-%\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper, top=20mm, left=30mm, right=30mm, bottom=20mm,headsep=10mm, footskip=10mm}
+\usepackage{fontspec}
 \usepackage{lmodern}
 \usepackage{color}
 \usepackage{tabularx}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage{slantsc}
 \usepackage[ngerman]{babel}
 \usepackage{booktabs,paralist}
 \usepackage{scrpage2,lastpage}
 \usepackage{menukeys}
 % Unserer Blau-Farbe definieren
-\definecolor{geekblue}{rgb}{0.01, 0.44, 0.99}
+\definecolor{geekblue}{rgb}{0.01, 0.67, 0.99}
+\definecolor{geekblue2}{rgb}{0.01, 0.40, 0.99}
 % Farbe des Menus aendern
 \changemenucolor{gray}{bg}{named}{geekblue}
 \changemenucolor{gray}{br}{named}{geekblue}
 \changemenucolor{gray}{txt}{named}{white}
+\usepackage[colorlinks, breaklinks, linkcolor=geekblue2, menucolor=black, pagecolor=geekblue2, urlcolor=geekblue2]{hyperref}
+
 %
 %
 %
@@ -47,21 +51,19 @@
 % Define \menusection
 %
 % Usage: \menusection{Number of Section}{Name of Section}
-\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}{\Huge{\menu{\,\,#2\,\,}}}\\[.5cm]}
+\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}{\fontsize{30}{30}\menu{ \hspace*{.2cm}#2\hspace*{.2cm}}}\\[.5cm]}
 %
 %
 % Define \menusubsection
 %
 % Usage: \menusubsection{Number of Subsection}{Name of Subsection}
-\def\menusubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsection}{\protect\numberline{\getnumber.#1} #2}\setsubnumber{#1}\setsubsection{#2}{\Large{\menu{\,\,\getsection\,\, > \,\,#2\,\,}}}\\[.5cm]}
+\def\menusubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsection}{\protect\numberline{\getnumber.#1} #2}\setsubnumber{#1}\setsubsection{#2}{\LARGE{\menu{\hspace*{.2cm}\getsection\hspace*{.2cm} > \hspace*{.2cm}#2\hspace*{.2cm}}}}\\[.5cm]}
 %
 %
 % Define \menusubsubsection
 %
 % Usage: \menusubsubsection{Number of Subsubsection}{Name of Subsubsection}
-\def\menusubsubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsubsection}{\protect\numberline{\getnumber.\getsubnumber.#1} #2}{\Large{\menu{\,\,\getsection\,\, > \,\,\getsubsection\,\, > \,\,#2\,\,}}}\\[.5cm]}
-%
-% Ja, ich habe mich hingesetzt un all die Commands abgekuerzt... Hat mich auch nur 3 Stunden gekostet... Felix
+\def\menusubsubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsubsection}{\protect\numberline{\getnumber.\getsubnumber.#1} #2}{\Large{\menu{\hspace*{.2cm}\getsection\hspace*{.2cm} > \hspace*{.2cm}\getsubsection\hspace*{.2cm} > \hspace*{.2cm}#2\hspace*{.2cm}}}}\\[.5cm]}
 
 
 
@@ -71,32 +73,73 @@
 \input{./title.tex}
 %
 % Inhaltsverzeichnis
+\begingroup
+\hypersetup{linkcolor=black}
 \tableofcontents
+\endgroup
 \newpage
 %
 %
-%    WICHTIG: GENAU FREIE ZEILEN VOR EINEM NEUEN \menu LASSEN!
+%    WICHTIG: MIND. 1 FREIE ZEILE VOR EINEM NEUEN \menu LASSEN!
 %
 %    SONST GIBT ES EINE FALSCHE FORMATIERUNG
 %
 %
-\menusection{1}{Authentifikation}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+\phantomsection\menusection{1}{Anmeldung}
+\label{sec:Anmeldung}
 
-% Artikelsuche
-\menusection{2}{Artikelsuche}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
 
-% Suchen
-\menusubsection{1}{Suchen}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % % Authentifikation
+\phantomsection\menusubsection{1}{Authentifikation}
+\label{subsec:Authentifikation}
+Da die Anwendung für die Kasse konzipiert ist, kann die Software nur nach erfolgreicher Anmeldung verwendet werden. Damit wird die Nutzung durch Unbefugte unterbunden.\\
+Für den ersten Login ist dem Ladenbesitzers (Benutzername "`owner"') das Passwort "`123"' zugewiesen. Dieses sollte nach erstmaliger Anmeldung den \hyperref[subsec:Passwortregeln]{Sicherheitsregeln für Passwörter} entsprechend geändert werden.\\
 
-% Sortieren
-\menusubsection{2}{Sortieren}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % Begrüßungswitz
+\phantomsection\menusubsection{2}{Begrüßungswitz}
+\label{subsec:Begrüßungswitz}
+Nach erfolgreicher Anmeldung bekommt der Nutzer einen Nerdwitz zur Begrüßung angezeigt.\\
+In der Navigationsleiste sind bereits die Schaltflächen der verschiedenen Kassenfunktionen übersichtlich aufgelistet. 
+\pagebreak
 
-% Reklamation
-\menusection{3}{Reklamation}
+
+% % % Artikelsuche
+\phantomsection\menusection{2}{Artikelsuche}
+\label{sec:Artikelsuche}
+Eine zentrale Funktion der Kasse ist die Artikelsuche, welche eine Liste von allen gefundenen Artikeln, die im Sortiment vorhanden sind, liefert.
+\\
+
+% % Suchen
+\phantomsection\menusubsection{1}{Suchen}
+\label{subsec:Suchen}
+Es können Artikel nach Bezeichnung und Artikelnummer sowie Kategorien gesucht werden. Geben Sie dazu einfach den betreffenden Suchbegriff in das Suchfeld ein und klicken Sie auf "`Suchen"' oder betätigen Sie die Eingabetaste.\\
+Falls die Suche keine Resultate liefert, wird eine entsprechende Meldung ausgegeben.\\
+Wenn nichts eingegeben und auf Suchen geklickt wurde, werden alle im Sortiment befindlichen Artikel angezeigt.\\
+
+% % Sortieren
+\phantomsection\menusubsection{2}{Sortieren}
+\label{subsec:Sortieren}
+Zusätzlich steht eine Sortierfunktion zum Ordnen der Suchergebnisse zur Verfügung. Wählen Sie dazu einfach die gewünschte Sortiermethode aus dem Drop-down-Menü rechts neben dem Suchfeld aus.\\
+Folgende Sortierungen sind möglich: nach Artikelbezeichnung, nach Preis (auf- und absteigend) sowie nach Artikelnummer.\\
+
+% % Kategorien
+\phantomsection\menusubsection{2}{Kategorien}
+\label{subsec:Kategorien}
+Am linken Rand sind alle angelegten Kategorien aufgeführt.
+Durch den Klick auf eine Kategorie werden alle Artikel, die zu dieser Gruppe gehören, aufgelistet. Dabei wird die Artikelsuche zurückgesetzt, die Suche wird nicht innerhalb der gewählten Kategorie fortgesetzt. Ebenso wird bei der Eingabe eines Suchbegriffes die Anzeige der Artikel einer Kategorie zurückgesetzt. Es wird folglich nicht nur die gewählte Rubrik durchsucht, sondern wiederum alle vorhandenen Kategorien.\\
+Wird eine Kategorie gewählt, die keine Artikel enthält, wird eine entsprechende Meldung ausgegeben.\\
+Auch die Auflistung von Artikeln einer Kategorie kann über das Drop-down-Menü sortiert werden.\\
+
+% % in den Warenkorb
+\phantomsection\menusubsection{2}{Zum Warenkorb hinzufügen}
+\label{subsec:in den Warenkorb}
+Die angezeigten Artikel können über die Schaltfläche mit dem Einkaufswagen-Symbol in den \hyperref[sec:Warenkorb]{Warenkorb} gelegt werden. Die gewünschte Menge wird dazu im Nummernfeld des betreffenden Artikels ausgewählt.\\
+Falls ein Artikel nicht mehr verfügbar ist, wird die Schaltfläche deaktiviert und das Nummernfeld ausgeblendet.
+
+
+% % % Reklamation
+\phantomsection\menusection{3}{Reklamation}
+\label{sec:Reklamation}
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
 
 % Artikel reklamieren

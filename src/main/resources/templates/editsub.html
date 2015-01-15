@@ -37,7 +37,7 @@
                                 <label for="name" class="highlight">Name:</label>
                             </td>
                             <td>
-                                <input name="name" id="name" type="text" size="30" maxlength="30"
+                                <input name="name" id="name" type="text" size="30"
                                        th:value="${name}" required="required" th:classappend="${nameError} ? 'fieldError'"/>
 
                                 <p th:if="${nameError}" class="errorMsg" th:text="${nameError}">Fehler</p>
