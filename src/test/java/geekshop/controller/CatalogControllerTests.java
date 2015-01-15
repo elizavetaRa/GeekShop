@@ -140,11 +140,16 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
 
         List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
-        for (GSProduct prod : catalog.findByName("Shirt")) {
-            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
-        }
+        int cntProducts = 0;
 
-        assertEquals(actual.size(), 3);
+        for (GSProduct prod : catalog.findByName("Shirt")) {
+
+                assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+                cntProducts++;
+
+            }
+
+        assertEquals(actual.size(), cntProducts);
 
     }
 
@@ -171,18 +176,27 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
         List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
         for (GSProduct prod : catalog.findAll()) {
-
-            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+            if (prod.isInRange()) {
+                assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+            } else {
+                assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), not(hasItem(prod)));
+            }
         }
+
+        int cntProducts = 0;
 
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
+            if (i > 0) {
                 assertTrue(actual.get(i).getProductNumber() > actual.get(i - 1).getProductNumber());
-            else
+                cntProducts++;
+            }
+            else {
                 assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 11);
+        assertEquals(actual.size(), cntProducts);
     }
 
     @Test
@@ -197,14 +211,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
-            else
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
+            if (i > 0) {
+                assertTrue(actual.get(i).getPrice().getAmount().compareTo(actual.get(i - 1).getPrice().getAmount()) >= 0);
+                cntProducts++;
+            }
+            else {
+                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice()))<=0);
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 11);
+        assertEquals(actual.size(), cntProducts);
 
 
     }
@@ -221,14 +241,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
-            else
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
+            if (i > 0) {
+                assertTrue(actual.get(i).getPrice().getAmount().compareTo(actual.get(i - 1).getPrice().getAmount()) <= 0);
+                cntProducts++;
+            }
+            else {
+                assertTrue(actual.get(i).getPrice().getAmount().compareTo(actual.get(i + 1).getPrice().getAmount()) >= 0);
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 11);
+        assertEquals(actual.size(), cntProducts);
     }
 
     @Test
@@ -243,14 +269,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
+            if (i > 0) {
                 assertTrue(actual.get(i).getProductNumber() > actual.get(i - 1).getProductNumber());
-            else
+                cntProducts++;
+            }
+            else {
                 assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 3);
+        assertEquals(actual.size(), cntProducts);
 
     }
 
@@ -266,14 +298,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
-            else
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
+            if (i > 0) {
+                assertTrue(actual.get(i).getPrice().getAmount().compareTo(actual.get(i - 1).getPrice().getAmount()) >= 0);
+                cntProducts++;
+            }
+            else {
+                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice()))<=0);
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 3);
+        assertEquals(actual.size(), cntProducts);
 
     }
 
@@ -289,14 +327,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
-            else
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
+            if (i > 0) {
+                assertTrue(actual.get(i).getPrice().getAmount().compareTo(actual.get(i - 1).getPrice().getAmount()) <= 0);
+                cntProducts++;
+            }
+            else {
+                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice()))>=0);
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 3);
+        assertEquals(actual.size(), cntProducts);
     }
 
     @Test
@@ -311,14 +355,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
+            if (i > 0) {
                 assertTrue(actual.get(i).getProductNumber() > actual.get(i - 1).getProductNumber());
-            else
+                cntProducts++;
+            }
+            else {
                 assertTrue(actual.get(i).getProductNumber() < actual.get(i + 1).getProductNumber());
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 4);
+        assertEquals(actual.size(), cntProducts);
     }
 
     @Test
@@ -333,14 +383,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), -1);
-            else
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), 1);
+            if (i > 0) {
+                assertTrue(actual.get(i).getPrice().getAmount().compareTo(actual.get(i - 1).getPrice().getAmount()) >= 0);
+                cntProducts++;
+            }
+            else {
+                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice()))<=0);
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 4);
+        assertEquals(actual.size(), cntProducts);
 
     }
 
@@ -356,14 +412,20 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
             assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
         }
 
+        int cntProducts = 0;
+
         for (int i = 0; i < actual.size(); i++) {
-            if (i > 0)
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i - 1).getPrice())), 1);
-            else
-                assertEquals(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice())), -1);
+            if (i > 0) {
+                assertTrue(actual.get(i).getPrice().getAmount().compareTo(actual.get(i - 1).getPrice().getAmount()) <= 0);
+                cntProducts++;
+            }
+            else {
+                assertTrue(GSProduct.moneyToString(actual.get(i).getPrice()).compareTo(GSProduct.moneyToString(actual.get(i + 1).getPrice()))>=0);
+                cntProducts++;
+            }
         }
 
-        assertEquals(actual.size(), 4);
+        assertEquals(actual.size(), cntProducts);
 
     }
 }
