@@ -143,15 +143,34 @@ Rechnung validieren & \"Uberpr\"uft, ob die Rechnung noch im Zeitrahmen liegt & 
 Reklamation genehmigen & Genehmigt die Reklamation und schlie\ss{}t sie ab & Ladenbesitzer\\ \hline
 \end{tabular}
 
-% Lösungsstrategie und Entwurfsentscheidungen
-\newpage
-\section{Lösungsstrategie und Entwurfsentscheidungen}
-
 % Bausteinsicht
 \section{Bausteinsicht}
+\includegraphics[width=1\textwidth]{../../Entwurf/entwurfsklassendiagramm}
 
 % Laufzeitsicht
 \section{Laufzeitsicht}
+\subsubsection*{Anmeldung}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/anmeldung}
+Dieses Diagramm beschreibt den Anmeldevorgang des Benutzers und wie das Programm bei einem fehlerhaften Benutzernamen oder Passwort reagiert.
+\subsubsection*{Witze}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/witze}
+Im oben stehenden Diagramm wird gezeigt, wie der Ladenbesitzer einen neuen Witz zur bestehenden Witzsammlung hinzufügen kann, wie ein zufälliger Witz aus der Sammlung einem Angestellten angezeigt wird und wie ein Witz aus der Sammlung gelöscht wird.
+\subsubsection*{Benutzerverwaltung}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/benutzerverwaltung}
+In dem Sequenzdiagramm der Benutzerverwaltung werden die M\"oglichkeit der \"Anderung der pers\"onlichen Daten und das Setzen neuer Passwortregeln sowie die dazugeh\"orige \"Anderung des Passwortes beschrieben.
+\subsubsection*{Angestellten hinzuf\"ugen}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/angestelltenhinzufuegen}
+Das Sequenzdiagramm zeigt den Ablauf und die Interaktion zwischen den Objekten des Systems f\"ur den Fall, dass ein neuer Mitarbeiter angelegt wird.
+\subsubsection*{Angestellten l\"oschen}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/angestelltenloeschen}
+Das Sequenzdiagramm zeigt den Ablauf und die Interaktion zwischen den Objekten des Systems f\"ur den Fall, dass ein neuer Mitarbeiter gel\"oscht wird.
+\subsubsection*{Kaufvorgang}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/kaufvorgang}
+Dieses Diagramm zeigt, wie ein \"ublicher Kaufvorgang abl\"auft.
+\subsubsection*{Reklamation}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/reklamation}
+Hier wird beschrieben, wie eine Reklamation abl\"auft.
+
 
 % Persistenz
 \subsection{Persistenz}
@@ -163,9 +182,8 @@ Die Persistenz wird mit Hilfe der Repositorys durch Spring und der in Maven inte
 
 % Ergonomie
 \subsection{Ergonomie}
-%TODO: Wie schätzen Sie die Ergonomie Ihres Systems ein?
-%Wer hat es getestet (Crosstesting, OMA Test?)
-
+Die Benutzeroberfl\"ache ist intuitiv gestaltet und leicht verst\"andlich.
+Das Produkt wurde von der Partnergruppe mit gleichem Projekt im Crosstesting gepr\"uft.
 % Transaktionsbehandlung
 \subsection{Transaktionsbehandlung}
 Es wurden die Transaktionen Barzahlung, Kreditkarte und Lastschrift implementiert.
@@ -177,9 +195,6 @@ Anhand von einer Session werden eingelogte Nutzer unterschieden. Das System basi
 % Plausibilisierung und Validierung
 \subsection{Plausibilisierung und Validierung}
 Alle Nutzereingaben werden \"uberpr\"uft.
-% Ausnahme-/Fehlerbehandlung
-\subsection{Ausnahme-/Fehlerbehandlung}
-%TODO: Es gibt keine Fehler?
 
 % Konfigurierbarkeit
 \subsection{Konfigurierbarkeit}
@@ -188,9 +203,7 @@ Der Ladenbesitzer kann jederzeit die Passwortregeln \"andern.
 % Internationalisierung
 \subsection{Internationalisierung}
 Es wird nur die Sprache Deutsch unterst\"utzt.
-% Testbarkeit
-\subsection{Testbarkeit}
-%TODO: Welche automatisierten Tests haben Sie implementiert?
+
 % Buildmanagement
 \subsection{Buildmanagement}
 Der vollst\"andige Sourcecode ist auf GitHub vorhanden.

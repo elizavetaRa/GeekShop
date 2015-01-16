@@ -6,7 +6,6 @@ Dokumente/tex/Protokolle/*.pdf
 *.synctex.gz
 *.out
 *.toc
-*.pdf
 *.jar
 geekshop.iml
 .idea/
