@@ -80,7 +80,9 @@
                     <tbody th:remove="tag" th:each="gsProductOrders : ${mapProductOrders}">
                     <tr class="highlight" th:with="productOrders = ${gsProductOrders.value}">
                         <td class="t-left" colspan="4"
-                            th:utext="${gsProductOrders.key.name} + ' &lt;span class=\'t-normal\'&gt;(Artikelnr. ' + ${T(geekshop.model.GSOrder).longToString(gsProductOrders.key.productNumber)} + ')&lt;/span&gt;'">
+                            th:utext="${gsProductOrders.key.name} + ' &lt;span class=\'t-normal\'&gt;(Artikelnr. '
+                            + ${T(geekshop.model.GSOrder).longToString(gsProductOrders.key.productNumber)} + ')&lt;/span&gt;'
+                            + (${gsProductOrders.key.isInRange()} ? '' : ' &nbsp; &lt;span class=\'t-normal infoMsg\'&gt;nicht mehr im Sortiment&lt;/span&gt;')">
                             PRODUKTNAME
                         </td>
                         <td th:text="${productOrders.totalQuantity.amount}">GESAMTANZAHL</td>
