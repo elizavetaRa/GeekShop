@@ -33,7 +33,7 @@
 
             <div id="content-in">
 
-                <p th:if="${!cart.empty} and ${!session.isReclaim}">Hinweis: Der Kaufvorgang muss abgeschlossen sein.<br/>
+                <p class="infoMsg msgMargin" th:if="${!cart.empty} and ${!session.isReclaim}">Beenden Sie zuerst den Kaufvorgang, um eine Reklamation durchführen zu können.<br/>
                 </p>
 
                 <form th:if="${session.isReclaim} and ${cart.empty} and !${session.ro}" method="get" action="/ordersearch">
@@ -42,7 +42,7 @@
                     <button id="searchCatalog" type="submit">suchen</button>
                 </form>
 
-                <p th:if="${error}" th:text="${error}" style="margin-top:9px"></p>
+                <p th:if="${error}" th:text="${error}" class="errorMsg msgMargin"></p>
 
                 <!--<div th:if="${noorder}">keine Rechnung gefunden</div>-->
                 <!--<div th:if="${alreadyreclaim}">Rechnung ist schon eine Reklamation</div>-->

@@ -5,7 +5,6 @@ import org.joda.money.Money;
 import org.salespointframework.catalog.Catalog;
 import org.salespointframework.core.DataInitializer;
 import org.salespointframework.inventory.Inventory;
-import org.salespointframework.order.OrderLine;
 import org.salespointframework.payment.Cash;
 import org.salespointframework.quantity.Units;
 import org.salespointframework.time.BusinessTime;
@@ -144,8 +143,6 @@ public class GeekShopDataInitializer implements DataInitializer {
         catalog.save(prod52);
         catalog.save(prod53);
 
-        System.out.println(catalog.count());
-
         subInfo.addProduct(prod11);
         subInfo.addProduct(prod12);
         subScience.addProduct(prod21);
@@ -163,7 +160,6 @@ public class GeekShopDataInitializer implements DataInitializer {
             if (product.getClass().equals(GSProduct.class)) {
                 GSInventoryItem inventoryItem = new GSInventoryItem(product, Units.of(20), Units.of(5));
                 inventory.save(inventoryItem);
-                System.out.println(product.getName() + ": " + product.getSubCategory());
             }
         }
     }
@@ -327,14 +323,6 @@ public class GeekShopDataInitializer implements DataInitializer {
         orderRepo.save(order2);
         orderRepo.save(order3);
         orderRepo.save(order4);
-
-
-        for (GSOrder o : orderRepo.findAll()) { // iteriere über alle gespeicherten Orders
-            System.out.println("+++++ Order " + GSOrder.longToString(o.getOrderNumber()) + ": " + o.getOrderType() + " (isPaid() = " + o.isPaid() + ", businessTime = " + o.getDateCreated() + ")");
-            for (OrderLine ol : o.getOrderLines()) {
-                System.out.println("+++++ --- OrderLine: " + ((GSOrderLine) ol).getId() + "   Type: " + ((GSOrderLine) ol).getType());
-            }
-        }
     }
 
     /**

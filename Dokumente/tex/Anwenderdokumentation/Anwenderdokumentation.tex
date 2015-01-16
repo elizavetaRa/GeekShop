@@ -1,21 +1,26 @@
 \documentclass[12pt,a4paper]{article}
-%\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper, top=20mm, left=30mm, right=30mm, bottom=20mm,headsep=10mm, footskip=10mm}
+\usepackage{fontspec}
 \usepackage{lmodern}
 \usepackage{color}
 \usepackage{tabularx}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage{slantsc}
 \usepackage[ngerman]{babel}
 \usepackage{booktabs,paralist}
 \usepackage{scrpage2,lastpage}
 \usepackage{menukeys}
+\usepackage{tocloft}
 % Unserer Blau-Farbe definieren
-\definecolor{geekblue}{rgb}{0.01, 0.44, 0.99}
+\definecolor{geekblue}{rgb}{0.01, 0.67, 0.99}
+\definecolor{geekblue2}{rgb}{0.01, 0.40, 0.99}
 % Farbe des Menus aendern
 \changemenucolor{gray}{bg}{named}{geekblue}
 \changemenucolor{gray}{br}{named}{geekblue}
 \changemenucolor{gray}{txt}{named}{white}
+\usepackage[colorlinks, breaklinks, linkcolor=geekblue2, menucolor=black, pagecolor=geekblue2, urlcolor=geekblue2]{hyperref}
+
 %
 %
 %
@@ -47,21 +52,19 @@
 % Define \menusection
 %
 % Usage: \menusection{Number of Section}{Name of Section}
-\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}{\Huge{\menu{\,\,#2\,\,}}}\\[.5cm]}
+\def\menusection#1#2{\newpage\addcontentsline{toc}{section}{\protect\numberline{#1} #2}\setnumber{#1}\setsection{#2}{\fontsize{30}{30}\menu{ \hspace*{.2cm}#2\hspace*{.2cm}}}\\[.5cm]}
 %
 %
 % Define \menusubsection
 %
 % Usage: \menusubsection{Number of Subsection}{Name of Subsection}
-\def\menusubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsection}{\protect\numberline{\getnumber.#1} #2}\setsubnumber{#1}\setsubsection{#2}{\Large{\menu{\,\,\getsection\,\, > \,\,#2\,\,}}}\\[.5cm]}
+\def\menusubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsection}{\protect\numberline{\getnumber.#1} #2}\setsubnumber{#1}\setsubsection{#2}{\LARGE{\menu{\hspace*{.2cm}\getsection\hspace*{.2cm} > \hspace*{.2cm}#2\hspace*{.2cm}}}}\\[.5cm]}
 %
 %
 % Define \menusubsubsection
 %
 % Usage: \menusubsubsection{Number of Subsubsection}{Name of Subsubsection}
-\def\menusubsubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsubsection}{\protect\numberline{\getnumber.\getsubnumber.#1} #2}{\Large{\menu{\,\,\getsection\,\, > \,\,\getsubsection\,\, > \,\,#2\,\,}}}\\[.5cm]}
-%
-% Ja, ich habe mich hingesetzt un all die Commands abgekuerzt... Hat mich auch nur 3 Stunden gekostet... Felix
+\def\menusubsubsection#1#2{\vspace{.5cm}\addcontentsline{toc}{subsubsection}{\protect\numberline{\getnumber.\getsubnumber.#1} #2}{\Large{\menu{\hspace*{.2cm}\getsection\hspace*{.2cm} > \hspace*{.2cm}\getsubsection\hspace*{.2cm} > \hspace*{.2cm}#2\hspace*{.2cm}}}}\\[.5cm]}
 
 
 
@@ -71,53 +74,130 @@
 \input{./title.tex}
 %
 % Inhaltsverzeichnis
+\begingroup
+\hypersetup{linkcolor=black}
+\cftsetindents{section}{0em}{1.15em}
 \tableofcontents
+\endgroup
 \newpage
 %
 %
-%    WICHTIG: GENAU FREIE ZEILEN VOR EINEM NEUEN \menu LASSEN!
+%    WICHTIG: MIND. 1 FREIE ZEILE VOR EINEM NEUEN \menu LASSEN!
 %
 %    SONST GIBT ES EINE FALSCHE FORMATIERUNG
 %
 %
-\menusection{1}{Authentifikation}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+\phantomsection\menusection{1}{Anmeldung}
+\label{s:Anmeldung}
 
-% Artikelsuche
-\menusection{2}{Artikelsuche}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
 
-% Suchen
-\menusubsection{1}{Suchen}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % % Authentifikation
+\phantomsection\menusubsection{1}{Authentifikation}
+\label{ss:Authentifikation}
+Da die Anwendung für die Kasse konzipiert ist, kann die Software nur nach erfolgreicher Anmeldung verwendet werden. Damit wird die Nutzung durch Unbefugte unterbunden.\\
+Für den ersten Login ist dem Ladenbesitzers (Benutzername "`owner"') das Passwort "`123"' zugewiesen. Dieses sollte nach erstmaliger Anmeldung den \hyperref[ss:Passwortregeln]{Sicherheitsregeln für Passwörter} entsprechend geändert werden.\\
 
-% Sortieren
-\menusubsection{2}{Sortieren}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % Begrüßungswitz
+\phantomsection\menusubsection{2}{Begrüßungswitz}
+\label{ss:Begrüßungswitz}
+Nach erfolgreicher Anmeldung bekommt der Nutzer einen Nerdwitz zur Begrüßung angezeigt.\\
+In der Navigationsleiste sind bereits die Schaltflächen der verschiedenen Kassenfunktionen übersichtlich aufgelistet. 
+\pagebreak
 
-% Reklamation
-\menusection{3}{Reklamation}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
 
-% Artikel reklamieren
-\menusubsection{1}{Artikel reklamieren}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % % Artikelsuche
+\phantomsection\menusection{2}{Artikelsuche}
+\label{s:Artikelsuche}
+Eine zentrale Funktion der Kasse ist die Artikelsuche, welche eine Liste von allen gefundenen Artikeln, die im Sortiment vorhanden sind, liefert.
+\\
 
-% Warenkorb
-\menusection{4}{Warenkorb}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % Suchen
+\phantomsection\menusubsection{1}{Suchen}
+\label{ss:Suchen}
+Es können Artikel nach Bezeichnung und Artikelnummer sowie Kategorien gesucht werden. Geben Sie dazu einfach den betreffenden Suchbegriff in das Suchfeld ein und klicken Sie auf "`Suchen"' oder betätigen Sie die Eingabetaste.\\
+Falls die Suche keine Resultate liefert, wird eine entsprechende Meldung ausgegeben.\\
+Wenn nichts eingegeben und auf Suchen geklickt wurde, werden alle im Sortiment befindlichen Artikel angezeigt.\\
 
-% Artikel aendern/loeschen
-\menusubsection{1}{Artikel ändern/löschen}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % Sortieren
+\phantomsection\menusubsection{2}{Sortieren}
+\label{ss:Sortieren}
+Zusätzlich steht eine Sortierfunktion zum Ordnen der Suchergebnisse zur Verfügung. Wählen Sie dazu einfach die gewünschte Sortiermethode aus dem Drop-down-Menü rechts neben dem Suchfeld aus.\\
+Folgende Sortierungen sind möglich: nach Artikelbezeichnung, nach Preis (auf- und absteigend) sowie nach Artikelnummer.\\
 
-% Kasse
-\menusubsection{2}{Kasse}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % Kategorien
+\phantomsection\menusubsection{3}{Kategorien}
+\label{ss:Kategorien}
+Am linken Rand sind alle angelegten Kategorien aufgeführt.
+Durch den Klick auf eine Kategorie werden alle Artikel, die zu dieser Gruppe gehören, aufgelistet. Dabei wird die Artikelsuche zurückgesetzt, die Suche wird nicht innerhalb der gewählten Kategorie fortgesetzt. Ebenso wird bei der Eingabe eines Suchbegriffes die Anzeige der Artikel einer Kategorie zurückgesetzt. Es wird folglich nicht nur die gewählte Rubrik durchsucht, sondern wiederum alle vorhandenen Kategorien.\\
+Wird eine Kategorie gewählt, die keine Artikel enthält, wird eine entsprechende Meldung ausgegeben.\\
+Auch die Auflistung von Artikeln einer Kategorie kann über das Drop-down-Menü sortiert werden.\\
 
-% Zahlungsart
-\menusubsubsection{1}{Zahlungsart}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+% % in den Warenkorb
+\phantomsection\menusubsection{4}{Zum Warenkorb hinzufügen}
+\label{ss:in den Warenkorb}
+Die angezeigten Artikel können über die Schaltfläche mit dem Einkaufswagen-Symbol in den \hyperref[s:Warenkorb]{Warenkorb} gelegt werden. Die gewünschte Menge wird dazu im Nummernfeld des betreffenden Artikels ausgewählt.\\
+Falls ein Artikel nicht mehr verfügbar ist, wird die Schaltfläche deaktiviert und das Nummernfeld ausgeblendet.\\
+Weiterhin können Artikel nicht in den Warenkorb gelegt werden, wenn gleichzeitig ein \hyperref[s:Reklamation]{Reklamationsvorgang} läuft. Dann wird eine entsprechende Meldung angezeigt.
+\pagebreak
+
+
+% % % Reklamation
+\phantomsection\menusection{3}{Reklamation}
+\label{s:Reklamation}
+Eine weitere wichtige Shopfunktion ist die Reklamation. Der Kunde besitzt die Möglichkeit, innerhalb von 14 Tagen nach Vorlage des erworbenen Produkts in unbenutztem Zustand sowie der zugehörigen Rechnung die bezahlte Geldsumme zurück\-zuerhalten.\\
+
+% % Rechungsnummer
+\phantomsection\menusubsection{1}{Rechnungsnummer}
+\label{ss:Rechungsnummer}
+Um einen Reklamationsvorgang einzuleiten, muss die Nummer der vom Kunden vorgelegten Rechnung eingegeben werden.
+Dabei kann es zu folgenden Fehlern kommen:
+\begin{itemize}
+\itemsep 0em
+\item Es existiert keine solche Rechnung.
+\item Die gefundene Rechnung ist ihrerseits eine Reklamation.
+\item Die Rechnung ist älter als 14 Tage.
+\item Die Rechnungsnummer stammt von einem abgebrochenen Kaufvorgang.
+\end{itemize}
+Wenn zur gleichen Zeit ein Kaufvorgang stattfindet, muss dieser erst beendet oder abgebrochen, d.\,h. der Warenkorb geleert werden, damit eine Reklamation durchgeführt werden kann. Dies wird durch eine Meldung signalisiert.\\
+
+% % Rechnungsposten
+\phantomsection\menusubsection{2}{Rechnungsposten in den Warenkorb legen}
+\label{ss:Rechnungsposten}
+Wird die gewünschte Rechnung anhand der Rechnungsnummer gefunden, werden deren Rechnungsposten aufgelistet. Die einzelnen Positionen können wie bei der \mbox{\hyperref[ss:in den Warenkorb]{Artikelsuche}} in den Warenkorb gelegt werden. Die Menge, die reklamiert werden kann, ist dabei selbstverständlich auf die Menge des Rechnungspostens abzüglich bisheriger Reklamationen dieser Position beschränkt. Wurde ein Rechnungsposten bereits vollständig reklamiert, wird analog zur Artikelsuche die entsprechende Schaltfläche deaktiviert und das Nummernfeld ausgeblendet.\\
+
+% % Alles reklamieren
+\phantomsection\menusubsection{3}{Komplette Rechnung reklamieren}
+\label{ss:Alles reklamieren}
+Sollen alle Artikel einer Rechnung reklamiert werden, bietet sich die Schaltfläche "`Alle Artikel reklamieren"' an. Ein Klick darauf bewirkt, dass alle Rechnungsposten zum Warenkorb hinzugefügt werden.\\
+
+% % Reklamation abbrechen
+\phantomsection\menusubsection{4}{Reklamationsvorgang abbrechen}
+\label{ss:Reklamation abbrechen}
+Um einen Reklamationsvorgang abzubrechen, genügt ein Klick auf die Schaltfläche "`Abbrechen"'. Dabei wird der Warenkorb geleert, die Artikelsuche freigeschaltet und es erscheint wieder das Eingabefeld für die Rechnungsnummer.
+\pagebreak
+
+
+% % % Warenkorb
+\phantomsection\menusection{4}{Warenkorb}
+\label{s:Warenkorb}
+Der Warenkorb enthält die Artikel, die im \hyperref[ss:in den Warenkorb]{Kaufvorgang} verkauft bzw. im \hyperref[ss:Rechnungsposten]{Reklamationsvorgang}  reklamiert werden sollen. Er ist zugleich Ausgangspunkt für den Abschluss beider Vorgänge.\\
+
+% % Artikel ändern und löschen
+\phantomsection\menusubsection{1}{Artikel ändern und löschen}
+\label{ss:Artikel ändern und löschen}
+Die im Warenkorb angezeigten Artikel können geändert und gelöscht werden.\\
+Um die Menge eines Artikels im Warenkorb zu aktualisieren, gibt man den gewünschten Betrag in das Nummernfeld der Spalte "`Anzahl"' ein. Nach einem Klick auf die Schaltfläche mit den zwei Pfeilen wird die Anzahl und der Gesamtpreis des Postens angepasst.\\
+Um einen Artikel aus dem Warenkorb zu entfernen, reicht ein Klick auf die Schaltfläche "`Löschen"' in der betreffenden Zeile. Sollen alle Artikel aus dem Warenkorb gelöscht werden, klicken Sie auf "`Warenkorb leeren"'. Falls es sich um einen Kaufvorgang handelt, wird dieser somit abgebrochen, d.\,h. es kann nun eine Reklamation gestartet werden. Dies gilt jedoch nicht für den Reklamationsvorgang. Auf der Seite "`Reklamation"' sind weiterhin die Posten der aktuellen Rechnung aufgeführt, welche wiederum zum Warenkorb hinzugefügt werden können.\\
+
+% % Kasse
+\phantomsection\menusubsection{2}{Kasse und Übersicht}
+\label{ss:Kasse}
+Zur (virtuellen) Kasse gelangt man, indem die Schaltfläche "`Zur Kasse"' gewählt wird. Die Struktur der Seite unterscheidet sich beim Kaufvorgang geringfügig von der Ansicht beim Reklamationsvorgang.\\
+Um von der Kasse zurück zum Warenkorb zu gelangen, kann bei beiden Vorgängen die Schaltfläche "`Zurück"' genutzt werden.\\
+Ein weiteres gemeinsames Element ist die Übersicht über die gekauften bzw. zurückgegebenen Artikel. Dabei wird die Gesamtsumme am Fuß der Tabelle angezeigt.\\
+Beim Kaufvorgang muss die Zahlungsmethode, mit welcher der Kunde bezahlen möchte, ausgewählt werden.  Zur Verfügung stehen Barzahlung, Kreditkarte und Lastschriftverfahren. Bei der Reklamation entfällt dieser Schritt, da die Summe immer in bar ausgezahlt wird.\\
+Abgeschlossen und damit rechtsgültig wird der Kaufvorgang durch Betätigung der Schaltfläche "`Kaufen"'. Abschließend erscheint nochmals eine Übersicht über die erworbenen Artikel mit Rechnungsnummer, Datum und Zahlungsart.\\
+Eine Reklamation wird vorläufig abgeschlossen, indem die Schaltfläche "`Reklamationsanfrage abschicken"' angeklickt wird. Damit wird eine Reklamationsanfrage an den Ladenbesitzer gesendet, der über die Ablehnung oder Genehmigung der Reklamation je nach Zustand der Ware entscheidet. Nach Absenden der Anfrage wird auch hier eine entsprechende Übersicht angezeigt.\\
 
 
 \end{document}

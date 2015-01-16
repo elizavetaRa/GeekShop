@@ -3,9 +3,7 @@ package geekshop.controller;
 
 import geekshop.model.*;
 import org.salespointframework.catalog.Catalog;
-import org.salespointframework.catalog.Product;
 import org.salespointframework.catalog.ProductIdentifier;
-import org.salespointframework.core.SalespointIdentifier;
 import org.salespointframework.order.Cart;
 import org.salespointframework.order.CartItem;
 import org.salespointframework.order.OrderLine;
@@ -103,7 +101,6 @@ class ReclaimController {
      *
      * @param num           must not be {@literal null}.
      * @param productid     must not be {@literal null}.
-     * @param olid          must not be {@literal null}.
      * @param reclaimnumber must not be {@literal null}.
      * @param session       must not be {@literal null}.
      * @param userAccount   must not be {@literal null}.
@@ -111,9 +108,8 @@ class ReclaimController {
      */
     @RequestMapping(value = "/reclaimcart", method = RequestMethod.POST)
     public String addProductToReclaimCart(@RequestParam("orderNumber") long num, @RequestParam("rpid") ProductIdentifier productid,
-                                          @RequestParam("olid") SalespointIdentifier olid,
-                                          @RequestParam("rnumber") int reclaimnumber,
-                                          @ModelAttribute Cart cart, HttpSession session, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+                                          @RequestParam("rnumber") int reclaimnumber, @ModelAttribute Cart cart, HttpSession session,
+                                          Model model, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -261,32 +257,27 @@ class ReclaimController {
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
 
-        if (!containsOnlyNumbers(searchOrderNumber)) {
-            String error = "Falsche Zeichen. Eingabe muss eine Zahl sein!";
+        if (searchOrderNumber == null || searchOrderNumber.trim().isEmpty() || !containsOnlyNumbers(searchOrderNumber)) {
+            String error = "Eingabe muss eine Artikelnummer sein.";
             model.addAttribute("error", error);
             return "reclaim";
         }
 
         long oNumber = Long.parseLong(searchOrderNumber);
         String orderNumber = GSOrder.longToString(oNumber);
-        System.out.println(oNumber + " orderNumber");
 
         Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(oNumber);
         if (!optOrder.isPresent()) {
             String error = "Rechnung " + orderNumber + " nicht gefunden!";
-            System.out.println(error);
             model.addAttribute("error", error);
         } else if (optOrder.get().getOrderType() == OrderType.RECLAIM) {
             String error = "Rechnung " + orderNumber + " ist schon eine Reklamation!";
-            System.out.println(error);
             model.addAttribute("error", error);
         } else if (optOrder.get().isCompleted()) {
             String error = "Rechnung " + orderNumber + " liegt nicht mehr innerhalb des 14-Tage-Fensters!";
-            System.out.println(error);
             model.addAttribute("error", error);
         } else if (optOrder.get().isCanceled()) {
             String error = "Rechnung " + orderNumber + " wurde storniert!";
-            System.out.println(error);
             model.addAttribute("error", error);
         } else {
             model.addAttribute("reclaimorder", optOrder.get());
@@ -325,10 +316,9 @@ class ReclaimController {
      * @param quantity
      * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
-     * @param model
      */
     @RequestMapping(value = "/updatereclaimcartitem/", method = RequestMethod.POST)
-    public String updateReclaimCartItem(@RequestParam String identifier, @RequestParam String quantity, HttpSession session, /*@RequestParam ("orderNumber") String strNumber,*/ @ModelAttribute Cart cart, Model model, @LoggedIn Optional<UserAccount> userAccount) {
+    public String updateReclaimCartItem(@RequestParam String identifier, @RequestParam String quantity, HttpSession session, @ModelAttribute Cart cart, @LoggedIn Optional<UserAccount> userAccount) {
         if (userAccount.get().hasRole(new Role("ROLE_INSECURE_PASSWORD")))
             return "redirect:/";
 
@@ -348,7 +338,6 @@ class ReclaimController {
             line = iterator.next();        //search Product of cartItem in order to compare quantity
             if (line.getProductName() == cart.getItem(identifier).get().getProductName()) {
                 inOrder = line.getQuantity().getAmount().intValueExact();
-                System.out.println("In Order: " + inOrder);
                 break;
             }
         }
