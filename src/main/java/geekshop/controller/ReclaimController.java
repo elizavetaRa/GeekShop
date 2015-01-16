@@ -257,13 +257,13 @@ class ReclaimController {
         if (!((boolean) session.getAttribute("isReclaim")))
             session.setAttribute("isReclaim", true);
 
-        if (searchOrderNumber == null || searchOrderNumber.trim().isEmpty() || !containsOnlyNumbers(searchOrderNumber)) {
-            String error = "Eingabe muss eine Artikelnummer sein.";
+        if (searchOrderNumber == null || searchOrderNumber.trim().isEmpty() || !searchOrderNumber.trim().matches("\\d+")) {
+            String error = "Eingabe muss eine Rechnungsnummer sein.";
             model.addAttribute("error", error);
             return "reclaim";
         }
 
-        long oNumber = Long.parseLong(searchOrderNumber);
+        long oNumber = Long.parseLong(searchOrderNumber.trim());
         String orderNumber = GSOrder.longToString(oNumber);
 
         Optional<GSOrder> optOrder = orderRepo.findByOrderNumber(oNumber);
@@ -398,16 +398,5 @@ class ReclaimController {
             }
         }
         return cnt;
-    }
-
-    /**
-     * Help function for validation
-     */
-    public boolean containsOnlyNumbers(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            if (!Character.isDigit(str.charAt(i)))
-                return false;
-        }
-        return true;
     }
 }
