@@ -12,6 +12,7 @@
 \usepackage{a4wide}
 \begin{document}
 \newcommand{\half}{0.5\textwidth}
+\newcommand{\third}{0.3\textwidth}
 
 % Titelblatt
 \input{./title.tex}
@@ -84,15 +85,66 @@ Die Namenskonvention lautet wie folgt:\\
 % Fachlicher Kontext
 \subsection{Fachlicher Kontext}
 \includegraphics[width=\textwidth]{../Pflichtenheft/images/toplevelarchitektur}
-
-
-% Technischer oder Verteilungskontext
-\subsection{Technischer oder Verteilungskontext}
+Die Top-Level-Architektur besteht aus der Benutzerverwaltung, welche die Witzeverwaltung nutzt und der Lagerverwaltung, welche auf die Produktverwaltung zugreift.
 
 % Externe Schnittstellen
 \subsection{Externe Schnittstellen}
+\includegraphics[width=\textwidth]{../Pflichtenheft/images/anwendungsfalldiagramm}
+\vspace*{.5cm}
+\begin{tabular}{|p{\third}|p{\third}|p{\third}|} \hline
+{\textbf{Anwendungsfall}} & {\textbf{Beschreibung}} & {\textbf{Akteur}}\\ \hline
+\multicolumn{3}{|l|}{\textbf{Benutzerverwaltung}}\\ \hline
+Angestellten hinzuf\"ugen & F\"ugt einen neuen Angestellten hinzu & Ladenbesitzer\\ \hline
+Angestellten l\"oschen & L\"oscht einen vorhandenen Angestellten & Ladenbesitzer\\ \hline
+pers\"onliche Daten \"andern & \"Andert die pers\"onlichen Daten des Nutzers & Angestellter\\ \hline
+Passwortregeln \"andern & \"Andert die Regeln der Passwortvalidierung & Ladenbesitzer\\ \hline
+Passwort \"andern & \"Andert das Passwort des Nutzers & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Anmeldung}}\\ \hline
+sich einloggen & Loggt den Nutzer ein & Angestellter\\ \hline
+\end{tabular}
+\newpage
+\begin{tabular}{|p{\third}|p{\third}|p{\third}|} \hline
+\multicolumn{3}{|l|}{\textbf{Sortiment}}\\ \hline
+Artikel hinzuf\"ugen & F\"ugt einen Artikel zum Sortiment hinzu & Ladenbesitzer\\ \hline
+Artikel bearbeiten & Ver\"andert einen vorhandenen Artikel im Sortiment & Ladenbesitzer\\ \hline
+Artikel l\"oschen & L\"oscht einen vorhandenen Artikel aus dem Sortiment & Ladenbesitzer\\ \hline
+Kategorie erstellen & F\"ugt eine neue Kategorie hinzu & Ladenbesitzer\\ \hline
+Kategorie bearbeiten & Ver\"andert eine vorhandene Kategorie & Ladenbesitzer\\ \hline
+Kategorie l\"oschen & L\"oscht eine vorhandene Kategorie & Ladenbesitzer\\ \hline
+\multicolumn{3}{|l|}{\textbf{Artikelsuche}}\\ \hline
+Sortiment durchsuchen & Sucht Artikel aus dem Sortiment & Angestellter\\ \hline
+Ergebnisse sortieren & Sortiert die gefundenen Artikel wie gew\"unscht & Angestellter\\ \hline
+zum Warenkorb hinzuf\"ugen & F\"ugt Artikel zum Warenkorb hinzu & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Warenkorb}}\\ \hline
+Artikelanzahl \"ander & \"Andert die Anzahl des Artikels im Warenkorb & Angestellter\\ \hline
+Artikel l\"oschen & Entfernt einen Artikel aus dem Warenkorb & Angestellter\\ \hline
+Zahlungsvorgang starten & Beginnt den Zahlungsvorgang & Angestellter\\ \hline
+Reklamation abschlie\ss{}en & Erstellt offene Reklamation & Angestellter\\ \hline
+Warenkorb leeren & L\"oscht alle Artikel aus dem Warenkorb & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Witzeverwaltung}}\\ \hline
+Witz hinzuf\"ugen & F\"ugt einen Witz hinzu & Ladenbesitzer\\ \hline
+Witz bearbeiten & Ver\"andert einen vorhandenen Witz & Ladenbesitzer\\ \hline
+Witz l\"oschen & L\"oscht einen vorhandenen Witz & Ladenbesitzer\\ \hline
+\end{tabular}
+\newpage
+\begin{tabular}{|p{\third}|p{\third}|p{\third}|} \hline
+\multicolumn{3}{|l|}{\textbf{Lagerverwaltung}}\\ \hline
+Artikelanzahl \"ander & \"Andert die Anzahl des Artikels im Bestand & Ladenbesitzer\\ \hline
+minimale Artikelanzahl \"ander & \"Andert die  minimale Anzahl des Artikels im Bestand & Ladenbesitzer \\ \hline
+\"Ubersicht anzeigen & Zeigt eine \"Ubersicht \"uber alle vorhandenen Artikel & Ladenbesitzer\\ \hline
+\multicolumn{3}{|l|}{\textbf{Zahlungsvorgang}}\\ \hline
+Zahlungsart ausw\"ahlen & W\"ahlt die Zahlungsart aus & Angestellter\\ \hline
+\"Ubersicht anzeigen & Zeigt die Bestell\"ubersicht an & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Verkaufsstatistik}}\\ \hline
+Rohdaten als XML exportieren & Exportiert die Verkaufsstatistik als XML & Ladenbesitzer\\ \hline
+\multicolumn{3}{|l|}{\textbf{Reklamation}}\\ \hline
+Rechnung validieren & \"Uberpr\"uft, ob die Rechnung noch im Zeitrahmen liegt & Angestellter\\ \hline
+\"Ubersicht anzeigen & Zeigt alle Produkte der Rechnung an & Angestellter\\ \hline
+Reklamation genehmigen & Genehmigt die Reklamation und schlie\ss{}t sie ab & Ladenbesitzer\\ \hline
+\end{tabular}
 
 % Lösungsstrategie und Entwurfsentscheidungen
+\newpage
 \section{Lösungsstrategie und Entwurfsentscheidungen}
 
 % Bausteinsicht
@@ -103,43 +155,49 @@ Die Namenskonvention lautet wie folgt:\\
 
 % Persistenz
 \subsection{Persistenz}
+Die Persistenz wird mit Hilfe der Repositorys durch Spring und der in Maven integrierten Datenbank geregelt.
 
 % Benutzungsoberfläche
 \subsection{Benutzungsoberfläche}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/dialoglandkarte}
 
 % Ergonomie
 \subsection{Ergonomie}
+%TODO: Wie schätzen Sie die Ergonomie Ihres Systems ein?
+%Wer hat es getestet (Crosstesting, OMA Test?)
 
 % Transaktionsbehandlung
 \subsection{Transaktionsbehandlung}
+Es wurden die Transaktionen Barzahlung, Kreditkarte und Lastschrift implementiert.
 
 % Sessionbehandlung
 \subsection{Sessionbehandlung}
-
+%TODO: Sessionsbehandlung
 % Sicherheit
 \subsection{Sicherheit}
-
+%TODO: Welche Sicherheiten?
 % Plausibilisierung und Validierung
 \subsection{Plausibilisierung und Validierung}
-
+Alle Nutzereingaben werden \"uberpr\"uft.
 % Ausnahme-/Fehlerbehandlung
 \subsection{Ausnahme-/Fehlerbehandlung}
-
+%TODO: Es gibt keine Fehler?
 % Logging, Protokollierung, Tracing
 \subsection{Logging, Protokollierung, Tracing}
 
 % Konfigurierbarkeit
 \subsection{Konfigurierbarkeit}
+Der Ladenbesitzer kann jederzeit die Passwortregeln \"andern.
 
 % Internationalisierung
 \subsection{Internationalisierung}
-
+Es wird nur die Sprache Deutsch unterst\"utzt.
 % Testbarkeit
 \subsection{Testbarkeit}
-
+%TODO: Welche automatisierten Tests haben Sie implementiert?
 % Buildmanagement
 \subsection{Buildmanagement}
-
+Der vollst\"andige Sourcecode ist auf GitHub vorhanden.
 % Glossar
 \section{Glossar}
 
