@@ -15,6 +15,7 @@ import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,10 +140,22 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), "Shirt", null, null);
 
         List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
+        List<GSProduct> expected = new LinkedList<>();
+        String searchTerm = "Shirt";
+
+        for (GSProduct product : catalog.findAll()) {
+                if (product.getName().toLowerCase().contains(searchTerm.toLowerCase())
+                        || product.getSubCategory().getName().toLowerCase().contains(searchTerm.toLowerCase())
+                        || product.getSubCategory().getSuperCategory().getName().toLowerCase().contains(searchTerm.toLowerCase()))
+                    expected.add(product);
+            }
+
 
         int cntProducts = 0;
 
-        for (GSProduct prod : catalog.findByName("Shirt")) {
+
+
+        for (GSProduct prod : expected) {
 
                 assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
                 cntProducts++;
@@ -158,13 +171,17 @@ public class CatalogControllerTests extends AbstractWebIntegrationTests {
     public void testCategoryView() {
         controller.searchEntryByName(model, Optional.of(owner.getUserAccount()), null, null, "subCat1");
 
-        for (GSProduct prod : catalog.findByCategory("subCat1")) {
-            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
-        }
-
         List<GSProduct> actual = (List<GSProduct>) model.asMap().get("catalog");
 
-        assertEquals(actual.size(), 4);
+        int cntProducts = 0;
+
+        for (GSProduct prod : subCatRepo.findByName("subCat1").getProducts()) {
+            assertThat((Iterable<GSProduct>) model.asMap().get("catalog"), hasItem(prod));
+            cntProducts++;
+
+        }
+
+        assertEquals(actual.size(), cntProducts);
 
     }
 
