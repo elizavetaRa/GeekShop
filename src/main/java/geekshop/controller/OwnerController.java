@@ -556,13 +556,7 @@ class OwnerController {
 
         SubCategory subCategory = subCategoryRepo.findByName(subName);
 
-//        SuperCategory superCategory = subCategory.getSuperCategory();
-
-//        superCategory.getSubCategories().remove(subCategory);
-
-
         delSub(subCategory);
-
 
         return "redirect:/range";
     }
@@ -902,7 +896,7 @@ class OwnerController {
      * @return
      */
     @RequestMapping(value = "/range/editsub/{sub}", method = RequestMethod.POST)
-    public String editSub(Model model, @PathVariable("sub") String subCatName, @RequestParam("name") String name, @RequestParam(value = "superCategory", required = false) String strSuperCat) {
+    public String editSub(Model model, @PathVariable("sub") String subCatName, @RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat) {
 
         if (subCategoryRepo.findByName(subCatName) == null)
             return "redirect:/range";

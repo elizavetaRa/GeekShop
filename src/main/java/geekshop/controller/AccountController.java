@@ -525,11 +525,9 @@ class AccountController {
         boolean hasErrors = false;
 
         if (oldPW.trim().isEmpty()) {
-            System.out.println("Passwort ist leer!");
             model.addAttribute("oldPWError", "Altes Passwort ist leer.");
             hasErrors = true;
         } else if (!authManager.matches(new Password(oldPW), userAccount.get().getPassword())) {
-            System.out.println("Altes Passwort ist falsch!");
             model.addAttribute("oldPWError", "Altes Passwort ist falsch.");
             hasErrors = true;
         }
@@ -587,22 +585,18 @@ class AccountController {
         boolean hasErrors = false;
 
         if (newPW.trim().isEmpty()) {
-            System.out.println("Passwort ist leer!");
             model.addAttribute("newPWError", "Neues Passwort ist leer.");
             hasErrors = true;
         } else if (!passRulesRepo.findOne("passwordRules").get().isValidPassword(newPW)) {
-            System.out.println("Neues Passwort entspricht nicht den Sicherheitsregeln!");
             model.addAttribute("newPWError", "Neues Passwort entspricht nicht den Sicherheitsregeln.");
             hasErrors = true;
         }
 
         if (!newPW.trim().isEmpty()) {
             if (retypePW.trim().isEmpty()) {
-                System.out.println("Geben Sie das neue Passwort nochmals ein!");
                 model.addAttribute("retypePWError", "Geben Sie das neue Passwort nochmals ein.");
                 hasErrors = true;
             } else if (!newPW.equals(retypePW)) {
-                System.out.println("Passwörter stimmen nicht überein!");
                 model.addAttribute("retypePWError", "Passwörter stimmen nicht überein.");
                 hasErrors = true;
             }
