@@ -29,7 +29,9 @@
 
             <div id="content-in">
 
-                <table class="table-style01 alternatRows">
+                <p class="infoMsg msgMargin" th:if="${staff.isEmpty()}" style="margin-bottom:30px;">Es sind keine Angestellten vorhanden.</p>
+
+                <table class="table-style01 alternatRows" th:unless="${staff.isEmpty()}">
 
                     <tr>
                         <th>Vorname</th>

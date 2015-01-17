@@ -27,7 +27,9 @@
 
             <div id="content-in">
 
-                <table class="table-style01" th:unless="${mapProductOrders}">
+                <p class="infoMsg msgMargin" th:if="${setOrders} and ${setOrders.isEmpty()}" style="margin-bottom:30px;">Es sind keine Verkäufe vorhanden.</p>
+
+                <table class="table-style01" th:if="${setOrders} and !${setOrders.isEmpty()}">
                     <tr>
                         <th>Artikelbezeichnung</th>
                         <th style="width:112px">Artikelnummer</th>
@@ -68,7 +70,7 @@
                     </tbody>
                 </table>
 
-                <table class="table-style01" th:if="${mapProductOrders}">
+                <table class="table-style01" th:if="${mapProductOrders} and !${mapProductOrders.isEmpty()}">
                     <tr>
                         <th style="width:140px">Datum</th>
                         <th style="width:98px">Rechnung</th>
