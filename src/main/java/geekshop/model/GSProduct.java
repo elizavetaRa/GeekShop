@@ -67,14 +67,14 @@ public class GSProduct extends Product {
     }
 
     /**
-     * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12, 34 €}" is delivered.
+     * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12,34 €}" is delivered.
      */
     public static String moneyToString(Money money) {
         return moneyToString(money, false);
     }
 
     /**
-     * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12, 34 €}" is delivered.
+     * Returns the given price formatted. For example, instead of "{@code EUR 12,34}", "{@code 12,34 €}" is delivered.
      *
      * @param withoutEuroSign indicates if set to {@literal true} that the euro sign has not to be appended.
      */

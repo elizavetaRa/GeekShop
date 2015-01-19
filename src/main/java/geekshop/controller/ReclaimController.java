@@ -351,7 +351,7 @@ class ReclaimController {
     }
 
     /**
-     * Cancels current reclaim
+     * Cancels current reclaim.
      *
      * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
@@ -367,7 +367,7 @@ class ReclaimController {
     }
 
     /**
-     * Returns current view of canceling reclaim
+     * Returns current view after canceling reclaim.
      *
      * @param userAccount must not be {@literal null}.
      */
@@ -380,10 +380,10 @@ class ReclaimController {
     }
 
     /**
-     * determines the amount of {@link GSProduct} not to be reclaimed
+     * As the method name says, determines the not reclaimed amount of {@link GSProduct} bought in the given order.
      *
-     * @param orderToBeReclaimed
-     * @param product
+     * @param orderToBeReclaimed the sale which contains the given product
+     * @param product the product whose not reclaimed amount is to be determined
      */
     private BigDecimal determineNotReclaimedAmountOfProduct(GSOrder orderToBeReclaimed, GSProduct product) {
         if (orderToBeReclaimed.getOrderType() == OrderType.RECLAIM)

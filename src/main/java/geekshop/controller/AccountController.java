@@ -59,7 +59,8 @@ class AccountController {
     //region Login/Logout
 
     /**
-     * Shows the start page with the welome joke or, if the user's password does not match the current password rules, redirects to the respective page demanding the user to change the password according to the current password rules.
+     * Shows the start page with the welome joke or, if the user's password does not match the current password rules,
+     * redirects to the respective page demanding the user to change the password according to the current password rules.
      */
     @RequestMapping({"/", "/index"})
     public String index(Model model, @LoggedIn Optional<UserAccount> userAccount, HttpSession session) {
@@ -138,7 +139,7 @@ class AccountController {
     }
 
     /**
-     * Redirects to start page if {@code /adjustpw} is mistakenly directly requested.
+     * Redirects to start page if {@code /adjustpw} is mistakenly requested directly.
      */
     @RequestMapping("/adjustpw")
     public String adjustPW() {
