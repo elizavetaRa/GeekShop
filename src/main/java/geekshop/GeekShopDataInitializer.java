@@ -84,7 +84,6 @@ public class GeekShopDataInitializer implements DataInitializer {
         initializeUsers();
         initializeJokes();
         initializeTestOrders(); // nur zu Testzwecken
-        initializeMessages();
     }
 
     /**
@@ -323,6 +322,8 @@ public class GeekShopDataInitializer implements DataInitializer {
         orderRepo.save(order2);
         orderRepo.save(order3);
         orderRepo.save(order4);
+
+        initializeMessages();
     }
 
     /**
