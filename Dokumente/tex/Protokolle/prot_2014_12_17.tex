@@ -1,0 +1,90 @@
+\documentclass{scrartcl}
+\usepackage{geometry}
+\geometry{a4paper, top=30mm, left=30mm, right=30mm, bottom=30mm, headsep=15mm, footskip=15mm}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{paralist}
+\usepackage{enumitem}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+
+\makeatletter
+\newcommand{\minipagetrue}{\@minipagetrue}
+\setlist[itemize]{itemsep=0pt,after=\vskip-\baselineskip,label={\textbullet},leftmargin=*,before=\minipagetrue,}
+
+\rofoot{\thepage~}
+\begin{document}
+\begin{center}
+\LARGE \bf{Protokoll vom 17.12.2014 \\
+SWT14W30}
+\end{center}
+
+\begin{tabular}{rp{10cm}}
+Protokollant & Marcus Kammerdiener \\
+Satz & Sebastian Döring \\
+Anwesend & Sebastian Döring, Felix Döring, Marcus Kammerdiener,\\
+& Dominik Lauck, Elizaveta Ragozina \\
+\end{tabular}
+
+\vspace*{3em}
+
+\section{Ablauf}
+\subsection{Fortschritte der vergangenen Woche}
+In der heutigen Konsultation wurden wieder die Fortschritte der vergangenen Woche vorgetragen. Die nachfolgende Tabelle protokolliert die wesentlichen Arbeitsleistungen:\\[.4cm]
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\textwidth}{p{0.13\textwidth}p{0.66\textwidth}X}
+\hline
+\textsf{\textbf{\large Person}} & \textsf{\textbf{\large Tätigkeiten}} & \textsf{\textbf{\large Probleme}} \\
+\hline\hline
+\textbf{Sebastian} & 
+ \begin{itemize}
+ \item Unterstützung der anderen Teammitglieder
+ \item Account-Funktionen fertiggestellt
+ \item Änderung der Passwortregeln und Passwortvalidierung nach Login fertig implementiert
+ \end{itemize}
+ & \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Felix} & 
+ \begin{itemize}
+ \item Reklamationsbenachrichtigungen an Ladenbesitzer implementiert
+ \item mit Sortimentverwaltung begonnen
+ \end{itemize}
+ & \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Lisa} & 
+ \begin{itemize}
+ \item Warenkorb, Kasse, Kaufvorgang fertiggestellt
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Marcus} & 
+ \begin{itemize}
+ \item Implementierung der Artikelsuche beendet
+ \item mit Sortierfunktion begonnen
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Dominik} &
+ \begin{itemize}
+ \item Übersicht über die bisherigen Verkäufe abgeschlossen
+ \item mit XML-Export-Funktion der Verkaufsdaten begonnen
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\end{tabularx}\\
+
+\vspace{1em}
+
+\subsection{Sonstiges}
+Anschließend wurden folgende Themen angesprochen:\\
+Während des Crosstestings ist für die andere Gruppe ein Testbericht anzulegen, in dem festgehalten wird, welche Funktionen getestet wurden, was erwartet und was zurückgegeben wurde.\\
+Außerdem wurde darauf hingewiesen, dass es aufgrund des leichten Rückstandes der Gruppe sinnvoll ist, eine Woche der Weihnachtsferien für die Wartung des Projekts zu nutzen.\\\\
+In der Wartungsphase sollen nur noch die Wunschkriterien implementiert sowie die Dokumente für den Kunden abgeschlossen werden.\\
+Die Endpräsentation findet voraussichtlich in der Woche vom 19. bis 23.01.2015 statt.
+
+\vspace{1em}
+
+\section{Nächste Konsultation}
+Die nächste Konsultation wurde auf Mittwoch, 07.01.2015, zur 4.~DS festgelegt.
+
+\end{document}

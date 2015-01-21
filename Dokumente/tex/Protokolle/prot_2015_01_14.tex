@@ -1,0 +1,94 @@
+\documentclass{scrartcl}
+\usepackage{geometry}
+\geometry{a4paper, top=30mm, left=30mm, right=30mm, bottom=30mm, headsep=15mm, footskip=15mm}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{paralist}
+\usepackage{enumitem}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+
+\parindent 0pt
+
+\makeatletter
+\newcommand{\minipagetrue}{\@minipagetrue}
+\setlist[itemize]{itemsep=0pt,after=\vskip-\baselineskip,label={\textbullet},leftmargin=*,before=\minipagetrue,}
+
+\rofoot{\thepage~}
+\begin{document}
+\begin{center}
+\LARGE \bf{Protokoll vom 14.01.2015 \\
+SWT14W30}
+\end{center}
+
+\begin{tabular}{rp{10cm}}
+Protokollant & Marcus Kammerdiener \\
+Satz & Sebastian Döring \\
+Anwesend & Sebastian Döring, Felix Döring, Marcus Kammerdiener,\\
+& Dominik Lauck, Elizaveta Ragozina \\
+\end{tabular}
+
+\vspace*{3em}
+
+\section{Fortschritte der letzten Woche}
+Die nachfolgende Tabelle protokolliert die wesentlichen Arbeitsleistungen der letzten Woche:\\[.4cm]
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\textwidth}{p{0.13\textwidth}p{0.66\textwidth}X}
+\hline
+\textsf{\textbf{\large Person}} & \textsf{\textbf{\large Tätigkeiten}} & \textsf{\textbf{\large Probleme}} \\
+\hline\hline
+\textbf{Sebastian} & 
+ \begin{itemize}
+ \item \textit{AccountController}-Tests geschrieben
+ \item Validierung der Formulareingaben in den Templates \textit{profile}, \textit{changepw}, \textit{adjustpw}, \textit{setrules}, \textit{editproduct}, \textit{editsub} und \textit{editsuper}
+ \item Validierungsklassen getestet
+ \end{itemize}
+ & \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Felix} & 
+ \begin{itemize}
+ \item Anwender"~ und Entwicklerdokumentation begonnen
+ \end{itemize}
+ & \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Lisa} & 
+ \begin{itemize}
+ \item Entwurfsklassendiagramm aktualisiert
+ \item Tests für \textit{CartController} geschrieben
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Marcus} & 
+ \begin{itemize}
+ \item \textit{GSProduct}"=Tests geschrieben
+ \item Überarbeitung der Sequenzdiagramme
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Dominik} &
+ \begin{itemize}
+ \item Integrationstests für Kauf- und Reklamationsvorgang sowie für alle verwendeten Requests geschrieben
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\end{tabularx}\\
+
+\vspace{1em}
+
+\section{Ablauf}
+Bis zum Freitag, den 16.01.2015, ist das Projekt fertigzustellen. Bis dahin müssen alle Muss-Kriterien realisiert sowie die Dokumentationen, die Tests und die überarbeiteten Diagramme vollständig verfügbar sein.\\\\
+Am Donnerstag, dem 22.01.2015, zur 6.~DS findet die Abschlusspräsentation statt. Diese gliedert sich in die Darlegung des Entwicklungsprozesses, die Vorstellung der fertigen Anwendung sowie eine anschließende Diskussion.\newpage
+Bis zur Präsentation sind folgende Berichte der Gruppe abzugeben:
+\begin{itemize}
+\itemsep 0pt
+\item Erfahrungsbericht (Welche Erfahrungen wurden gesammelt?)
+\item Bericht zum Lösungsvorgang (Welche Mittel wurden genutzt? Was hätte man besser machen können? Was wurde gut umgesetzt?)
+\item Bericht zum Projektverlauf (Einschätzung zum Ablauf des Projekts)
+\end{itemize}
+
+\vspace{1em}
+
+\section{Letzte Konsultation}
+Die letzte Konsultation wird am Mittwoch, dem 21.01.2015, zur 4.~DS stattfinden.
+
+\end{document}
