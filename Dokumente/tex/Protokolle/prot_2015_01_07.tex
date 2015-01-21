@@ -1,0 +1,93 @@
+\documentclass{scrartcl}
+\usepackage{geometry}
+\geometry{a4paper, top=30mm, left=30mm, right=30mm, bottom=30mm, headsep=15mm, footskip=15mm}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{paralist}
+\usepackage{enumitem}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+
+\makeatletter
+\newcommand{\minipagetrue}{\@minipagetrue}
+\setlist[itemize]{itemsep=0pt,after=\vskip-\baselineskip,label={\textbullet},leftmargin=*,before=\minipagetrue,}
+
+\rofoot{\thepage~}
+\begin{document}
+\begin{center}
+\LARGE \bf{Protokoll vom 07.01.2015 \\
+SWT14W30}
+\end{center}
+
+\begin{tabular}{rp{10cm}}
+Protokollant & Marcus Kammerdiener \\
+Satz & Sebastian Döring \\
+Anwesend & Sebastian Döring, Felix Döring, Marcus Kammerdiener,\\
+& Dominik Lauck, Elizaveta Ragozina \\
+\end{tabular}
+
+\vspace*{3em}
+
+\section{Fortschritte seit der letzten Konsultation}
+Die nachfolgende Tabelle protokolliert die wesentlichen Arbeitsleistungen seit der letzten Konsultation am 17.12.2014:\\[.4cm]
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\textwidth}{p{0.13\textwidth}p{0.66\textwidth}X}
+\hline
+\textsf{\textbf{\large Person}} & \textsf{\textbf{\large Tätigkeiten}} & \textsf{\textbf{\large Probleme}} \\
+\hline\hline
+\textbf{Sebastian} & 
+ \begin{itemize}
+ \item Unterstützung der anderen Teammitglieder
+ \item \textit{Order}-Logik vollständig überarbeitet, \textit{OrderManager} damit überflüssig
+ \item nach Rechnungen sortierte Verkaufsübersicht hinzugefügt
+ \item Teststrukturen refaktorisiert, Tests für Modelklassen geschrieben
+ \end{itemize}
+ & \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Felix} & 
+ \begin{itemize}
+ \item Sortimentverwaltung fertiggestellt
+ \item \textit{Messages} refaktorisiert
+ \item Tests für \textit{OwnerController} geschrieben
+ \end{itemize}
+ & \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Lisa} & 
+ \begin{itemize}
+ \item vollständigen Reklamationsvorgang implementiert
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Marcus} & 
+ \begin{itemize}
+ \item Sortierfunktion fertiggestellt
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Dominik} &
+ \begin{itemize}
+ \item XML-Export-Funktion der Verkaufsdaten fertiggestellt
+ \item Tests für \textit{OwnerController} geschrieben
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\end{tabularx}\\
+
+\vspace{1em}
+
+\section{Ablauf}
+In der heutigen Konsultation ging es überwiegend um abschließende Fragen zum Projekt.\\
+Da sich das Crosstesting verschoben hat, muss zwangsläufig am 08.01.2015 zur 5. oder 6.~DS ein Treffen der beiden Gruppen stattfinden, bei dem das Testen vor Ort durchgeführt wird. Der Testbericht soll dabei in Form von Testfalltabellen geschehen.\\
+Des Weiteren ist es notwendig, dass sich die Gruppenmitglieder in jExam für das Praktikum einschreiben, um eine Bewertung zu ermöglichen.\\\\
+Um das Projekt zu bestehen, ist es zwingend notwendig, alle Muss-Kriterien erfüllt und getestet zu haben.\\
+Für die Abgabe ist Folgendes zu beachten: Der Kunde bekommt das gesamte Softwarepaket einschließlich aller Dokumente. Dazu wird verlangt, dass nur der Login für den Ladenbesitzer, ansonsten jedoch keine Datensätze enthalten sind. Für die Präsentation kann es hingegen hilfreich sein, Dummydaten in der Anwendung zu verwenden.\\
+Die Gruppe fragte im Übrigen nach einer Vorlage für die Entwicklerdokumentation. Das bereits für das Pflichtenheft verteilte Template sollte dafür werden.\\
+Es wurde ferner darauf hingewiesen, dass alle Diagramme in einem MagicDraw"=Projekt unterzubringen sind.\\
+Bezüglich der Abschlusspräsentation wurde darauf hingewiesen, dass die Redezeit ohne Diskussion nicht länger als 20 Minuten dauern sollte.
+
+\vspace{1em}
+
+\section{Nächste Konsultation}
+Die nächste Konsultation erfolgt wieder am Mittwoch, dem 14.01.2015, zur 4.~DS.
+
+\end{document}
