@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav (${isOwnProfile} ? 'profile' : 'staff')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title"
+                th:text="(${personalDataForm.firstname} ? 'Profil von ' + ${personalDataForm.firstname} + ' ' + ${personalDataForm.lastname} : 'Angestellten hinzufügen')">Profil</h3>
+
+            <div id="content-in">
+
+                <form th:action="${#httpServletRequest.requestURI}" method="post" th:object="${personalDataForm}">
+                    <table class="table-style01 t-left noborder">
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('firstname')} ? 'vertical-align:top'">
+                                <label th:for="'firstname'" class="highlight">Vorname:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{firstname}"></p>
+                                <input type="text" th:field="*{firstname}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="30" required="required"/>
+                                <p th:if="${#fields.hasErrors('firstname')}" class="errorMsg" th:errors="*{firstname}">Fehler</p>
+                            </td>
+
+                            <td class="indent" th:styleappend="${#fields.hasErrors('lastname')} ? 'vertical-align:top'">
+                                <label th:for="'lastname'" class="highlight">Nachname:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{lastname}"></p>
+                                <input type="text" th:field="*{lastname}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="30" required="required"/>
+                                <p th:if="${#fields.hasErrors('lastname')}" class="errorMsg" th:errors="*{lastname}">Fehler</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('username')} ? 'vertical-align:top'">
+                                <label th:for="'username'" class="highlight">Benutzername:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{username}"></p>
+                                <input type="text" th:field="*{username}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="30" required="required" th:disabled="!${#strings.contains(#httpServletRequest.requestURI, '/addemployee')}"
+                                       th:title="!*{#strings.contains(#httpServletRequest.requestURI, '/addemployee')} ? 'Benuzername muss muss mind. drei Zeichen lang sein'"/>
+                                <input type="hidden" th:field="*{username}" th:if="${inEditingMode} and !${#strings.contains(#httpServletRequest.requestURI, '/addemployee')}"/>
+                                <p th:if="${#fields.hasErrors('username')}" class="errorMsg" th:errors="*{username}">Fehler</p>
+                            </td>
+
+                            <td class="indent" th:styleappend="${#fields.hasErrors('email')} ? 'vertical-align:top'">
+                                <label th:for="'email'" class="highlight">E-Mail-Adresse:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{email}"></p>
+                                <input type="text" th:field="*{email}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="30" required="required"/>
+                                <p th:if="${#fields.hasErrors('email')}" class="errorMsg" th:errors="*{email}">Fehler</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('gender')} ? 'vertical-align:top'">
+                                <label th:for="'gender'" class="highlight">Geschlecht:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{gender.value}"></p>
+                                <select name="gender" id="gender" th:if="${inEditingMode}" th:errorclass="fieldError">
+                                    <option th:each="g : ${T(geekshop.model.Gender).values()}"
+                                            th:value="${g}" th:text="${g.value}"
+                                            th:selected="${g} == *{gender}"></option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('gender')}" class="errorMsg" th:errors="*{gender}">Fehler</p>
+                            </td>
+
+                            <td class="indent" th:styleappend="${#fields.hasErrors('dateOfBirth')} ? 'vertical-align:top'">
+                                <label th:for="'dateOfBirth'" class="highlight">Geburtsdatum:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{dateOfBirth}"></p>
+                                <input type="text" th:field="*{dateOfBirth}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       required="required" title="Geben Sie das Datum in der Form TT.MM.JJJJ an"/>
+                                <p th:if="${#fields.hasErrors('dateOfBirth')}" class="errorMsg" th:errors="*{dateOfBirth}">Fehler</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('maritalStatus')} ? 'vertical-align:top'">
+                                <label th:for="'maritalStatus'" class="highlight">Familienstand:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{maritalStatus.value}"></p>
+                                <select name="maritalStatus" id="maritalStatus" th:if="${inEditingMode}" th:errorclass="fieldError">
+                                    <option th:each="ms : ${T(geekshop.model.MaritalStatus).values()}"
+                                            th:value="${ms}" th:text="${ms.value}"
+                                            th:selected="${ms} == *{maritalStatus}"></option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('maritalStatus')}" class="errorMsg" th:errors="*{maritalStatus}">Fehler</p>
+                            </td>
+
+                            <td class="indent" th:styleappend="${#fields.hasErrors('phone')} ? 'vertical-align:top'">
+                                <label th:for="'phone'" class="highlight">Telefonnummer:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{phone}"></p>
+                                <input type="text" th:field="*{phone}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="30" required="required"/>
+                                <p th:if="${#fields.hasErrors('phone')}" class="errorMsg" th:errors="*{phone}">Fehler</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="t-left" th:styleappend="${#fields.hasErrors('street')} ? 'vertical-align:top'">
+                                <label th:for="'street'" class="highlight">Straße:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{street}"></p>
+                                <input type="text" th:field="*{street}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="15" required="required"/>
+                                <p th:if="${#fields.hasErrors('street')}" class="errorMsg" th:errors="*{street}">Fehler</p>
+                            </td>
+
+                            <td class="indent" th:styleappend="${#fields.hasErrors('houseNr')} ? 'vertical-align:top'">
+                                <label th:for="'houseNr'" class="highlight">Hausnummer:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{houseNr}"></p>
+                                <input type="text" th:field="*{houseNr}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="15" required="required"/>
+                                <p th:if="${#fields.hasErrors('houseNr')}" class="errorMsg" th:errors="*{houseNr}">Fehler</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('postcode')} ? 'vertical-align:top'">
+                                <label th:for="'postcode'" class="highlight">PLZ:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{postcode}"></p>
+                                <input type="text" th:field="*{postcode}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="7" maxlength="5" pattern="\d{5}" required="required"/>
+                                <p th:if="${#fields.hasErrors('postcode')}" class="errorMsg" th:errors="*{postcode}">Fehler</p>
+                            </td>
+
+                            <td class="indent" th:styleappend="${#fields.hasErrors('place')} ? 'vertical-align:top'">
+                                <label th:for="'place'" class="highlight">Ort:</label>
+                            </td>
+                            <td>
+                                <p th:if="${!inEditingMode}" th:text="*{place}"></p>
+                                <input type="text" th:field="*{place}" th:if="${inEditingMode}" th:errorclass="fieldError"
+                                       size="15" required="required"/>
+                                <p th:if="${#fields.hasErrors('place')}" class="errorMsg" th:errors="*{place}">Fehler</p>
+                            </td>
+
+                        </tr>
+                    </table>
+                    <!--<input name="uai" type="hidden" th:if="${user}" th:value="${user.userAccount.identifier}"/>-->
+                    <button type="submit" name="save" id="save" class="myButton" th:if="${inEditingMode}">Speichern</button>
+                    <a th:href="${#strings.contains(#httpServletRequest.requestURI, '/changedata')} ? ${#strings.substringBefore(#httpServletRequest.requestURI, '/changedata')} : '/staff'" th:if="${inEditingMode}" class="myButton f-right">Zurück</a>
+                </form>
+
+                <a th:href="${#httpServletRequest.requestURI} + '/changedata'" class="myButton marginButton f-left" th:if="${!inEditingMode}">
+                    Daten bearbeiten
+                </a>
+                <a th:href="${#httpServletRequest.requestURI} + '/changepw'" class="myButton" th:if="${!inEditingMode}">
+                    Passwort ändern
+                </a>
+
+            </div>
+            <!-- /content-in -->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

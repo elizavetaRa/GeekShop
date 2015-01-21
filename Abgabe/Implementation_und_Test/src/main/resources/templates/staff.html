@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <!--<script th:replace="header :: jquery-js"></script>-->
+    <!--<script th:replace="header :: selectAll-js"></script>-->
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('staff')"></div>
+
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Personalverwaltung</h3>
+
+            <div id="content-in">
+
+                <p class="infoMsg msgMargin" th:if="${staff.isEmpty()}" style="margin-bottom:30px;">Es sind keine Angestellten vorhanden.</p>
+
+                <table class="table-style01 alternatRows" th:unless="${staff.isEmpty()}">
+
+                    <tr>
+                        <th>Vorname</th>
+                        <th>Nachname</th>
+                        <th>Benutzername</th>
+                        <th></th>
+                    </tr>
+
+                    <tr th:each="employee : ${staff}">
+                        <td th:utext="${employee.userAccount.firstname}">Steve</td>
+                        <td th:utext="${employee.userAccount.lastname}">Jobs</td>
+                        <td th:utext="${employee.userAccount.identifier}">Musterstrasse 1</td>
+                        <td class="fitToContent">
+                            <a th:href="'staff/' + ${employee.userAccount.identifier}" class="myButton">Ansehen/Bearbeiten</a>
+
+                            <form th:method="delete" th:action="@{/staff/} + ${employee.userAccount.identifier}"
+                                  th:attr="data-entry-id=${employee.id}">
+                                <button class="myButton">Entlassen</button>
+                            </form>
+                        </td>
+                    </tr>
+
+                </table>
+
+                <form th:action="@{/addemployee}">
+                    <button id="employ" class="myButton marginButton" type="submit">
+                        Einstellen
+                    </button>
+                </form>
+
+                <form th:action="@{/setrules}">
+                    <button id="changeRules" class="myButton" type="submit">
+                        Passwortregeln ändern
+                    </button>
+                </form>
+
+                <form th:action="@{/firestaff}" th:method="delete">
+                    <button id="dismissAll" class="myButton f-right" type="submit">
+                        Alle Angestellten entlassen
+                    </button>
+                </form>
+
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

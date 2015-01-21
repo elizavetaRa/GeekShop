@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <!--<script th:replace="header :: jquery-js"></script>-->
+    <!--<script th:replace="header :: selectAll-js"></script>-->
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('jokes')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Witzeverwaltung</h3>
+
+            <div id="content-in">
+
+                <div>
+
+                    <table class="table-style01 firstLeft alternatRows">
+                        <tr>
+                            <!--<th><input type="checkbox" id="selectAll"/></th>-->
+                            <th class="t-center">Text</th>
+                            <th style="width:1px"></th>
+                        </tr>
+                        <tr th:each="joke : ${jokes}">
+                            <!--<td class="t-center"><input type="checkbox" class="case" name="case" th:value="${joke.id}"/>-->
+                            <!--</td>-->
+                            <td class="t-left">
+                                <p name="joke[]" cols="50" rows="4" th:utext="${#strings.replace(joke.text, T(java.lang.System).getProperty('line.separator'), '&lt;br/&gt;')}">Es war dunkel, feucht und
+                                    neblig ...</p>
+                            </td>
+                            <td>
+                                <a th:href="@{/jokes/} + ${joke.id}" class="myButton" style="margin-bottom:3px">Ändern</a>
+                                <form th:action="@{/jokes/} + ${joke.id}" th:method="delete">
+                                    <button type="submit" class="myButton">Löschen</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <a href="/newjoke" class="myButton">Witz hinzufügen</a>
+
+                <!--<form method="delete" id="delJokes" th:action="@{/deljokes}">-->
+                <!--<button id="delete" class="myButton">Markierte löschen</button>-->
+                <!--</form>-->
+
+                <form th:method="delete" id="delJokes" th:action="@{/deljokes}">
+                    <button id="deleteAll" class="myButton f-right">Alle Witze löschen</button>
+                </form>
+
+            </div>
+            <!-- content-in-->
+
+            <hr class="noscreen"/>
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

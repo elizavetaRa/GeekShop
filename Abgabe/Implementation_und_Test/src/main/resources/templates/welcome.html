@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('welcome')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h2 id="content-title">Dein Begrüßungswitz</h2>
+
+            <!-- Perex -->
+            <div id="perex" class="box"
+                 th:utext="${joke} ? ${#strings.replace(joke.text, T(java.lang.System).getProperty('line.separator'), '&lt;br/&gt;')}
+                                   : (${session.user.userAccount.username == 'owner'} ? 'Die Witze sind ausgegangen' : 'Dem Chef ist das Lachen vergangen') + ' &ndash; kein Witz! ;-)'">
+
+                <p>
+                    Frau: „Ich habe das neuste Windows-System.“<br/>
+                    Berater: „Ja, und?“<br/>
+                    Frau: „Ich habe da ein Problem.“<br/>
+                    Berater: „Ja, aber das haben Sie doch bereits gesagt.“
+                </p>
+
+            </div>
+            <!-- /perex -->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+        <!-- Sidebar -->
+        <!--<div id="aside">-->
+
+        <!-- News -->
+        <!--<h4 id="aside-title">Warenkorb</h4>
+
+        <div class="aside-in">
+            <div class="aside-box">
+
+                <dl id="news">
+
+                </dl>
+
+            </div>--> <!-- /aside-box -->
+        <!--</div>--> <!-- /aside-in -->
+
+
+        <!--</div>--> <!-- /aside -->
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+
+
+
+    </div>--> <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+</body>
+</html>

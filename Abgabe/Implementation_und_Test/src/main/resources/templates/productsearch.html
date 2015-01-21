@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <link th:replace="header :: tree-css"/>
+    <script th:replace="header :: jquery-js"></script>
+    <script>
+        $(window).load(function () {
+            preload([
+                '/resources/images/cart.png',
+                '/resources/images/cart-add.png'
+            ]);
+        });
+
+        $(document).ready(function () {
+            $(".expand").click(function (e) {
+                $(this).toggleClass("expanded");
+                $(this).children("ul").slideToggle("300");
+                e.stopPropagation();
+            });
+
+            $("#formSearch").submit(function () {
+                if (formSearch.q.value != "") {
+                    formSearch.cat.value = "";
+                }
+            });
+
+            $("#sort").change(function () {
+                $("#formSearch").submit();
+            });
+        }); //$(document).ready
+
+        function preload(arrayOfImages) {
+            $(arrayOfImages).each(function () {
+                (new Image()).src = this;
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('productsearch')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Artikelsuche</h3>
+
+            <div id="content-in">
+
+                <div id="categories">
+                    <ul class="ul-style01" th:each="superCategory: ${superCategories}">
+
+                        <li>
+                            <a th:href="'/productsearch?q=&amp;sort=' + (${param.sort} ? ${param.sort[0]} : '') + '&amp;cat=' + ${T(java.net.URLEncoder).encode(superCategory.name)}">
+                                <h5 th:text="${superCategory.name}">Kleidung für Nerds</h5>
+                            </a>
+                            <ul th:each="subCategory: ${superCategory.subCategories}">
+                                <li>
+                                    <a th:href="'/productsearch?q=&amp;sort=' + (${param.sort} ? ${param.sort[0]} : '') + '&amp;cat=' + ${T(java.net.URLEncoder).encode(subCategory.name)}"
+                                       th:text="${subCategory.name}">T-Shirts</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+
+
+                <div id="product-list">
+
+                    <form method="get" action="/productsearch" name="formSearch" id="formSearch">
+                        <input value="suchen" th:value="${param.q} ? ${param.q[0]}" name="q" id="q"
+                               type="text" size="35" maxlength="400" placeholder="Suche nach Artikelnr., Artikelname, Kategorie"/>
+                        <select name="sort" id="sort" style="margin: 0 15px 0 5px" class="f-right">
+                            <option value="name" th:selected="${param.sort} and (${param.sort[0]} == 'name')">Name</option>
+                            <option value="priceasc" th:selected="${param.sort} and (${param.sort[0]} == 'priceasc')">Preis
+                                aufsteigend
+                            </option>
+                            <option value="pricedesc" th:selected="${param.sort} and (${param.sort[0]} == 'pricedesc')">Preis
+                                absteigend
+                            </option>
+                            <option value="prodnum" th:selected="${param.sort} and (${param.sort[0]} == 'prodnum')">Artikelnummer
+                            </option>
+                        </select>
+                        <label class="f-right">sortieren nach</label>
+                        <button id="searchAndSortProducts" type="submit">suchen</button>
+                        <input type="hidden" name="cat" id="cat" th:value="${param.cat} ? ${param.cat[0]}"/>
+                    </form>
+                    <p class="infoMsg msgMargin" th:if="${session.ro}">Beenden Sie den Reklamationsvorgang, um Artikel in den Warenkorb legen zu können.</p>
+
+                    <div th:style="${session.ro} ? 'top:70px'">
+                        <p class="infoMsg" th:if="${catalog.isEmpty()} and (!${param.cat} or ${#strings.isEmpty(param.cat[0])})">Keine entsprechenden Artikel gefunden.</p>
+                        <p class="infoMsg" th:if="${catalog.isEmpty()} and ${param.cat} and !${#strings.isEmpty(param.cat[0])}">Keine Artikel in dieser Kategorie enthalten.</p>
+
+                        <table id="searchTable" class="table-style01 alternatRows noMargin" th:unless="${catalog.isEmpty()}">
+                            <tr>
+                                <th>Artikelbezeichnung</th>
+                                <th style="width:84px">Artikelnr.</th>
+                                <th style="width:84px">Anzahl</th>
+                                <th style="width:84px">Stückpreis</th>
+                                <th style="width:28px"></th>
+                            </tr>
+
+                            <tr th:each="product : ${catalog}">
+                                <form method="post" th:action="@{/cart}"
+                                      th:with="max = ${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">
+                                    <td class="t-bold" th:text="${product.name}">Digitalkamera</td>
+                                    <td th:text="${T(geekshop.model.GSOrder).longToString(product.productNumber)}">12345678</td>
+                                    <td th:if="${max > 0} and !${session.ro}"><input type="number" name="number" value="1" min="1" th:max="${max}"/></td>
+                                    <td th:unless="${max > 0} and !${session.ro}">&mdash;</td>
+                                    <td class="sorter:'currency'" th:text="${T(geekshop.model.GSProduct).moneyToString(product.price)}">123 €</td>
+                                    <td th:if="${max > 0} and !${session.ro}">
+                                        <input type="hidden" name="pid" th:value="${product.identifier}"/>
+                                        <input type="hidden" name="query" th:value="${#httpServletRequest.queryString}"/>
+                                        <button id="tocart" name="tocart" type="submit" title="in den Warenkorb" class="cartButton">&nbsp;</button>
+                                    </td>
+                                    <td th:if="!${max > 0} and !${session.ro}">
+                                        <span class="cartButtonUnavailable" title="Artikel nicht verfügbar"></span>
+                                    </td>
+                                    <td th:if="${session.ro}">
+                                        <span class="cartButtonUnavailable" title="Reklamation muss vorher abgeschlossen werden"></span>
+                                    </td>
+                                </form>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+            <!--/content-in -->
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

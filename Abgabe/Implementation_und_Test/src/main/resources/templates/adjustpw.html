@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div id="nav">
+        <ul class="box">
+            <li class="nav-active"><a href="#" style="width:180px">Passwort anpassen</a></li>
+            <li><a href="logout" style="width:100px">Logout</a></li>
+        </ul>
+
+        <hr class="noscreen"/>
+    </div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Passwort den Sicherheitsregeln anpassen</h3>
+
+            <div id="content-in">
+
+                <p>
+                    Ihr Passwort entspricht nicht den aktuellen Sicherheitsregeln für Passwörter. Daher ist eine Änderung des Passwortes erforderlich.
+                </p>
+
+                <p>
+                    Folgendes ist bei der Passwortwahl zu beachten:
+                </p>
+
+                <ul class="ul-style01">
+                    <li>Es dürfen <strong>keine Leerraumzeichen</strong> enthalten sein.</li>
+                    <li th:if="${passwordRules.areUpperAndLowerNecessary()}">Es müssen <strong>Groß- und Kleinbuchstaben</strong>
+                        vorkommen.
+                    </li>
+                    <li th:if="${!passwordRules.areUpperAndLowerNecessary()}">Es müssen <strong>Buchstaben</strong> vorkommen.
+                    </li>
+                    <li th:if="${passwordRules.areDigitsNecessary()}">Es müssen <strong>Ziffern</strong> verwendet werden.</li>
+                    <li th:if="${passwordRules.areSpecialCharactersNecessary()}">Es müssen <strong>Sonderzeichen</strong> enthalten
+                        sein.
+                    </li>
+                    <li>
+                        Das Passwort muss <strong th:text="'mindestens ' + ${passwordRules.minLength} + ' Zeichen'">mindestens ein Zeichen</strong> umfassen.
+                    </li>
+                </ul>
+
+                <form method="post" action="/adjustpw">
+                    <table class="table-style01 t-left noborder">
+                        <tr>
+                            <td style="width:30%;" th:styleappend="${newPWError} ? 'vertical-align:top'"><label for="newPW">Neues Passwort:</label></td>
+                            <td>
+                                <input name="newPW" id="newPW" type="password" th:value="${newPW} ? ${newPW}"
+                                       placeholder="Neues Passwort" required="required" th:classappend="${newPWError} ? 'fieldError'"/>
+                                <p th:if="${newPWError}" class="errorMsg" th:text="${newPWError}">Fehler</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td th:styleappend="${retypePWError} ? 'vertical-align:top'"><label for="retypePW">Neues Passwort wiederholen:</label></td>
+                            <td>
+                                <input name="retypePW" id="retypePW" type="password" th:value="${retypePW} ? ${retypePW}"
+                                       placeholder="Neues Passwort wiederholen" required="required" th:classappend="${retypePWError} ? 'fieldError'"/>
+                                <p th:if="${retypePWError}" class="errorMsg" th:text="${retypePWError}">Fehler</p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p>
+                        <button type="submit" name="submit" class="myButton" th:value="#{profil.changePW.submit}"
+                                value="Passwort ändern">Passwort ändern
+                        </button>
+                    </p>
+                </form>
+
+            </div>
+            <!-- /content-in -->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

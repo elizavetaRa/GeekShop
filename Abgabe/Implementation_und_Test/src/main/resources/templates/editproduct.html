@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('range')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title"
+                th:text="(${productName} ? 'Artikel »' + ${productName} + '« bearbeiten' : 'Artikel hinzufügen')">Artikel</h3>
+
+            <div id="content-in">
+
+                <form th:action="${#httpServletRequest.requestURI}" method="post" th:object="${productForm}">
+                    <table class="table-style01 t-left noborder">
+                        <tr>
+                            <td style="width:50px;" th:styleappend="${#fields.hasErrors('name')} ? 'vertical-align:top'">
+                                <label th:for="'name'" class="highlight">Artikelbezeichnung:</label>
+                            </td>
+                            <td>
+                                <input type="text" th:field="*{name}" size="30" required="required" th:errorclass="fieldError"/>
+
+                                <p th:if="${#fields.hasErrors('name')}" class="errorMsg" th:errors="*{name}">Fehler</p>
+                            </td>
+
+                            <td class="indent" style="width:50px;" rowspan="5">
+                                <label th:for="'subCategory'" class="highlight">Kategorie:</label>
+                            </td>
+                            <td rowspan="5">
+                                <select name="subCategory" id="subCategory" size="10" required="required" th:errorclass="fieldError">
+                                    <optgroup th:each="super : ${superCategories}" th:label="${super.name}">
+                                        <option th:each="sub : ${super.subCategories}"
+                                                th:value="${sub.name}" th:text="${sub.name}"
+                                                th:selected="*{subCategory} == ${sub.name}"></option>
+                                    </optgroup>
+                                </select>
+
+                                <p th:if="${#fields.hasErrors('subCategory')}" class="errorMsg" th:errors="*{subCategory}">Fehler</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('productNumber')} ? 'vertical-align:top'">
+                                <label th:for="'productNumber'" class="highlight">Artikelnummer:</label>
+                            </td>
+                            <td>
+                                <p th:unless="${isNew}" th:text="*{T(geekshop.model.GSOrder).longToString(productNumber)}">0</p>
+                                <input th:type="${isNew} ? 'number' : 'hidden'" th:field="*{productNumber}" size="2" value="1" min="1"
+                                       required="required" th:errorclass="fieldError"/>
+
+                                <p th:if="${#fields.hasErrors('productNumber')}" class="errorMsg" th:errors="*{productNumber}">Fehler</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('price')} ? 'vertical-align:top'">
+                                <label th:for="'price'" class="highlight">Preis in Euro:</label>
+                            </td>
+                            <td>
+                                <input type="text" th:field="*{price}" size="30" required="required" th:errorclass="fieldError"/>
+                                <p th:if="${#fields.hasErrors('price')}" class="errorMsg" th:errors="*{price}">Fehler</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('minQuantity')} ? 'vertical-align:top'">
+                                <label th:for="'minQuantity'" class="highlight">Minimale Stückzahl:</label>
+                            </td>
+                            <td>
+                                <input type="number" th:field="*{minQuantity}" size="2" min="0"
+                                       required="required" th:errorclass="fieldError"/>
+                                <p th:if="${#fields.hasErrors('minQuantity')}" class="errorMsg" th:errors="*{minQuantity}">Fehler</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td th:styleappend="${#fields.hasErrors('quantity')} ? 'vertical-align:top'">
+                                <label th:for="'quantity'" class="highlight">Stückzahl:</label>
+                            </td>
+                            <td>
+                                <input type="number" th:field="*{quantity}" size="2" min="0"
+                                       required="required" th:errorclass="fieldError"/>
+                                <p th:if="${#fields.hasErrors('quantity')}" class="errorMsg" th:errors="*{quantity}">Fehler</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <!--<input th:value="${product} ? ${product.identifier}" type="hidden" name="productId"/>-->
+                    <button type="submit" name="save" id="save" class="myButton">Speichern</button>
+                    <a th:href="@{/range}" class="myButton f-right">Zurück</a>
+                </form>
+
+            </div>
+            <!-- /content-in -->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

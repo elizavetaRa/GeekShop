@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('orders')"></div>
+
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Bisherige Verkäufe</h3>
+
+            <div id="content-in">
+
+                <p class="infoMsg msgMargin" th:if="${setOrders} and ${setOrders.isEmpty()}" style="margin-bottom:30px;">Es sind keine Verkäufe vorhanden.</p>
+
+                <table class="table-style01" th:if="${setOrders} and !${setOrders.isEmpty()}">
+                    <tr>
+                        <th>Artikelbezeichnung</th>
+                        <th style="width:112px">Artikelnummer</th>
+                        <th style="width:98px">Anzahl</th>
+                        <th style="width:112px">Gesamtpreis</th>
+                    </tr>
+                    <tbody th:remove="tag" th:each="order : ${setOrders}">
+                    <tr class="highlight">
+                        <td class="t-left" colspan="3"
+                            th:utext="'Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.orderNumber)}
+                            + ' &lt;span class=\'t-normal\'&gt;(vom ' + ${#dates.format(order.creationDate, 'dd.MM.yyyy HH:mm')}
+                            + (${order.orderType == T(geekshop.model.OrderType).NORMAL} ? ', ' + ${order.paymentType.value} : '')
+                            + ', Verkäufer: ' + ${userRepo.findByUserAccount(order.userAccount)}
+                            + (${order.orderType == T(geekshop.model.OrderType).RECLAIM} ? ', Reklamation von Rechnung ' + ${T(geekshop.model.GSOrder).longToString(order.reclaimedOrder.orderNumber)} : '')
+                            + ')&lt;/span&gt;'">
+                            RECHNUNG
+                        </td>
+                        <td th:text="${order.orderType == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(order.totalPrice)}">
+                            GESAMTPREIS
+                        </td>
+                    </tr>
+                    <div th:remove="tag" th:each="ol : ${order.orderLines}">
+                        <tr>
+                            <td class="t-left indent" th:text="${ol.productName}">
+                                ARTIKELNAME
+                            </td>
+                            <td th:text="${T(geekshop.model.GSOrder).longToString(catalog.findOne(ol.productIdentifier).get().productNumber)}">
+                                ARTIKELNUMMER
+                            </td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${ol.quantity.amount}">
+                                ANZAHL
+                            </td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(ol.price)}">
+                                PREIS
+                            </td>
+                        </tr>
+                    </div>
+                    </tbody>
+                </table>
+
+                <table class="table-style01" th:if="${mapProductOrders} and !${mapProductOrders.isEmpty()}">
+                    <tr>
+                        <th style="width:140px">Datum</th>
+                        <th style="width:98px">Rechnung</th>
+                        <th style="width:98px">Zahlungsart</th>
+                        <th>Verkäufer</th>
+                        <th style="width:56px">Anzahl</th>
+                        <th style="width:84px">Gesamtpreis</th>
+                    </tr>
+                    <tbody th:remove="tag" th:each="gsProductOrders : ${mapProductOrders}">
+                    <tr class="highlight" th:with="productOrders = ${gsProductOrders.value}">
+                        <td class="t-left" colspan="4"
+                            th:utext="${gsProductOrders.key.name} + ' &lt;span class=\'t-normal\'&gt;(Artikelnr. '
+                            + ${T(geekshop.model.GSOrder).longToString(gsProductOrders.key.productNumber)} + ')&lt;/span&gt;'
+                            + (${gsProductOrders.key.isInRange()} ? '' : ' &nbsp; &lt;span class=\'t-normal infoMsg\'&gt;nicht mehr im Sortiment&lt;/span&gt;')">
+                            PRODUKTNAME
+                        </td>
+                        <td th:text="${productOrders.totalQuantity.amount}">GESAMTANZAHL</td>
+                        <td th:text="${T(geekshop.model.GSProduct).moneyToString(productOrders.totalPrice)}">GESAMTPREIS</td>
+                    </tr>
+                    <div th:remove="tag" th:each="gsProductOrder : ${gsProductOrders.value.productOrders}">
+                        <tr th:with="ol = ${gsProductOrder.orderLine}">
+                            <td class="t-left indent" th:text="${#dates.format(gsProductOrder.date, 'dd.MM.yyyy HH:mm')}">DATUM
+                            </td>
+                            <td th:text="${T(geekshop.model.GSOrder).longToString(gsProductOrder.orderNumber)}">RECHNUNG</td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '(Reklamation)' : gsProductOrder.paymentType.value}">ZAHLUNGSART</td>
+                            <td th:text="${gsProductOrder.seller}">VERKÄUFER</td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${ol.quantity.amount}">
+                                ANZAHL
+                            </td>
+                            <td th:text="${ol.type == T(geekshop.model.OrderType).RECLAIM ? '–' : ''} + ${T(geekshop.model.GSProduct).moneyToString(ol.price)}">
+                                PREIS
+                            </td>
+                        </tr>
+                    </div>
+                    </tbody>
+                </table>
+
+                <a th:href="${setOrders} ? '/orders?sort=products' : '/orders?sort=orders'" class="myButton marginButton"
+                   th:text="${setOrders} ? 'Nach Artikeln sortieren' : 'Nach Rechnungen sortieren'"></a>
+
+                <a th:href="${setOrders} ? '/exportxml?sort=orders' : '/exportxml?sort=products'" class="myButton">
+                    Als XML exportieren
+                </a>
+
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

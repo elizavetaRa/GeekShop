@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <!--<script th:replace="header :: jquery-js"></script>-->
+    <!--<script th:replace="header :: selectAll-js"></script>-->
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('reclaim')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Reklamation <span th:if="${session.ro}"
+                                                     th:text="' von Rechnung ' + ${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"></span>
+            </h3>
+
+            <div id="content-in">
+
+                <p class="infoMsg msgMargin" th:if="${!cart.empty} and ${!session.isReclaim}">Beenden Sie zuerst den Kaufvorgang, um eine Reklamation durchführen zu können.<br/>
+                </p>
+
+                <form th:if="${session.isReclaim} and ${cart.empty} and !${session.ro}" method="get" action="/ordersearch">
+                    <input value="suchen" th:value="${suchen}" name="searchordernumber" id="searchordernumber" type="text"
+                           size="25" maxlength="20" required="required" placeholder="Rechnungsnummer"/>
+                    <button id="searchCatalog" type="submit">suchen</button>
+                </form>
+
+                <p th:if="${error}" th:text="${error}" class="errorMsg msgMargin"></p>
+
+                <!--<div th:if="${noorder}">keine Rechnung gefunden</div>-->
+                <!--<div th:if="${alreadyreclaim}">Rechnung ist schon eine Reklamation</div>-->
+                <!--<div th:if="${toolate}">Rechnung liegt nicht mehr innerhalb des 14-Tage-Fensters!</div>-->
+                <!--<div th:if="${canceled}">Rechnung wurde storniert</div>-->
+
+                <table th:if="${session.ro} " class="table-style01 alternatRows">
+                    <tr>
+
+                        <th>Artikel</th>
+                        <th style="width:140px">Zu reklamierende Anzahl</th>
+                        <th style="width:98px">Stückpreis</th>
+                        <th style="width:98px">Gesamtpreis</th>
+                        <th style="width:28px"></th>
+
+                    </tr>
+                    <!--  <tr name="orderNumber" th:text="'OrderNumber: '+${reclaimorder.orderNumber}">666</tr>-->
+                    <tr th:each="orderline : ${session.ro.orderLines}">
+
+                        <form method="post" th:action="@{/reclaimcart}"
+                              th:with="amount = ${session.mapAmounts.get(catalog.findOne(orderline.productIdentifier).get())}">
+                            <td class="t-bold" th:text="${orderline.productName}">USB-Ventilator</td>
+                            <td>
+                                <input th:if="${amount &gt; 0}" type="number" name="rnumber" id="rnumber" min="1"
+                                       th:max="${amount}"
+                                       th:value="${amount}"/>
+
+                                <p th:unless="${amount &gt; 0}">&mdash;</p>
+                            </td>
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(catalog.findOne(orderline.productIdentifier).get().price)}">
+                                15 EUR
+                            </td>
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(orderline.price)}">15 EUR</td>
+                            <td th:if="${amount &gt; 0}">
+                                <input type="hidden" name="orderNumber"
+                                       th:value="${T(geekshop.model.GSOrder).longToString(session.ro.orderNumber)}"/>
+                                <input type="hidden" name="rpid" th:value="${orderline.productIdentifier}"/>
+                                <input type="hidden" name="olid" th:value="${orderline.identifier}"/>
+                                <button id="toreclaim" name="toreclaimcart" type="submit" title="in den Warenkorb"
+                                        class="cartButton">&nbsp;</button>
+                            </td>
+                            <td th:unless="${amount &gt; 0}">
+                                <span class="cartButtonUnavailable"
+                                      title="Dieser Rechnungsposten wurde bereits vollständig reklamiert."></span>
+                            </td>
+                        </form>
+                    </tr>
+                </table>
+
+                <form th:if="${session.ro} or ${orderNumber} " th:method="post" th:action="@{/alltoreclaimcart}">
+                    <input type="hidden" name="orderNumber" th:value="${session.ro.orderNumber}"/>
+                    <button id="toreclaimcart" class="myButton marginButton">Alle Artikel reklamieren</button>
+                </form>
+
+                <form th:if="${session.ro} or ${orderNumber} " th:method="post" th:action="@{/cancelreclaim}">
+                    <button id="toreclaimcart" class="myButton f-right">Abbrechen</button>
+                </form>
+
+
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

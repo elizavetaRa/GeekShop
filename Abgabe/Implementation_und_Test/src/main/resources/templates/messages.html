@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('messages')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Benachrichtigungen</h3>
+
+            <div id="content-in">
+
+                <p class="infoMsg msgMargin" th:if="${ownermessage.isEmpty()}">Es sind keine Benachrichtigungen vorhanden.</p>
+
+                <div th:each="message : ${ownermessage}" th:unless="${ownermessage.isEmpty()}">
+                    <table class="table-style01 alternatRows">
+                        <tr th:if="${message.messageKind == T(geekshop.model.MessageKind).PASSWORD}" style="height: 1.3cm; background: #e70; border-color: #BE190C">
+                            <td th:utext="'Sicherheitswarnung: ' + ${message.messageText}">Passwort aendern!</td>
+                        </tr>
+                        <tr th:if="${message.messageKind != T(geekshop.model.MessageKind).PASSWORD}" style="height: 1.3cm; background: #EFEFEF; border-color: #EFEFEF;">
+                            <td th:utext="${message.messageText}">Hans hat seine Daten geändert.</td>
+                            <td style="width: 100px;">
+                                <form th:method="post" th:if="${message.messageKind == T(geekshop.model.MessageKind).RECLAIM}"
+                                      th:action="'/showreclaim/' + ${message.reclaimId}">
+                                    <input name="msgId" type="hidden" th:value="${message.id}"/>
+                                    <button id="shwoReclaim" class="myButton">Ansehen</button>
+                                </form>
+                                <form th:method="delete" th:if="${message.messageKind == T(geekshop.model.MessageKind).NOTIFICATION}"
+                                      th:action="@{/messages/} + ${message.id}">
+                                    <button id="delMessage" class="myButton">Löschen</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

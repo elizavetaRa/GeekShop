@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('range')"></div>
+
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Sortimentverwaltung</h3>
+
+            <div id="content-in">
+
+                <p class="infoMsg msgMargin" th:if="${supercategories.isEmpty()}" style="margin-bottom:30px;">Das Sortiment ist leer.</p>
+
+                <table class="table-style01" th:unless="${supercategories.isEmpty()}">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="width:42px">Kategorie</th>
+                        <th>Artikel</th>
+                        <th style="width:84px">Artikelnr.</th>
+                        <th style="width:84px">Bestand</th>
+                        <th style="width:84px">Preis</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody th:each="super : ${supercategories}">
+                    <tr class="highlight">      <!--Kategorie-->
+                        <td class="t-left" colspan="6" th:text="${super.name}">Kleidung</td>
+                        <td class="fitToContent">
+                            <form th:action="@{/range/editsuper/} + ${super.name}">
+                                <button class="myButton">Bearbeiten</button>
+                            </form>
+                            <form th:method="delete" th:action="@{/range/delsuper}">
+                                <input name="superName" type="hidden" th:value="${super.name}"/>
+                                <button class="myButton">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr th:each="sub : ${super.subCategories}">                     <!--Unterkategorie-->
+
+                        <td style="width:30px"></td>
+                        <td bgcolor="#E5F4FA" class="t-left t-bold" colspan="5" th:text="${sub.name}">T-Shirts</td>
+                        <td bgcolor="#E5F4FA" class="fitToContent">
+                            <form th:action="@{/range/editsub/} + ${sub.name}">
+                                <button class="myButton">Bearbeiten</button>
+                            </form>
+                            <form th:method="delete" th:action="@{/range/delsub}">
+                                <input name="subName" type="hidden" th:value="${sub.name}"/>
+                                <button class="myButton">Löschen</button>
+                            </form>
+                        </td>
+                    <tr th:each="product : ${sub.products}">                        <!--Produkt-->
+                        <td colspan="2"></td>
+                        <td th:text="${product.name}">Grünes T-Shirt</td>
+                        <td th:text="${T(geekshop.model.GSOrder).longToString(product.productNumber)}">1</td>
+                        <td th:text="${inventory.findByProductIdentifier(product.identifier).get().quantity.amount}">
+                            100
+                        </td>
+                        <td th:text="${product.moneyToString(product.getPrice())}">10€</td>
+                        <td class="fitToContent">
+                            <form th:action="@{/range/editproduct/} + ${product.identifier}">
+                                <button class="myButton">Bearbeiten</button>
+                            </form>
+                            <form th:method="delete" th:action="@{/range/delproduct}">
+                                <input name="productIdent" type="hidden" th:value="${product.getIdentifier()}"/>
+                                <button class="myButton">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    </tr>
+
+
+                    </tbody>
+
+                </table>
+
+                <form th:method="get" th:action="@{/range/addsuper}">
+                    <button id="addProd" class="myButton marginButton">Kategorie hinzufügen</button>
+                </form>
+                <form th:method="get" th:action="@{/range/addsub}">
+                    <button id="addProd" class="myButton marginButton">Unterkategorie hinzufügen</button>
+                </form>
+                <form th:method="get" th:action="@{/range/addproduct}">
+                    <button id="addProd" class="myButton">Artikel hinzufügen</button>
+                </form>
+
+
+            </div>
+
+            <hr class="noscreen"/>
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

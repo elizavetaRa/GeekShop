@@ -1,0 +1,203 @@
+
+
+* {margin:0; padding:0;}
+body, div, span, p, a, img, ul, ol, li, caption, table, thead, tbody, tfoot, tr, th, td, form, fieldset, legend, label, dl, dt, dd, blockquote, applet, object, h1, h2, h3, h4, h5 {border:0;}
+body {padding-bottom:0px; background:url("../images/bg.gif") 0 0 repeat-x; font:14px/1.5 "arial",sans-serif; text-align:center;}
+html, body {height:100%;}
+
+/* h1, h2, h3, h4, h5 {margin:15px 0 10px 0;} */
+h1 {margin:5px 0 10px; font-size:180%;}
+h2 {margin:5px 0 10px; font-size:160%;}
+h3 {margin:5px 0 7px; font-size:140%;}
+h4 {margin:5px 0 3px; font-size:120%;}
+h5 {margin:5px 0 0px; font-size:100%;}
+
+p, table, ul, ol, dl, fieldset {margin:10px 0 15px;}
+p {margin:0px 0;}
+#content-in p + p {margin-top:10px;}
+
+table {border-collapse:collapse; border-spacing:0; font-size:100%;}
+th {text-align:center; font-weight:bold;}
+
+ul, ol {margin-left:30px;}
+ul ul, ol ol {margin:0; margin-left:20px;}
+ol {list-style-type:decimal;}
+li {display:list-item;}
+
+dt {font-weight:bold;}
+dd {margin-left:30px;}
+
+fieldset {position:relative; padding:10px;}
+
+legend {position:absolute; top:-1em; margin:0; padding:5px 10px; font-size:100%; font-weight:bold;}
+textarea {font-family:inherit; font-size:inherit; width:100%; max-width:100%; margin-bottom:10px;}
+
+input, select, option, button {font-family:inherit; font-size:13px; padding: 2px 3px;}
+
+input[type="button"], button {padding: 0 6px;}
+select {padding:0;}
+
+table input, table select {width:100%; box-sizing:border-box;}
+
+table form {display:inline-block;}
+
+/* ----------------------------------------------------------------------------------------------------------
+2) Universal styles (display, float, margin, text-align...)
+---------------------------------------------------------------------------------------------------------- */
+
+.box {min-height:1px;}
+.box:after {display:block; visibility:hidden; clear:both; line-height:0; font-size:0; content:".";}
+
+.relative {position:relative;}
+
+.clear {clear:both;}
+
+.f-left {float:left !important;} img.f-left {float:left; margin-right:10px;}
+.f-right {float:right !important;} img.f-right {float:right; margin-left:10px;}
+
+.t-left {text-align:left !important;}
+.t-center {text-align:center !important;}
+.t-right {text-align:right !important;}
+.t-justify {text-align:justify !important;}
+
+.t-bold{font-weight:bold !important;}
+.t-normal{font-weight:normal !important;}
+
+.va-top {vertical-align:top;}
+.va-middle {vertical-align:middle;}
+.va-bottom {vertical-align:bottom;}
+
+.nom {margin:0 !important;}
+.nomt {margin-top:0 !important;}
+.nomb {margin-bottom:0 !important;}
+
+.noscreen {display:none;}
+
+table.noborder, table.noborder tr, table.noborder th, table.noborder td  {border:0 !important;}
+
+/* ----------------------------------------------------------------------------------------------------------
+3) Generally HTML styles (table, ul, dl...)
+---------------------------------------------------------------------------------------------------------- */
+
+table.table-style01 {width:100%;text-align:center;}
+table.table-style01 th {text-align:center;}
+table.table-style01 th, table.table-style01 td {padding:3px 7px;}
+table.table-style01 td:first-child {font-weight:bold;}
+
+table.alternatRows tr:nth-child(2n+3) {background:#EFEFEF;}
+
+table.firstLeft th:first-child, table.firstLeft td:first-child {text-align:left;}
+table.firstLeft td:first-child {font-weight:normal;}
+
+tr.highlight th, tr.highlight td {font-weight:bold !important; background:#D5E7EF;/* cursor:pointer;*/}
+/*tr.highlight:focus th, tr.highlight:hover th, tr.highlight:active th,
+tr.highlight:focus td, tr.highlight:hover td, tr.highlight:active td {background:#E5F3F9;}*/
+
+tr.indent td:first-child, td.indent {padding-left:2em !important;}
+
+table.noMargin {margin:0 !important;}
+
+td * {float:none !important;}
+
+td.fitToContent {white-space:nowrap; width:1px;}
+td.fitToContent > * {margin:0; margin-left:5px;}
+td.fitToContent :first-child, td.fitToContent :first-child {margin:0;}
+
+ul.ul-style01 {margin:5px 0 15px 0px; padding:0; list-style:none;}
+ul.ul-style01 li {margin:0; padding:0; padding-left:15px; background:url("../images/ul-style01.gif") 0 0.5em no-repeat;}
+ul.ul-style01 ul {margin:0; padding:0; list-style:none;}
+ul.ul-style01 ul li {background:url("../images/ul-style01-sub.gif") 0 5px no-repeat;}
+
+/* ----------------------------------------------------------------------------------------------------------
+4) Layout
+---------------------------------------------------------------------------------------------------------- */
+
+#main {position: relative; width:910px; height:100%; min-height:400px; margin:0 auto; text-align:left;}
+
+    #header {position:relative; height:100px; background:url("../images/header.jpg") 0 0 no-repeat; overflow:hidden;}
+
+        #logo {position:absolute; top:30px; left:80px; margin:0; font-size:200%; letter-spacing:-1px; font-weight:normal;}
+        #logo span {font-weight:bold;}
+        #logo a {text-decoration:none;}
+
+        #slogan {position:absolute; top:40px; right:15px; width:230px; font-size:120%; font-weight:normal; font-style:italic; text-align:center;}
+
+    #nav {padding:0 6px 5px 6px; background:url("../images/nav.gif") 0 100% no-repeat;}
+
+        #nav ul {margin:0; padding:0; list-style:none;}
+        #nav ul li {float:left; position:relative; margin:0; padding:0;}
+        #nav ul li a {display:block; /*min-width:100px;*/ float:left; position: relative; width:100%; height:45px; line-height:45px; /*padding:12px 0;*/ background:url("../images/nav-link.gif") 0 0 repeat-y; text-align:center; text-decoration:none;}
+        #nav ul li:first-child a {background:none;}
+        #nav ul li.nav-active > a {font-weight:bold; text-decoration:none; color:black;}
+
+        #nav ul li:focus > ul, #nav ul li:hover > ul, #nav ul li:active > ul {display:block;}
+        #nav ul li ul {display:none; position:absolute; top:45px; left:1px; width:100%; z-index:2; background:#E0E0E0;
+            -webkit-border-radius:0 0 7px 7px; -moz-border-radius:0 0 7px 7px; border-radius:0 0 7px 7px;
+            -webkit-box-shadow: 0 3px 4px #555; -moz-box-shadow: 0 3px 4px #555; box-shadow: 0 3px 4px #555;}
+        #nav ul li ul li {float:none; display:block;}
+        #nav ul li ul li a {border-top:1px solid #aaa; background:none;}
+
+    #cols {position:absolute; top:150px; bottom:27px;/*77px;*/ background:url("../images/cols.gif") 0 0 repeat-y;}
+
+        #content {position:relative; height:100%; float:left; width:910px; overflow:hidden;}
+
+            #content #content-title {margin:0; padding:15px 15px 10px 20px; height:30px; line-height:30px; background:url("../images/content-title.gif") 0 0 no-repeat; font-size:140%; font-weight:normal;}
+            #content #content-in {position:absolute; top:55px; bottom:0; width: 870px; overflow: auto; padding:10px 15px 10px 20px;}
+
+        #aside {position:relative; height:100%; float:right; width:255px; overflow:hidden;}
+
+            #aside #aside-title {margin:0; padding:15px 15px 10px 15px; height:30px; line-height:30px; background:url("../images/aside-title.gif") 0 0 no-repeat; font-size:140%; font-weight:normal;}
+            #aside .aside-in {position:absolute; top: 55px; bottom: 0; width: 230px; overflow: auto; padding:10px;}
+            #aside .aside-box {padding:10px; background:url("../images/aside-box.jpg") 0 0 no-repeat;}
+            #aside .title {margin:0 5px 0 0; padding:10px 15px; background:url("../images/aside-title-02.gif") 0 0 repeat-x; font-size:100%;}
+
+    #cols-bottom {position: absolute; bottom:15px;/*65px;*/ width:910px; height:12px; background:url("../images/cols-bottom.gif") 0 0 no-repeat; font-size:0;}
+
+    #footer {position: absolute; bottom: 5px; width:870px; height:40px; padding:20px 20px 0 20px; background:url("../images/footer.gif") 0 0 no-repeat;}
+    #footer p {margin:0;}
+
+/* ----------------------------------------------------------------------------------------------------------
+5) Page: Home
+---------------------------------------------------------------------------------------------------------- */
+
+#perex {/*margin-left:5px;*/margin:0 5px; padding:15px; background:url("../images/perex.gif") 0 100% no-repeat;}
+#perex p {margin:0;}
+
+#sections {background:url("../images/sections.gif") 0 0 repeat-y;}
+#sections-bottom {width:620px; height:7px; background:url("../images/sections-bottom.gif") 0 0 no-repeat; font-size:0;}
+
+    .section {float:left; width:200px;}
+    .section p {margin:0;}
+    .section.margin {margin:0 10px;}
+    .section h3 {margin:0; padding:10px; background:url("../images/section-title.gif") 0 0 no-repeat; font-size:100%;}
+    .section-in {margin-bottom:10px; padding:0 10px 10px 10px;}
+
+dl#news, dl#news dd {margin:0;}
+dl#news dt {clear:both; padding-left:18px; background:url("../images/ico-list.gif") 0 2px no-repeat;}
+dl#news dd {margin:7px 0 10px 0; padding-bottom:10px; font-size: 90%; line-height: 130%;}
+dl#news dd span.date {padding-right:10px; background:url("../images/date.gif") 100% 50% no-repeat; font-size:85%; font-weight:bold;}
+
+
+.members {font-size: 120%;}
+.members li {clear: left;}
+.members span {display: block; float: left; width: 12em; font-weight: bold;}
+
+
+/*
+ * Joke
+ */
+#joke{position: absolute; width: 899px; height: 504px; top: 8%; background:url("../images/joke.gif");
+    background-size:70%; border-radius: 12px; color: black;  text-align: center; padding-right: 10px; padding-left:10px;}
+
+/*
+ * Message counter
+ */
+#cntMessages {position: absolute; font-weight: normal; display: block; top: 3px; right: 3px; background: #a00; color: white;
+    border-radius: 50%; width: 15px; height: 15px; line-height: 15px; font-size: 80%;}
+
+/*
+ * Product search styles
+ */
+#categories {width:200px; position:absolute; top:10px; left:20px; bottom:5px; border:4px solid #02AAFC; border-radius:6px; padding-left:10px; overflow:auto;}
+#product-list {width:640px; position:absolute; top:10px; right:0; bottom:0;}
+#product-list > div {overflow:auto; position:absolute; top:40px; padding-right:15px; right:0; bottom:10px; left:0;}

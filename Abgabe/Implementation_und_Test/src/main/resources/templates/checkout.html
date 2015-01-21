@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Geek-Shop Think NERD</title>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <link th:replace="header :: print-css"/>
+    <link th:replace="header :: tree-css"/>
+    <script th:replace="header :: jquery-js"></script>
+    <!--<script th:replace="header :: selectAll-js"></script>-->
+    <script>
+        function process_select(sel, id) {
+            $('#' + 'Barzahlung' + '_' + id).hide();
+            $('#' + 'Kreditkarte' + '_' + id).hide();
+            $('#' + 'Lastschriftverfahren' + '_' + id).hide();
+            $('#' + sel.value + '_' + id).show();
+        }
+    </script>
+</head>
+
+<body>
+
+<div id="main">
+
+    <!-- Header -->
+    <div th:replace="header :: #header"></div>
+
+    <!-- Navigation -->
+    <div th:replace="navigation :: nav ('cart')"></div>
+
+    <!-- 2 columns (content + sidebar) -->
+    <div id="cols" class="box">
+
+        <!-- Content -->
+        <div id="content">
+
+            <h3 id="content-title">Kasse</h3>
+
+            <div id="content-in">
+
+                <div th:unless="${cart.empty}">
+                    <table class="table-style01 alternatRows">
+                        <tr>
+                            <th>Artikel</th>
+                            <th style="width:112px">Anzahl</th>
+                            <th style="width:112px">Stückpreis</th>
+                            <th style="width:112px">Gesamtpreis</th>
+                        </tr>
+                        <tr th:each="cartitem : ${cart}">
+
+                            <td th:text="${cartitem.productName}">FujiFilm FinePix F100fd</td>
+                            <td th:text="${cartitem.quantity.amount}">42</td>
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.product.price)}">209,19 EUR</td>
+                            <td th:text="${T(geekshop.model.GSProduct).moneyToString(cartitem.price)}">209,19 EUR</td>
+                        </tr>
+
+                        <tfoot>
+                        <tr>
+                            <td th:unless="${session.isReclaim}" colspan="3" class="t-right">Zu zahlende Summe:</td>
+                            <td th:if="${session.isReclaim}" colspan="3" class="t-right">Zurückzuzahlende Summe:</td>
+                            <td><strong th:text="${T(geekshop.model.GSProduct).moneyToString(cart.price)}">269,47 EUR</strong></td>
+                        </tr>
+                        </tfoot>
+                    </table>
+
+                    <form th:unless="${session.isReclaim}" method="post" id="buyit" th:action="@{/buy}">
+
+                        <div th:unless="${session.isReclaim}">
+                            <label for="payment"><strong>Zahlungsart:</strong>&nbsp;</label>
+
+                            <select name="payment" id="payment">
+                                <option th:each="p : ${T(geekshop.model.PaymentType).values()}"
+                                        th:value="${p}" th:text="${p.value}"
+                                        th:selected="${p == payment}"></option>
+                            </select></div>
+
+                        <br/>
+
+                        <input type="submit" class="myButton" value="Kaufen" id="checkout"/>
+                    </form>
+
+                    <form th:if="${session.isReclaim}" method="post" id="reclaimit" th:action="@{/reclaimrequest}">
+
+                        <input type="hidden" name="orderNumber"
+                               th:value="${orderNumber} ? ${T(geekshop.model.GSOrder).longToString(orderNumber)}"/>
+                        <input type="submit" class="myButton" value="Reklamationsanfrage abschicken" id="reclaimrequest"/>
+                    </form>
+
+                    <a href="/cart" class="myButton f-right">Zurück</a>
+
+                </div>
+                <p th:if="${cart.empty}">Nichts zu zeigen</p>
+            </div>
+            <!--/content-in-->
+
+            <hr class="noscreen"/>
+
+
+        </div>
+        <!-- /content -->
+
+        <hr class="noscreen"/>
+
+
+    </div>
+    <!-- /cols -->
+
+    <div id="cols-bottom"></div>
+
+    <hr class="noscreen"/>
+
+    <!-- Footer -->
+    <!--<div id="footer">
+
+
+    </div>-->
+    <!-- /footer -->
+
+</div>
+<!-- /main -->
+
+
+</body>
+</html>

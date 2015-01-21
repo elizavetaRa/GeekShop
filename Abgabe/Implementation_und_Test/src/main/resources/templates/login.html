@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Login</title>
+    <link th:replace="header :: style-css"/>
+    <link th:replace="header :: main-css"/>
+    <link th:replace="header :: scheme-css"/>
+    <script th:replace="header :: modernizr-js"></script>
+</head>
+<body>
+<!--<div class="container">-->
+
+    <div id="main">
+
+        <!-- Header -->
+        <div th:replace="header :: #header"></div>
+
+        <div id="nav">
+            <ul class="box">
+                <li class="nav-active"><a href="#" style="width:90px">Login</a></li>
+            </ul>
+
+            <hr class="noscreen" />
+        </div>
+
+        <section class="main">
+            <form method="post" class="form-1" id="form" th:action="@{/login}">
+                <p class="field">
+                    <input name="username" id="username" type="text" placeholder="Benutzername" required="required"/>
+                    <i class="icon-user icon-large"></i>
+                </p>
+                <p class="field">
+                    <input name="password" id="password" type="password" placeholder="Passwort" required="required"/>
+                    <i class="icon-lock icon-large"></i>
+                </p>
+                <p class="submit">
+                    <button type="submit" name="submit" th:value="#{index.form.login}" value="Login"><i class="icon-arrow-right icon-large"></i></button>
+                </p>
+                <p class="errorMsg msgMargin" th:if="${param.error}">Benutzername oder Passwort falsch!</p>
+                <p class="infoMsg msgMargin" th:if="${param.logout}">Sie haben sich erfolgreich abgemeldet!</p>
+            </form>
+        </section>
+    </div>
+<!--</div>-->
+</body>
+</html>
