@@ -13,3 +13,4 @@ db/
 Sales.xml
 orders.xml
 *.dvi
+target/
