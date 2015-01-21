@@ -27,7 +27,9 @@
 
             <div id="content-in">
 
-                <table class="table-style01">
+                <p class="infoMsg msgMargin" th:if="${supercategories.isEmpty()}" style="margin-bottom:30px;">Das Sortiment ist leer.</p>
+
+                <table class="table-style01" th:unless="${supercategories.isEmpty()}">
                     <thead>
                     <tr>
                         <th colspan="2" style="width:42px">Kategorie</th>

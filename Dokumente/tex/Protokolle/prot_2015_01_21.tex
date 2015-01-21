@@ -1,0 +1,51 @@
+\documentclass{scrartcl}
+\usepackage{geometry}
+\geometry{a4paper, top=30mm, left=30mm, right=30mm, bottom=30mm, headsep=15mm, footskip=15mm}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{paralist}
+\usepackage{enumitem}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+
+\parindent 0pt
+
+\makeatletter
+\newcommand{\minipagetrue}{\@minipagetrue}
+\setlist[itemize]{itemsep=0pt,after=\vskip-\baselineskip,label={\textbullet},leftmargin=*,before=\minipagetrue,}
+
+\rofoot{\thepage~}
+\begin{document}
+\begin{center}
+\LARGE \bf{Protokoll vom 21.01.2015 \\
+SWT14W30}
+\end{center}
+
+\begin{tabular}{rp{10cm}}
+Protokollant & Marcus Kammerdiener \\
+Satz & Sebastian Döring \\
+Anwesend & Sebastian Döring, Felix Döring, Marcus Kammerdiener,\\
+& Dominik Lauck, Elizaveta Ragozina \\
+\end{tabular}
+
+\vspace*{3em}
+
+\section{Ablauf}
+Zu Beginn der Konsultation wurde der Online-Fragebogen zur Evaluation des Praktikums gemeinsam mit dem Tutor ausgefüllt.
+
+Anschließend wurden noch Details zur Abschlusspräsentation abgesprochen.
+Die eigentliche Präsentation soll 20 Minuten betragen. Sie untergliedert sich wie folgt:
+\begin{itemize}
+\item 2--3 Minuten: Vorstellung der Gruppe und der Aufgabe
+\item 7--8 Minuten: Vorstellung des Entwicklungsprozesses: Wie lag die Gruppe in der Zeit? Wo gab es Probleme? Was würde die Gruppe nächstes Mal anders machen?
+\item 10 Minuten: Produktvorführung: Vorstellung der Muss-Kriterien, Präsentation von Kann-Kriterien
+\end{itemize}
+Anschließend findet eine zehnminütige Diskussion statt, in der Fragen jedweder Art an die Gruppe gestellt werden können.
+
+Zudem meinte der Tutor auf Nachfrage, dass Diagramme zur Präsentation nicht nötig sind. Sie können jedoch zur Veranschaulichung des Entwicklungsprozesses genutzt werden.
+\end{document}

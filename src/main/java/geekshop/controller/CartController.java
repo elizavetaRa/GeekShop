@@ -172,7 +172,7 @@ class CartController {
 
 
     /**
-     * Deletes every {@link CartItem} from {@link Cart} .
+     * Deletes every {@link CartItem} from {@link Cart}.
      *
      * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
@@ -192,7 +192,7 @@ class CartController {
 
 
     /**
-     * Returns a view of {@link Cart} after it´s emptiing.
+     * Returns a view of {@link Cart} after it has been emptied.
      */
     @RequestMapping("/deleteallitems/")
     public String deleteAll(@LoggedIn Optional<UserAccount> userAccount) {
@@ -204,7 +204,7 @@ class CartController {
 
 
     /**
-     * Deletes {@link CartItem} from {@link Cart} .
+     * Deletes {@link CartItem} from {@link Cart}.
      *
      * @param identifier  must not be {@literal null}.
      * @param session     must not be {@literal null}.
@@ -225,7 +225,7 @@ class CartController {
     }
 
     /**
-     * Returns a view of {@link Cart} after deleting of {@link CartItem}.
+     * Returns a view of {@link Cart} after deletion of a {@link CartItem}.
      */
     @RequestMapping("/deletecartitem/")
     public String deleteCartItem(@LoggedIn Optional<UserAccount> userAccount) {
@@ -237,7 +237,7 @@ class CartController {
 
 
     /**
-     * Updates {@link CartItem} of {@link Cart} .
+     * Updates {@link CartItem} of {@link Cart}.
      *
      * @param identifier  must not be {@literal null}.
      * @param quantity    must not be {@literal null}.
@@ -323,8 +323,7 @@ class CartController {
 
 
     /**
-     * Checks out the current state of the {@link Cart} and creates new GSOrder from {@link CartItem} Using a method parameter of type {@code Optional<UserAccount>}
-     * annotated with {@link LoggedIn} you can access the {@link UserAccount} of the currently logged in user.
+     * Checks out the current state of the {@link Cart} and creates new GSOrder from {@link CartItem}.
      *
      * @param session     must not be {@literal null}.
      * @param userAccount must not be {@literal null}.
@@ -363,7 +362,7 @@ class CartController {
     }
 
     /**
-     * Returns a view of after buying.
+     * Redirects to product search after buying.
      */
     @RequestMapping("/buy")
     public String buy(@LoggedIn Optional<UserAccount> userAccount) {
@@ -374,7 +373,7 @@ class CartController {
     }
 
     /**
-     * Help function for validation
+     * Help function for validation.
      */
     public boolean containsOnlyNumbers(String str) {
         for (int i = 0; i < str.length(); i++) {

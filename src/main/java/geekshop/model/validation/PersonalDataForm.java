@@ -43,7 +43,7 @@ public class PersonalDataForm {
     private MaritalStatus maritalStatus;
 
     @NotNull(message = "Keine Telefonnummer angegeben.")
-    @Pattern(regexp = "\\s*(\\+?(\\d\\s?){2,6}[\\s-])?(\\(0\\)\\s?(\\d\\s?){2,5}|\\(?(\\d\\s?){3,6}\\)?)\\s?[-/]?\\s?(\\d[\\s-]?){5,11}\\s*", message = "Ungültige Telefonnummer.")
+    @Pattern(regexp = "\\s*(\\+?(\\d\\s?){2,6}[\\s-])?(\\(0\\)\\s?(\\d\\s?){2,5}|\\(?(\\d\\s?){3,6}\\)?)\\s?[-/]?\\s?(\\d[\\s-]?){3,11}\\s*", message = "Ungültige Telefonnummer.")
     private String phone;
 
     @NotBlank(message = "Keine Straße angegeben.")

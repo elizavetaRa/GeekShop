@@ -1,0 +1,38 @@
+\documentclass{scrartcl}
+ \usepackage{geometry}
+ \geometry{a4paper, top=30mm, left=30mm, right=30mm, bottom=30mm, headsep=15mm, footskip=15mm}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+
+\rofoot{\thepage~}
+
+\begin{document}
+\begin{center}
+\LARGE \bf{Protokoll vom 16.12.2014 \\
+SWT14W30 (intern)}
+\end{center}
+
+\begin{tabular}{rp{10cm}}
+Protokollant & Marcus Kammerdiener \\
+Satz & Sebastian Döring \\
+Anwesend & Sebastian Döring, Marcus Kammerdiener \\
+         & Dominik Lauck, Elizaveta Ragozina \\
+\end{tabular}
+
+\vspace*{3em}
+
+\section{Ablauf}
+Das Treffen im Lernraum diente hauptsächlich der Beantwortung einer Frage bezüglich Spring MVC.\\
+Es musste ein Weg gefunden werden, den Request auf eine beliebige Seite der Anwendung abzufangen, falls der Angestellte sich mit einem unsicheren Passwort angemeldet hat. Bevor es diesem möglich sein sollte, die Kasse zu benutzen, soll er zur Passwort"-änderung gezwungen werden.\\
+Der Idee der Gruppe, beispielsweise ein allgemeingültiges RequestMapping zur Vorschaltung zu implementieren, wurde mit einem anderen Vorschlag entgegnet. Dieser besteht darin, unabhängig davon, welche Seite ursprünglich angefordert wurde, den Benutzer mittels WebSecurityConfiguration immer auf die Startseite weiterzuleiten. Dort kann nun das Passwort auf Sicherheit überprüft werden und entsprechend weiter verfahren werden.
+
+\vspace*{1em}
+
+\section{N\"achstes Treffen}
+Nächstes Treffen ist die Konsultation am nächsten Tag, dem 17.12.2014, zur 4.~DS.
+\end{document}

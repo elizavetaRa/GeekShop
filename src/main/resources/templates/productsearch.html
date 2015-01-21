@@ -104,8 +104,8 @@
                     <p class="infoMsg msgMargin" th:if="${session.ro}">Beenden Sie den Reklamationsvorgang, um Artikel in den Warenkorb legen zu können.</p>
 
                     <div th:style="${session.ro} ? 'top:70px'">
-                        <p class="infoMsg" th:if="${catalog.isEmpty()} and ${#strings.isEmpty(param.cat[0])}">Keine entsprechenden Artikel gefunden.</p>
-                        <p class="infoMsg" th:if="${catalog.isEmpty()} and !${#strings.isEmpty(param.cat[0])}">Keine Artikel in dieser Kategorie enthalten.</p>
+                        <p class="infoMsg" th:if="${catalog.isEmpty()} and (!${param.cat} or ${#strings.isEmpty(param.cat[0])})">Keine entsprechenden Artikel gefunden.</p>
+                        <p class="infoMsg" th:if="${catalog.isEmpty()} and ${param.cat} and !${#strings.isEmpty(param.cat[0])}">Keine Artikel in dieser Kategorie enthalten.</p>
 
                         <table id="searchTable" class="table-style01 alternatRows noMargin" th:unless="${catalog.isEmpty()}">
                             <tr>

@@ -83,10 +83,10 @@ public class PasswordRules {
     /**
      * Validates the given password according to the rules.
      *
-     * @return {@code True} if and only if the set conditions are fulfilled, the password is long enough, does not contain any white space characters and contains at least one alphanumeric character.
+     * @return {@code True} if and only if the set conditions are fulfilled, the password is long enough, does not contain any white-space characters and contains at least one letter.
      */
     public boolean isValidPassword(String password) {
-        return isLongEnough(password) && !password.matches(".*\\s.*") && password.matches(".*\\w.*") &&
+        return isLongEnough(password) && !password.matches(".*\\s.*") && password.matches(".*[a-zA-Z].*") &&
                 (!this.upperAndLowerNecessary || containsUpperAndLower(password)) &&
                 (!this.digitsNecessary || containsDigits(password)) &&
                 (!this.specialCharactersNecessary || containsSpecialCharacters(password));
@@ -95,7 +95,7 @@ public class PasswordRules {
     /**
      * Validates the given password in the form of {@link PasswordAttributes} according to the rules.
      *
-     * @return {@code True} if and only if the set conditions are fulfilled, the password is long enough, does not contain any white space characters and contains at least one alphanumeric character.
+     * @return {@code True} if and only if the set conditions are fulfilled, the password is long enough, does not contain any white-space characters and contains at least one letter.
      */
     public boolean isValidPassword(PasswordAttributes passwordAttributes) {
         return isLongEnough(passwordAttributes.getLength()) &&
@@ -119,7 +119,7 @@ public class PasswordRules {
     }
 
     /**
-     * Checks whether at least one special character, i. e. no Latin letter, digit or white space character, is contained in the given password.
+     * Checks whether at least one special character, i. e. all but Latin letter, digit and white-space character, is contained in the given password.
      */
     public static boolean containsSpecialCharacters(String password) {
         return password.matches(".*[^A-Za-z0-9\\s].*");

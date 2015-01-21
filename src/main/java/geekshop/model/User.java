@@ -95,11 +95,15 @@ public class User {
     }
 
     /**
-     * Converts a proper {@link java.lang.String} representing a date arranged in the common order of the German-speaking area
-     * to {@link java.util.Date}.
+     * Converts a proper {@link java.lang.String} representing a date arranged in the common order of the German-speaking area,
+     * e. g. {@code 14.03.95} or {@code 14.03.1995}, to {@link java.util.Date}.
+     * Permitted as separators are white-space character, {@literal .}, {@literal -} and {@literal /}.
+     * <p>
+     * If there are given only two digits for year, the year is completed automatically according to the current century,
+     * yet so that the date is lying in the past. For example, {@code xx.xx.99} becomes to {@code xx.xx.1999}.
      *
      * @param strDate the String which contains a Date
-     * @return {@link java.util.Date}
+     * @return the represented {@link java.util.Date} or {@literal null} if the given String cannot be parsed
      */
     public static Date strToDate(String strDate) {
         if (!strDate.matches("\\d{1,2}[\\s.\\-/]\\d{1,2}[\\s.\\-/]\\d{2}(\\d{2})?"))
@@ -204,7 +208,7 @@ public class User {
     }
 
     /**
-     * Returns the last joke shown or {@literal null} if no jokes were shown currently.
+     * Provides the last joke shown or {@literal null} if no jokes were shown currently.
      */
     public Joke getLastJoke() {
         return recentJokes.size() > 0 ? recentJokes.get(recentJokes.size() - 1) : null;
@@ -223,7 +227,7 @@ public class User {
     }
 
     /**
-     * Returns the user's full name.
+     * Provides the user's full name.
      */
     @Override
     public String toString() {

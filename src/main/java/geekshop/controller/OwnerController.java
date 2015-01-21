@@ -78,7 +78,6 @@ class OwnerController {
      * Shows all sales for all {@link geekshop.model.GSProduct}s or {@link geekshop.model.GSOrder}s.
      * @param model
      * @param sort the object this overview should be sorted by.
-     * @return
      */
     @RequestMapping("/orders")
     public String orders(Model model, @RequestParam(value = "sort", required = false) String sort) {
@@ -104,7 +103,6 @@ class OwnerController {
 
     /**
      * Creates the map needed to show the sales sorted by {@link geekshop.model.GSProduct}s.
-     * @return
      */
     public TreeMap<GSProduct, GSProductOrders> putMap() {
 
@@ -126,9 +124,9 @@ class OwnerController {
 
 
     /**
-     * Creates {@link geekshop.model.GSProductOrders} for
+     * Creates {@link geekshop.model.GSProductOrders} for order overview.
      * @param map the map with {@link geekshop.model.GSProduct} for which the {@link geekshop.model.GSProductOrders} should be created.
-     * @param order the {@link geekshop.model.GSOrder} from which a {@link geekshop.model.GSOrderLine} should be added to {@link geekshop.model.GSProductOrders}.
+     * @param order the {@link geekshop.model.GSOrder} of which a {@link geekshop.model.GSOrderLine} should be added to {@link geekshop.model.GSProductOrders}.
      */
     private void createProductOrder(Map<GSProduct, GSProductOrders> map, GSOrder order) {
         LocalDateTime ldt = order.getDateCreated();    // date
@@ -148,8 +146,8 @@ class OwnerController {
 
 
     /**
-     * Decides what the .xml should by sorted by.
-     * @param sort the Object which the .xml should by sorted by.
+     * Creates xml containing completed orders by now.
+     * @param sort the method which the .xml should be sorted by.
      */
     @RequestMapping("/exportxml")
     public String exportXML(@RequestParam(value = "sort", required = false) String sort) {
@@ -318,19 +316,16 @@ class OwnerController {
 
             transformer.transform(source, result);
 
-        } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
-        } catch (TransformerException tfe) {
-            tfe.printStackTrace();
+        } catch (ParserConfigurationException | TransformerException ex) {
+            ex.printStackTrace();
         }
     }
 
     /**
-     * Shows an open {@link geekshop.model.GSOrder} with {@link geekshop.model.OrderType} RECLAIM.
+     * Shows an open {@link geekshop.model.GSOrder} with {@link geekshop.model.OrderType} {@code RECLAIM}.
      *
-     * @param reclaimId the OrderIdentifier from the Order
+     * @param reclaimId the OrderIdentifier of the Order
      * @param msgId     the Id of the Message
-     * @return
      */
     @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.POST)
     public String showReclaim(Model model, @PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId) {
@@ -351,13 +346,12 @@ class OwnerController {
     }
 
     /**
-     * Accepts or declines the open {@link geekshop.model.GSOrder} with {@link geekshop.model.OrderType} RECLAIM and close it.
+     * Accepts or declines the open {@link geekshop.model.GSOrder} with {@link geekshop.model.OrderType} {@code RECLAIM} and closes it.
      * Deletes the message.
      *
-     * @param reclaimId the OrderIdentifier from the Order
+     * @param reclaimId the OrderIdentifier of the Order
      * @param msgId     the Id of the Message
      * @param accept    boolean value if the reclaim is accepted
-     * @return
      */
     @RequestMapping(value = "/showreclaim/{rid}", method = RequestMethod.DELETE)
     public String acceptReclaim(@PathVariable("rid") OrderIdentifier reclaimId, @RequestParam("msgId") Long msgId, @RequestParam("accept") Boolean accept) {
@@ -378,8 +372,6 @@ class OwnerController {
 
     /**
      * Shows all existing {@link geekshop.model.Joke}s.
-     *
-     * @return
      */
     @RequestMapping("/jokes")
     public String jokes(Model model) {
@@ -388,9 +380,7 @@ class OwnerController {
     }
 
     /**
-     * Shows editpage for new {@link geekshop.model.Joke}s.
-     *
-     * @return
+     * Shows editing form for new {@link geekshop.model.Joke}s.
      */
     @RequestMapping("/newjoke")
     public String newJoke() {
@@ -398,10 +388,9 @@ class OwnerController {
     }
 
     /**
-     * Creates a new instance of {@link geekshop.model.Joke} and save it to the {@link geekshop.model.JokeRepository}.
+     * Creates a new instance of {@link geekshop.model.Joke} and saves it to the {@link geekshop.model.JokeRepository}.
      *
      * @param text the text of the Joke
-     * @return
      */
     @RequestMapping(value = "/newjoke", method = RequestMethod.POST)
     public String newJoke(@RequestParam("jokeText") String text) {
@@ -412,10 +401,9 @@ class OwnerController {
 
 
     /**
-     * Shows editpage for an existing {@link geekshop.model.Joke}.
+     * Shows editing form for an existing {@link geekshop.model.Joke}.
      *
      * @param id the Id of the Joke
-     * @return
      */
     @RequestMapping("/jokes/{id}")
     public String showJoke(Model model, @PathVariable("id") Long id) {
@@ -426,11 +414,10 @@ class OwnerController {
 
 
     /**
-     * Edits an existing {@link geekshop.model.Joke} and save it to the {@link geekshop.model.JokeRepository}.
+     * Edits an existing {@link geekshop.model.Joke} and saves it to the {@link geekshop.model.JokeRepository}.
      *
      * @param id       the Id of the Joke
      * @param jokeText the text of the Joke
-     * @return
      */
     @RequestMapping(value = "/editjoke/{id}", method = RequestMethod.POST)
     public String editJoke(@PathVariable("id") Long id, @RequestParam("jokeText") String jokeText) {
@@ -447,7 +434,6 @@ class OwnerController {
      * Deletes an existing {@link geekshop.model.Joke} from the {@link geekshop.model.JokeRepository}.
      *
      * @param id the Id of the Joke
-     * @return
      */
     @RequestMapping(value = "/jokes/{id}", method = RequestMethod.DELETE)
     public String deleteJoke(@PathVariable("id") Long id) {
@@ -466,8 +452,6 @@ class OwnerController {
 
     /**
      * Deletes all existing {@link geekshop.model.Joke}s.
-     *
-     * @return
      */
     @RequestMapping(value = "/deljokes", method = RequestMethod.DELETE)
     public String deleteAllJokes() {
@@ -484,8 +468,6 @@ class OwnerController {
 
     /**
      * Shows all existing {@link geekshop.model.Message}s.
-     *
-     * @return
      */
     @RequestMapping("/messages")
     public String messages(Model model) {
@@ -497,7 +479,6 @@ class OwnerController {
      * Deletes an existing {@link geekshop.model.Message} from the {@link geekshop.model.MessageRepository}.
      *
      * @param id the Id of the Message
-     * @return
      */
     @RequestMapping(value = "/messages/{id}", method = RequestMethod.DELETE)
     public String deleteMessage(@PathVariable("id") Long id) {
@@ -507,10 +488,9 @@ class OwnerController {
 
 
     /**
-     * Shows all existing {@link geekshop.model.SuperCategory}s, {@link geekshop.model.SubCategory}s an {@link geekshop.model.GSProduct}s.
+     * Shows all existing {@link geekshop.model.SuperCategory}s, {@link geekshop.model.SubCategory}s and {@link geekshop.model.GSProduct}s.
      *
      * @param model
-     * @return
      */
     @RequestMapping("/range")
     public String range(Model model) {
@@ -525,7 +505,6 @@ class OwnerController {
      * Deletes a {@link geekshop.model.SuperCategory}.
      *
      * @param superName the name of the SuperCategory
-     * @return
      */
     @RequestMapping(value = "/range/delsuper", method = RequestMethod.DELETE)
     public String delSuper(@RequestParam("superName") String superName) {
@@ -549,7 +528,6 @@ class OwnerController {
      * Deletes a {@link geekshop.model.SubCategory} when requested.
      *
      * @param subName the name of the SubCategory
-     * @return
      */
     @RequestMapping(value = "/range/delsub", method = RequestMethod.DELETE)
     public String delSubRequest(@RequestParam("subName") String subName) {
@@ -565,7 +543,6 @@ class OwnerController {
      * Deletes a {@link geekshop.model.GSProduct} when requested.
      *
      * @param productIdentifier the ProductIdentifier
-     * @return
      */
     @RequestMapping(value = "/range/delproduct", method = RequestMethod.DELETE)
     public String delProductRequest(@RequestParam("productIdent") ProductIdentifier productIdentifier) {
@@ -617,10 +594,9 @@ class OwnerController {
 
 
     /**
-     * Shows Editpage for the {@link geekshop.model.GSProduct}.
+     * Shows editing form for the {@link geekshop.model.GSProduct}.
      *
      * @param productId the ProductIdentifier of the GSProduct to be edited
-     * @return
      */
     @RequestMapping("/range/editproduct/{prodId}")
     public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId) {
@@ -646,7 +622,6 @@ class OwnerController {
      * @param productId   the ProductIdentifier of the GSProduct
      * @param productForm contains the form data
      * @param result      the result of validation
-     * @return
      */
     @RequestMapping(value = "/range/editproduct/{prodId}", method = RequestMethod.POST)
     public String editProduct(Model model, @PathVariable("prodId") ProductIdentifier productId,
@@ -708,9 +683,7 @@ class OwnerController {
     }
 
     /**
-     * Shows Editpage to create new {@link geekshop.model.GSProduct}.
-     *
-     * @return
+     * Shows editing form to create new {@link geekshop.model.GSProduct}.
      */
     @RequestMapping(value = "/range/addproduct")
     public String addProduct(Model model) {
@@ -723,11 +696,10 @@ class OwnerController {
     }
 
     /**
-     * Creates a new instance of {@link geekshop.model.GSProduct} and save it to {@link org.salespointframework.inventory.Inventory}.
+     * Creates a new instance of {@link geekshop.model.GSProduct} and saves it to {@link org.salespointframework.inventory.Inventory}.
      *
      * @param productForm contains the form data
      * @param result      the result of validation
-     * @return
      */
     @RequestMapping(value = "/range/addproduct", method = RequestMethod.POST)
     public String addProductToCatalog(Model model, @ModelAttribute("productForm") @Valid ProductForm productForm, BindingResult result) {
@@ -769,10 +741,9 @@ class OwnerController {
 
 
     /**
-     * Shows the Editpage for {@link geekshop.model.SuperCategory}s.
+     * Shows the editing form for {@link geekshop.model.SuperCategory}s.
      *
      * @param superCatName the name of the SuperCategory
-     * @return
      */
     @RequestMapping(value = "/range/editsuper/{super}")
     public String editSuperCategory(Model model, @PathVariable("super") String superCatName) {
@@ -790,11 +761,10 @@ class OwnerController {
 
 
     /**
-     * Saves changes from a {@link geekshop.model.SuperCategory} to {@link geekshop.model.SuperCategoryRepository}.
+     * Saves changes of a {@link geekshop.model.SuperCategory} to {@link geekshop.model.SuperCategoryRepository}.
      *
      * @param superCatName the old name of the Supercategory
      * @param name         the new name of the Supercategory
-     * @return
      */
     @RequestMapping(value = "/range/editsuper/{super}", method = RequestMethod.POST)
     public String editSuper(Model model, @PathVariable("super") String superCatName, @RequestParam("name") String name) {
@@ -826,9 +796,7 @@ class OwnerController {
     }
 
     /**
-     * Shows Editpage to create new {@link geekshop.model.SuperCategory}.
-     *
-     * @return
+     * Shows editing form to create new {@link geekshop.model.SuperCategory}.
      */
     @RequestMapping(value = "/range/addsuper")
     public String addSuper(Model model) {
@@ -840,7 +808,6 @@ class OwnerController {
      * Creates a new instance of {@link geekshop.model.SuperCategory} an saves it to {@link geekshop.model.SuperCategoryRepository}.
      *
      * @param name the name of the Supercategory
-     * @return
      */
     @RequestMapping(value = "/range/addsuper", method = RequestMethod.POST)
     public String addSuperCategory(Model model, @RequestParam("name") String name) {
@@ -866,10 +833,9 @@ class OwnerController {
 
 
     /**
-     * Shows the Editpage for {@link geekshop.model.SubCategory}s.
+     * Shows the editing form for {@link geekshop.model.SubCategory}s.
      *
      * @param subCatName the name of the Subcategory
-     * @return
      */
     @RequestMapping(value = "/range/editsub/{sub}")
     public String editSubCategory(Model model, @PathVariable("sub") String subCatName) {
@@ -888,12 +854,11 @@ class OwnerController {
     }
 
     /**
-     * Saves changes from a {@link geekshop.model.SubCategory} to {@link geekshop.model.SubCategoryRepository}.
+     * Saves changes of a {@link geekshop.model.SubCategory} to {@link geekshop.model.SubCategoryRepository}.
      *
      * @param subCatName  the old name of the SubCategory
      * @param name        the new name of the SubCategory
      * @param strSuperCat the name of the (new) SuperCategory
-     * @return
      */
     @RequestMapping(value = "/range/editsub/{sub}", method = RequestMethod.POST)
     public String editSub(Model model, @PathVariable("sub") String subCatName, @RequestParam("name") String name, @RequestParam("superCategory") String strSuperCat) {
@@ -947,11 +912,10 @@ class OwnerController {
 
 
     /**
-     * Shows Editpage to create new {@link geekshop.model.SubCategory}.
+     * Shows editing form to create new {@link geekshop.model.SubCategory}.
      *
      * @param name        the name of the SubCategory
      * @param strSuperCat the name of the SuperCategory
-     * @return
      */
     @RequestMapping(value = "/range/addsub", method = RequestMethod.POST)
     public String addSubCategory(Model model, @RequestParam("name") String name, @RequestParam(value = "superCategory", required = false) String strSuperCat) {
@@ -991,8 +955,6 @@ class OwnerController {
 
     /**
      * Creates a new instance of {@link geekshop.model.SubCategory} and saves it to {@link geekshop.model.SubCategoryRepository}.
-     *
-     * @return
      */
     @RequestMapping(value = "/range/addsub")
     public String addSub(Model model) {

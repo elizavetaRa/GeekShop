@@ -34,6 +34,7 @@
                 </p>
 
                 <ul class="ul-style01">
+                    <li>Es dürfen <strong>keine Leerraumzeichen</strong> enthalten sein.</li>
                     <li th:if="${passwordRules.areUpperAndLowerNecessary()}">Es müssen <strong>Groß- und Kleinbuchstaben</strong>
                         vorkommen.
                     </li>
@@ -81,7 +82,7 @@
 
                     <p>
                         <button type="submit" name="submit" class="myButton" th:value="#{profil.changePW.submit}"
-                                value="Passwort speichern">Passwort speichern
+                                value="Passwort speichern">Passwort ändern
                         </button>
                         <a th:href="${#strings.substringBefore(#httpServletRequest.requestURI, '/changepw')}"
                            class="myButton f-right">Zurück</a>

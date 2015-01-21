@@ -1,0 +1,91 @@
+\documentclass{scrartcl}
+\usepackage{geometry}
+\geometry{a4paper, top=30mm, left=30mm, right=30mm, bottom=30mm, headsep=15mm, footskip=15mm}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{paralist}
+\usepackage{enumitem}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs,paralist}
+\usepackage{scrpage2,lastpage}
+
+\makeatletter
+\newcommand{\minipagetrue}{\@minipagetrue}
+\setlist[itemize]{itemsep=0pt,after=\vskip-\baselineskip,label={\textbullet},leftmargin=*,before=\minipagetrue,}
+
+\rofoot{\thepage~}
+\begin{document}
+\begin{center}
+\LARGE \bf{Protokoll vom 10.12.2014 \\
+SWT14W30}
+\end{center}
+
+\begin{tabular}{rp{10cm}}
+Protokollant & Marcus Kammerdiener \\
+Satz & Sebastian Döring \\
+Anwesend & Sebastian Döring, Marcus Kammerdiener,\\
+& Dominik Lauck, Elizaveta Ragozina \\
+Entschuldigt & Felix Döring (vertreten durch den Chefprogrammierer)
+\end{tabular}
+
+\vspace*{3em}
+
+\section{Ablauf}
+\subsection{Fortschritte der vergangenen Woche}
+In der heutigen Konsultation wurden wieder die Fortschritte der vergangenen Woche vorgetragen. Die nachfolgende Tabelle protokolliert die wesentlichen Arbeitsleistungen:\\[.4cm]
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\textwidth}{p{0.13\textwidth}p{0.55\textwidth}X}
+\hline
+\textsf{\textbf{\large Person}} & \textsf{\textbf{\large Tätigkeiten}} & \textsf{\textbf{\large Probleme}} \\
+\hline\hline
+\textbf{Sebastian} & 
+ \begin{itemize}
+ \item Unterstützung der anderen Teammitglieder
+  \item Account-Funktionen überarbeitet: Einsehen des Angestelltenprofils durch Ladenbesitzer, eigenes Profil
+  \item \textit{Product}"=/\textit{Category}-Logik umgebaut
+ \end{itemize}
+ & \textit{OrderLines} bereits im \textit{OrderManager} gespeicherter \textit{Orders} können nachträglich nicht bearbeitet werden (siehe Protokoll vom 09.12.2014). \\ \hline
+\textbf{Felix} & 
+ \begin{itemize}
+ \item erste Funktionen in Personalverwaltung implementiert
+ \item Logik für die Benachrichtigungen des Ladenbesitzers angelegt, erste Tests dazu geschrieben
+ \item Witzeverwaltung fertiggestellt
+ \end{itemize}
+ & \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Lisa} & 
+ \begin{itemize}
+ \item Grundstruktur des \textit{CartControllers} erstellt
+ \item erste Funktionen des Warenkorbs implementiert
+ \item \textit{cart}"= und \textit{catalog}-Template überarbeitet
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Marcus} & 
+ \begin{itemize}
+ \item Anzeige von Ergebnissen der Artikelsuche
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\textbf{Dominik} &
+ \begin{itemize}
+ \item Funktion zum Sortieren der Verkäufe nach Artikeln implementiert
+ \end{itemize}
+& \rule[1ex]{.7cm}{1pt} \\ \hline
+\end{tabularx}\\
+
+\vspace{1em}
+
+\subsection{Sonstiges}
+Weiterhin wurden folgende Punkte besprochen:\\
+Die Implementation der stabilen Version muss bis Sonntag, den 21.12.2014, abgeschlossen sein. Es sind Tests zu schreiben, welche die Anwendungslogik überprüfen, d.\,h. Daten speichern, auslesen und auf Richtigkeit prüfen. Die Programmierung eines Crawlers ist nicht notwendig.\\
+In den Weihnachtsferien soll ein Crosstesting stattfinden, in dem die Projektgruppen mit den gleichen Aufgabenstellungen ihre Anwendungen austauschen und gegenseitig testen.\\
+Mit Abschluss des Praktikums müssen neben der Software auch alle geforderten Dokumente abgegeben werden, u.\,a. JavaDoc, Testberichte, Anwender- und Entwicklerdokumentation.
+
+\vspace{1em}
+
+\section{Nächste Konsultation}
+Die nächste Konsultation findet am Mittwoch, dem 17.12.2014, zur gewohnten Zeit in der 4.~DS statt.
+
+\end{document}

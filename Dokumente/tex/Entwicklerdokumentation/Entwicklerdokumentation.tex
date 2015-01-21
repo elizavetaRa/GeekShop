@@ -12,6 +12,7 @@
 \usepackage{a4wide}
 \begin{document}
 \newcommand{\half}{0.5\textwidth}
+\newcommand{\third}{0.3\textwidth}
 
 % Titelblatt
 \input{./title.tex}
@@ -84,64 +85,129 @@ Die Namenskonvention lautet wie folgt:\\
 % Fachlicher Kontext
 \subsection{Fachlicher Kontext}
 \includegraphics[width=\textwidth]{../Pflichtenheft/images/toplevelarchitektur}
-
-
-% Technischer oder Verteilungskontext
-\subsection{Technischer oder Verteilungskontext}
+Die Top-Level-Architektur besteht aus der Benutzerverwaltung, welche die Witzeverwaltung nutzt und der Lagerverwaltung, welche auf die Produktverwaltung zugreift.
 
 % Externe Schnittstellen
 \subsection{Externe Schnittstellen}
-
-% Lösungsstrategie und Entwurfsentscheidungen
-\section{Lösungsstrategie und Entwurfsentscheidungen}
+\includegraphics[width=\textwidth]{../Pflichtenheft/images/anwendungsfalldiagramm}
+\vspace*{.5cm}
+\begin{tabular}{|p{\third}|p{\third}|p{\third}|} \hline
+{\textbf{Anwendungsfall}} & {\textbf{Beschreibung}} & {\textbf{Akteur}}\\ \hline
+\multicolumn{3}{|l|}{\textbf{Benutzerverwaltung}}\\ \hline
+Angestellten hinzuf\"ugen & F\"ugt einen neuen Angestellten hinzu & Ladenbesitzer\\ \hline
+Angestellten l\"oschen & L\"oscht einen vorhandenen Angestellten & Ladenbesitzer\\ \hline
+pers\"onliche Daten \"andern & \"Andert die pers\"onlichen Daten des Nutzers & Angestellter\\ \hline
+Passwortregeln \"andern & \"Andert die Regeln der Passwortvalidierung & Ladenbesitzer\\ \hline
+Passwort \"andern & \"Andert das Passwort des Nutzers & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Anmeldung}}\\ \hline
+sich einloggen & Loggt den Nutzer ein & Angestellter\\ \hline
+\end{tabular}
+\newpage
+\begin{tabular}{|p{\third}|p{\third}|p{\third}|} \hline
+\multicolumn{3}{|l|}{\textbf{Sortiment}}\\ \hline
+Artikel hinzuf\"ugen & F\"ugt einen Artikel zum Sortiment hinzu & Ladenbesitzer\\ \hline
+Artikel bearbeiten & Ver\"andert einen vorhandenen Artikel im Sortiment & Ladenbesitzer\\ \hline
+Artikel l\"oschen & L\"oscht einen vorhandenen Artikel aus dem Sortiment & Ladenbesitzer\\ \hline
+Kategorie erstellen & F\"ugt eine neue Kategorie hinzu & Ladenbesitzer\\ \hline
+Kategorie bearbeiten & Ver\"andert eine vorhandene Kategorie & Ladenbesitzer\\ \hline
+Kategorie l\"oschen & L\"oscht eine vorhandene Kategorie & Ladenbesitzer\\ \hline
+\multicolumn{3}{|l|}{\textbf{Artikelsuche}}\\ \hline
+Sortiment durchsuchen & Sucht Artikel aus dem Sortiment & Angestellter\\ \hline
+Ergebnisse sortieren & Sortiert die gefundenen Artikel wie gew\"unscht & Angestellter\\ \hline
+zum Warenkorb hinzuf\"ugen & F\"ugt Artikel zum Warenkorb hinzu & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Warenkorb}}\\ \hline
+Artikelanzahl \"ander & \"Andert die Anzahl des Artikels im Warenkorb & Angestellter\\ \hline
+Artikel l\"oschen & Entfernt einen Artikel aus dem Warenkorb & Angestellter\\ \hline
+Zahlungsvorgang starten & Beginnt den Zahlungsvorgang & Angestellter\\ \hline
+Reklamation abschlie\ss{}en & Erstellt offene Reklamation & Angestellter\\ \hline
+Warenkorb leeren & L\"oscht alle Artikel aus dem Warenkorb & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Witzeverwaltung}}\\ \hline
+Witz hinzuf\"ugen & F\"ugt einen Witz hinzu & Ladenbesitzer\\ \hline
+Witz bearbeiten & Ver\"andert einen vorhandenen Witz & Ladenbesitzer\\ \hline
+Witz l\"oschen & L\"oscht einen vorhandenen Witz & Ladenbesitzer\\ \hline
+\end{tabular}
+\newpage
+\begin{tabular}{|p{\third}|p{\third}|p{\third}|} \hline
+\multicolumn{3}{|l|}{\textbf{Lagerverwaltung}}\\ \hline
+Artikelanzahl \"ander & \"Andert die Anzahl des Artikels im Bestand & Ladenbesitzer\\ \hline
+minimale Artikelanzahl \"ander & \"Andert die  minimale Anzahl des Artikels im Bestand & Ladenbesitzer \\ \hline
+\"Ubersicht anzeigen & Zeigt eine \"Ubersicht \"uber alle vorhandenen Artikel & Ladenbesitzer\\ \hline
+\multicolumn{3}{|l|}{\textbf{Zahlungsvorgang}}\\ \hline
+Zahlungsart ausw\"ahlen & W\"ahlt die Zahlungsart aus & Angestellter\\ \hline
+\"Ubersicht anzeigen & Zeigt die Bestell\"ubersicht an & Angestellter\\ \hline
+\multicolumn{3}{|l|}{\textbf{Verkaufsstatistik}}\\ \hline
+Rohdaten als XML exportieren & Exportiert die Verkaufsstatistik als XML & Ladenbesitzer\\ \hline
+\multicolumn{3}{|l|}{\textbf{Reklamation}}\\ \hline
+Rechnung validieren & \"Uberpr\"uft, ob die Rechnung noch im Zeitrahmen liegt & Angestellter\\ \hline
+\"Ubersicht anzeigen & Zeigt alle Produkte der Rechnung an & Angestellter\\ \hline
+Reklamation genehmigen & Genehmigt die Reklamation und schlie\ss{}t sie ab & Ladenbesitzer\\ \hline
+\end{tabular}
 
 % Bausteinsicht
 \section{Bausteinsicht}
+\includegraphics[width=1\textwidth]{../../Entwurf/entwurfsklassendiagramm}
 
 % Laufzeitsicht
 \section{Laufzeitsicht}
+\subsubsection*{Anmeldung}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/anmeldung}
+Dieses Diagramm beschreibt den Anmeldevorgang des Benutzers und wie das Programm bei einem fehlerhaften Benutzernamen oder Passwort reagiert.
+\subsubsection*{Witze}
+\includegraphics[width=1\textwidth]{../../Entwurf/witze_ood}
+Im oben stehenden Diagramm wird gezeigt, wie der Ladenbesitzer einen neuen Witz zur bestehenden Witzsammlung hinzufügen kann, wie ein zufälliger Witz aus der Sammlung einem Angestellten angezeigt wird und wie ein Witz aus der Sammlung gelöscht wird.
+\subsubsection*{Benutzerverwaltung}
+\includegraphics[width=1\textwidth]{../../Entwurf/benutzerverwaltung_ood}
+In dem Sequenzdiagramm der Benutzerverwaltung werden die M\"oglichkeit der \"Anderung der pers\"onlichen Daten und das Setzen neuer Passwortregeln sowie die dazugeh\"orige \"Anderung des Passwortes beschrieben.
+\subsubsection*{Angestellten hinzuf\"ugen}
+\includegraphics[width=1\textwidth]{../../Entwurf/angestellten_hinzufuegen_ood}
+Das Sequenzdiagramm zeigt den Ablauf und die Interaktion zwischen den Objekten des Systems f\"ur den Fall, dass ein neuer Mitarbeiter angelegt wird.
+\subsubsection*{Angestellten l\"oschen}
+\includegraphics[width=1\textwidth]{../../Entwurf/angestellten_loeschen_ood}
+Das Sequenzdiagramm zeigt den Ablauf und die Interaktion zwischen den Objekten des Systems f\"ur den Fall, dass ein neuer Mitarbeiter gel\"oscht wird.
+\subsubsection*{Kaufvorgang}
+\includegraphics[width=1\textwidth]{../../Entwurf/kaufvorgang_ood}
+Dieses Diagramm zeigt, wie ein \"ublicher Kaufvorgang abl\"auft.
+\subsubsection*{Reklamation}
+\includegraphics[width=1\textwidth]{../../Entwurf/reklamation_ood}
+Hier wird beschrieben, wie eine Reklamation abl\"auft.
+
 
 % Persistenz
 \subsection{Persistenz}
+Die Persistenz wird mit Hilfe der Repositorys durch Spring und der in Maven integrierten Datenbank geregelt.
 
 % Benutzungsoberfläche
 \subsection{Benutzungsoberfläche}
+\includegraphics[width=1\textwidth]{../Pflichtenheft/images/dialoglandkarte}
 
 % Ergonomie
 \subsection{Ergonomie}
-
+Die Benutzeroberfl\"ache ist intuitiv gestaltet und leicht verst\"andlich.
+Das Produkt wurde von der Partnergruppe mit gleichem Projekt im Crosstesting gepr\"uft.
 % Transaktionsbehandlung
 \subsection{Transaktionsbehandlung}
+Es wurden die Transaktionen Barzahlung, Kreditkarte und Lastschrift implementiert.
 
 % Sessionbehandlung
-\subsection{Sessionbehandlung}
-
-% Sicherheit
-\subsection{Sicherheit}
+\subsection{Sessionbehandlung und Sicherheit}
+Anhand von einer Session werden eingelogte Nutzer unterschieden. Das System basiert auf Spring Security.
 
 % Plausibilisierung und Validierung
 \subsection{Plausibilisierung und Validierung}
-
-% Ausnahme-/Fehlerbehandlung
-\subsection{Ausnahme-/Fehlerbehandlung}
-
-% Logging, Protokollierung, Tracing
-\subsection{Logging, Protokollierung, Tracing}
+Alle Nutzereingaben werden \"uberpr\"uft.
 
 % Konfigurierbarkeit
 \subsection{Konfigurierbarkeit}
+Der Ladenbesitzer kann jederzeit die Passwortregeln \"andern.
 
 % Internationalisierung
 \subsection{Internationalisierung}
-
-% Testbarkeit
-\subsection{Testbarkeit}
+Es wird nur die Sprache Deutsch unterst\"utzt.
 
 % Buildmanagement
 \subsection{Buildmanagement}
+Der vollst\"andige Sourcecode ist auf GitHub vorhanden.
 
-% Glossar
-\section{Glossar}
 
 
 \end{document}

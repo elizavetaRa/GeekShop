@@ -84,7 +84,6 @@ public class GeekShopDataInitializer implements DataInitializer {
         initializeUsers();
         initializeJokes();
         initializeTestOrders(); // nur zu Testzwecken
-        initializeMessages();
     }
 
     /**
@@ -323,6 +322,8 @@ public class GeekShopDataInitializer implements DataInitializer {
         orderRepo.save(order2);
         orderRepo.save(order3);
         orderRepo.save(order4);
+
+        initializeMessages();
     }
 
     /**
@@ -331,8 +332,6 @@ public class GeekShopDataInitializer implements DataInitializer {
     private void initializeMessages() {
         if (messageRepo.count() > 1)
             return;
-
-        messageRepo.save(new Message(MessageKind.NOTIFICATION, "Testmessage"));
 
         for (GSOrder order : orderRepo.findByType(OrderType.RECLAIM)) {
             String messageText = "Es wurden Produkte der Rechnung " + GSOrder.longToString(order.getReclaimedOrder().getOrderNumber()) + " zurückgegeben.";
